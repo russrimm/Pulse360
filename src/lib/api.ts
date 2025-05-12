@@ -1,6 +1,12 @@
 import { Message, MessageResponse } from './types';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://graphapirim.azure-api.net/v1.0';
+const API_KEY = process.env.NEXT_PUBLIC_API_KEY;
+
+const headers = {
+  'Content-Type': 'application/json',
+  'Ocp-Apim-Subscription-Key': API_KEY || '',
+};
 
 interface GraphApiMessage {
   id: string;
@@ -24,9 +30,12 @@ interface GraphApiResponse {
 }
 
 export async function getMessages(page = 1, limit = 10): Promise<MessageResponse> {
-  const response = await fetch(`${API_BASE_URL}/admin/serviceAnnouncement/messages?$top=${limit}&$skip=${(page - 1) * limit}`);
+  const response = await fetch(
+    `${API_BASE_URL}/admin/serviceAnnouncement/messages?$top=${limit}&$skip=${(page - 1) * limit}`,
+    { headers }
+  );
   if (!response.ok) {
-    throw new Error('Failed to fetch messages');
+    throw new Error(`Failed to fetch messages: ${response.status} ${response.statusText}`);
   }
   const data: GraphApiResponse = await response.json();
   
@@ -42,14 +51,17 @@ export async function getMessages(page = 1, limit = 10): Promise<MessageResponse
 
   return {
     messages,
-    total: messages.length // Note: This is just the current page count. You might want to get total count from headers
+    total: messages.length
   };
 }
 
 export async function getMessage(id: string): Promise<Message> {
-  const response = await fetch(`${API_BASE_URL}/admin/serviceAnnouncement/messages/${id}`);
+  const response = await fetch(
+    `${API_BASE_URL}/admin/serviceAnnouncement/messages/${id}`,
+    { headers }
+  );
   if (!response.ok) {
-    throw new Error('Failed to fetch message');
+    throw new Error(`Failed to fetch message: ${response.status} ${response.statusText}`);
   }
   const data: GraphApiMessage = await response.json();
   
