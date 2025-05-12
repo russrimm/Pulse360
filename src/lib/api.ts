@@ -1,6 +1,6 @@
 import { Message, MessageResponse } from './types';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://your-api-management-instance.azure-api.net';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://graphapirim.azure-api.net/v1.0';
 const API_KEY = process.env.NEXT_PUBLIC_API_KEY || '';
 
 const headers = {
@@ -31,7 +31,7 @@ interface GraphApiResponse {
 
 export async function getMessages(): Promise<Message[]> {
   try {
-    const response = await fetch(`${API_BASE_URL}/messages`, {
+    const response = await fetch(`${API_BASE_URL}/admin/serviceAnnouncement/messages`, {
       headers,
     });
 
@@ -49,7 +49,7 @@ export async function getMessages(): Promise<Message[]> {
 
 export async function getMessage(id: string): Promise<Message> {
   try {
-    const response = await fetch(`${API_BASE_URL}/messages/${id}`, {
+    const response = await fetch(`${API_BASE_URL}/admin/serviceAnnouncement/messages/${id}`, {
       headers,
     });
 
