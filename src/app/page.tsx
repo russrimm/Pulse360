@@ -1,6 +1,9 @@
 import { MessageCard } from '@/components/MessageCard';
+import { getMessages } from '@/lib/api';
 
-export default function Home() {
+export default async function Home() {
+  const { messages } = await getMessages();
+
   return (
     <main className="min-h-screen bg-gray-50">
       <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
@@ -9,7 +12,17 @@ export default function Home() {
             Microsoft 365 Message Center
           </h1>
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {/* Message cards will be rendered here */}
+            {messages.map((message) => (
+              <MessageCard
+                key={message.id}
+                id={message.id}
+                title={message.title}
+                service={message.service}
+                lastUpdated={message.lastUpdated}
+                published={message.published}
+                tags={message.tags}
+              />
+            ))}
           </div>
         </div>
       </div>
