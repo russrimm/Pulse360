@@ -1,11 +1,11 @@
 import { Message, MessageResponse } from './types';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://graphapirim.azure-api.net/v1.0';
-const API_KEY = process.env.NEXT_PUBLIC_API_KEY;
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://your-api-management-instance.azure-api.net';
+const API_KEY = process.env.NEXT_PUBLIC_API_KEY || '';
 
 const headers = {
   'Content-Type': 'application/json',
-  'Ocp-Apim-Subscription-Key': API_KEY || '',
+  'Ocp-Apim-Subscription-Key': API_KEY,
 };
 
 interface GraphApiMessage {
@@ -29,49 +29,41 @@ interface GraphApiResponse {
   value: GraphApiMessage[];
 }
 
-export async function getMessages(page = 1, limit = 10): Promise<MessageResponse> {
-  const response = await fetch(
-    `${API_BASE_URL}/admin/serviceAnnouncement/messages?$top=${limit}&$skip=${(page - 1) * limit}`,
-    { headers }
-  );
-  if (!response.ok) {
-    throw new Error(`Failed to fetch messages: ${response.status} ${response.statusText}`);
-  }
-  const data: GraphApiResponse = await response.json();
-  
-  const messages: Message[] = data.value.map(msg => ({
-    id: msg.id,
-    title: msg.title,
-    service: msg.services,
-    lastUpdated: msg.lastModifiedDateTime,
-    published: msg.startDateTime,
-    tags: msg.tags,
-    content: msg.body.content
-  }));
+export async function getMessages(): Promise<Message[]> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/messages`, {
+      headers,
+    });
 
-  return {
-    messages,
-    total: messages.length
-  };
+    if (!response.ok) {
+      throw new Error(`Failed to fetch messages: ${response.status} ${response.statusText}`);
+    }
+
+    const data: MessageResponse = await response.json();
+    return data.messages || [];
+  } catch (error) {
+    console.error('Error fetching messages:', error);
+    throw error;
+  }
 }
 
 export async function getMessage(id: string): Promise<Message> {
-  const response = await fetch(
-    `${API_BASE_URL}/admin/serviceAnnouncement/messages/${id}`,
-    { headers }
-  );
-  if (!response.ok) {
-    throw new Error(`Failed to fetch message: ${response.status} ${response.statusText}`);
+  try {
+    const response = await fetch(`${API_BASE_URL}/messages/${id}`, {
+      headers,
+    });
+
+    if (!response.ok) {
+      if (response.status === 404) {
+        throw new Error(`Message not found: ${id}`);
+      }
+      throw new Error(`Failed to fetch message: ${response.status} ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Error fetching message:', error);
+    throw error;
   }
-  const data: GraphApiMessage = await response.json();
-  
-  return {
-    id: data.id,
-    title: data.title,
-    service: data.services,
-    lastUpdated: data.lastModifiedDateTime,
-    published: data.startDateTime,
-    tags: data.tags,
-    content: data.body.content
-  };
 } 
