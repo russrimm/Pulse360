@@ -49,19 +49,29 @@ export async function getMessages(): Promise<Message[]> {
 
 export async function getMessage(id: string): Promise<Message> {
   try {
-    const response = await fetch(`${API_BASE_URL}/admin/serviceAnnouncement/messages/${id}`, {
+    const response = await fetch(`${API_BASE_URL}/admin/serviceAnnouncement/messages?$filter=id eq '${id}'`, {
       headers,
     });
 
     if (!response.ok) {
-      if (response.status === 404) {
-        throw new Error(`Message not found: ${id}`);
-      }
       throw new Error(`Failed to fetch message: ${response.status} ${response.statusText}`);
     }
 
-    const data = await response.json();
-    return data;
+    const data: GraphApiResponse = await response.json();
+    if (!data.value || data.value.length === 0) {
+      throw new Error(`Message not found: ${id}`);
+    }
+
+    const message = data.value[0];
+    return {
+      id: message.id,
+      title: message.title,
+      service: message.services,
+      lastUpdated: message.lastModifiedDateTime,
+      published: message.startDateTime,
+      tags: message.tags,
+      content: message.body.content
+    };
   } catch (error) {
     console.error('Error fetching message:', error);
     throw error;
