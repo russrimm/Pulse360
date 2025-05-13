@@ -9,7 +9,7 @@ interface MessageDetailProps {
 export function MessageDetail({ message }: MessageDetailProps) {
   return (
     <div className="px-4 sm:px-6 lg:px-8">
-      <div className="mb-8 flex justify-center">
+      <div className="mb-8">
         <Link
           href="/"
           className="inline-flex items-center text-sm font-medium text-primary-600 hover:text-primary-500 dark:text-primary-400 dark:hover:text-primary-300 transition-colors"
@@ -75,13 +75,29 @@ export function MessageDetail({ message }: MessageDetailProps) {
                 <p className="text-3xl text-gray-900 dark:text-gray-100">{format(new Date(message.actionRequiredByDateTime), 'MMM d, yyyy')}</p>
               </div>
             )}
+
+            {message.details?.find(d => d.name === 'Platforms') && (
+              <div className="w-[250px] h-[250px] rounded-xl p-6 border border-gray-200 dark:border-gray-600">
+                <h2 className="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-2">Platforms</h2>
+                <div className="flex flex-wrap gap-2">
+                  {message.details.find(d => d.name === 'Platforms')?.value.split(',').map((platform) => (
+                    <span
+                      key={platform}
+                      className="inline-flex items-center px-2.5 py-1 rounded-full text-base font-medium bg-primary-50 text-primary-700 dark:bg-primary-900/50 dark:text-primary-300 border border-primary-100 dark:border-primary-800"
+                    >
+                      {platform.trim()}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
 
-          {message.details?.length > 0 && (
+          {message.details?.filter(d => d.name !== 'Platforms').length > 0 && (
             <div className="border-t border-gray-200 dark:border-gray-700">
               <div className="pt-6">
                 <div className="grid gap-4">
-                  {message.details?.map((detail) => (
+                  {message.details?.filter(d => d.name !== 'Platforms').map((detail) => (
                     <div key={detail.name} className="bg-gray-50 dark:bg-gray-700 rounded-xl p-6 border border-gray-200 dark:border-gray-600">
                       <h3 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-2 capitalize">{detail.name}</h3>
                       <p className="text-xl text-gray-900 dark:text-gray-100">{detail.value}</p>
@@ -92,12 +108,10 @@ export function MessageDetail({ message }: MessageDetailProps) {
             </div>
           )}
 
-          <div className="border-t border-gray-200 dark:border-gray-700">
-            <div className="pt-6">
-              <div className="prose prose-lg dark:prose-invert max-w-none prose-blue prose-headings:font-semibold prose-headings:text-gray-900 dark:prose-headings:text-white prose-p:text-gray-600 dark:prose-p:text-white prose-a:text-primary-600 dark:prose-a:text-primary-400 prose-strong:text-gray-900 dark:prose-strong:text-white prose-ul:list-disc prose-ul:pl-6 prose-ol:list-decimal prose-ol:pl-6 [&_*]:text-gray-600 dark:[&_*]:text-white [&_a]:text-primary-600 dark:[&_a]:text-primary-400 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
-                <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-6">More information</h2>
-                <div dangerouslySetInnerHTML={{ __html: message.content }} />
-              </div>
+          <div className="pt-6">
+            <div className="prose prose-lg dark:prose-invert max-w-none prose-blue prose-headings:font-semibold prose-headings:text-gray-900 dark:prose-headings:text-white prose-p:text-gray-600 dark:prose-p:text-white prose-a:text-primary-600 dark:prose-a:text-primary-400 prose-strong:text-gray-900 dark:prose-strong:text-white prose-ul:list-disc prose-ul:pl-6 prose-ol:list-decimal prose-ol:pl-6 [&_*]:text-gray-600 dark:[&_*]:text-white [&_a]:text-primary-600 dark:[&_a]:text-primary-400 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
+              <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-6">More information</h2>
+              <div dangerouslySetInnerHTML={{ __html: message.content }} />
             </div>
           </div>
         </div>

@@ -90,7 +90,7 @@ export async function getMessage(id: string): Promise<Message> {
       tags: message.tags,
       content: message.body.content,
       summary: message.details?.find(v => v.name === 'Summary')?.value || '',
-      details: message.details || [],
+      details: message.details?.filter(detail => !['RoadmapIds', 'FeatureStatusJson'].includes(detail.name)) || [],
       isMajorChange: message.isMajorChange || false,
       actionRequiredByDateTime: message.actionRequiredByDateTime
     };
