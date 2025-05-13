@@ -109,19 +109,21 @@ export function MessageDetail({ message }: MessageDetailProps) {
                 ))}
               </div>
             </div>
-            <div className="rounded-xl border border-gray-200 dark:border-gray-700 p-4">
-              <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Platforms</h3>
-              <div className="flex flex-wrap gap-1">
-                {message.details?.find(d => d.name === 'Platforms')?.value.split(',').map((platform) => (
-                  <span
-                    key={platform}
-                    className="inline-flex items-center px-2 py-0.5 rounded-full text-sm font-medium bg-primary-50 text-primary-700 dark:bg-primary-900/50 dark:text-primary-300 border border-primary-100 dark:border-primary-800"
-                  >
-                    {platform.trim()}
-                  </span>
-                ))}
+            {message.details?.find(d => d.name === 'Platforms')?.value && (
+              <div className="rounded-xl border border-gray-200 dark:border-gray-700 p-4">
+                <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Platforms</h3>
+                <div className="flex flex-wrap gap-1">
+                  {message.details?.find(d => d.name === 'Platforms')?.value.split(',').map((platform) => (
+                    <span
+                      key={platform}
+                      className="inline-flex items-center px-2 py-0.5 rounded-full text-sm font-medium bg-primary-50 text-primary-700 dark:bg-primary-900/50 dark:text-primary-300 border border-primary-100 dark:border-primary-800"
+                    >
+                      {platform.trim()}
+                    </span>
+                  ))}
+                </div>
               </div>
-            </div>
+            )}
           </div>
 
           {message.details?.filter(d => d.name !== 'Platforms').length > 0 && (
