@@ -59,13 +59,13 @@ export function MessageDetail({ message }: MessageDetailProps) {
         <div className="p-6 sm:p-8">
           <h1 className="text-2xl sm:text-4xl font-bold text-gray-900 dark:text-white mb-8">{message.id} - {message.title}</h1>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
-            <div className="rounded-xl border border-gray-200 dark:border-gray-700 p-6">
-              <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">Message ID</h3>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4 mb-8">
+            <div className="rounded-xl border border-gray-200 dark:border-gray-700 p-4">
+              <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Message ID</h3>
               <p className="text-base text-gray-900 dark:text-white">{message.id}</p>
             </div>
-            <div className="rounded-xl border border-gray-200 dark:border-gray-700 p-6">
-              <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">Service</h3>
+            <div className="rounded-xl border border-gray-200 dark:border-gray-700 p-4">
+              <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Service</h3>
               <div className="max-h-[140px] overflow-y-auto">
                 {message.service.map((s) => (
                   <span
@@ -77,57 +77,52 @@ export function MessageDetail({ message }: MessageDetailProps) {
                 ))}
               </div>
             </div>
-            <div className="rounded-xl border border-gray-200 dark:border-gray-700 p-6">
-              <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">Published</h3>
+            <div className="rounded-xl border border-gray-200 dark:border-gray-700 p-4">
+              <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Published</h3>
               <p className="text-base text-gray-900 dark:text-white">
                 {format(new Date(message.published), 'MMM d, yyyy')}
               </p>
             </div>
-            <div className="rounded-xl border border-gray-200 dark:border-gray-700 p-6">
-              <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">Action Required By</h3>
+            <div className="rounded-xl border border-gray-200 dark:border-gray-700 p-4">
+              <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Action Required By</h3>
               <p className="text-base text-gray-900 dark:text-white">
                 {message.actionRequiredByDateTime
                   ? format(new Date(message.actionRequiredByDateTime), 'MMM d, yyyy')
                   : 'Not specified'}
               </p>
             </div>
-            <div className="rounded-xl border border-gray-200 dark:border-gray-700 p-6">
-              <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">Tags</h3>
-              <div className="flex flex-wrap gap-2">
+            <div className="rounded-xl border border-gray-200 dark:border-gray-700 p-4">
+              <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Tags</h3>
+              <div className="flex flex-wrap gap-1">
                 {message.isMajorChange && (
-                  <span className="inline-flex items-center px-2.5 py-1 rounded-full text-base font-medium bg-red-100 text-red-700 dark:bg-red-900/50 dark:text-red-300 border border-red-200 dark:border-red-800">
+                  <span className="inline-flex items-center px-2 py-0.5 rounded-full text-sm font-medium bg-red-100 text-red-700 dark:bg-red-900/50 dark:text-red-300 border border-red-200 dark:border-red-800">
                     Major Change
                   </span>
                 )}
                 {message.tags.map((tag) => (
                   <span
                     key={tag}
-                    className="inline-flex items-center px-2.5 py-1 rounded-full text-base font-medium bg-gray-100 text-gray-700 dark:bg-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-500"
+                    className="inline-flex items-center px-2 py-0.5 rounded-full text-sm font-medium bg-gray-100 text-gray-700 dark:bg-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-500"
                   >
                     {tag}
                   </span>
                 ))}
               </div>
             </div>
-          </div>
-
-          {message.details?.find(d => d.name === 'Platforms') && (
-            <div className="mb-8">
-              <div className="w-[250px] rounded-xl p-6 border border-gray-200 dark:border-gray-600">
-                <h2 className="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-2">Platforms</h2>
-                <div className="flex flex-wrap gap-2">
-                  {message.details.find(d => d.name === 'Platforms')?.value.split(',').map((platform) => (
-                    <span
-                      key={platform}
-                      className="inline-flex items-center px-2.5 py-1 rounded-full text-base font-medium bg-primary-50 text-primary-700 dark:bg-primary-900/50 dark:text-primary-300 border border-primary-100 dark:border-primary-800"
-                    >
-                      {platform.trim()}
-                    </span>
-                  ))}
-                </div>
+            <div className="rounded-xl border border-gray-200 dark:border-gray-700 p-4">
+              <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Platforms</h3>
+              <div className="flex flex-wrap gap-1">
+                {message.details?.find(d => d.name === 'Platforms')?.value.split(',').map((platform) => (
+                  <span
+                    key={platform}
+                    className="inline-flex items-center px-2 py-0.5 rounded-full text-sm font-medium bg-primary-50 text-primary-700 dark:bg-primary-900/50 dark:text-primary-300 border border-primary-100 dark:border-primary-800"
+                  >
+                    {platform.trim()}
+                  </span>
+                ))}
               </div>
             </div>
-          )}
+          </div>
 
           {message.details?.filter(d => d.name !== 'Platforms').length > 0 && (
             <div className="border-t border-gray-200 dark:border-gray-700">
