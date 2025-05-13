@@ -1,4 +1,4 @@
-import { Message, MessageResponse } from './types';
+import { Message } from './types';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://graphapirim.azure-api.net/v1.0';
 const API_KEY = process.env.NEXT_PUBLIC_API_KEY || '';

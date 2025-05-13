@@ -11,9 +11,9 @@ export function MessageCard({ message }: MessageCardProps) {
     <Link href={`/message/${message.id}`}>
       <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm hover:shadow-md transition-all duration-200 border border-gray-200 dark:border-gray-700">
         <div className="p-6">
-          <div className="flex items-center justify-between mb-4">
+          <div className="flex flex-col mb-4">
+            <span className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">{message.id}</span>
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white line-clamp-2">{message.title}</h3>
-            <span className="text-xs font-medium text-gray-500 dark:text-gray-400">ID: {message.id}</span>
           </div>
           
           <div className="flex flex-wrap gap-2 mb-4">

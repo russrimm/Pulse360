@@ -1,38 +1,76 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useRef, useEffect } from 'react';
 
 interface ProductFilterProps {
   services: string[];
-  onFilterChange: (selectedService: string | null) => void;
+  selectedServices: string[];
+  onFilterChange: (services: string[]) => void;
 }
 
-export function ProductFilter({ services, onFilterChange }: ProductFilterProps) {
-  const [selectedService, setSelectedService] = useState<string | null>(null);
+export function ProductFilter({ services, selectedServices, onFilterChange }: ProductFilterProps) {
+  const [isOpen, setIsOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
-  const handleChange = (service: string | null) => {
-    setSelectedService(service);
-    onFilterChange(service);
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const toggleService = (service: string) => {
+    const newSelection = selectedServices.includes(service)
+      ? selectedServices.filter(s => s !== service)
+      : [...selectedServices, service];
+    onFilterChange(newSelection);
   };
 
+  const displayText = selectedServices.length > 0
+    ? `${selectedServices.length} selected`
+    : 'All Products';
+
   return (
-    <div className="mb-6">
-      <label htmlFor="service-filter" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-        Filter by Product
-      </label>
-      <select
-        id="service-filter"
-        value={selectedService || ''}
-        onChange={(e) => handleChange(e.target.value || null)}
-        className="block w-auto min-w-[200px] rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
+    <div className="relative" ref={dropdownRef}>
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className="flex items-center justify-between w-auto min-w-[200px] px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-primary-500"
       >
-        <option value="">All Products</option>
-        {services.map((service) => (
-          <option key={service} value={service}>
-            {service}
-          </option>
-        ))}
-      </select>
+        <span>{displayText}</span>
+        <svg
+          className={`w-5 h-5 ml-2 transition-transform ${isOpen ? 'rotate-180' : ''}`}
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+        </svg>
+      </button>
+
+      {isOpen && (
+        <div className="absolute z-10 w-full mt-1 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow-lg max-h-60 overflow-auto">
+          <div className="py-1">
+            {services.map((service) => (
+              <label
+                key={service}
+                className="flex items-center px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer"
+              >
+                <input
+                  type="checkbox"
+                  checked={selectedServices.includes(service)}
+                  onChange={() => toggleService(service)}
+                  className="w-4 h-4 text-primary-600 border-gray-300 rounded focus:ring-primary-500"
+                />
+                <span className="ml-2 text-sm text-gray-700 dark:text-gray-200">{service}</span>
+              </label>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 } 
