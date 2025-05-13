@@ -25,6 +25,7 @@ interface GraphApiMessage {
     contentType: string;
     content: string;
   };
+  isMajorChange: boolean;
 }
 
 interface GraphApiResponse {
@@ -43,8 +44,19 @@ export async function getMessages(): Promise<Message[]> {
       throw new Error(`Failed to fetch messages: ${response.status} ${response.statusText}`);
     }
 
-    const data: MessageResponse = await response.json();
-    return data.messages || [];
+    const data: GraphApiResponse = await response.json();
+    return data.value.map(message => ({
+      id: message.id,
+      title: message.title,
+      service: message.services,
+      lastUpdated: message.lastModifiedDateTime,
+      published: message.startDateTime,
+      tags: message.tags,
+      content: message.body.content,
+      summary: message.details?.find(v => v.name === 'Summary')?.value || '',
+      details: message.details || [],
+      isMajorChange: message.isMajorChange || false
+    }));
   } catch (error) {
     console.error('Error fetching messages:', error);
     throw error;
@@ -67,7 +79,6 @@ export async function getMessage(id: string): Promise<Message> {
     }
 
     const message = data.value[0];
-    const summary = message.details?.find(v => v.name === 'Summary')?.value || '';
     return {
       id: message.id,
       title: message.title,
@@ -76,8 +87,9 @@ export async function getMessage(id: string): Promise<Message> {
       published: message.startDateTime,
       tags: message.tags,
       content: message.body.content,
-      summary,
-      details: message.details || []
+      summary: message.details?.find(v => v.name === 'Summary')?.value || '',
+      details: message.details || [],
+      isMajorChange: message.isMajorChange || false
     };
   } catch (error) {
     console.error('Error fetching message:', error);

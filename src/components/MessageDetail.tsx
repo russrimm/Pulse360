@@ -23,17 +23,17 @@ export function MessageDetail({ message }: MessageDetailProps) {
 
       <article className="rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
         <div className="p-6 sm:p-8">
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-8">{message.title}</h1>
+          <h1 className="text-4xl sm:text-6xl font-bold text-gray-900 dark:text-white mb-8">{message.id} - {message.title}</h1>
 
           <div className="flex flex-wrap gap-4 mb-8">
-            <div className="w-[250px] h-[200px] rounded-xl p-4 border border-gray-200 dark:border-gray-600">
+            <div className="w-[250px] h-[250px] rounded-xl p-4 border border-gray-200 dark:border-gray-600">
               <h2 className="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-2">Message ID</h2>
-              <p className="text-xl text-gray-900 dark:text-gray-100 font-mono break-all">{message.id}</p>
+              <p className="text-3xl text-gray-900 dark:text-gray-100 font-sans break-all">{message.id}</p>
             </div>
 
-            <div className="w-[250px] h-[200px] rounded-xl p-4 border border-gray-200 dark:border-gray-600">
+            <div className="w-[250px] h-[250px] rounded-xl p-4 border border-gray-200 dark:border-gray-600">
               <h2 className="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-2">Service</h2>
-              <div className="flex flex-wrap gap-2 overflow-y-auto max-h-[140px]">
+              <div className="flex flex-wrap gap-2">
                 {message.service.map((s) => (
                   <span
                     key={s}
@@ -45,14 +45,19 @@ export function MessageDetail({ message }: MessageDetailProps) {
               </div>
             </div>
 
-            <div className="w-[250px] h-[200px] rounded-xl p-4 border border-gray-200 dark:border-gray-600">
+            <div className="w-[250px] h-[250px] rounded-xl p-4 border border-gray-200 dark:border-gray-600">
               <h2 className="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-2">Published</h2>
               <p className="text-xl text-gray-900 dark:text-gray-100">{format(new Date(message.published), 'MMMM d, yyyy')}</p>
             </div>
 
-            <div className="w-[250px] h-[200px] rounded-xl p-4 border border-gray-200 dark:border-gray-600">
+            <div className="w-[250px] h-[250px] rounded-xl p-4 border border-gray-200 dark:border-gray-600">
               <h2 className="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-2">Tags</h2>
-              <div className="flex flex-wrap gap-2 overflow-y-auto max-h-[140px]">
+              <div className="flex flex-wrap gap-2">
+                {message.isMajorChange && (
+                  <span className="inline-flex items-center px-2.5 py-1 rounded-full text-base font-medium bg-red-100 text-red-700 dark:bg-red-900/50 dark:text-red-300 border border-red-200 dark:border-red-800">
+                    Major Change
+                  </span>
+                )}
                 {message.tags.map((tag) => (
                   <span
                     key={tag}

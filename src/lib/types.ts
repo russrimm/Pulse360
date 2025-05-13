@@ -11,6 +11,7 @@ export interface Message {
     name: string;
     value: string;
   }[];
+  isMajorChange: boolean;
 }
 
 export interface MessageResponse {
