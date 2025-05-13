@@ -2,12 +2,19 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --foreground-rgb: 0, 0, 0;
-  --background-rgb: 249, 250, 251;
+@layer base {
+  :root {
+    --foreground-rgb: 0, 0, 0;
+    --background-rgb: 249, 250, 251;
+  }
+
+  body {
+    @apply bg-gray-50 text-gray-900;
+  }
 }
 
-body {
-  color: rgb(var(--foreground-rgb));
-  background: rgb(var(--background-rgb));
+@layer components {
+  .prose {
+    @apply max-w-none;
+  }
 } 

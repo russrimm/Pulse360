@@ -6,6 +6,11 @@ export interface Message {
   published: string;
   tags: string[];
   content: string;
+  summary: string;
+  details: {
+    name: string;
+    value: string;
+  }[];
 }
 
 export interface MessageResponse {

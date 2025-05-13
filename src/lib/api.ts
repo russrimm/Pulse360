@@ -17,6 +17,10 @@ interface GraphApiMessage {
   severity: string;
   tags: string[];
   services: string[];
+  details: {
+    name: string;
+    value: string;
+  }[];
   body: {
     contentType: string;
     content: string;
@@ -63,6 +67,7 @@ export async function getMessage(id: string): Promise<Message> {
     }
 
     const message = data.value[0];
+    const summary = message.details?.find(v => v.name === 'Summary')?.value || '';
     return {
       id: message.id,
       title: message.title,
@@ -70,7 +75,9 @@ export async function getMessage(id: string): Promise<Message> {
       lastUpdated: message.lastModifiedDateTime,
       published: message.startDateTime,
       tags: message.tags,
-      content: message.body.content
+      content: message.body.content,
+      summary,
+      details: message.details || []
     };
   } catch (error) {
     console.error('Error fetching message:', error);
