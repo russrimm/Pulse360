@@ -1,6 +1,8 @@
 import { getMessages } from '@/lib/api';
 import { MessageCard } from '@/components/MessageCard';
+import { ProductFilter } from '@/components/ProductFilter';
 import { Message } from '@/lib/types';
+import { MessageList } from '@/components/MessageList';
 
 export default async function Home() {
   let messages: Message[] = [];
@@ -15,7 +17,7 @@ export default async function Home() {
 
   return (
     <main>
-      <div>
+      <div className="px-4 sm:px-6 lg:px-8">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Message Center</h1>
           <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
@@ -45,11 +47,7 @@ export default async function Home() {
             <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">Get started by checking back later for new announcements.</p>
           </div>
         ) : (
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {messages.map((message) => (
-              <MessageCard key={message.id} message={message} />
-            ))}
-          </div>
+          <MessageList initialMessages={messages} />
         )}
       </div>
     </main>

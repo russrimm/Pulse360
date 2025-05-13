@@ -27,6 +27,14 @@ export default function RootLayout({
               </a>
               <div className="flex items-center gap-4">
                 <a
+                  href="mailto:russ.rimmerman@microsoft.com"
+                  className="text-sm text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white transition-colors"
+                >
+                  Russ Rimmerman
+                  <br />
+                  Cloud Solution Architect
+                </a>
+                <a
                   href="https://www.linkedin.com/in/russrimm"
                   target="_blank"
                   rel="noopener noreferrer"
