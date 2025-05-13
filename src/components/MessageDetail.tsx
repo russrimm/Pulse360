@@ -3,7 +3,7 @@
 import { format } from 'date-fns';
 import { Message } from '@/lib/types';
 import Link from 'next/link';
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { ImageModal } from './ImageModal';
 
 interface MessageDetailProps {
@@ -18,22 +18,21 @@ export function MessageDetail({ message }: MessageDetailProps) {
     setSelectedImage({ src: img.src, alt: img.alt });
   };
 
-  const processContent = (content: string) => {
+  const processedContent = useMemo(() => {
     const patterns = [
       '[When this will happen:]',
       '[How this will affect your organization:]',
       '[What you need to do to prepare:]'
     ];
 
-    let processedContent = content;
-    patterns.forEach(pattern => {
-      const regex = new RegExp(pattern, 'g');
-      const replacement = pattern.replace(/[\[\]]/g, '');
-      processedContent = processedContent.replace(regex, `<h2 class="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-6">${replacement}</h2>`);
+    // Create a single regex pattern for all replacements
+    const regex = new RegExp(patterns.map(p => p.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|'), 'g');
+    
+    return message.content.replace(regex, (match) => {
+      const text = match.replace(/[\[\]]/g, '');
+      return `<h2 class="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-6">${text}</h2>`;
     });
-
-    return processedContent;
-  };
+  }, [message.content]);
 
   return (
     <div className="px-4 sm:px-6 lg:px-8">
@@ -156,7 +155,7 @@ export function MessageDetail({ message }: MessageDetailProps) {
               }}
             >
               <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-6">More information</h2>
-              <div dangerouslySetInnerHTML={{ __html: processContent(message.content) }} />
+              <div dangerouslySetInnerHTML={{ __html: processedContent }} />
             </div>
           </div>
         </div>
