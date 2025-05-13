@@ -19,7 +19,7 @@ export function MessageList({ messages }: MessageListProps) {
     if (!messages) return;
     
     setFilteredMessages(messages);
-    const uniqueServices = Array.from(new Set(messages.flatMap(m => m.service))).sort();
+    const uniqueServices = Array.from(new Set(messages.flatMap(m => m.service))).sort((a, b) => a.localeCompare(b));
     setServices(uniqueServices);
   }, [messages]);
 
