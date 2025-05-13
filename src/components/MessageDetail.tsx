@@ -23,7 +23,7 @@ export function MessageDetail({ message }: MessageDetailProps) {
 
       <article className="rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
         <div className="p-6 sm:p-8">
-          <h1 className="text-4xl sm:text-6xl font-bold text-gray-900 dark:text-white mb-8">{message.id} - {message.title}</h1>
+          <h1 className="text-2xl sm:text-4xl font-bold text-gray-900 dark:text-white mb-8">{message.id} - {message.title}</h1>
 
           <div className="flex flex-wrap gap-4 mb-8">
             <div className="w-[250px] h-[250px] rounded-xl p-6 border border-gray-200 dark:border-gray-600">
