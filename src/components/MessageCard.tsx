@@ -20,7 +20,7 @@ export function MessageCard({ message }: MessageCardProps) {
                 </span>
               )}
             </div>
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white line-clamp-2">{message.title}</h3>
+            <h3 className="text-base font-semibold text-gray-900 dark:text-white line-clamp-2">{message.title}</h3>
           </div>
           
           <div className="flex flex-wrap gap-2 mb-4">
