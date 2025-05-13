@@ -17,7 +17,7 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en" className="light">
+    <html lang="en" className="dark text-base">
       <body className={`${inter.className} min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-200`}>
         <nav className="bg-white dark:bg-gray-800 shadow-sm">
           <div className="px-4 sm:px-6 lg:px-8">
