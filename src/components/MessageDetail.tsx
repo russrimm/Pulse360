@@ -9,7 +9,7 @@ interface MessageDetailProps {
 export function MessageDetail({ message }: MessageDetailProps) {
   return (
     <div className="px-4 sm:px-6 lg:px-8">
-      <div className="mb-8">
+      <div className="mb-8 flex justify-center">
         <Link
           href="/"
           className="inline-flex items-center text-sm font-medium text-primary-600 hover:text-primary-500 dark:text-primary-400 dark:hover:text-primary-300 transition-colors"
@@ -26,12 +26,12 @@ export function MessageDetail({ message }: MessageDetailProps) {
           <h1 className="text-4xl sm:text-6xl font-bold text-gray-900 dark:text-white mb-8">{message.id} - {message.title}</h1>
 
           <div className="flex flex-wrap gap-4 mb-8">
-            <div className="w-[250px] h-[250px] rounded-xl p-4 border border-gray-200 dark:border-gray-600">
+            <div className="w-[250px] h-[250px] rounded-xl p-6 border border-gray-200 dark:border-gray-600">
               <h2 className="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-2">Message ID</h2>
               <p className="text-3xl text-gray-900 dark:text-gray-100 font-sans break-all">{message.id}</p>
             </div>
 
-            <div className="w-[250px] h-[250px] rounded-xl p-4 border border-gray-200 dark:border-gray-600">
+            <div className="w-[250px] h-[250px] rounded-xl p-6 border border-gray-200 dark:border-gray-600">
               <h2 className="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-2">Service</h2>
               <div className="flex flex-wrap gap-2">
                 {message.service.map((s) => (
@@ -45,12 +45,12 @@ export function MessageDetail({ message }: MessageDetailProps) {
               </div>
             </div>
 
-            <div className="w-[250px] h-[250px] rounded-xl p-4 border border-gray-200 dark:border-gray-600">
+            <div className="w-[250px] h-[250px] rounded-xl p-6 border border-gray-200 dark:border-gray-600">
               <h2 className="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-2">Published</h2>
-              <p className="text-xl text-gray-900 dark:text-gray-100">{format(new Date(message.published), 'MMMM d, yyyy')}</p>
+              <p className="text-3xl text-gray-900 dark:text-gray-100">{format(new Date(message.published), 'MMMM d, yyyy')}</p>
             </div>
 
-            <div className="w-[250px] h-[250px] rounded-xl p-4 border border-gray-200 dark:border-gray-600">
+            <div className="w-[250px] h-[250px] rounded-xl p-6 border border-gray-200 dark:border-gray-600">
               <h2 className="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-2">Tags</h2>
               <div className="flex flex-wrap gap-2">
                 {message.isMajorChange && (
@@ -68,20 +68,29 @@ export function MessageDetail({ message }: MessageDetailProps) {
                 ))}
               </div>
             </div>
+
+            {message.actionRequiredByDateTime && (
+              <div className="w-[250px] h-[250px] rounded-xl p-6 border border-gray-200 dark:border-gray-600">
+                <h2 className="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-2">Action Required By</h2>
+                <p className="text-3xl text-gray-900 dark:text-gray-100">{format(new Date(message.actionRequiredByDateTime), 'MMM d, yyyy')}</p>
+              </div>
+            )}
           </div>
 
-          <div className="border-t border-gray-200 dark:border-gray-700">
-            <div className="pt-6">
-              <div className="grid gap-4">
-                {message.details?.map((detail) => (
-                  <div key={detail.name} className="bg-gray-50 dark:bg-gray-700 rounded-xl p-4 border border-gray-200 dark:border-gray-600">
-                    <h3 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-2 capitalize">{detail.name}</h3>
-                    <p className="text-xl text-gray-900 dark:text-gray-100">{detail.value}</p>
-                  </div>
-                ))}
+          {message.details?.length > 0 && (
+            <div className="border-t border-gray-200 dark:border-gray-700">
+              <div className="pt-6">
+                <div className="grid gap-4">
+                  {message.details?.map((detail) => (
+                    <div key={detail.name} className="bg-gray-50 dark:bg-gray-700 rounded-xl p-6 border border-gray-200 dark:border-gray-600">
+                      <h3 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-2 capitalize">{detail.name}</h3>
+                      <p className="text-xl text-gray-900 dark:text-gray-100">{detail.value}</p>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
-          </div>
+          )}
 
           <div className="border-t border-gray-200 dark:border-gray-700">
             <div className="pt-6">

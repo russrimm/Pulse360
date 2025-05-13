@@ -26,6 +26,7 @@ interface GraphApiMessage {
     content: string;
   };
   isMajorChange: boolean;
+  actionRequiredByDateTime?: string;
 }
 
 interface GraphApiResponse {
@@ -55,7 +56,8 @@ export async function getMessages(): Promise<Message[]> {
       content: message.body.content,
       summary: message.details?.find(v => v.name === 'Summary')?.value || '',
       details: message.details || [],
-      isMajorChange: message.isMajorChange || false
+      isMajorChange: message.isMajorChange || false,
+      actionRequiredByDateTime: message.actionRequiredByDateTime
     }));
   } catch (error) {
     console.error('Error fetching messages:', error);
@@ -89,7 +91,8 @@ export async function getMessage(id: string): Promise<Message> {
       content: message.body.content,
       summary: message.details?.find(v => v.name === 'Summary')?.value || '',
       details: message.details || [],
-      isMajorChange: message.isMajorChange || false
+      isMajorChange: message.isMajorChange || false,
+      actionRequiredByDateTime: message.actionRequiredByDateTime
     };
   } catch (error) {
     console.error('Error fetching message:', error);
