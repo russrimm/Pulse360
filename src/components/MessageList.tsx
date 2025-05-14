@@ -4,12 +4,14 @@ import { useState, useEffect } from 'react';
 import { MessageCard } from '@/components/MessageCard';
 import { ProductFilter } from '@/components/ProductFilter';
 import { Message } from '@/lib/types';
+import { useRouter } from 'next/navigation';
 
 interface MessageListProps {
   messages: Message[];
 }
 
 export function MessageList({ messages }: MessageListProps) {
+  const router = useRouter();
   const [filteredMessages, setFilteredMessages] = useState<Message[]>([]);
   const [services, setServices] = useState<string[]>([]);
   const [selectedServices, setSelectedServices] = useState<string[]>([]);
@@ -37,6 +39,10 @@ export function MessageList({ messages }: MessageListProps) {
     }
   }, [messages, selectedServices]);
 
+  const handleMessageClick = (messageId: string) => {
+    router.push(`/message/${messageId}`);
+  };
+
   if (!messages) return null;
 
   return (
@@ -50,7 +56,11 @@ export function MessageList({ messages }: MessageListProps) {
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {filteredMessages?.map((message) => (
-          <MessageCard key={message.id} message={message} />
+          <MessageCard 
+            key={message.id} 
+            message={message} 
+            onClick={handleMessageClick}
+          />
         ))}
       </div>
     </div>

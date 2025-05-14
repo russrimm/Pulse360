@@ -2,16 +2,21 @@ import { getMessage } from '@/lib/api';
 import { MessageDetail } from '@/components/MessageDetail';
 import { notFound } from 'next/navigation';
 
-export default async function MessagePage({
-  params,
-}: {
-  params: { id: string }
-}) {
+type PageProps = {
+  params: Promise<{ id: string }>;
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+}
+
+export default async function MessagePage({ params }: PageProps) {
   try {
-    const message = await getMessage(params.id);
+    const resolvedParams = await params;
+    const message = await getMessage(resolvedParams.id);
+    if (!message) {
+      return notFound();
+    }
     return <MessageDetail message={message} />;
   } catch (error) {
-    console.error('Failed to fetch message:', error);
-    notFound();
+    console.error('Error fetching message:', error);
+    return notFound();
   }
-} 
+}
