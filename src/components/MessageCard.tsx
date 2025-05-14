@@ -9,7 +9,7 @@ interface MessageCardProps {
 export function MessageCard({ message }: MessageCardProps) {
   return (
     <Link href={`/message/${message.id}`}>
-      <div className="group bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm rounded-xl shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-200/50 dark:border-gray-700/50 hover:border-primary-200 dark:hover:border-primary-800 hover:-translate-y-1">
+      <div className="group bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm rounded-xl shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-200/50 dark:border-gray-700/50 hover:border-primary-200 dark:hover:border-primary-800 hover:-translate-y-1 h-full">
         <div className="p-6">
           <div className="flex flex-col mb-4">
             <div className="flex items-center justify-between mb-2">
