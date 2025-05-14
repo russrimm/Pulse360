@@ -14,7 +14,7 @@ export default async function Home() {
           <div className="max-w-7xl mx-auto">
             <div className="text-center mb-12">
               <h1 className="text-4xl sm:text-5xl font-bold text-white mb-4">
-                Power Pulse 360°
+                Microsoft Pulse 360°
               </h1>
               <p className="text-lg text-gray-300 max-w-2xl mx-auto">
                 Stay ahead. Stay informed. Stay in control.
