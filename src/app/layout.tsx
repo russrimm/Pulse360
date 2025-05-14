@@ -7,8 +7,8 @@ import { ThemeToggle } from '@/components/ThemeToggle'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'Message Center',
-  description: 'Stay informed about the latest updates and announcements from Microsoft 365.',
+  title: 'Power Pulse 360°',
+  description: 'Stay informed about the latest updates and announcements from Microsoft.',
 }
 
 export default function RootLayout({
