@@ -19,10 +19,10 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark text-base">
       <body className={`${inter.className} min-h-screen bg-gray-50 dark:bg-black transition-colors duration-200`}>
-        <nav className="bg-white dark:bg-gray-900 shadow-sm">
+        <nav className="fixed top-0 left-0 right-0 z-50 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm border-b border-gray-200 dark:border-gray-800 shadow-sm">
           <div className="px-4 sm:px-6 lg:px-8">
             <div className="flex flex-col sm:flex-row sm:h-20 py-4 sm:py-0 items-center justify-between gap-4 sm:gap-0">
-              <a href="/" className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white text-center sm:text-left">
+              <a href="/" className="text-2xl sm:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-primary-600 to-primary-400 dark:from-primary-400 dark:to-primary-300 bg-clip-text text-transparent text-center sm:text-left">
                 Microsoft 365 Message Center Archives
               </a>
               <div className="flex items-center gap-4">
@@ -59,7 +59,9 @@ export default function RootLayout({
             </div>
           </div>
         </nav>
-        {children}
+        <main className="pt-32 sm:pt-36">
+          {children}
+        </main>
       </body>
     </html>
   )

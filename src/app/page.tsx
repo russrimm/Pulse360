@@ -1,41 +1,29 @@
-'use client';
-
-import { useState, useEffect } from 'react';
 import { MessageList } from '@/components/MessageList';
-import { Message } from '@/lib/types';
+import { getMessages } from '@/lib/api';
 
-export default function Home() {
-  const [messages, setMessages] = useState<Message[]>([]);
-  const [error, setError] = useState<string | null>(null);
+export const revalidate = 3600; // Revalidate every hour
 
-  useEffect(() => {
-    const fetchMessages = async () => {
-      try {
-        const response = await fetch('/api/messages');
-        if (!response.ok) {
-          throw new Error('Failed to fetch messages');
-        }
-        const data = await response.json();
-        setMessages(data);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'An error occurred');
-      }
-    };
-
-    fetchMessages();
-  }, []);
-
-  if (error) {
-    return (
-      <main className="flex min-h-screen flex-col items-center justify-between p-24">
-        <div className="text-red-500">Error: {error}</div>
-      </main>
-    );
-  }
+export default async function Home() {
+  const messages = await getMessages();
 
   return (
-    <main className="flex min-h-screen flex-col p-4 sm:p-6 lg:p-8">
-      <MessageList messages={messages} />
-    </main>
+    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 dark:from-gray-900 dark:to-black">
+      <div className="absolute inset-0 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:16px_16px] dark:bg-[radial-gradient(#1f2937_1px,transparent_1px)]" />
+      <div className="relative">
+        <div className="px-4 sm:px-6 lg:px-8 py-12">
+          <div className="max-w-7xl mx-auto">
+            <div className="text-center mb-12">
+              <h1 className="text-4xl sm:text-5xl font-bold text-gray-900 dark:text-white mb-4">
+                Welcome to the Message Center
+              </h1>
+              <p className="text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
+                Stay informed about the latest updates and announcements from Microsoft 365. Browse through our comprehensive archive of messages.
+              </p>
+            </div>
+            <MessageList messages={messages} />
+          </div>
+        </div>
+      </div>
+    </div>
   );
 } 
