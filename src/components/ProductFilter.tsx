@@ -8,9 +8,68 @@ interface ProductFilterProps {
   onFilterChange: (services: string[]) => void;
 }
 
+// Map of service names to their normalized versions
+const serviceNameMap: Record<string, string> = {
+  'Microsoft Power Automate in Microsoft 365': 'Power Automate'
+};
+
+// Storage key for persisting filter settings
+const STORAGE_KEY = 'message-center-filters';
+
+// Function to normalize service names
+const normalizeServiceName = (service: string): string => {
+  // First check if there's a specific mapping
+  if (serviceNameMap[service]) {
+    return serviceNameMap[service];
+  }
+  
+  // If the service contains "365", keep the full name
+  if (service.includes('365')) {
+    return service;
+  }
+  
+  // Otherwise remove "Microsoft" prefix if it exists
+  return service.replace(/^Microsoft\s+/, '');
+};
+
 export function ProductFilter({ services, selectedServices, onFilterChange }: ProductFilterProps) {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // Load saved filters on mount
+  useEffect(() => {
+    try {
+      const savedFilters = localStorage.getItem(STORAGE_KEY);
+      if (savedFilters) {
+        const parsedFilters = JSON.parse(savedFilters);
+        // Only apply saved filters if they exist in current services
+        const validFilters = parsedFilters.filter((filter: string) => 
+          services.some(s => normalizeServiceName(s) === filter)
+        );
+        if (validFilters.length > 0) {
+          onFilterChange(validFilters);
+        }
+      }
+    } catch (error) {
+      console.error('Error loading saved filters:', error);
+    }
+  }, [services, onFilterChange]);
+
+  // Save filters whenever they change
+  useEffect(() => {
+    try {
+      if (selectedServices.length > 0) {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(selectedServices));
+      } else {
+        localStorage.removeItem(STORAGE_KEY);
+      }
+    } catch (error) {
+      console.error('Error saving filters:', error);
+    }
+  }, [selectedServices]);
+
+  // Normalize services and remove duplicates
+  const normalizedServices = Array.from(new Set(services.map(normalizeServiceName))).sort();
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -24,10 +83,21 @@ export function ProductFilter({ services, selectedServices, onFilterChange }: Pr
   }, []);
 
   const toggleService = (service: string) => {
+    // Get all original services that map to this normalized service
+    const originalServices = services.filter(s => normalizeServiceName(s) === service);
+    
     const newSelection = selectedServices.includes(service)
-      ? selectedServices.filter(s => s !== service)
-      : [...selectedServices, service];
+      ? selectedServices.filter(s => !originalServices.includes(s))
+      : [...selectedServices, ...originalServices];
+    
     onFilterChange(newSelection);
+  };
+
+  // Check if any of the original services for a normalized service are selected
+  const isServiceSelected = (normalizedService: string): boolean => {
+    return services
+      .filter(s => normalizeServiceName(s) === normalizedService)
+      .some(s => selectedServices.includes(s));
   };
 
   return (
@@ -66,14 +136,14 @@ export function ProductFilter({ services, selectedServices, onFilterChange }: Pr
             </p>
           </div>
           <div className="max-h-60 overflow-y-auto p-2">
-            {services.map((service) => (
+            {normalizedServices.map((service) => (
               <label
                 key={service}
                 className="flex items-center px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md cursor-pointer"
               >
                 <input
                   type="checkbox"
-                  checked={selectedServices.includes(service)}
+                  checked={isServiceSelected(service)}
                   onChange={() => toggleService(service)}
                   className="w-4 h-4 text-primary-600 border-gray-300 rounded focus:ring-primary-500"
                 />
