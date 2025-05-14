@@ -8,7 +8,9 @@ const inter = Inter({
   subsets: ['latin'],
   display: 'swap',
   preload: true,
-  fallback: ['system-ui', 'arial']
+  fallback: ['system-ui', 'arial'],
+  adjustFontFallback: true,
+  variable: '--font-inter'
 })
 
 export const metadata: Metadata = {
@@ -27,6 +29,8 @@ export default function RootLayout({
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" as="style" />
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" />
       </head>
       <body className={`${inter.className} min-h-screen bg-gray-900 dark:bg-black transition-colors duration-200`} suppressHydrationWarning>
         <nav className="fixed top-0 left-0 right-0 z-50 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm border-b border-gray-200 dark:border-gray-800 shadow-sm">
