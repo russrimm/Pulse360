@@ -10,7 +10,25 @@ interface ProductFilterProps {
 
 // Map of service names to their normalized versions
 const serviceNameMap: Record<string, string> = {
-  'Microsoft Power Automate in Microsoft 365': 'Power Automate'
+  'Microsoft Power Automate in Microsoft 365': 'Power Automate',
+  'Microsoft Power Automate': 'Power Automate',
+  'Power Apps in Microsoft 365': 'Power Apps',
+  'Forms': 'Microsoft Forms',
+  'Microsoft Forms': 'Microsoft Forms',
+  'Stream': 'Microsoft Stream',
+  'Microsoft Stream': 'Microsoft Stream',
+  'Intune': 'Microsoft Intune',
+  'Microsoft Intune': 'Microsoft Intune',
+  'Planner': 'Microsoft Planner',
+  'Microsoft Planner': 'Microsoft Planner',
+  'Entra': 'Microsoft Entra',
+  'Microsoft Entra': 'Microsoft Entra',
+  'Dynamics 365 Apps': 'Dynamics 365 Apps',
+  'Microsoft Dynamics 365 Apps': 'Dynamics 365 Apps',
+  'Viva': 'Microsoft Viva',
+  'Microsoft Viva': 'Microsoft Viva',
+  'Purview': 'Microsoft Purview',
+  'Microsoft Purview': 'Microsoft Purview'
 };
 
 // Storage key for persisting filter settings
@@ -99,17 +117,6 @@ export function ProductFilter({ services, selectedServices, onFilterChange }: Pr
     };
   }, [selectedServices]);
 
-  // Memoize toggle function
-  const toggleService = useCallback((service: string) => {
-    const originalServices = services.filter(s => normalizeServiceName(s) === service);
-    
-    const newSelection = selectedServices.includes(service)
-      ? selectedServices.filter(s => !originalServices.includes(s))
-      : [...selectedServices, ...originalServices];
-    
-    onFilterChange(newSelection);
-  }, [services, selectedServices, onFilterChange]);
-
   // Memoize selection check
   const isServiceSelected = useCallback((normalizedService: string): boolean => {
     return services
@@ -117,11 +124,28 @@ export function ProductFilter({ services, selectedServices, onFilterChange }: Pr
       .some(s => selectedServices.includes(s));
   }, [services, selectedServices]);
 
+  // Memoize toggle function
+  const toggleService = useCallback((service: string) => {
+    const originalServices = services.filter(s => normalizeServiceName(s) === service);
+    
+    if (isServiceSelected(service)) {
+      // Remove all original services from selection
+      const newSelection = selectedServices.filter(s => 
+        !originalServices.some(os => normalizeServiceName(os) === normalizeServiceName(s))
+      );
+      onFilterChange(newSelection);
+    } else {
+      // Add all original services to selection
+      const newSelection = [...selectedServices, ...originalServices];
+      onFilterChange(newSelection);
+    }
+  }, [services, selectedServices, onFilterChange, isServiceSelected]);
+
   return (
     <div className="relative inline-block" ref={dropdownRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center justify-center w-10 h-10 text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-primary-500 relative"
+        className="flex items-center justify-center gap-2 px-4 h-10 text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-primary-500 relative"
         aria-label="Filter products"
       >
         <svg
@@ -137,6 +161,7 @@ export function ProductFilter({ services, selectedServices, onFilterChange }: Pr
             d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"
           />
         </svg>
+        <span className="text-sm font-medium">Product Filter</span>
         {selectedServices.length > 0 && (
           <span className="absolute -top-1 -right-1 flex items-center justify-center w-5 h-5 text-xs font-medium text-white bg-primary-600 rounded-full">
             {selectedServices.length}
