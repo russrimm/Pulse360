@@ -12,14 +12,23 @@ console.log('Environment variables:', {
   hasTenantId: !!TENANT_ID,
   hasClientId: !!CLIENT_ID,
   tenantId: TENANT_ID,
-  clientId: CLIENT_ID
+  clientId: CLIENT_ID,
+  environment: process.env.NODE_ENV
 });
 
-if (!API_KEY || !TENANT_ID || !CLIENT_ID) {
+// Only throw in development
+if (process.env.NODE_ENV === 'development' && (!API_KEY || !TENANT_ID || !CLIENT_ID)) {
   throw new Error('Missing required environment variables. Please check your .env.local file.');
 }
 
+// In production, return empty data instead of throwing
+const hasRequiredEnvVars = API_KEY && TENANT_ID && CLIENT_ID;
+
 async function getToken(): Promise<string> {
+  if (!hasRequiredEnvVars) {
+    throw new Error('Missing required environment variables');
+  }
+
   try {
     const tokenEndpoint = `https://login.microsoftonline.com/${TENANT_ID}/oauth2/v2.0/token`;
     console.log('Getting token from:', tokenEndpoint);
@@ -93,6 +102,11 @@ interface GraphApiResponse {
 }
 
 export async function getMessages(): Promise<Message[]> {
+  if (!hasRequiredEnvVars) {
+    console.error('Missing required environment variables in production');
+    return [];
+  }
+
   try {
     const token = await getToken();
     let allMessages: GraphApiMessage[] = [];
@@ -158,6 +172,10 @@ export async function getMessages(): Promise<Message[]> {
 }
 
 export async function getMessage(id: string): Promise<Message> {
+  if (!hasRequiredEnvVars) {
+    throw new Error('Message not found');
+  }
+
   try {
     const token = await getToken();
     const headers = {
