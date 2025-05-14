@@ -4,7 +4,12 @@ import './globals.css'
 import Link from 'next/link'
 import { ThemeToggle } from '@/components/ThemeToggle'
 
-const inter = Inter({ subsets: ['latin'] })
+const inter = Inter({ 
+  subsets: ['latin'],
+  display: 'swap',
+  preload: true,
+  fallback: ['system-ui', 'arial']
+})
 
 export const metadata: Metadata = {
   title: 'Microsoft Pulse 360°',
@@ -19,6 +24,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className="dark text-base" suppressHydrationWarning>
+      <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+      </head>
       <body className={`${inter.className} min-h-screen bg-gray-900 dark:bg-black transition-colors duration-200`} suppressHydrationWarning>
         <nav className="fixed top-0 left-0 right-0 z-50 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm border-b border-gray-200 dark:border-gray-800 shadow-sm">
           <div className="px-4 sm:px-6 lg:px-8">
@@ -57,7 +66,7 @@ export default function RootLayout({
             </div>
           </div>
         </nav>
-        <main className="pt-32 sm:pt-36">
+        <main className="pt-20">
           {children}
         </main>
       </body>

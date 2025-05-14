@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { MessageCard } from '@/components/MessageCard';
 import { ProductFilter } from '@/components/ProductFilter';
 import { Message } from '@/lib/types';
@@ -10,11 +10,17 @@ interface MessageListProps {
   messages: Message[];
 }
 
+const ITEMS_PER_PAGE = 12;
+
 export function MessageList({ messages }: MessageListProps) {
   const router = useRouter();
   const [filteredMessages, setFilteredMessages] = useState<Message[]>([]);
   const [services, setServices] = useState<string[]>([]);
   const [selectedServices, setSelectedServices] = useState<string[]>([]);
+  const [visibleMessages, setVisibleMessages] = useState<Message[]>([]);
+  const [page, setPage] = useState(1);
+  const observerRef = useRef<IntersectionObserver | null>(null);
+  const loadMoreRef = useRef<HTMLDivElement>(null);
 
   // Initialize filtered messages and services
   useEffect(() => {
@@ -37,7 +43,37 @@ export function MessageList({ messages }: MessageListProps) {
       );
       setFilteredMessages(filtered);
     }
+    setPage(1);
   }, [messages, selectedServices]);
+
+  // Update visible messages when page changes
+  useEffect(() => {
+    const start = 0;
+    const end = page * ITEMS_PER_PAGE;
+    setVisibleMessages(filteredMessages.slice(start, end));
+  }, [filteredMessages, page]);
+
+  // Setup intersection observer for infinite scroll
+  useEffect(() => {
+    observerRef.current = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && visibleMessages.length < filteredMessages.length) {
+          setPage(prev => prev + 1);
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    if (loadMoreRef.current) {
+      observerRef.current.observe(loadMoreRef.current);
+    }
+
+    return () => {
+      if (observerRef.current) {
+        observerRef.current.disconnect();
+      }
+    };
+  }, [visibleMessages.length, filteredMessages.length]);
 
   const handleMessageClick = (messageId: string) => {
     router.push(`/message/${messageId}`);
@@ -55,7 +91,7 @@ export function MessageList({ messages }: MessageListProps) {
         />
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredMessages?.map((message) => (
+        {visibleMessages.map((message) => (
           <MessageCard 
             key={message.id} 
             message={message} 
@@ -63,6 +99,7 @@ export function MessageList({ messages }: MessageListProps) {
           />
         ))}
       </div>
+      <div ref={loadMoreRef} className="h-10" />
     </div>
   );
 } 
