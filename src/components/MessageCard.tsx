@@ -9,10 +9,53 @@ interface MessageCardProps {
   onClick: (messageId: string) => void;
 }
 
+// Map of service names to their icon paths
+const serviceIcons: Record<string, string> = {
+  'Power Apps': '/icons/PowerApps_scalable.svg',
+  'Power Automate': '/icons/PowerAutomate_scalable.svg',
+  'Power Platform': '/icons/PowerPlatform_scalable.svg',
+  'Microsoft Dataverse': '/icons/Dataverse_scalable.svg',
+  'Power BI': '/icons/PowerBI_scalable.svg',
+  'Microsoft Teams': '/icons/teams.svg',
+  'SharePoint Online': '/icons/sharepoint.svg',
+  'Microsoft 365': '/icons/m365.svg',
+  'OneDrive for Business': '/icons/onedrive.svg',
+  'Microsoft Stream': '/icons/stream.svg',
+  'Exchange Online': '/icons/exchange.svg',
+  'Microsoft Forms': '/icons/forms.svg',
+  'Microsoft Intune': '/icons/intune.svg',
+  'Microsoft Planner': '/icons/planner.svg',
+  'Microsoft Entra': '/icons/entra.svg',
+  'Dynamics 365 Apps': '/icons/Dynamics365_scalable.svg',
+  'Microsoft Viva': '/icons/viva.svg',
+  'Microsoft Purview': '/icons/purview.svg',
+  'Microsoft Defender XDR': '/icons/defender.svg'
+};
+
+// Normalize service names
+const normalizeService = (service: string): string => {
+  if (service.includes('365')) return 'Microsoft 365';
+  if (service.includes('Power Apps')) return 'Power Apps';
+  if (service.includes('Power Automate')) return 'Power Automate';
+  if (service.includes('Forms')) return 'Microsoft Forms';
+  if (service.includes('Stream')) return 'Microsoft Stream';
+  if (service.includes('Intune')) return 'Microsoft Intune';
+  if (service.includes('Planner')) return 'Microsoft Planner';
+  if (service.includes('Entra')) return 'Microsoft Entra';
+  if (service.includes('Dynamics')) return 'Dynamics 365 Apps';
+  if (service.includes('Viva')) return 'Microsoft Viva';
+  if (service.includes('Purview')) return 'Microsoft Purview';
+  if (service.includes('Defender')) return 'Microsoft Defender XDR';
+  return service;
+};
+
 export const MessageCard: React.FC<MessageCardProps> = ({ message, onClick }) => {
   const handleClick = () => {
     onClick(message.id);
   };
+
+  // Deduplicate and normalize services
+  const uniqueServices = Array.from(new Set(message.service.map(normalizeService)));
 
   return (
     <Link href={`/message/${message.id}`}>
@@ -34,314 +77,40 @@ export const MessageCard: React.FC<MessageCardProps> = ({ message, onClick }) =>
           </div>
           
           <div className="flex flex-wrap gap-2 mb-4">
-            {message.service.map((service) => {
-              if (service === 'Power Apps' || service === 'Power Apps in Microsoft 365') {
-                return (
-                  <div
-                    key={service}
-                    className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-transparent text-blue-800 dark:text-blue-300 border border-blue-200 dark:border-blue-800"
-                  >
-                    <Image
-                      src="/icons/PowerApps_scalable.svg"
-                      alt="Power Apps"
-                      width={16}
-                      height={16}
-                      className="mr-1"
-                    />
-                    Power Apps
-                  </div>
-                );
-              }
-              if (service === 'Power Automate' || service === 'Microsoft Power Automate' || service === 'Microsoft Power Automate in Microsoft 365') {
-                return (
-                  <div
-                    key={service}
-                    className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-transparent text-blue-800 dark:text-blue-300 border border-blue-200 dark:border-blue-800"
-                  >
-                    <Image
-                      src="/icons/PowerAutomate_scalable.svg"
-                      alt="Power Automate"
-                      width={16}
-                      height={16}
-                      className="mr-1"
-                    />
-                    Power Automate
-                  </div>
-                );
-              }
-              if (service === 'Power Platform') {
-                return (
-                  <div
-                    key={service}
-                    className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-transparent text-blue-800 dark:text-blue-300 border border-blue-200 dark:border-blue-800"
-                  >
-                    <Image
-                      src="/icons/PowerPlatform_scalable.svg"
-                      alt="Power Platform"
-                      width={16}
-                      height={16}
-                      className="mr-1"
-                    />
-                    Power Platform
-                  </div>
-                );
-              }
-              if (service === 'Microsoft Dataverse') {
-                return (
-                  <div
-                    key={service}
-                    className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-transparent text-blue-800 dark:text-blue-300 border border-blue-200 dark:border-blue-800"
-                  >
-                    <Image
-                      src="/icons/Dataverse_scalable.svg"
-                      alt="Microsoft Dataverse"
-                      width={16}
-                      height={16}
-                      className="mr-1"
-                    />
-                    Microsoft Dataverse
-                  </div>
-                );
-              }
-              if (service === 'Power BI') {
-                return (
-                  <div
-                    key={service}
-                    className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-transparent text-blue-800 dark:text-blue-300 border border-blue-200 dark:border-blue-800"
-                  >
-                    <Image
-                      src="/icons/PowerBI_scalable.svg"
-                      alt="Power BI"
-                      width={16}
-                      height={16}
-                      className="mr-1"
-                    />
-                    Power BI
-                  </div>
-                );
-              }
-              if (service === 'Microsoft Teams') {
-                return (
-                  <div
-                    key={service}
-                    className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-transparent text-blue-800 dark:text-blue-300 border border-blue-200 dark:border-blue-800"
-                  >
-                    <Image
-                      src="/icons/teams.svg"
-                      alt="Microsoft Teams"
-                      width={16}
-                      height={16}
-                      className="mr-1"
-                    />
-                    Microsoft Teams
-                  </div>
-                );
-              }
-              if (service === 'SharePoint Online') {
-                return (
-                  <div key={service} className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-transparent text-blue-800 dark:text-blue-300 border border-blue-200 dark:border-blue-800">
-                    <Image
-                      src="/icons/sharepoint.svg"
-                      alt="SharePoint Online"
-                      width={16}
-                      height={16}
-                      className="mr-1"
-                    />
-                    SharePoint Online
-                  </div>
-                );
-              }
-              if (service.startsWith('Microsoft 365')) {
-                return (
-                  <div key={service} className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-transparent text-blue-800 dark:text-blue-300 border border-blue-200 dark:border-blue-800">
-                    <Image
-                      src="/icons/m365.svg"
-                      alt="Microsoft 365"
-                      width={16}
-                      height={16}
-                      className="mr-1"
-                    />
-                    {service}
-                  </div>
-                );
-              }
-              if (service === 'OneDrive for Business') {
-                return (
-                  <div key={service} className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-transparent text-blue-800 dark:text-blue-300 border border-blue-200 dark:border-blue-800">
-                    <Image
-                      src="/icons/onedrive.svg"
-                      alt="OneDrive for Business"
-                      width={16}
-                      height={16}
-                      className="mr-1"
-                    />
-                    OneDrive for Business
-                  </div>
-                );
-              }
-              if (service === 'Stream' || service === 'Microsoft Stream') {
-                return (
-                  <div key={service} className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-transparent text-blue-800 dark:text-blue-300 border border-blue-200 dark:border-blue-800">
-                    <Image
-                      src="/icons/stream.svg"
-                      alt="Microsoft Stream"
-                      width={16}
-                      height={16}
-                      className="mr-1"
-                    />
-                    Microsoft Stream
-                  </div>
-                );
-              }
-              if (service === 'Exchange Online') {
-                return (
-                  <div key={service} className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-transparent text-blue-800 dark:text-blue-300 border border-blue-200 dark:border-blue-800">
-                    <Image
-                      src="/icons/exchange.svg"
-                      alt="Exchange Online"
-                      width={16}
-                      height={16}
-                      className="mr-1"
-                    />
-                    Exchange Online
-                  </div>
-                );
-              }
-              if (service === 'Forms' || service === 'Microsoft Forms') {
-                return (
-                  <div key={service} className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-transparent text-blue-800 dark:text-blue-300 border border-blue-200 dark:border-blue-800">
-                    <Image
-                      src="/icons/forms.svg"
-                      alt="Microsoft Forms"
-                      width={16}
-                      height={16}
-                      className="mr-1"
-                    />
-                    Microsoft Forms
-                  </div>
-                );
-              }
-              if (service === 'Intune' || service === 'Microsoft Intune') {
-                return (
-                  <div key={service} className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-transparent text-blue-800 dark:text-blue-300 border border-blue-200 dark:border-blue-800">
-                    <img
-                      src="/icons/intune.svg"
-                      alt="Microsoft Intune"
-                      width={16}
-                      height={16}
-                      className="mr-1"
-                    />
-                    Microsoft Intune
-                  </div>
-                );
-              }
-              if (service === 'Planner' || service === 'Microsoft Planner') {
-                return (
-                  <div key={service} className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-transparent text-blue-800 dark:text-blue-300 border border-blue-200 dark:border-blue-800">
-                    <img
-                      src="/icons/planner.svg"
-                      alt="Microsoft Planner"
-                      width={16}
-                      height={16}
-                      className="mr-1"
-                    />
-                    Microsoft Planner
-                  </div>
-                );
-              }
-              if (service === 'Entra' || service === 'Microsoft Entra') {
-                return (
-                  <div key={service} className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-transparent text-blue-800 dark:text-blue-300 border border-blue-200 dark:border-blue-800">
-                    <img
-                      src="/icons/entra.svg"
-                      alt="Microsoft Entra"
-                      width={16}
-                      height={16}
-                      className="mr-1"
-                    />
-                    Microsoft Entra
-                  </div>
-                );
-              }
-              if (service === 'Dynamics 365 Apps' || service === 'Microsoft Dynamics 365 Apps') {
-                return (
-                  <div key={service} className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-transparent text-blue-800 dark:text-blue-300 border border-blue-200 dark:border-blue-800">
-                    <img
-                      src="/icons/Dynamics365_scalable.svg"
-                      alt="Dynamics 365 Apps"
-                      width={16}
-                      height={16}
-                      className="mr-1"
-                    />
-                    Dynamics 365 Apps
-                  </div>
-                );
-              }
-              if (service === 'Viva' || service === 'Microsoft Viva') {
-                return (
-                  <div key={service} className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-transparent text-blue-800 dark:text-blue-300 border border-blue-200 dark:border-blue-800">
-                    <img
-                      src="/icons/viva.svg"
-                      alt="Microsoft Viva"
-                      width={16}
-                      height={16}
-                      className="mr-1"
-                    />
-                    Microsoft Viva
-                  </div>
-                );
-              }
-              if (service === 'Purview' || service === 'Microsoft Purview') {
-                return (
-                  <div key={service} className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-transparent text-blue-800 dark:text-blue-300 border border-blue-200 dark:border-blue-800">
-                    <img
-                      src="/icons/purview.svg"
-                      alt="Microsoft Purview"
-                      width={16}
-                      height={16}
-                      className="mr-1"
-                    />
-                    Microsoft Purview
-                  </div>
-                );
-              }
-              if (service === 'Defender XDR' || service === 'Microsoft Defender XDR') {
-                return (
-                  <div key={service} className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-transparent text-blue-800 dark:text-blue-300 border border-blue-200 dark:border-blue-800">
-                    <img
-                      src="/icons/defender.svg"
-                      alt="Microsoft Defender XDR"
-                      width={16}
-                      height={16}
-                      className="mr-1"
-                    />
-                    Microsoft Defender XDR
-                  </div>
-                );
-              }
+            {uniqueServices.map((service) => {
+              const iconPath = serviceIcons[service];
               return (
-                <span
+                <div
                   key={service}
                   className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-transparent text-blue-800 dark:text-blue-300 border border-blue-200 dark:border-blue-800"
                 >
+                  {iconPath && (
+                    <Image
+                      src={iconPath}
+                      alt={service}
+                      width={16}
+                      height={16}
+                      className="mr-1"
+                    />
+                  )}
                   {service}
-                </span>
+                </div>
               );
             })}
           </div>
           
-          <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+          <div className="flex flex-wrap gap-4 text-sm text-gray-500 dark:text-gray-400">
             <span className="flex items-center gap-1">
               <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
               </svg>
-              Published: {format(new Date(message.published), 'MMM d, yyyy')}
+              {format(new Date(message.published), 'MMM d, yyyy')}
             </span>
             <span className="flex items-center gap-1">
               <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
-              Updated: {format(new Date(message.lastUpdated), 'MMM d, yyyy')}
+              {format(new Date(message.lastUpdated), 'MMM d, yyyy')}
             </span>
           </div>
           
