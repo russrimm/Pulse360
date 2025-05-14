@@ -17,7 +17,7 @@ export default async function Home() {
                 Power Pulse 360°
               </h1>
               <p className="text-lg text-gray-300 max-w-2xl mx-auto">
-                Stay ahead. Stay informed. Stay in control. — Power Pulse 360°
+                Stay ahead. Stay informed. Stay in control.
               </p>
             </div>
             <MessageList messages={messages} />
