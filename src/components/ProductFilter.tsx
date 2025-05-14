@@ -30,34 +30,46 @@ export function ProductFilter({ services, selectedServices, onFilterChange }: Pr
     onFilterChange(newSelection);
   };
 
-  const displayText = selectedServices.length > 0
-    ? `${selectedServices.length} selected`
-    : 'All Products';
-
   return (
     <div className="relative inline-block" ref={dropdownRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center justify-between w-auto min-w-[300px] px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-primary-500"
+        className="flex items-center justify-center w-10 h-10 text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-primary-500 relative"
+        aria-label="Filter products"
       >
-        <span>{displayText}</span>
         <svg
-          className={`w-5 h-5 ml-2 transition-transform ${isOpen ? 'rotate-180' : ''}`}
+          className="w-5 h-5"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
         >
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"
+          />
         </svg>
+        {selectedServices.length > 0 && (
+          <span className="absolute -top-1 -right-1 flex items-center justify-center w-5 h-5 text-xs font-medium text-white bg-primary-600 rounded-full">
+            {selectedServices.length}
+          </span>
+        )}
       </button>
 
       {isOpen && (
-        <div className="absolute z-10 w-[300px] mt-1 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow-lg max-h-60 overflow-auto">
-          <div className="py-1">
+        <div className="absolute z-10 w-72 mt-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow-lg">
+          <div className="p-4 border-b border-gray-200 dark:border-gray-700">
+            <h3 className="text-sm font-medium text-gray-900 dark:text-white">Filter Products</h3>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+              {selectedServices.length} product{selectedServices.length !== 1 ? 's' : ''} selected
+            </p>
+          </div>
+          <div className="max-h-60 overflow-y-auto p-2">
             {services.map((service) => (
               <label
                 key={service}
-                className="flex items-center px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer whitespace-nowrap"
+                className="flex items-center px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md cursor-pointer"
               >
                 <input
                   type="checkbox"
@@ -68,6 +80,14 @@ export function ProductFilter({ services, selectedServices, onFilterChange }: Pr
                 <span className="ml-2 text-sm text-gray-700 dark:text-gray-200">{service}</span>
               </label>
             ))}
+          </div>
+          <div className="p-3 border-t border-gray-200 dark:border-gray-700">
+            <button
+              onClick={() => onFilterChange([])}
+              className="w-full px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
+            >
+              Clear all
+            </button>
           </div>
         </div>
       )}

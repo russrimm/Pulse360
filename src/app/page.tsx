@@ -1,7 +1,7 @@
 import { MessageList } from '@/components/MessageList';
 import { getMessages } from '@/lib/api';
 
-export const revalidate = 3600; // Revalidate every hour
+export const revalidate = 604800; // Revalidate every 7 days (7 * 24 * 60 * 60)
 
 export default async function Home() {
   const messages = await getMessages();
