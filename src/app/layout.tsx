@@ -7,7 +7,7 @@ import { ThemeToggle } from '@/components/ThemeToggle'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'Power Pulse 360°',
+  title: 'Microsoft Pulse 360°',
   description: 'Stay informed about the latest updates and announcements from Microsoft.',
 }
 

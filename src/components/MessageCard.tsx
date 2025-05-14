@@ -305,6 +305,20 @@ export const MessageCard: React.FC<MessageCardProps> = ({ message, onClick }) =>
                   </div>
                 );
               }
+              if (service === 'Defender XDR' || service === 'Microsoft Defender XDR') {
+                return (
+                  <div key={service} className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-transparent text-blue-800 dark:text-blue-300 border border-blue-200 dark:border-blue-800">
+                    <img
+                      src="/icons/defender.svg"
+                      alt="Microsoft Defender XDR"
+                      width={16}
+                      height={16}
+                      className="mr-1"
+                    />
+                    Microsoft Defender XDR
+                  </div>
+                );
+              }
               return (
                 <span
                   key={service}
