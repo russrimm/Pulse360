@@ -9,6 +9,7 @@ const inter = Inter({ subsets: ['latin'] })
 export const metadata: Metadata = {
   title: 'Microsoft Pulse 360°',
   description: 'Stay informed about the latest updates and announcements from Microsoft.',
+  metadataBase: new URL('https://microsoft-pulse-360.vercel.app'),
 }
 
 export default function RootLayout({
@@ -17,8 +18,8 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en" className="dark text-base">
-      <body className={`${inter.className} min-h-screen bg-gray-900 dark:bg-black transition-colors duration-200`}>
+    <html lang="en" className="dark text-base" suppressHydrationWarning>
+      <body className={`${inter.className} min-h-screen bg-gray-900 dark:bg-black transition-colors duration-200`} suppressHydrationWarning>
         <nav className="fixed top-0 left-0 right-0 z-50 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm border-b border-gray-200 dark:border-gray-800 shadow-sm">
           <div className="px-4 sm:px-6 lg:px-8">
             <div className="flex flex-col sm:flex-row sm:h-20 py-4 sm:py-0 items-center justify-end gap-4 sm:gap-0">
