@@ -3,6 +3,11 @@ import { getMessages } from '@/lib/api';
 
 export const revalidate = 604800; // Revalidate every 7 days (7 * 24 * 60 * 60)
 
+export const metadata = {
+  title: 'Microsoft Pulse 360° - Home',
+  description: 'Stay informed about the latest updates and announcements from Microsoft.',
+};
+
 export default async function Home() {
   const messages = await getMessages();
 
