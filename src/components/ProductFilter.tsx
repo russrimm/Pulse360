@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useMemo, useCallback } from 'react';
 
 interface ProductFilterProps {
   services: string[];
@@ -35,6 +35,25 @@ const normalizeServiceName = (service: string): string => {
 export function ProductFilter({ services, selectedServices, onFilterChange }: ProductFilterProps) {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const saveTimeoutRef = useRef<NodeJS.Timeout>();
+
+  // Memoize normalized services
+  const normalizedServices = useMemo(() => 
+    Array.from(new Set(services.map(normalizeServiceName))).sort(),
+    [services]
+  );
+
+  // Memoize click outside handler
+  const handleClickOutside = useCallback((event: MouseEvent) => {
+    if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+      setIsOpen(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [handleClickOutside]);
 
   // Load saved filters on mount
   useEffect(() => {
@@ -55,35 +74,33 @@ export function ProductFilter({ services, selectedServices, onFilterChange }: Pr
     }
   }, [services, onFilterChange]);
 
-  // Save filters whenever they change
+  // Save filters with debounce
   useEffect(() => {
-    try {
-      if (selectedServices.length > 0) {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(selectedServices));
-      } else {
-        localStorage.removeItem(STORAGE_KEY);
-      }
-    } catch (error) {
-      console.error('Error saving filters:', error);
+    if (saveTimeoutRef.current) {
+      clearTimeout(saveTimeoutRef.current);
     }
+
+    saveTimeoutRef.current = setTimeout(() => {
+      try {
+        if (selectedServices.length > 0) {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(selectedServices));
+        } else {
+          localStorage.removeItem(STORAGE_KEY);
+        }
+      } catch (error) {
+        console.error('Error saving filters:', error);
+      }
+    }, 300); // 300ms debounce
+
+    return () => {
+      if (saveTimeoutRef.current) {
+        clearTimeout(saveTimeoutRef.current);
+      }
+    };
   }, [selectedServices]);
 
-  // Normalize services and remove duplicates
-  const normalizedServices = Array.from(new Set(services.map(normalizeServiceName))).sort();
-
-  useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setIsOpen(false);
-      }
-    }
-
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
-
-  const toggleService = (service: string) => {
-    // Get all original services that map to this normalized service
+  // Memoize toggle function
+  const toggleService = useCallback((service: string) => {
     const originalServices = services.filter(s => normalizeServiceName(s) === service);
     
     const newSelection = selectedServices.includes(service)
@@ -91,14 +108,14 @@ export function ProductFilter({ services, selectedServices, onFilterChange }: Pr
       : [...selectedServices, ...originalServices];
     
     onFilterChange(newSelection);
-  };
+  }, [services, selectedServices, onFilterChange]);
 
-  // Check if any of the original services for a normalized service are selected
-  const isServiceSelected = (normalizedService: string): boolean => {
+  // Memoize selection check
+  const isServiceSelected = useCallback((normalizedService: string): boolean => {
     return services
       .filter(s => normalizeServiceName(s) === normalizedService)
       .some(s => selectedServices.includes(s));
-  };
+  }, [services, selectedServices]);
 
   return (
     <div className="relative inline-block" ref={dropdownRef}>
