@@ -162,10 +162,20 @@ export function MessageDetail({ message }: MessageDetailProps) {
                   </div>
                 </div>
                 <div className="bg-white/50 dark:bg-gray-700/50 backdrop-blur-sm rounded-xl border border-gray-200 dark:border-gray-600 p-4">
-                  <h3 className="text-base font-medium text-primary-600 dark:text-primary-400 mb-3">Published</h3>
-                  <p className="text-lg font-medium text-gray-900 dark:text-white">
-                    {format(new Date(message.published), 'MMM d, yyyy')}
-                  </p>
+                  <div className="flex flex-col gap-3">
+                    <div className="flex items-center">
+                      <span className="w-24 text-base font-medium text-primary-600 dark:text-primary-400">Published:</span>
+                      <p className="text-lg font-medium text-gray-900 dark:text-white ml-4">
+                        {format(new Date(message.published), 'MMM d, yyyy')}
+                      </p>
+                    </div>
+                    <div className="flex items-center">
+                      <span className="w-24 text-base font-medium text-primary-600 dark:text-primary-400">Updated:</span>
+                      <p className="text-lg font-medium text-gray-900 dark:text-white ml-4">
+                        {format(new Date(message.lastUpdated), 'MMM d, yyyy')}
+                      </p>
+                    </div>
+                  </div>
                 </div>
                 <div className="bg-white/50 dark:bg-gray-700/50 backdrop-blur-sm rounded-xl border border-gray-200 dark:border-gray-600 p-4">
                   <h3 className="text-base font-medium text-primary-600 dark:text-primary-400 mb-3">Action Required By</h3>
@@ -181,7 +191,7 @@ export function MessageDetail({ message }: MessageDetailProps) {
                     {message.tags.map((tag) => (
                       <span
                         key={tag}
-                        className="inline-flex items-center px-3 py-1.5 rounded-full text-lg font-medium bg-gray-100 text-gray-700 dark:bg-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-500"
+                        className="inline-flex items-center px-2.5 py-1 rounded-full text-sm font-medium bg-gray-100 text-gray-700 dark:bg-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-500"
                       >
                         {tag}
                       </span>

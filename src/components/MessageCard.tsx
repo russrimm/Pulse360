@@ -117,9 +117,9 @@ export const MessageCard: React.FC<MessageCardProps> = ({ message, onClick }) =>
             {message.tags.map((tag) => (
               <span
                 key={tag}
-                className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-700 dark:bg-gray-700/50 dark:text-gray-300 border border-gray-200 dark:border-gray-600/50 backdrop-blur-sm transition-all duration-200 hover:scale-105"
+                className="inline-flex items-center px-3 py-1.5 rounded text-sm font-medium bg-gray-100 text-gray-700 dark:bg-gray-700/50 dark:text-gray-300 border border-gray-200 dark:border-gray-600/50 backdrop-blur-sm transition-all duration-200 hover:scale-105 min-w-[150px] justify-center"
               >
-                {tag}
+                <span className="truncate">{tag}</span>
               </span>
             ))}
           </div>
