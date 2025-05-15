@@ -18,6 +18,7 @@ const Navbar = () => {
                 width={32}
                 height={32}
                 className="w-8 h-8"
+                priority
               />
               <span className="ml-2 text-xl font-bold text-gray-900 dark:text-white">
                 Message Center
