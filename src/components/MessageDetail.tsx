@@ -32,24 +32,6 @@ const serviceIcons: Record<string, string> = {
   'Windows': '/icons/Windows.svg'
 };
 
-// Normalize service names
-const normalizeService = (service: string): string => {
-  if (service.includes('365')) return 'Microsoft 365';
-  if (service.includes('Power Apps')) return 'Power Apps';
-  if (service.includes('Power Automate')) return 'Power Automate';
-  if (service.includes('Forms')) return 'Microsoft Forms';
-  if (service.includes('Stream')) return 'Microsoft Stream';
-  if (service.includes('Intune')) return 'Microsoft Intune';
-  if (service.includes('Planner')) return 'Microsoft Planner';
-  if (service.includes('Entra')) return 'Microsoft Entra';
-  if (service.includes('Dynamics')) return 'Dynamics 365 Apps';
-  if (service.includes('Viva')) return 'Microsoft Viva';
-  if (service.includes('Purview')) return 'Microsoft Purview';
-  if (service.includes('Defender')) return 'Microsoft Defender XDR';
-  if (service.includes('Windows')) return 'Windows';
-  return service;
-};
-
 interface MessageDetailProps {
   message: Message;
 }
@@ -88,8 +70,8 @@ export function MessageDetail({ message }: MessageDetailProps) {
     });
   }, [message.content]);
 
-  // Deduplicate and normalize services
-  const uniqueServices = Array.from(new Set(message.service.map(normalizeService)));
+  // Get unique services
+  const uniqueServices = Array.from(new Set(message.service));
 
   return (
     <div className="min-h-screen">
@@ -117,42 +99,40 @@ export function MessageDetail({ message }: MessageDetailProps) {
             </Link>
           </div>
 
-          <article className="bg-white/80 dark:bg-gray-800/50 backdrop-blur-sm rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
+          <article className="bg-white/90 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
             <div className="p-6 sm:p-8">
               <div className="flex items-center justify-between mb-6">
                 <h1 className="text-2xl sm:text-4xl font-bold bg-gradient-to-r from-primary-600 to-primary-400 dark:from-primary-400 dark:to-primary-300 bg-clip-text text-transparent">{message.title}</h1>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
                 {message.isMajorChange && (
-                  <div className="bg-white/50 dark:bg-gray-700/50 backdrop-blur-sm rounded-xl border border-gray-200 dark:border-gray-600 p-3">
+                  <div className="bg-white/70 dark:bg-gray-700/70 backdrop-blur-sm rounded-xl border border-gray-200 dark:border-gray-600 p-3">
                     <h3 className="text-sm font-medium text-primary-600 dark:text-primary-400 mb-2">Status</h3>
                     <span className="inline-flex items-center px-3 py-1.5 rounded-xl text-base font-medium bg-red-50 text-red-700 dark:bg-red-900/50 dark:text-red-300">
                       Major Change
                     </span>
                   </div>
                 )}
-                <div className="bg-white/50 dark:bg-gray-700/50 backdrop-blur-sm rounded-xl border border-gray-200 dark:border-gray-600 p-3">
-                  <h3 className="text-sm font-medium text-primary-600 dark:text-primary-400 mb-2">Message ID</h3>
-                  <p className="text-base font-medium text-gray-900 dark:text-white">{message.id}</p>
+                <div className="bg-white/70 dark:bg-gray-700/70 backdrop-blur-sm rounded-xl border border-gray-200 dark:border-gray-600 p-3 flex items-center justify-center">
+                  <p className="text-4xl font-bold text-gray-900 dark:text-white text-center">{message.id}</p>
                 </div>
-                <div className="bg-white/50 dark:bg-gray-700/50 backdrop-blur-sm rounded-xl border border-gray-200 dark:border-gray-600 p-3">
-                  <h3 className="text-sm font-medium text-primary-600 dark:text-primary-400 mb-2">Service</h3>
-                  <div className="flex flex-wrap gap-2">
+                <div className="bg-white/70 dark:bg-gray-700/70 backdrop-blur-sm rounded-xl border border-gray-200 dark:border-gray-600 p-2 sm:p-3">
+                  <div className="flex flex-wrap gap-1.5 sm:gap-2 justify-center items-center">
                     {uniqueServices.map((service) => {
                       const iconPath = serviceIcons[service];
                       return (
                         <span
                           key={service}
-                          className="inline-flex items-center px-3 py-1.5 rounded-xl text-base font-medium bg-blue-50 text-blue-700 dark:bg-transparent dark:text-blue-300"
+                          className="inline-flex items-center px-2 sm:px-3 py-1 sm:py-1.5 rounded-xl text-lg sm:text-2xl font-medium bg-blue-50 text-blue-700 dark:bg-transparent dark:text-blue-300"
                         >
                           {iconPath && (
                             <Image
                               src={iconPath}
                               alt={service}
-                              width={32}
-                              height={32}
-                              className="mr-2"
+                              width={24}
+                              height={24}
+                              className="mr-1.5 sm:mr-2 w-6 h-6 sm:w-10 sm:h-10"
                             />
                           )}
                           {service}
@@ -161,45 +141,45 @@ export function MessageDetail({ message }: MessageDetailProps) {
                     })}
                   </div>
                 </div>
-                <div className="bg-white/50 dark:bg-gray-700/50 backdrop-blur-sm rounded-xl border border-gray-200 dark:border-gray-600 p-3">
-                  <div className="flex flex-col gap-2">
-                    <div className="flex items-center">
-                      <span className="w-24 text-sm font-medium text-primary-600 dark:text-primary-400">Published:</span>
-                      <p className="text-base font-medium text-gray-900 dark:text-white ml-4">
-                        {format(new Date(message.published), 'MMM d, yyyy')}
-                      </p>
-                    </div>
-                    <div className="flex items-center">
-                      <span className="w-24 text-sm font-medium text-primary-600 dark:text-primary-400">Updated:</span>
-                      <p className="text-base font-medium text-gray-900 dark:text-white ml-4">
-                        {format(new Date(message.lastUpdated), 'MMM d, yyyy')}
-                      </p>
-                    </div>
+                <div className="bg-white/70 dark:bg-gray-700/70 backdrop-blur-sm rounded-xl border border-gray-200 dark:border-gray-600 p-3 flex flex-col justify-between">
+                  <div className="flex items-center">
+                    <span className="w-24 text-sm font-medium text-primary-600 dark:text-primary-400">Published:</span>
+                    <p className="text-base font-medium text-gray-900 dark:text-white ml-4">
+                      {format(new Date(message.published), 'MMM d, yyyy')}
+                    </p>
+                  </div>
+                  <div className="flex items-center mt-2">
+                    <span className="w-24 text-sm font-medium text-primary-600 dark:text-primary-400">Updated:</span>
+                    <p className="text-base font-medium text-gray-900 dark:text-white ml-4">
+                      {format(new Date(message.lastUpdated), 'MMM d, yyyy')}
+                    </p>
                   </div>
                 </div>
-                <div className="bg-white/50 dark:bg-gray-700/50 backdrop-blur-sm rounded-xl border border-gray-200 dark:border-gray-600 p-3">
-                  <h3 className="text-sm font-medium text-primary-600 dark:text-primary-400 mb-2">Action Required By</h3>
-                  <p className="text-base font-medium text-gray-900 dark:text-white">
-                    {message.actionRequiredByDateTime
-                      ? format(new Date(message.actionRequiredByDateTime), 'MMM d, yyyy')
-                      : 'Not specified'}
-                  </p>
-                </div>
-                <div className="bg-white/50 dark:bg-gray-700/50 backdrop-blur-sm rounded-xl border border-gray-200 dark:border-gray-600 p-3">
+                {message.actionRequiredByDateTime && (
+                  <div className="bg-white/70 dark:bg-gray-700/70 backdrop-blur-sm rounded-xl border border-gray-200 dark:border-gray-600 p-3">
+                    <h3 className="text-sm font-medium text-primary-600 dark:text-primary-400 mb-2">Action Required By</h3>
+                    <p className="text-base font-medium text-gray-900 dark:text-white">
+                      {format(new Date(message.actionRequiredByDateTime), 'MMM d, yyyy')}
+                    </p>
+                  </div>
+                )}
+                <div className="bg-white/70 dark:bg-gray-700/70 backdrop-blur-sm rounded-xl border border-gray-200 dark:border-gray-600 p-3">
                   <h3 className="text-sm font-medium text-primary-600 dark:text-primary-400 mb-2">Tags</h3>
-                  <div className="flex flex-wrap gap-2">
+                  <div className="grid grid-cols-2 gap-2">
                     {message.tags.map((tag) => (
-                      <span
-                        key={tag}
-                        className="inline-flex items-center px-2.5 py-1 rounded-full text-sm font-medium bg-gray-100 text-gray-700 dark:bg-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-500"
-                      >
-                        {tag}
-                      </span>
+                      <div key={tag} className="flex items-center justify-between">
+                        <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{tag}</span>
+                        <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300">
+                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                          </svg>
+                        </span>
+                      </div>
                     ))}
                   </div>
                 </div>
                 {message.details?.find(d => d.name === 'Platforms')?.value && (
-                  <div className="bg-white/50 dark:bg-gray-700/50 backdrop-blur-sm rounded-xl border border-gray-200 dark:border-gray-600 p-4">
+                  <div className="bg-white/70 dark:bg-gray-700/70 backdrop-blur-sm rounded-xl border border-gray-200 dark:border-gray-600 p-4">
                     <h3 className="text-sm font-medium text-primary-600 dark:text-primary-400 mb-1">Platforms</h3>
                     <div className="flex flex-wrap gap-2">
                       {message.details?.find(d => d.name === 'Platforms')?.value.split(',').map((platform) => (
@@ -220,7 +200,7 @@ export function MessageDetail({ message }: MessageDetailProps) {
                   <div className="pt-6">
                     <div className="grid gap-4">
                       {message.details?.filter(d => d.name !== 'Platforms').map((detail) => (
-                        <div key={detail.name} className="bg-white/50 dark:bg-gray-700/50 backdrop-blur-sm rounded-xl p-6 border border-gray-200 dark:border-gray-600">
+                        <div key={detail.name} className="bg-white/70 dark:bg-gray-700/70 backdrop-blur-sm rounded-xl p-6 border border-gray-200 dark:border-gray-600">
                           <h3 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-primary-600 to-primary-400 dark:from-primary-400 dark:to-primary-300 bg-clip-text text-transparent mb-2 capitalize">{detail.name}</h3>
                           <p className="text-xl text-gray-900 dark:text-gray-100">{detail.value}</p>
                         </div>
@@ -232,7 +212,7 @@ export function MessageDetail({ message }: MessageDetailProps) {
 
               <div className="pt-6">
                 <div 
-                  className="prose prose-lg dark:prose-invert max-w-none prose-blue prose-headings:font-semibold prose-headings:text-gray-900 dark:prose-headings:text-white prose-p:text-gray-600 dark:prose-p:text-white prose-a:text-primary-600 dark:prose-a:text-primary-400 prose-strong:text-gray-900 dark:prose-strong:text-white prose-ul:list-disc prose-ul:pl-6 prose-ol:list-decimal prose-ol:pl-6 [&_*]:text-gray-600 dark:[&_*]:text-white [&_a]:text-primary-600 dark:[&_a]:text-primary-400 bg-white/50 dark:bg-gray-700/50 backdrop-blur-sm rounded-xl border border-gray-200 dark:border-gray-600 p-6"
+                  className="prose prose-lg dark:prose-invert max-w-none prose-blue prose-headings:font-semibold prose-headings:text-gray-900 dark:prose-headings:text-white prose-p:text-gray-600 dark:prose-p:text-white prose-a:text-primary-600 dark:prose-a:text-primary-400 prose-strong:text-gray-900 dark:prose-strong:text-white prose-ul:list-disc prose-ul:pl-6 prose-ol:list-decimal prose-ol:pl-6 [&_*]:text-gray-600 dark:[&_*]:text-white [&_a]:text-primary-600 dark:[&_a]:text-primary-400 bg-white/70 dark:bg-gray-700/70 backdrop-blur-sm rounded-xl border border-gray-200 dark:border-gray-600 p-6"
                   onClick={(e) => {
                     const target = e.target as HTMLElement;
                     if (target.tagName === 'IMG') {

@@ -14,17 +14,7 @@ const serviceNameMap: Record<string, string> = {
   'Microsoft Power Automate': 'Power Automate',
   'Power Apps in Microsoft 365': 'Power Apps',
   'Dynamics 365 Apps': 'Dynamics 365 Apps',
-  'Microsoft Dynamics 365 Apps': 'Dynamics 365 Apps',
-  'Dataverse': 'Microsoft Dataverse',
-  'Microsoft Dataverse': 'Microsoft Dataverse',
-  'Forms': 'Microsoft Forms',
-  'Microsoft Forms': 'Microsoft Forms',
-  'Intune': 'Microsoft Intune',
-  'Microsoft Intune': 'Microsoft Intune',
-  'Defender XDR': 'Microsoft Defender XDR',
-  'Microsoft Defender XDR': 'Microsoft Defender XDR',
-  'Entra': 'Microsoft Entra',
-  'Microsoft Entra': 'Microsoft Entra'
+  'Microsoft Dynamics 365 Apps': 'Dynamics 365 Apps'
 };
 
 // Storage key for persisting filter settings
@@ -36,12 +26,7 @@ const normalizeServiceName = (service: string): string => {
   if (serviceNameMap[service]) {
     return serviceNameMap[service];
   }
-  
-  // If the service contains "365", keep the full name
-  if (service.includes('365')) {
-    return service;
-  }
-  
+    
   // Otherwise remove "Microsoft" prefix if it exists
   return service.replace(/^Microsoft\s+/, '');
 };
