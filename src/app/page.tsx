@@ -2,6 +2,7 @@ import { MessageList } from '@/components/MessageList';
 import { SearchBar } from '@/components/SearchBar';
 import { getMessages } from '@/lib/api';
 import { Message } from '@/lib/types';
+import { HomeContent } from '@/components/HomeContent';
 
 export const revalidate = 604800; // Revalidate every 7 days (7 * 24 * 60 * 60)
 
@@ -17,11 +18,11 @@ export default async function Home() {
     <div className="min-h-screen">
       <div className="absolute inset-0 bg-[radial-gradient(#1f2937_1px,transparent_1px)] [background-size:16px_16px]" />
       <div className="relative">
-        <div className="px-4 sm:px-6 lg:px-8 py-12">
+        <div className="px-4 sm:px-6 lg:px-8 py-8">
           <div className="max-w-7xl mx-auto">
-            <div className="text-center mb-12">
+            <div className="text-center mb-6">
               <h1 
-                className="text-4xl sm:text-5xl font-bold text-white mb-4 [text-wrap:balance] [font-display:swap] [content-visibility:auto] [contain-intrinsic-size:0_5rem] [contain:layout] [contain:paint] [contain:style] [will-change:transform]"
+                className="text-4xl sm:text-5xl font-bold text-white mb-3 [text-wrap:balance] [font-display:swap] [content-visibility:auto] [contain-intrinsic-size:0_5rem] [contain:layout] [contain:paint] [contain:style] [will-change:transform]"
                 style={{ 
                   textRendering: 'optimizeSpeed',
                   WebkitFontSmoothing: 'antialiased',
@@ -50,6 +51,11 @@ export default async function Home() {
               </p>
             </div>
           </div>
+        </div>
+      </div>
+      <div className="relative px-4 sm:px-6 lg:px-8 py-6">
+        <div className="max-w-7xl mx-auto">
+          <HomeContent messages={messages} />
         </div>
       </div>
     </div>

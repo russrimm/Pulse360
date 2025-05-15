@@ -33,7 +33,8 @@ export function MessageList({ messages }: MessageListProps) {
     if (!messages) return;
     
     const filtered = messages.filter(message => {
-      const matchesSearch = message.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      const matchesSearch = !searchQuery || 
+        message.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
         message.content.toLowerCase().includes(searchQuery.toLowerCase());
       const matchesServices = selectedServices.length === 0 || 
         message.service.some(service => selectedServices.includes(service));
@@ -116,6 +117,7 @@ export function MessageList({ messages }: MessageListProps) {
     <div className="relative">
       {isLoading && <LoadingSpinner />}
       <div className="mb-6">
+        <h2 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Filters</h2>
         <div className="flex flex-wrap gap-4">
           <ProductFilter
             services={services}
@@ -125,37 +127,42 @@ export function MessageList({ messages }: MessageListProps) {
           <div className="relative">
             <button
               onClick={() => setIsTagDropdownOpen(!isTagDropdownOpen)}
-              className="px-4 py-2 rounded-lg text-sm font-medium bg-gray-100 text-gray-700 dark:bg-gray-700/50 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600/50 transition-colors flex items-center gap-2"
+              className="flex items-center justify-center gap-2 px-4 h-10 text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-primary-500 relative"
+              aria-label="Filter tags"
             >
-              {selectedTags.length > 0 ? `${selectedTags.length} Tags Selected` : 'All Tags'}
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12" />
+              <svg
+                className="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"
+                />
               </svg>
+              <span className="text-sm font-medium">Tags</span>
+              {selectedTags.length > 0 && (
+                <span className="absolute -top-1 -right-1 flex items-center justify-center w-5 h-5 text-xs font-medium text-white bg-primary-600 rounded-full">
+                  {selectedTags.length}
+                </span>
+              )}
             </button>
             {isTagDropdownOpen && (
-              <div className="absolute top-full left-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 z-10">
-                <div className="p-2">
-                  <button
-                    onClick={() => {
-                      setSelectedTags([]);
-                      setIsTagDropdownOpen(false);
-                    }}
-                    className={`w-full text-left px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                      selectedTags.length === 0
-                        ? 'bg-primary-100 text-primary-700 dark:bg-primary-900/50 dark:text-primary-300'
-                        : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700/50'
-                    }`}
-                  >
-                    All Tags
-                  </button>
+              <div className="absolute z-10 w-72 mt-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow-lg">
+                <div className="p-4 border-b border-gray-200 dark:border-gray-700">
+                  <h3 className="text-sm font-medium text-gray-900 dark:text-white">Filter Tags</h3>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                    {selectedTags.length} tag{selectedTags.length !== 1 ? 's' : ''} selected
+                  </p>
+                </div>
+                <div className="max-h-60 overflow-y-auto p-2">
                   {uniqueTags.map((tag) => (
                     <label
                       key={tag}
-                      className={`w-full flex items-center px-3 py-2 rounded-md text-sm font-medium transition-colors cursor-pointer ${
-                        selectedTags.includes(tag)
-                          ? 'bg-primary-100 text-primary-700 dark:bg-primary-900/50 dark:text-primary-300'
-                          : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700/50'
-                      }`}
+                      className="flex items-center px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md cursor-pointer"
                     >
                       <input
                         type="checkbox"
@@ -167,11 +174,22 @@ export function MessageList({ messages }: MessageListProps) {
                             setSelectedTags(selectedTags.filter(t => t !== tag));
                           }
                         }}
-                        className="mr-2 rounded border-gray-300 text-primary-600 focus:ring-primary-500 dark:border-gray-600 dark:bg-gray-700 dark:checked:bg-primary-600"
+                        className="w-4 h-4 text-primary-600 border-gray-300 rounded focus:ring-primary-500"
                       />
-                      {tag}
+                      <span className="ml-2 text-sm text-gray-700 dark:text-gray-200">{tag}</span>
                     </label>
                   ))}
+                </div>
+                <div className="p-3 border-t border-gray-200 dark:border-gray-700">
+                  <button
+                    onClick={() => {
+                      setSelectedTags([]);
+                      setIsTagDropdownOpen(false);
+                    }}
+                    className="w-full px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
+                  >
+                    Clear all
+                  </button>
                 </div>
               </div>
             )}

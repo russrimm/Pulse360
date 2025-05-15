@@ -137,16 +137,7 @@ export function MessageDetail({ message }: MessageDetailProps) {
                   <p className="text-base font-medium text-gray-900 dark:text-white">{message.id}</p>
                 </div>
                 <div className="bg-white/50 dark:bg-gray-700/50 backdrop-blur-sm rounded-xl border border-gray-200 dark:border-gray-600 p-3">
-                  <div className="flex items-center gap-2 mb-2">
-                    <Image
-                      src="/icons/PowerPlatform_scalable.svg"
-                      alt="Service"
-                      width={20}
-                      height={20}
-                      className="text-primary-600 dark:text-primary-400"
-                    />
-                    <h3 className="text-sm font-medium text-primary-600 dark:text-primary-400">Service</h3>
-                  </div>
+                  <h3 className="text-sm font-medium text-primary-600 dark:text-primary-400 mb-2">Service</h3>
                   <div className="flex flex-wrap gap-2">
                     {uniqueServices.map((service) => {
                       const iconPath = serviceIcons[service];

@@ -28,7 +28,8 @@ export default async function MessagePage({ params }: PageProps) {
   const message = await getMessage(resolvedParams.id);  
 
   if (!message) {
-    return <div>Message not found</div>;
+    return notFound();
   }
 
+  return <MessageDetail message={message} />;
 }

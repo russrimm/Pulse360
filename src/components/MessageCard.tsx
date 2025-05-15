@@ -33,6 +33,46 @@ const serviceIcons: Record<string, string> = {
   'Windows': '/icons/Windows.svg'
 };
 
+// Map of tag names to their icon paths and colors
+const tagIcons: Record<string, { icon: string; color: string }> = {
+  'Security': { icon: '/icons/security.svg', color: 'red' },
+  'Update': { icon: '/icons/update.svg', color: 'blue' },
+  'New Feature': { icon: '/icons/feature.svg', color: 'green' },
+  'Deprecation': { icon: '/icons/deprecation.svg', color: 'yellow' },
+  'Bug Fix': { icon: '/icons/bug.svg', color: 'purple' },
+  'Performance': { icon: '/icons/performance.svg', color: 'indigo' },
+  'Compliance': { icon: '/icons/compliance.svg', color: 'pink' },
+  'Integration': { icon: '/icons/integration.svg', color: 'teal' },
+  'API': { icon: '/icons/api.svg', color: 'orange' },
+  'UI': { icon: '/icons/ui.svg', color: 'cyan' },
+  'Mobile': { icon: '/icons/mobile.svg', color: 'emerald' },
+  'Desktop': { icon: '/icons/desktop.svg', color: 'violet' },
+  'Cloud': { icon: '/icons/cloud.svg', color: 'sky' },
+  'On-Premises': { icon: '/icons/onprem.svg', color: 'amber' },
+  'Preview': { icon: '/icons/preview.svg', color: 'rose' },
+  'GA': { icon: '/icons/ga.svg', color: 'lime' }
+};
+
+// Color mapping for tag pills
+const tagColors: Record<string, { bg: string; text: string; border: string }> = {
+  'red': { bg: 'bg-red-50', text: 'text-red-700', border: 'border-red-200' },
+  'blue': { bg: 'bg-blue-50', text: 'text-blue-700', border: 'border-blue-200' },
+  'green': { bg: 'bg-green-50', text: 'text-green-700', border: 'border-green-200' },
+  'yellow': { bg: 'bg-yellow-50', text: 'text-yellow-700', border: 'border-yellow-200' },
+  'purple': { bg: 'bg-purple-50', text: 'text-purple-700', border: 'border-purple-200' },
+  'indigo': { bg: 'bg-indigo-50', text: 'text-indigo-700', border: 'border-indigo-200' },
+  'pink': { bg: 'bg-pink-50', text: 'text-pink-700', border: 'border-pink-200' },
+  'teal': { bg: 'bg-teal-50', text: 'text-teal-700', border: 'border-teal-200' },
+  'orange': { bg: 'bg-orange-50', text: 'text-orange-700', border: 'border-orange-200' },
+  'cyan': { bg: 'bg-cyan-50', text: 'text-cyan-700', border: 'border-cyan-200' },
+  'emerald': { bg: 'bg-emerald-50', text: 'text-emerald-700', border: 'border-emerald-200' },
+  'violet': { bg: 'bg-violet-50', text: 'text-violet-700', border: 'border-violet-200' },
+  'sky': { bg: 'bg-sky-50', text: 'text-sky-700', border: 'border-sky-200' },
+  'amber': { bg: 'bg-amber-50', text: 'text-amber-700', border: 'border-amber-200' },
+  'rose': { bg: 'bg-rose-50', text: 'text-rose-700', border: 'border-rose-200' },
+  'lime': { bg: 'bg-lime-50', text: 'text-lime-700', border: 'border-lime-200' }
+};
+
 // Normalize service names
 const normalizeService = (service: string): string => {
   if (service.includes('365')) return 'Microsoft 365';
@@ -111,17 +151,6 @@ export const MessageCard: React.FC<MessageCardProps> = ({ message, onClick }) =>
               <span className="font-medium text-primary-600 dark:text-primary-400">Updated:</span>
               {format(new Date(message.lastUpdated), 'MMM d, yyyy')}
             </span>
-          </div>
-          
-          <div className="mt-4 flex flex-wrap gap-2">
-            {message.tags.map((tag) => (
-              <span
-                key={tag}
-                className="inline-flex items-center px-3 py-1.5 rounded text-sm font-medium bg-gray-100 text-gray-700 dark:bg-gray-700/50 dark:text-gray-300 border border-gray-200 dark:border-gray-600/50 backdrop-blur-sm transition-all duration-200 hover:scale-105 min-w-[150px] justify-center"
-              >
-                <span className="truncate">{tag}</span>
-              </span>
-            ))}
           </div>
         </div>
       </div>
