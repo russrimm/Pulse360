@@ -15,6 +15,16 @@ const serviceNameMap: Record<string, string> = {
   'Power Apps in Microsoft 365': 'Power Apps',
   'Dynamics 365 Apps': 'Dynamics 365 Apps',
   'Microsoft Dynamics 365 Apps': 'Dynamics 365 Apps',
+  'Dataverse': 'Microsoft Dataverse',
+  'Microsoft Dataverse': 'Microsoft Dataverse',
+  'Forms': 'Microsoft Forms',
+  'Microsoft Forms': 'Microsoft Forms',
+  'Intune': 'Microsoft Intune',
+  'Microsoft Intune': 'Microsoft Intune',
+  'Defender XDR': 'Microsoft Defender XDR',
+  'Microsoft Defender XDR': 'Microsoft Defender XDR',
+  'Entra': 'Microsoft Entra',
+  'Microsoft Entra': 'Microsoft Entra'
 };
 
 // Storage key for persisting filter settings

@@ -27,6 +27,46 @@ export const metadata: Metadata = {
   }
 }
 
+// Preload critical icons
+const preloadIcons = [
+  '/icons/m365.svg',
+  '/icons/teams.svg',
+  '/icons/sharepoint.svg',
+  '/icons/exchange.svg',
+  '/icons/forms.svg',
+  '/icons/intune.svg',
+  '/icons/entra.svg',
+  '/icons/defender.svg',
+  '/icons/PowerApps_scalable.svg',
+  '/icons/PowerAutomate_scalable.svg',
+  '/icons/PowerPlatform_scalable.svg',
+  '/icons/Dataverse_scalable.svg',
+  '/icons/PowerBI_scalable.svg',
+  '/icons/onedrive.svg',
+  '/icons/stream.svg',
+  '/icons/planner.svg',
+  '/icons/Dynamics365_scalable.svg',
+  '/icons/viva.svg',
+  '/icons/purview.svg',
+  '/icons/Windows.svg',
+  '/icons/security.svg',
+  '/icons/update.svg',
+  '/icons/feature.svg',
+  '/icons/deprecation.svg',
+  '/icons/bug.svg',
+  '/icons/performance.svg',
+  '/icons/compliance.svg',
+  '/icons/integration.svg',
+  '/icons/api.svg',
+  '/icons/ui.svg',
+  '/icons/mobile.svg',
+  '/icons/desktop.svg',
+  '/icons/cloud.svg',
+  '/icons/onprem.svg',
+  '/icons/preview.svg',
+  '/icons/ga.svg'
+];
+
 export default function RootLayout({
   children,
 }: {
@@ -34,6 +74,17 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className="dark text-base" suppressHydrationWarning>
+      <head>
+        {preloadIcons.map((icon) => (
+          <link
+            key={icon}
+            rel="preload"
+            href={icon}
+            as="image"
+            type="image/svg+xml"
+          />
+        ))}
+      </head>
       <body className={`${inter.className} min-h-screen bg-gray-900 dark:bg-black transition-colors duration-200`} suppressHydrationWarning>
         <nav className="fixed top-0 left-0 right-0 z-50 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm border-b border-gray-200 dark:border-gray-800 shadow-sm">
           <div className="px-4 sm:px-6 lg:px-8">
