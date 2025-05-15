@@ -119,25 +119,23 @@ export function ProductFilter({ services, selectedServices, onFilterChange }: Pr
 
   // Memoize selection check
   const isServiceSelected = useCallback((normalizedService: string): boolean => {
-    return services
-      .filter(s => normalizeServiceName(s) === normalizedService)
-      .some(s => selectedServices.includes(s));
-  }, [services, selectedServices]);
+    return selectedServices.some(s => normalizeServiceName(s) === normalizedService);
+  }, [selectedServices]);
 
   // Memoize toggle function
   const toggleService = useCallback((service: string) => {
-    const originalServices = services.filter(s => normalizeServiceName(s) === service);
-    
     if (isServiceSelected(service)) {
-      // Remove all original services from selection
+      // Remove all services with the same normalized name
       const newSelection = selectedServices.filter(s => 
-        !originalServices.some(os => normalizeServiceName(os) === normalizeServiceName(s))
+        normalizeServiceName(s) !== service
       );
       onFilterChange(newSelection);
     } else {
-      // Add all original services to selection
-      const newSelection = [...selectedServices, ...originalServices];
-      onFilterChange(newSelection);
+      // Add the first original service to selection
+      const originalService = services.find(s => normalizeServiceName(s) === service);
+      if (originalService) {
+        onFilterChange([...selectedServices, originalService]);
+      }
     }
   }, [services, selectedServices, onFilterChange, isServiceSelected]);
 

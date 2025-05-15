@@ -20,7 +20,7 @@ type PageProps = {
 /* This should stay like this
 export default async function MessagePage({ params }: PageProps) {
   const resolvedParams = await params;
-  const 
+  const message = await getMessage(resolvedParams.id);  
 */
 
 export default async function MessagePage({ params }: PageProps) {
