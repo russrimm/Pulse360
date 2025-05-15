@@ -28,7 +28,11 @@ const serviceNameMap: Record<string, string> = {
   'Viva': 'Microsoft Viva',
   'Microsoft Viva': 'Microsoft Viva',
   'Purview': 'Microsoft Purview',
-  'Microsoft Purview': 'Microsoft Purview'
+  'Microsoft Purview': 'Microsoft Purview',
+  'Teams': 'Microsoft Teams',
+  'Microsoft Teams': 'Microsoft Teams',
+  'Dataverse': 'Microsoft Dataverse',
+  'Microsoft Dataverse': 'Microsoft Dataverse'
 };
 
 // Storage key for persisting filter settings
