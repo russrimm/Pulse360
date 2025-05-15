@@ -1,6 +1,8 @@
 import { MessageList } from '@/components/MessageList';
+import { SearchBar } from '@/components/SearchBar';
 import { getMessages } from '@/lib/api';
-
+import { Message } from '@/lib/types';
+import { HomeContent } from '@/components/HomeContent';
 
 export const revalidate = 604800; // Revalidate every 7 days (7 * 24 * 60 * 60)
 
@@ -48,7 +50,7 @@ export default async function Home() {
                 Stay ahead. Stay informed. Stay in control.
               </p>
             </div>
-            <MessageList messages={messages} />
+            <HomeContent messages={messages} />
           </div>
         </div>
       </div>
