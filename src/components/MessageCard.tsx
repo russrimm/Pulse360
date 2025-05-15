@@ -29,7 +29,8 @@ const serviceIcons: Record<string, string> = {
   'Dynamics 365 Apps': '/icons/Dynamics365_scalable.svg',
   'Microsoft Viva': '/icons/viva.svg',
   'Microsoft Purview': '/icons/purview.svg',
-  'Microsoft Defender XDR': '/icons/defender.svg'
+  'Microsoft Defender XDR': '/icons/defender.svg',
+  'Windows': '/icons/Windows.svg'
 };
 
 // Normalize service names
@@ -66,50 +67,48 @@ export const MessageCard: React.FC<MessageCardProps> = ({ message, onClick }) =>
         <div className="p-6">
           <div className="flex flex-col mb-4">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-base font-medium text-gray-700 dark:text-white">{message.id}</span>
-              {message.isMajorChange && (
-                <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-300 border border-red-200 dark:border-red-800 animate-pulse">
-                  Major Change
-                </span>
-              )}
+              <div className="relative group">
+                <div className="absolute -inset-1 bg-gradient-to-r from-primary-500/20 to-primary-600/20 dark:from-primary-400/20 dark:to-primary-300/20 rounded-lg blur opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                <div className="relative">
+                  <div className="absolute -inset-0.5 bg-gradient-to-r from-primary-500 to-primary-600 dark:from-primary-400 dark:to-primary-300 rounded-lg blur opacity-30" />
+                  <span className="relative inline-block px-3 py-1 text-sm font-bold bg-white/90 dark:bg-gray-800/90 text-primary-600 dark:text-primary-400 border border-primary-200 dark:border-primary-700 rounded-lg backdrop-blur-sm">
+                    {message.id}
+                  </span>
+                </div>
+              </div>
+              <div className="flex flex-wrap gap-2 justify-end">
+                {uniqueServices.map((service) => {
+                  const iconPath = serviceIcons[service];
+                  return (
+                    <div
+                      key={service}
+                      className="inline-flex items-center px-3 py-1.5 rounded-xl text-sm font-medium bg-blue-50 text-blue-700 dark:bg-transparent dark:text-blue-300 border border-blue-200 dark:border-blue-800 min-w-[200px] justify-center"
+                    >
+                      {iconPath && (
+                        <Image
+                          src={iconPath}
+                          alt={service}
+                          width={24}
+                          height={24}
+                          className="mr-2"
+                        />
+                      )}
+                      <span className="truncate">{service}</span>
+                    </div>
+                  );
+                })}
+              </div>
             </div>
             <h3 className="text-base font-semibold text-gray-900 dark:text-white line-clamp-2 group-hover:text-primary-700 dark:group-hover:text-primary-400 transition-colors">{message.title}</h3>
           </div>
           
-          <div className="flex flex-wrap gap-2 mb-4">
-            {uniqueServices.map((service) => {
-              const iconPath = serviceIcons[service];
-              return (
-                <div
-                  key={service}
-                  className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-50 text-blue-700 dark:bg-transparent dark:text-blue-300 border border-blue-200 dark:border-blue-800"
-                >
-                  {iconPath && (
-                    <Image
-                      src={iconPath}
-                      alt={service}
-                      width={16}
-                      height={16}
-                      className="mr-1"
-                    />
-                  )}
-                  {service}
-                </div>
-              );
-            })}
-          </div>
-          
           <div className="flex flex-wrap gap-4 text-sm text-gray-600 dark:text-gray-400">
             <span className="flex items-center gap-1">
-              <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-              </svg>
+              <span className="font-medium text-primary-600 dark:text-primary-400">Published:</span>
               {format(new Date(message.published), 'MMM d, yyyy')}
             </span>
             <span className="flex items-center gap-1">
-              <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
+              <span className="font-medium text-primary-600 dark:text-primary-400">Updated:</span>
               {format(new Date(message.lastUpdated), 'MMM d, yyyy')}
             </span>
           </div>

@@ -181,11 +181,13 @@ export async function getMessage(id: string): Promise<Message> {
     const headers = {
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${token}`,
-      'Ocp-Apim-Subscription-Key': API_KEY || ''
+      'Ocp-Apim-Subscription-Key': API_KEY || '',
+      'Cache-Control': 'public, max-age=86400' // Cache for 24 hours
     };
 
     const response = await fetch(`${API_BASE_URL}/admin/serviceAnnouncement/messages?$filter=id eq '${id}'`, {
-      headers
+      headers,
+      next: { revalidate: 86400 } // Enable Next.js cache for 24 hours
     });
 
     if (!response.ok) {
