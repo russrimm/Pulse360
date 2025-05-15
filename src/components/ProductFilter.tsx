@@ -13,26 +13,8 @@ const serviceNameMap: Record<string, string> = {
   'Microsoft Power Automate in Microsoft 365': 'Power Automate',
   'Microsoft Power Automate': 'Power Automate',
   'Power Apps in Microsoft 365': 'Power Apps',
-  'Forms': 'Microsoft Forms',
-  'Microsoft Forms': 'Microsoft Forms',
-  'Stream': 'Microsoft Stream',
-  'Microsoft Stream': 'Microsoft Stream',
-  'Intune': 'Microsoft Intune',
-  'Microsoft Intune': 'Microsoft Intune',
-  'Planner': 'Microsoft Planner',
-  'Microsoft Planner': 'Microsoft Planner',
-  'Entra': 'Microsoft Entra',
-  'Microsoft Entra': 'Microsoft Entra',
   'Dynamics 365 Apps': 'Dynamics 365 Apps',
   'Microsoft Dynamics 365 Apps': 'Dynamics 365 Apps',
-  'Viva': 'Microsoft Viva',
-  'Microsoft Viva': 'Microsoft Viva',
-  'Purview': 'Microsoft Purview',
-  'Microsoft Purview': 'Microsoft Purview',
-  'Teams': 'Microsoft Teams',
-  'Microsoft Teams': 'Microsoft Teams',
-  'Dataverse': 'Microsoft Dataverse',
-  'Microsoft Dataverse': 'Microsoft Dataverse'
 };
 
 // Storage key for persisting filter settings
