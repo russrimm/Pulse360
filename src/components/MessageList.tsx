@@ -5,6 +5,7 @@ import { MessageCard } from '@/components/MessageCard';
 import { ProductFilter } from '@/components/ProductFilter';
 import { Message } from '@/lib/types';
 import { useRouter } from 'next/navigation';
+import { LoadingSpinner } from './LoadingSpinner';
 
 interface MessageListProps {
   messages: Message[];
@@ -21,6 +22,7 @@ export function MessageList({ messages }: MessageListProps) {
   const [page, setPage] = useState(1);
   const observerRef = useRef<IntersectionObserver | null>(null);
   const loadMoreRef = useRef<HTMLDivElement>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   // Initialize filtered messages and services
   useEffect(() => {
@@ -75,6 +77,15 @@ export function MessageList({ messages }: MessageListProps) {
     };
   }, [visibleMessages.length, filteredMessages.length]);
 
+  useEffect(() => {
+    // Simulate loading time for messages
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, []);
+
   const handleMessageClick = (messageId: string) => {
     router.push(`/message/${messageId}`);
   };
@@ -87,7 +98,8 @@ export function MessageList({ messages }: MessageListProps) {
   if (!messages) return null;
 
   return (
-    <div>
+    <div className="relative">
+      {isLoading && <LoadingSpinner />}
       <div className="mb-6">
         <ProductFilter
           services={services}

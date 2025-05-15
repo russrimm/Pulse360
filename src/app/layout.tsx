@@ -48,9 +48,9 @@ export default function RootLayout({
                   href="mailto:russ.rimmerman@microsoft.com"
                   className="text-sm text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white transition-colors text-center"
                 >
-                  Russ Rimmerman
+                  A blog by Russ Rimmerman
                   <br />
-                  Cloud Solution Architect
+                  Microsoft Cloud Solution Architect
                 </a>
                 <a
                   href="https://www.linkedin.com/in/russrimm"

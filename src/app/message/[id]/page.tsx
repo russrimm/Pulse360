@@ -2,15 +2,16 @@ import { getMessage } from '@/lib/api';
 import { MessageDetail } from '@/components/MessageDetail';
 import { notFound } from 'next/navigation';
 
+// Enable ISR for this page - revalidate every 24 hours
+export const revalidate = 86400;
+
 type PageProps = {
-  params: Promise<{ id: string }>;
-  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+  params: { id: string };
 }
 
 export default async function MessagePage({ params }: PageProps) {
   try {
-    const resolvedParams = await params;
-    const message = await getMessage(resolvedParams.id);
+    const message = await getMessage(params.id);
     if (!message) {
       return notFound();
     }
