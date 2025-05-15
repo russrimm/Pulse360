@@ -16,7 +16,12 @@ const inter = Inter({
 export const metadata: Metadata = {
   title: 'Microsoft Pulse 360°',
   description: 'Stay informed about the latest updates and announcements from Microsoft.',
-  metadataBase: new URL('https://microsoft-pulse-360.vercel.app'),
+  metadataBase: new URL('https://www.russrimmerman.com'),
+  icons: {
+    icon: '/siteicon.png',
+    shortcut: '/siteicon.png',
+    apple: '/siteicon.png',
+  }
 }
 
 export default function RootLayout({
@@ -31,6 +36,8 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" as="style" />
         <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" />
+        <link rel="icon" href="/siteicon.png" />
+        <link rel="apple-touch-icon" href="/siteicon.png" />
       </head>
       <body className={`${inter.className} min-h-screen bg-gray-900 dark:bg-black transition-colors duration-200`} suppressHydrationWarning>
         <nav className="fixed top-0 left-0 right-0 z-50 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm border-b border-gray-200 dark:border-gray-800 shadow-sm">

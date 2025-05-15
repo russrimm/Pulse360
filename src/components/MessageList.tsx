@@ -14,7 +14,7 @@ const ITEMS_PER_PAGE = 12;
 
 export function MessageList({ messages }: MessageListProps) {
   const router = useRouter();
-  const [filteredMessages, setFilteredMessages] = useState<Message[]>([]);
+  const [filteredMessages, setFilteredMessages] = useState<Message[]>(messages);
   const [services, setServices] = useState<string[]>([]);
   const [selectedServices, setSelectedServices] = useState<string[]>([]);
   const [visibleMessages, setVisibleMessages] = useState<Message[]>([]);
@@ -77,6 +77,11 @@ export function MessageList({ messages }: MessageListProps) {
 
   const handleMessageClick = (messageId: string) => {
     router.push(`/message/${messageId}`);
+  };
+
+  const handleSearch = (filtered: Message[]) => {
+    setFilteredMessages(filtered);
+    setPage(1);
   };
 
   if (!messages) return null;
