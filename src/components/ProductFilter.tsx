@@ -55,6 +55,29 @@ export function ProductFilter({ services, selectedServices, onFilterChange }: Pr
   const dropdownRef = useRef<HTMLDivElement>(null);
   const saveTimeoutRef = useRef<NodeJS.Timeout>();
 
+  // Memoize selection check
+  const isServiceSelected = useCallback((service: string): boolean => {
+    return selectedServices.includes(service);
+  }, [selectedServices]);
+
+  // Memoize toggle function
+  const toggleService = useCallback((service: string) => {
+    if (isServiceSelected(service)) {
+      // Remove the service
+      const newSelection = selectedServices.filter(s => s !== service);
+      onFilterChange(newSelection);
+    } else {
+      // Add the service
+      onFilterChange([...selectedServices, service]);
+    }
+  }, [selectedServices, onFilterChange, isServiceSelected]);
+
+  // Clear all function
+  const handleClearAll = useCallback(() => {
+    onFilterChange([]);
+    setIsOpen(false);
+  }, [onFilterChange]);
+
   // Memoize normalized services
   const normalizedServices = useMemo(() => 
     Array.from(new Set(services.map(normalizeServiceName))).sort(),
@@ -117,30 +140,6 @@ export function ProductFilter({ services, selectedServices, onFilterChange }: Pr
     };
   }, [selectedServices]);
 
-  // Memoize selection check
-  const isServiceSelected = useCallback((normalizedService: string): boolean => {
-    return services
-      .filter(s => normalizeServiceName(s) === normalizedService)
-      .some(s => selectedServices.includes(s));
-  }, [services, selectedServices]);
-
-  // Memoize toggle function
-  const toggleService = useCallback((service: string) => {
-    const originalServices = services.filter(s => normalizeServiceName(s) === service);
-    
-    if (isServiceSelected(service)) {
-      // Remove all original services from selection
-      const newSelection = selectedServices.filter(s => 
-        !originalServices.some(os => normalizeServiceName(os) === normalizeServiceName(s))
-      );
-      onFilterChange(newSelection);
-    } else {
-      // Add all original services to selection
-      const newSelection = [...selectedServices, ...originalServices];
-      onFilterChange(newSelection);
-    }
-  }, [services, selectedServices, onFilterChange, isServiceSelected]);
-
   return (
     <div className="relative inline-block" ref={dropdownRef}>
       <button
@@ -195,7 +194,7 @@ export function ProductFilter({ services, selectedServices, onFilterChange }: Pr
           </div>
           <div className="p-3 border-t border-gray-200 dark:border-gray-700">
             <button
-              onClick={() => onFilterChange([])}
+              onClick={handleClearAll}
               className="w-full px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
             >
               Clear all

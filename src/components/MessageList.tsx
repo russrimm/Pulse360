@@ -28,25 +28,36 @@ export function MessageList({ messages }: MessageListProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [isTagDropdownOpen, setIsTagDropdownOpen] = useState(false);
 
-  // Initialize filtered messages and services
+  // Filter messages based on search query and selected filters
   useEffect(() => {
-    if (!messages) return;
-    
     const filtered = messages.filter(message => {
-      const matchesSearch = !searchQuery || 
+      const matchesSearch = searchQuery === '' || 
         message.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        message.content.toLowerCase().includes(searchQuery.toLowerCase());
+        message.id.toLowerCase().includes(searchQuery.toLowerCase());
+
       const matchesServices = selectedServices.length === 0 || 
-        message.service.some(service => selectedServices.includes(service));
+        message.service.some(s => selectedServices.includes(s));
+
       const matchesTags = selectedTags.length === 0 || 
-        message.tags.some(tag => selectedTags.includes(tag));
+        message.tags.some(t => selectedTags.includes(t));
+
       return matchesSearch && matchesServices && matchesTags;
     });
     
     setFilteredMessages(filtered);
+  }, [messages, searchQuery, selectedServices, selectedTags]);
+
+  // Update available services
+  useEffect(() => {
     const uniqueServices = Array.from(new Set(messages.flatMap(m => m.service))).sort((a, b) => a.localeCompare(b));
     setServices(uniqueServices);
-  }, [messages, searchQuery, selectedServices, selectedTags]);
+  }, [messages]);
+
+  // Update available tags
+  useEffect(() => {
+    const uniqueTags = Array.from(new Set(messages.flatMap(m => m.tags))).sort((a, b) => a.localeCompare(b));
+    setSelectedTags(uniqueTags);
+  }, [messages]);
 
   // Update visible messages when page changes
   useEffect(() => {
