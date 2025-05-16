@@ -16,36 +16,55 @@ const ITEMS_PER_PAGE = 12;
 
 export function MessageList({ messages }: MessageListProps) {
   const router = useRouter();
-  const [filteredMessages, setFilteredMessages] = useState<Message[]>(messages);
   const [services, setServices] = useState<string[]>([]);
   const [selectedServices, setSelectedServices] = useState<string[]>([]);
   const [visibleMessages, setVisibleMessages] = useState<Message[]>([]);
   const [page, setPage] = useState(1);
   const observerRef = useRef<IntersectionObserver | null>(null);
   const loadMoreRef = useRef<HTMLDivElement>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [isTagDropdownOpen, setIsTagDropdownOpen] = useState(false);
 
-  // Filter messages based on search query and selected filters
-  useEffect(() => {
-    const filtered = messages.filter(message => {
-      const matchesSearch = searchQuery === '' || 
-        message.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        message.id.toLowerCase().includes(searchQuery.toLowerCase());
-
-      const matchesServices = selectedServices.length === 0 || 
-        message.service.some(s => selectedServices.includes(s));
-
-      const matchesTags = selectedTags.length === 0 || 
-        message.tags.some(t => selectedTags.includes(t));
-
-      return matchesSearch && matchesServices && matchesTags;
+  // Get unique tags
+  const uniqueTags = useMemo(() => {
+    const tags = new Set<string>();
+    messages.forEach(message => {
+      message.tags.forEach(tag => {
+        tags.add(tag);
+      });
     });
-    
-    setFilteredMessages(filtered);
+    return Array.from(tags).sort();
+  }, [messages]);
+
+  // Filter and sort messages
+  const filteredMessages = useMemo(() => {
+    return messages
+      .filter(message => {
+        const matchesSearch = searchQuery === '' || 
+          message.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          message.content.toLowerCase().includes(searchQuery.toLowerCase());
+        
+        const matchesServices = selectedServices.length === 0 || 
+          message.service.some(service => selectedServices.includes(service));
+        
+        const matchesTags = selectedTags.length === 0 || 
+          message.tags.some(tag => selectedTags.includes(tag));
+        
+        return matchesSearch && matchesServices && matchesTags;
+      })
+      .sort((a, b) => new Date(b.lastUpdated).getTime() - new Date(a.lastUpdated).getTime());
   }, [messages, searchQuery, selectedServices, selectedTags]);
+
+  // Handle loading state
+  useEffect(() => {
+    setIsLoading(true);
+    const timer = requestAnimationFrame(() => {
+      setIsLoading(false);
+    });
+    return () => cancelAnimationFrame(timer);
+  }, [searchQuery, selectedServices, selectedTags]);
 
   // Update available services
   useEffect(() => {
@@ -56,7 +75,7 @@ export function MessageList({ messages }: MessageListProps) {
   // Update available tags
   useEffect(() => {
     const uniqueTags = Array.from(new Set(messages.flatMap(m => m.tags))).sort((a, b) => a.localeCompare(b));
-    setSelectedTags(uniqueTags);
+    setSelectedTags([]);
   }, [messages]);
 
   // Update visible messages when page changes
@@ -88,36 +107,6 @@ export function MessageList({ messages }: MessageListProps) {
     };
   }, [visibleMessages.length, filteredMessages.length]);
 
-  useEffect(() => {
-    // Simulate loading time for messages
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 500);
-
-    return () => clearTimeout(timer);
-  }, []);
-
-  // Get unique products and tags
-  const uniqueProducts = useMemo(() => {
-    const products = new Set<string>();
-    messages.forEach(message => {
-      message.service.forEach(service => {
-        products.add(service);
-      });
-    });
-    return Array.from(products).sort();
-  }, [messages]);
-
-  const uniqueTags = useMemo(() => {
-    const tags = new Set<string>();
-    messages.forEach(message => {
-      message.tags.forEach(tag => {
-        tags.add(tag);
-      });
-    });
-    return Array.from(tags).sort();
-  }, [messages]);
-
   const handleMessageClick = (messageId: string) => {
     router.push(`/message/${messageId}`);
   };
@@ -126,7 +115,11 @@ export function MessageList({ messages }: MessageListProps) {
 
   return (
     <div className="relative">
-      {isLoading && <LoadingSpinner />}
+      {isLoading && (
+        <div className="fixed inset-0 bg-black/20 dark:bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center">
+          <LoadingSpinner />
+        </div>
+      )}
       <div className="mb-6">
         <h2 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Filters</h2>
         <div className="flex flex-wrap gap-4">

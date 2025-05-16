@@ -40,8 +40,28 @@ export function MessageDetail({ message }: MessageDetailProps) {
   const [selectedImage, setSelectedImage] = useState<{ src: string; alt: string } | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
+  // Format date helper
+  const formatDate = (date: string) => format(new Date(date), 'MMM d, yyyy');
+
+  // Check if dates are the same
+  const isSameDate = (date1: string, date2: string) => formatDate(date1) === formatDate(date2);
+
+  // Get unique services
+  const uniqueServices = useMemo(() => Array.from(new Set(message.service)), [message.service]);
+
+  // Get platform details
+  const platformDetails = useMemo(() => 
+    message.details?.find(d => d.name === 'Platforms')?.value,
+    [message.details]
+  );
+
+  // Get other details (excluding Platforms)
+  const otherDetails = useMemo(() => 
+    message.details?.filter(d => d.name !== 'Platforms'),
+    [message.details]
+  );
+
   useEffect(() => {
-    // Simulate loading time for images and content
     const timer = setTimeout(() => {
       setIsLoading(false);
     }, 500);
@@ -70,12 +90,12 @@ export function MessageDetail({ message }: MessageDetailProps) {
     });
   }, [message.content]);
 
-  // Get unique services
-  const uniqueServices = Array.from(new Set(message.service));
+  if (isLoading) {
+    return <LoadingSpinner />;
+  }
 
   return (
     <div className="min-h-screen">
-      {isLoading && <LoadingSpinner />}
       <div className="absolute inset-0 bg-[radial-gradient(#1f2937_1px,transparent_1px)] [background-size:16px_16px]" />
       <div className="relative px-3 sm:px-6 lg:px-8 pt-0 pb-2 sm:py-4">
         <div className="max-w-7xl mx-auto">
@@ -171,11 +191,11 @@ export function MessageDetail({ message }: MessageDetailProps) {
                     {/* Right Column */}
                     <div className="space-y-4">
                       {/* Platforms */}
-                      {message.details?.find(d => d.name === 'Platforms')?.value && (
+                      {platformDetails && (
                         <div>
                           <h3 className="text-base font-medium text-primary-600 dark:text-primary-400 mb-2">Impacted Platforms</h3>
                           <div className="flex flex-wrap gap-1.5">
-                            {message.details?.find(d => d.name === 'Platforms')?.value.split(',').map((platform) => (
+                            {platformDetails.split(',').map((platform) => (
                               <span
                                 key={platform}
                                 className="inline-flex items-center px-2 py-1 rounded-lg text-base font-medium bg-primary-50 text-primary-700 dark:bg-primary-900/50 dark:text-primary-300"
@@ -195,15 +215,15 @@ export function MessageDetail({ message }: MessageDetailProps) {
                       <div className="flex items-center">
                         <span className="w-24 text-base font-medium text-primary-600 dark:text-primary-400">Published</span>
                         <p className="text-base font-medium text-gray-900 dark:text-white">
-                          {format(new Date(message.published), 'MMM d, yyyy')}
+                          {formatDate(message.published)}
                         </p>
                       </div>
 
-                      {format(new Date(message.published), 'MMM d, yyyy') !== format(new Date(message.lastUpdated), 'MMM d, yyyy') && (
+                      {!isSameDate(message.published, message.lastUpdated) && (
                         <div className="flex items-center">
                           <span className="w-24 text-base font-medium text-primary-600 dark:text-primary-400">Updated</span>
                           <p className="text-base font-medium text-gray-900 dark:text-white">
-                            {format(new Date(message.lastUpdated), 'MMM d, yyyy')}
+                            {formatDate(message.lastUpdated)}
                           </p>
                         </div>
                       )}
@@ -212,7 +232,7 @@ export function MessageDetail({ message }: MessageDetailProps) {
                         <div className="flex items-center">
                           <span className="w-24 text-base font-medium text-primary-600 dark:text-primary-400">Action Required</span>
                           <p className="text-base font-medium text-gray-900 dark:text-white">
-                            {format(new Date(message.actionRequiredByDateTime), 'MMM d, yyyy')}
+                            {formatDate(message.actionRequiredByDateTime)}
                           </p>
                         </div>
                       )}
@@ -221,11 +241,11 @@ export function MessageDetail({ message }: MessageDetailProps) {
                 </div>
               </div>
 
-              {message.details?.filter(d => d.name !== 'Platforms').length > 0 && (
+              {otherDetails && otherDetails.length > 0 && (
                 <div className="border-t border-gray-200 dark:border-gray-700">
                   <div className="pt-3 sm:pt-4">
                     <div className="grid gap-2 sm:gap-3">
-                      {message.details?.filter(d => d.name !== 'Platforms').map((detail) => (
+                      {otherDetails.map((detail) => (
                         <div key={detail.name} className="bg-white/70 dark:bg-gray-700/70 backdrop-blur-sm rounded-xl p-3 sm:p-4 border border-gray-200 dark:border-gray-600">
                           <h3 className="text-lg sm:text-2xl font-bold bg-gradient-to-r from-primary-600 to-primary-400 dark:from-primary-400 dark:to-primary-300 bg-clip-text text-transparent mb-2 capitalize">{detail.name}</h3>
                           <p className="text-sm text-gray-900 dark:text-gray-100">{detail.value}</p>
