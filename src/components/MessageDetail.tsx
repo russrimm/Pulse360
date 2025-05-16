@@ -102,41 +102,47 @@ export function MessageDetail({ message }: MessageDetailProps) {
           <article className="bg-white/90 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
             <div className="p-1.5 sm:p-6">
               <div className="flex items-center justify-center mb-1.5 sm:mb-4">
-                <h1 className="text-xl sm:text-3xl font-bold bg-gradient-to-r from-primary-600 to-primary-400 dark:from-primary-400 dark:to-primary-300 bg-clip-text text-transparent text-center">
-                  {message.id} - {message.title}
-                </h1>
+                <div className="flex flex-col items-center">
+                  <h1 className="text-xl sm:text-3xl font-bold bg-gradient-to-r from-primary-600 to-primary-400 dark:from-primary-400 dark:to-primary-300 bg-clip-text text-transparent text-center">
+                    {message.id} - {message.title}
+                  </h1>
+                </div>
               </div>
 
-              <div className="bg-white/70 dark:bg-gray-700/70 backdrop-blur-sm rounded-xl border border-gray-200 dark:border-gray-600 overflow-hidden mb-4 sm:mb-6">
-                <div className="grid grid-cols-1 sm:grid-cols-2 divide-y sm:divide-y-0 sm:divide-x divide-gray-200 dark:divide-gray-600">
-                  <div className="p-2 sm:p-3">
-                    <div className="space-y-2">
-                      <div className="flex flex-wrap items-center justify-end gap-2">
-                        {message.isMajorChange && (
-                          <span className="inline-flex items-center px-3 py-1.5 rounded-lg text-sm font-medium bg-red-100 text-red-700 dark:bg-red-900/70 dark:text-red-300 border border-red-200 dark:border-red-800 shadow-sm">
-                            <svg className="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                            </svg>
-                            Major Change
-                          </span>
-                        )}
-                      </div>
+              {message.isMajorChange && (
+                <div className="w-full bg-red-50/50 dark:bg-red-900/20 border-b border-red-200/50 dark:border-red-800/50 animate-pulse-subtle">
+                  <div className="flex items-center justify-center py-1.5">
+                    <span className="inline-flex items-center px-3 py-1 text-sm font-medium text-red-700/90 dark:text-red-300/90">
+                      <svg className="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                      </svg>
+                      Major Change
+                    </span>
+                  </div>
+                </div>
+              )}
 
-                      <div className="flex flex-wrap gap-2">
+              <div className="bg-white/70 dark:bg-gray-700/70 backdrop-blur-sm rounded-xl border border-gray-200 dark:border-gray-600 overflow-hidden mb-4 sm:mb-6">
+                <div className="p-3 sm:p-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    {/* Left Column */}
+                    <div className="space-y-4">
+                      {/* Services */}
+                      <div className="flex flex-wrap gap-3">
                         {uniqueServices.map((service) => {
                           const iconPath = serviceIcons[service];
                           return (
                             <span
                               key={service}
-                              className="inline-flex items-center px-3 py-2 rounded-lg text-lg font-semibold bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300 border border-blue-200 dark:border-blue-800 shadow-sm"
+                              className="inline-flex items-center px-4 py-3 rounded-lg text-base font-semibold bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300 border border-blue-200 dark:border-blue-800 shadow-sm"
                             >
                               {iconPath && (
                                 <Image
                                   src={iconPath}
                                   alt={service}
-                                  width={24}
-                                  height={24}
-                                  className="mr-2 w-6 h-6"
+                                  width={32}
+                                  height={32}
+                                  className="mr-3 w-8 h-8"
                                 />
                               )}
                               {service}
@@ -145,57 +151,65 @@ export function MessageDetail({ message }: MessageDetailProps) {
                         })}
                       </div>
 
-                      <div className="grid grid-cols-2 gap-2">
-                        <div>
-                          <span className="text-sm font-medium text-primary-600 dark:text-primary-400">Published</span>
-                          <p className="text-sm font-medium text-gray-900 dark:text-white mt-0.5">
-                            {format(new Date(message.published), 'MMM d, yyyy')}
-                          </p>
+                      {/* Tags */}
+                      {message.tags.length > 0 && (
+                        <div className="flex flex-wrap gap-1.5">
+                          {message.tags.map((tag) => (
+                            <span key={tag} className="inline-flex items-center px-2 py-1 rounded-lg text-sm font-medium bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300 border border-gray-200 dark:border-gray-700">
+                              <svg className="w-4 h-4 mr-1.5 text-gray-500 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+                              </svg>
+                              {tag}
+                            </span>
+                          ))}
                         </div>
+                      )}
+                    </div>
 
+                    {/* Right Column */}
+                    <div className="space-y-4">
+                      {/* Platforms */}
+                      {message.details?.find(d => d.name === 'Platforms')?.value && (
                         <div>
-                          <span className="text-sm font-medium text-primary-600 dark:text-primary-400">Updated</span>
-                          <p className="text-sm font-medium text-gray-900 dark:text-white mt-0.5">
-                            {format(new Date(message.lastUpdated), 'MMM d, yyyy')}
-                          </p>
-                        </div>
-
-                        {message.actionRequiredByDateTime && (
-                          <div className="col-span-2">
-                            <span className="text-sm font-medium text-primary-600 dark:text-primary-400">Action Required By</span>
-                            <p className="text-sm font-medium text-gray-900 dark:text-white mt-0.5">
-                              {format(new Date(message.actionRequiredByDateTime), 'MMM d, yyyy')}
-                            </p>
+                          <h3 className="text-base font-medium text-primary-600 dark:text-primary-400 mb-2">Impacted Platforms</h3>
+                          <div className="flex flex-wrap gap-1.5">
+                            {message.details?.find(d => d.name === 'Platforms')?.value.split(',').map((platform) => (
+                              <span
+                                key={platform}
+                                className="inline-flex items-center px-2 py-1 rounded-lg text-base font-medium bg-primary-50 text-primary-700 dark:bg-primary-900/50 dark:text-primary-300"
+                              >
+                                {platform.trim()}
+                              </span>
+                            ))}
                           </div>
-                        )}
-                      </div>
+                        </div>
+                      )}
                     </div>
                   </div>
 
-                  <div className="p-2 sm:p-3">
-                    <div className="space-y-2">
-                      <div className="flex flex-wrap justify-end gap-1.5">
-                        {message.tags.map((tag) => (
-                          <span key={tag} className="inline-flex items-center px-2 py-1 rounded-lg text-sm font-medium bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300 border border-gray-200 dark:border-gray-700">
-                            <svg className="w-4 h-4 mr-1.5 text-gray-500 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
-                            </svg>
-                            {tag}
-                          </span>
-                        ))}
+                  {/* Dates Section */}
+                  <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+                    <div className="space-y-3">
+                      <div className="flex items-center">
+                        <span className="w-24 text-base font-medium text-primary-600 dark:text-primary-400">Published</span>
+                        <p className="text-base font-medium text-gray-900 dark:text-white">
+                          {format(new Date(message.published), 'MMM d, yyyy')}
+                        </p>
                       </div>
 
-                      {message.details?.find(d => d.name === 'Platforms')?.value && (
-                        <div className="flex flex-wrap items-center justify-end gap-1.5">
-                          <span className="text-sm font-medium text-primary-600 dark:text-primary-400">Impacted Platforms</span>
-                          {message.details?.find(d => d.name === 'Platforms')?.value.split(',').map((platform) => (
-                            <span
-                              key={platform}
-                              className="inline-flex items-center px-2 py-1 rounded-lg text-sm font-medium bg-primary-50 text-primary-700 dark:bg-primary-900/50 dark:text-primary-300"
-                            >
-                              {platform.trim()}
-                            </span>
-                          ))}
+                      <div className="flex items-center">
+                        <span className="w-24 text-base font-medium text-primary-600 dark:text-primary-400">Updated</span>
+                        <p className="text-base font-medium text-gray-900 dark:text-white">
+                          {format(new Date(message.lastUpdated), 'MMM d, yyyy')}
+                        </p>
+                      </div>
+
+                      {message.actionRequiredByDateTime && (
+                        <div className="flex items-center">
+                          <span className="w-24 text-base font-medium text-primary-600 dark:text-primary-400">Action Required</span>
+                          <p className="text-base font-medium text-gray-900 dark:text-white">
+                            {format(new Date(message.actionRequiredByDateTime), 'MMM d, yyyy')}
+                          </p>
                         </div>
                       )}
                     </div>

@@ -14,12 +14,20 @@ const Navbar = () => {
         <div className="flex justify-between items-center h-12 sm:h-16">
           <div className="flex items-center">
             <Link href="/" className="flex items-center">
-              <span className="text-xl font-bold bg-gradient-to-r from-primary-600 to-primary-400 dark:from-primary-400 dark:to-primary-300 bg-clip-text text-transparent">
+              <span className="text-2xl sm:text-4xl font-bold bg-gradient-to-r from-primary-600 to-primary-400 dark:from-primary-400 dark:to-primary-300 bg-clip-text text-transparent">
                 Pulse 360°
+              </span>
+              <span className="hidden sm:inline-block ml-4 text-sm text-gray-600 dark:text-gray-400 italic">
+                Stay ahead. Stay informed. Stay in control.
               </span>
             </Link>
           </div>
           <div className="hidden sm:flex items-center space-x-4">
+            <div className="text-right mr-4">
+              <div className="text-xs text-gray-500 dark:text-gray-400">Crafted with care by</div>
+              <div className="text-sm font-medium text-gray-700 dark:text-gray-300">Russ Rimmerman</div>
+              <div className="text-xs text-gray-600 dark:text-gray-400">Microsoft Cloud Solution Architect</div>
+            </div>
             <a
               href="https://www.linkedin.com/in/your-profile"
               target="_blank"
