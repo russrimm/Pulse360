@@ -16,8 +16,8 @@ const inter = Inter({
 })
 
 export const metadata: Metadata = {
-  title: 'Microsoft Pulse 360°',
-  description: 'Stay informed about the latest updates and announcements from Microsoft.',
+  title: 'Pulse 360°',
+  description: 'Stay informed about Microsoft 365 service updates and changes',
   metadataBase: new URL('https://www.russrimmerman.com'),
   icons: {
     icon: '/siteicon.png',
@@ -48,7 +48,7 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <Navbar />
-          <main className="pt-20">
+          <main className="pt-2">
             {children}
           </main>
         </ThemeProvider>
