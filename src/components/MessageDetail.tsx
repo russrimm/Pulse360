@@ -128,7 +128,7 @@ export function MessageDetail({ message }: MessageDetailProps) {
                     {/* Left Column */}
                     <div className="space-y-4">
                       {/* Services */}
-                      <div className="flex flex-wrap gap-3">
+                      <div className="flex flex-wrap gap-2">
                         {uniqueServices.map((service) => {
                           const iconPath = service.startsWith('Microsoft 365') 
                             ? '/icons/m365.svg' 
@@ -136,7 +136,7 @@ export function MessageDetail({ message }: MessageDetailProps) {
                           return (
                             <span
                               key={service}
-                              className="inline-flex items-center px-3 py-2 rounded-lg text-sm font-medium bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300 border border-blue-200 dark:border-blue-800 shadow-sm"
+                              className="inline-flex items-center px-2 py-1.5 rounded-lg text-sm font-medium bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300 border border-blue-200 dark:border-blue-800 shadow-sm"
                             >
                               {iconPath && (
                                 <Image
@@ -147,7 +147,7 @@ export function MessageDetail({ message }: MessageDetailProps) {
                                   className="mr-2 w-5 h-5"
                                 />
                               )}
-                              {service}
+                              <span className="truncate max-w-[200px]">{service}</span>
                             </span>
                           );
                         })}
