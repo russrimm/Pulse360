@@ -20,34 +20,12 @@ export default async function Home() {
       <div className="relative">
         <div className="px-4 sm:px-6 lg:px-8 py-8">
           <div className="max-w-7xl mx-auto">
-            <div className="text-center mb-6">
-              <h1 
-                className="text-4xl sm:text-5xl font-bold text-white mb-3 [text-wrap:balance] [font-display:swap] [content-visibility:auto] [contain-intrinsic-size:0_5rem] [contain:layout] [contain:paint] [contain:style] [will-change:transform]"
-                style={{ 
-                  textRendering: 'optimizeSpeed',
-                  WebkitFontSmoothing: 'antialiased',
-                  MozOsxFontSmoothing: 'grayscale'
-                }}
-              >
-                <span 
-                  className="inline-block [text-rendering:optimizeSpeed] [transform:translateZ(0)]"
-                  style={{ 
-                    backfaceVisibility: 'hidden',
-                    perspective: '1000px'
-                  }}
-                >
-                  Microsoft Pulse 360°
-                </span>
+            <div className="text-center mb-8">
+              <h1 className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-primary-600 to-primary-400 dark:from-primary-400 dark:to-primary-300 bg-clip-text text-transparent mb-2">
+                Pulse 360°
               </h1>
-              <p 
-                className="text-lg text-gray-300 max-w-2xl mx-auto [text-wrap:balance] [content-visibility:auto] [contain-intrinsic-size:0_1.5rem] [contain:layout] [contain:paint] [contain:style]"
-                style={{ 
-                  textRendering: 'optimizeSpeed',
-                  WebkitFontSmoothing: 'antialiased',
-                  MozOsxFontSmoothing: 'grayscale'
-                }}
-              >
-                Stay ahead. Stay informed. Stay in control.
+              <p className="text-lg text-gray-600 dark:text-gray-400">
+                Stay informed about Microsoft 365 service updates and changes
               </p>
             </div>
           </div>

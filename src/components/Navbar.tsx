@@ -14,15 +14,9 @@ const Navbar = () => {
         <div className="flex justify-between items-center h-12 sm:h-16">
           <div className="flex items-center">
             <Link href="/" className="flex items-center">
-              <Image
-                src="/icons/m365.svg"
-                alt="Microsoft 365"
-                width={32}
-                height={32}
-                className="h-8 w-8 sm:h-10 sm:w-10"
-                priority
-              />
-              <span className="ml-2 text-lg sm:text-xl font-semibold text-gray-900 dark:text-white">Message Center</span>
+              <span className="text-xl font-bold bg-gradient-to-r from-primary-600 to-primary-400 dark:from-primary-400 dark:to-primary-300 bg-clip-text text-transparent">
+                Pulse 360°
+              </span>
             </Link>
           </div>
           <div className="hidden sm:flex items-center space-x-4">
