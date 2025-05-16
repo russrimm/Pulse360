@@ -12,7 +12,7 @@ interface MessageCardProps {
 // Map of service names to their icon paths
 const serviceIcons: Record<string, string> = {
   'Power Apps': '/icons/PowerApps_scalable.svg',
-  'Power Automate': '/icons/PowerAutomate_scalable.svg',
+  'Microsoft Power Automate': '/icons/PowerAutomate_scalable.svg',
   'Power Platform': '/icons/PowerPlatform_scalable.svg',
   'Microsoft Dataverse': '/icons/Dataverse_scalable.svg',
   'Power BI': '/icons/PowerBI_scalable.svg',
@@ -29,13 +29,15 @@ const serviceIcons: Record<string, string> = {
   'Exchange Online': '/icons/exchange.svg',
   'Microsoft Forms': '/icons/forms.svg',
   'Microsoft Intune': '/icons/intune.svg',
-  'Microsoft Planner': '/icons/planner.svg',
+  'Planner': '/icons/planner.svg',
   'Microsoft Entra': '/icons/entra.svg',
   'Dynamics 365 Apps': '/icons/Dynamics365_scalable.svg',
   'Microsoft Viva': '/icons/viva.svg',
   'Microsoft Purview': '/icons/purview.svg',
   'Microsoft Defender XDR': '/icons/defender.svg',
-  'Windows': '/icons/Windows.svg'
+  'Windows': '/icons/Windows.svg',
+  'Microsoft Power Automate in Microsoft 365': '/icons/PowerAutomate_scalable.svg',
+  'Power Apps in Microsoft 365': '/icons/PowerApps_scalable.svg'
 };
 
 // Normalize service names
@@ -142,15 +144,16 @@ export const MessageCard: React.FC<MessageCardProps> = ({ message, onClick }) =>
             </div>
           )}
 
-          <div className="flex flex-wrap gap-4 text-sm text-gray-600 dark:text-gray-400 mb-4">
-            <div className="flex items-center">
-              <span className="text-sm text-gray-500 dark:text-gray-400">
-                {format(new Date(message.published), 'MMM d, yyyy') === format(new Date(message.lastUpdated), 'MMM d, yyyy')
-                  ? `Published: ${format(new Date(message.published), 'MMM d, yyyy')}`
-                  : `Published: ${format(new Date(message.published), 'MMM d, yyyy')} • Updated: ${format(new Date(message.lastUpdated), 'MMM d, yyyy')}`
-                }
-              </span>
-            </div>
+          <div className="flex items-center text-xs text-gray-500 dark:text-gray-400 gap-2 mb-6">
+            <span className="font-medium">Published:</span>
+            <span>{format(new Date(message.published), 'MMM d, yyyy')}</span>
+            {format(new Date(message.published), 'MMM d, yyyy') !== format(new Date(message.lastUpdated), 'MMM d, yyyy') && (
+              <>
+                <span>•</span>
+                <span className="font-medium">Updated:</span>
+                <span>{format(new Date(message.lastUpdated), 'MMM d, yyyy')}</span>
+              </>
+            )}
           </div>
 
           <div className="flex flex-col gap-4">
