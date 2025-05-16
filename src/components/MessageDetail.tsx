@@ -199,12 +199,14 @@ export function MessageDetail({ message }: MessageDetailProps) {
                         </p>
                       </div>
 
-                      <div className="flex items-center">
-                        <span className="w-24 text-base font-medium text-primary-600 dark:text-primary-400">Updated</span>
-                        <p className="text-base font-medium text-gray-900 dark:text-white">
-                          {format(new Date(message.lastUpdated), 'MMM d, yyyy')}
-                        </p>
-                      </div>
+                      {format(new Date(message.published), 'MMM d, yyyy') !== format(new Date(message.lastUpdated), 'MMM d, yyyy') && (
+                        <div className="flex items-center">
+                          <span className="w-24 text-base font-medium text-primary-600 dark:text-primary-400">Updated</span>
+                          <p className="text-base font-medium text-gray-900 dark:text-white">
+                            {format(new Date(message.lastUpdated), 'MMM d, yyyy')}
+                          </p>
+                        </div>
+                      )}
 
                       {message.actionRequiredByDateTime && (
                         <div className="flex items-center">
@@ -245,7 +247,7 @@ export function MessageDetail({ message }: MessageDetailProps) {
                   }}
                 >
                   <h2 className="text-lg sm:text-2xl font-bold bg-gradient-to-r from-primary-600 to-primary-400 dark:from-primary-400 dark:to-primary-300 bg-clip-text text-transparent mb-3 sm:mb-4">More information</h2>
-                  <div className="break-words" dangerouslySetInnerHTML={{ __html: processedContent }} />
+                  <div className="break-words break-all [&_*]:break-words [&_*]:break-all [&_p]:whitespace-normal [&_*]:whitespace-normal [&_*]:overflow-wrap-anywhere" dangerouslySetInnerHTML={{ __html: processedContent }} />
                 </div>
               </div>
             </div>
