@@ -55,7 +55,7 @@ export const MessageCard: React.FC<MessageCardProps> = ({ message, onClick }) =>
   return (
     <Link href={`/message/${message.id}`}>
       <div 
-        className="group bg-white/80 dark:bg-gray-800/50 backdrop-blur-sm rounded-xl shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-200 dark:border-gray-700/50 hover:border-primary-200 dark:hover:border-primary-800 hover:-translate-y-1 h-full cursor-pointer"
+        className="group bg-white/80 dark:bg-gray-800/50 backdrop-blur-sm rounded-xl shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-200 dark:border-gray-700/50 hover:border-primary-200 dark:hover:border-primary-800 hover:-translate-y-1 h-full cursor-pointer flex flex-col"
         onClick={handleClick}
       >
         {message.isMajorChange && (
@@ -84,15 +84,15 @@ export const MessageCard: React.FC<MessageCardProps> = ({ message, onClick }) =>
               return (
                 <div
                   key={service}
-                  className="inline-flex items-center px-3 py-1.5 rounded-xl text-sm font-medium bg-blue-50 text-blue-700 dark:bg-transparent dark:text-blue-300 border border-blue-200 dark:border-blue-800 min-w-[200px] justify-center"
+                  className="inline-flex items-center px-2 py-1 rounded-lg text-xs font-medium bg-blue-50 text-blue-700 dark:bg-transparent dark:text-blue-300 border border-blue-200 dark:border-blue-800 min-w-[160px] justify-center"
                 >
                   {iconPath && (
                     <Image
                       src={iconPath}
                       alt={service}
-                      width={24}
-                      height={24}
-                      className="mr-2"
+                      width={16}
+                      height={16}
+                      className="mr-1.5 w-4 h-4"
                     />
                   )}
                   <span className="truncate">{service}</span>
@@ -101,18 +101,19 @@ export const MessageCard: React.FC<MessageCardProps> = ({ message, onClick }) =>
             })}
           </div>
         </div>
-        <div className="p-6">
+        <div className="p-6 flex flex-col flex-grow">
+          <div className="flex flex-wrap gap-4 text-sm text-gray-600 dark:text-gray-400 mb-4">
+            <div className="flex items-center">
+              <span className="text-sm text-gray-500 dark:text-gray-400">
+                {format(new Date(message.published), 'MMM d, yyyy') === format(new Date(message.lastUpdated), 'MMM d, yyyy')
+                  ? `Published: ${format(new Date(message.published), 'MMM d, yyyy')}`
+                  : `Published: ${format(new Date(message.published), 'MMM d, yyyy')} • Updated: ${format(new Date(message.lastUpdated), 'MMM d, yyyy')}`
+                }
+              </span>
+            </div>
+          </div>
           <div className="flex flex-col gap-4">
             <h3 className="text-base font-semibold text-gray-900 dark:text-white group-hover:text-primary-700 dark:group-hover:text-primary-400 transition-colors">{message.title}</h3>
-          </div>
-          
-          <div className="flex flex-wrap gap-4 text-sm text-gray-600 dark:text-gray-400 mt-6">
-            <div className="flex items-center">
-              <span className="text-sm text-gray-500 dark:text-gray-400">Published: {format(new Date(message.published), 'MMM d, yyyy')}</span>
-            </div>
-            <div className="flex items-center">
-              <span className="text-sm text-gray-500 dark:text-gray-400">Updated: {format(new Date(message.lastUpdated), 'MMM d, yyyy')}</span>
-            </div>
           </div>
         </div>
       </div>
