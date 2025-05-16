@@ -31,8 +31,13 @@ const normalizeServiceName = (service: string): string => {
   return service;
 };
 
-export function ProductFilter({ services, selectedServices, onFilterChange }: ProductFilterProps) {
+export function ProductFilter({ onFilterChange }: ProductFilterProps) {
+  const [selectedServices, setSelectedServices] = useState<string[]>([]);
   const [isOpen, setIsOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [isLoading, setIsLoading] = useState(true);
+  const [services, setServices] = useState<Service[]>([]);
+  const [error, setError] = useState<string | null>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const saveTimeoutRef = useRef<NodeJS.Timeout>();
 

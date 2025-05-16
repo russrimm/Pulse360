@@ -16,7 +16,6 @@ const ITEMS_PER_PAGE = 12;
 
 export function MessageList({ messages }: MessageListProps) {
   const router = useRouter();
-  const [filteredMessages, setFilteredMessages] = useState<Message[]>(messages);
   const [services, setServices] = useState<string[]>([]);
   const [selectedServices, setSelectedServices] = useState<string[]>([]);
   const [visibleMessages, setVisibleMessages] = useState<Message[]>([]);
@@ -28,23 +27,23 @@ export function MessageList({ messages }: MessageListProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [isTagDropdownOpen, setIsTagDropdownOpen] = useState(false);
 
-  // Filter messages based on search query and selected filters
-  useEffect(() => {
-    const filtered = messages.filter(message => {
-      const matchesSearch = searchQuery === '' || 
-        message.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        message.id.toLowerCase().includes(searchQuery.toLowerCase());
-
-      const matchesServices = selectedServices.length === 0 || 
-        message.service.some(s => selectedServices.includes(s));
-
-      const matchesTags = selectedTags.length === 0 || 
-        message.tags.some(t => selectedTags.includes(t));
-
-      return matchesSearch && matchesServices && matchesTags;
-    });
-    
-    setFilteredMessages(filtered);
+  // Filter and sort messages
+  const filteredMessages = useMemo(() => {
+    return messages
+      .filter(message => {
+        const matchesSearch = searchQuery === '' || 
+          message.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          message.content.toLowerCase().includes(searchQuery.toLowerCase());
+        
+        const matchesServices = selectedServices.length === 0 || 
+          message.service.some(service => selectedServices.includes(service));
+        
+        const matchesTags = selectedTags.length === 0 || 
+          message.tags.some(tag => selectedTags.includes(tag));
+        
+        return matchesSearch && matchesServices && matchesTags;
+      })
+      .sort((a, b) => new Date(b.lastUpdated).getTime() - new Date(a.lastUpdated).getTime());
   }, [messages, searchQuery, selectedServices, selectedTags]);
 
   // Update available services
@@ -56,7 +55,7 @@ export function MessageList({ messages }: MessageListProps) {
   // Update available tags
   useEffect(() => {
     const uniqueTags = Array.from(new Set(messages.flatMap(m => m.tags))).sort((a, b) => a.localeCompare(b));
-    setSelectedTags(uniqueTags);
+    setSelectedTags([]);
   }, [messages]);
 
   // Update visible messages when page changes
