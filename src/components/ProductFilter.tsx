@@ -8,33 +8,50 @@ interface ProductFilterProps {
   onFilterChange: (services: string[]) => void;
 }
 
-// Map of service names to their normalized versions
-const serviceNameMap: Record<string, string> = {
-  'Microsoft Power Automate in Microsoft 365': 'Microsoft Power Automate',
-  'Microsoft Power Automate': 'Microsoft Power Automate',
-  'Power Apps in Microsoft 365': 'Microsoft Power Apps',
-  'Dynamics 365 Apps': 'Microsoft Dynamics 365 Apps',
-  'Microsoft Dynamics 365 Apps': 'Microsoft Dynamics 365 Apps'
+// Map of service names to their icons
+const serviceIconMap: Record<string, string> = {
+  'Power Apps': '/icons/PowerApps_scalable.svg',
+  'Microsoft Power Automate': '/icons/PowerAutomate_scalable.svg',
+  'Power Platform': '/icons/PowerPlatform_scalable.svg',
+  'Microsoft Dataverse': '/icons/Dataverse_scalable.svg',
+  'Power BI': '/icons/PowerBI_scalable.svg',
+  'Microsoft Teams': '/icons/teams.svg',
+  'SharePoint Online': '/icons/sharepoint.svg',
+  'Microsoft 365': '/icons/m365.svg',
+  'Microsoft 365 Apps': '/icons/m365.svg',
+  'Microsoft 365 for Business': '/icons/m365.svg',
+  'Microsoft 365 for Enterprise': '/icons/m365.svg',
+  'Microsoft 365 for Education': '/icons/m365.svg',
+  'Microsoft 365 for Government': '/icons/m365.svg',
+  'OneDrive for Business': '/icons/onedrive.svg',
+  'Microsoft Stream': '/icons/stream.svg',
+  'Exchange Online': '/icons/exchange.svg',
+  'Microsoft Forms': '/icons/forms.svg',
+  'Microsoft Intune': '/icons/intune.svg',
+  'Planner': '/icons/planner.svg',
+  'Microsoft Entra': '/icons/entra.svg',
+  'Dynamics 365 Apps': '/icons/Dynamics365_scalable.svg',
+  'Microsoft Viva': '/icons/viva.svg',
+  'Microsoft Purview': '/icons/purview.svg',
+  'Microsoft Defender XDR': '/icons/defender.svg',
+  'Windows': '/icons/Windows.svg',
+  'Microsoft Power Automate in Microsoft 365': '/icons/PowerAutomate_scalable.svg',
+  'Power Apps in Microsoft 365': '/icons/PowerApps_scalable.svg'
 };
 
 // Storage key for persisting filter settings
 const STORAGE_KEY = 'message-center-filters';
 
-// Function to normalize service names
-const normalizeServiceName = (service: string): string => {
-  // First check if there's a specific mapping
-  if (serviceNameMap[service]) {
-    return serviceNameMap[service];
-  }
-  
-  // Return the service name as is
-  return service;
-};
-
 export function ProductFilter({ services, selectedServices, onFilterChange }: ProductFilterProps) {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const saveTimeoutRef = useRef<NodeJS.Timeout>();
+
+  // Log services for debugging
+  useEffect(() => {
+    console.log('Available services:', services);
+    console.log('Service icon mapping:', serviceIconMap);
+  }, [services]);
 
   // Memoize selection check
   const isServiceSelected = useCallback((service: string): boolean => {
@@ -59,9 +76,9 @@ export function ProductFilter({ services, selectedServices, onFilterChange }: Pr
     setIsOpen(false);
   }, [onFilterChange]);
 
-  // Memoize normalized services
-  const normalizedServices = useMemo(() => 
-    Array.from(new Set(services.map(normalizeServiceName))).sort(),
+  // Memoize sorted services
+  const sortedServices = useMemo(() => 
+    [...services].sort(),
     [services]
   );
 
@@ -85,7 +102,7 @@ export function ProductFilter({ services, selectedServices, onFilterChange }: Pr
         const parsedFilters = JSON.parse(savedFilters);
         // Only apply saved filters if they exist in current services
         const validFilters = parsedFilters.filter((filter: string) => 
-          services.some(s => normalizeServiceName(s) === filter)
+          services.includes(filter)
         );
         if (validFilters.length > 0) {
           onFilterChange(validFilters);
@@ -158,20 +175,34 @@ export function ProductFilter({ services, selectedServices, onFilterChange }: Pr
             </p>
           </div>
           <div className="max-h-60 overflow-y-auto p-2">
-            {normalizedServices.map((service) => (
-              <label
-                key={service}
-                className="flex items-center px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md cursor-pointer"
-              >
-                <input
-                  type="checkbox"
-                  checked={isServiceSelected(service)}
-                  onChange={() => toggleService(service)}
-                  className="w-4 h-4 text-primary-600 border-gray-300 rounded focus:ring-primary-500"
-                />
-                <span className="ml-2 text-sm text-gray-700 dark:text-gray-200">{service}</span>
-              </label>
-            ))}
+            {sortedServices.map((service) => {
+              console.log('Service:', service, 'Has icon:', !!serviceIconMap[service]);
+              return (
+                <label
+                  key={service}
+                  className="flex items-center px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md cursor-pointer"
+                >
+                  <input
+                    type="checkbox"
+                    checked={isServiceSelected(service)}
+                    onChange={() => toggleService(service)}
+                    className="w-4 h-4 text-primary-600 border-gray-300 rounded focus:ring-primary-500"
+                  />
+                  <span className="ml-2 text-sm text-gray-700 dark:text-gray-200 flex items-center gap-2">
+                    {serviceIconMap[service] && (
+                      <img 
+                        src={serviceIconMap[service]} 
+                        alt={`${service} icon`}
+                        className="w-3.5 h-3.5 object-contain"
+                        width={14}
+                        height={14}
+                      />
+                    )}
+                    {service}
+                  </span>
+                </label>
+              );
+            })}
           </div>
           <div className="p-3 border-t border-gray-200 dark:border-gray-700">
             <button
