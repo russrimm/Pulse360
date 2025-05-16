@@ -97,14 +97,12 @@ export const MessageCard: React.FC<MessageCardProps> = ({ message, onClick }) =>
           </div>
           
           <div className="flex flex-wrap gap-4 text-sm text-gray-600 dark:text-gray-400 mt-6">
-            <span className="flex items-center gap-1">
-              <span className="font-medium text-primary-600 dark:text-primary-400">Published:</span>
-              {format(new Date(message.published), 'MMM d, yyyy')}
-            </span>
-            <span className="flex items-center gap-1 ml-auto">
-              <span className="font-medium text-primary-600 dark:text-primary-400">Updated:</span>
-              {format(new Date(message.lastUpdated), 'MMM d, yyyy')}
-            </span>
+            <div className="flex items-center">
+              <span className="text-sm text-gray-500 dark:text-gray-400">Published: {format(new Date(message.published), 'MMM d, yyyy')}</span>
+            </div>
+            <div className="flex items-center">
+              <span className="text-sm text-gray-500 dark:text-gray-400">Updated: {format(new Date(message.lastUpdated), 'MMM d, yyyy')}</span>
+            </div>
           </div>
         </div>
       </div>
