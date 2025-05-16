@@ -10,11 +10,11 @@ interface ProductFilterProps {
 
 // Map of service names to their normalized versions
 const serviceNameMap: Record<string, string> = {
-  'Microsoft Power Automate in Microsoft 365': 'Power Automate',
-  'Microsoft Power Automate': 'Power Automate',
-  'Power Apps in Microsoft 365': 'Power Apps',
-  'Dynamics 365 Apps': 'Dynamics 365 Apps',
-  'Microsoft Dynamics 365 Apps': 'Dynamics 365 Apps'
+  'Microsoft Power Automate in Microsoft 365': 'Microsoft Power Automate',
+  'Microsoft Power Automate': 'Microsoft Power Automate',
+  'Power Apps in Microsoft 365': 'Microsoft Power Apps',
+  'Dynamics 365 Apps': 'Microsoft Dynamics 365 Apps',
+  'Microsoft Dynamics 365 Apps': 'Microsoft Dynamics 365 Apps'
 };
 
 // Storage key for persisting filter settings
