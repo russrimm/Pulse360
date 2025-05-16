@@ -26,9 +26,9 @@ const normalizeServiceName = (service: string): string => {
   if (serviceNameMap[service]) {
     return serviceNameMap[service];
   }
-    
-  // Otherwise remove "Microsoft" prefix if it exists
-  return service.replace(/^Microsoft\s+/, '');
+  
+  // Return the service name as is
+  return service;
 };
 
 export function ProductFilter({ services, selectedServices, onFilterChange }: ProductFilterProps) {

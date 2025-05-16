@@ -19,6 +19,11 @@ const serviceIcons: Record<string, string> = {
   'Microsoft Teams': '/icons/teams.svg',
   'SharePoint Online': '/icons/sharepoint.svg',
   'Microsoft 365': '/icons/m365.svg',
+  'Microsoft 365 Apps': '/icons/m365.svg',
+  'Microsoft 365 for Business': '/icons/m365.svg',
+  'Microsoft 365 for Enterprise': '/icons/m365.svg',
+  'Microsoft 365 for Education': '/icons/m365.svg',
+  'Microsoft 365 for Government': '/icons/m365.svg',
   'OneDrive for Business': '/icons/onedrive.svg',
   'Microsoft Stream': '/icons/stream.svg',
   'Exchange Online': '/icons/exchange.svg',
@@ -35,18 +40,7 @@ const serviceIcons: Record<string, string> = {
 
 // Normalize service names
 const normalizeService = (service: string): string => {
-  if (service.includes('365')) return 'Microsoft 365';
-  if (service.includes('Power Apps')) return 'Power Apps';
-  if (service.includes('Power Automate')) return 'Power Automate';
-  if (service.includes('Forms')) return 'Microsoft Forms';
-  if (service.includes('Stream')) return 'Microsoft Stream';
-  if (service.includes('Intune')) return 'Microsoft Intune';
-  if (service.includes('Planner')) return 'Microsoft Planner';
-  if (service.includes('Entra')) return 'Microsoft Entra';
-  if (service.includes('Dynamics')) return 'Dynamics 365 Apps';
-  if (service.includes('Viva')) return 'Microsoft Viva';
-  if (service.includes('Purview')) return 'Microsoft Purview';
-  if (service.includes('Defender')) return 'Microsoft Defender XDR';
+  // Return the service name as is
   return service;
 };
 
@@ -84,7 +78,9 @@ export const MessageCard: React.FC<MessageCardProps> = ({ message, onClick }) =>
           </div>
           <div className="flex flex-wrap gap-2 justify-end">
             {uniqueServices.map((service) => {
-              const iconPath = serviceIcons[service];
+              const iconPath = service.startsWith('Microsoft 365') 
+                ? '/icons/m365.svg' 
+                : serviceIcons[service];
               return (
                 <div
                   key={service}
