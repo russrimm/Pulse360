@@ -100,39 +100,39 @@ export function MessageDetail({ message }: MessageDetailProps) {
           </div>
 
           <article className="bg-white/90 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
-            <div className="p-6 sm:p-8">
-              <div className="flex items-center justify-between mb-6">
-                <h1 className="text-2xl sm:text-4xl font-bold bg-gradient-to-r from-primary-600 to-primary-400 dark:from-primary-400 dark:to-primary-300 bg-clip-text text-transparent">{message.title}</h1>
+            <div className="p-3 sm:p-8">
+              <div className="flex items-center justify-between mb-4 sm:mb-6">
+                <h1 className="text-xl sm:text-4xl font-bold bg-gradient-to-r from-primary-600 to-primary-400 dark:from-primary-400 dark:to-primary-300 bg-clip-text text-transparent">{message.title}</h1>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-4 mb-4 sm:mb-8">
                 {message.isMajorChange && (
-                  <div className="bg-white/70 dark:bg-gray-700/70 backdrop-blur-sm rounded-xl border border-gray-200 dark:border-gray-600 p-3">
-                    <h3 className="text-sm font-medium text-primary-600 dark:text-primary-400 mb-2">Status</h3>
-                    <span className="inline-flex items-center px-3 py-1.5 rounded-xl text-base font-medium bg-red-50 text-red-700 dark:bg-red-900/50 dark:text-red-300">
+                  <div className="bg-white/70 dark:bg-gray-700/70 backdrop-blur-sm rounded-xl border border-gray-200 dark:border-gray-600 p-2 sm:p-3">
+                    <h3 className="text-sm font-medium text-primary-600 dark:text-primary-400 mb-1 sm:mb-2">Status</h3>
+                    <span className="inline-flex items-center px-2 sm:px-3 py-1 sm:py-1.5 rounded-xl text-sm sm:text-base font-medium bg-red-50 text-red-700 dark:bg-red-900/50 dark:text-red-300">
                       Major Change
                     </span>
                   </div>
                 )}
-                <div className="bg-white/70 dark:bg-gray-700/70 backdrop-blur-sm rounded-xl border border-gray-200 dark:border-gray-600 p-3 flex items-center justify-center">
-                  <p className="text-4xl font-bold text-gray-900 dark:text-white text-center">{message.id}</p>
+                <div className="bg-white/70 dark:bg-gray-700/70 backdrop-blur-sm rounded-xl border border-gray-200 dark:border-gray-600 p-2 sm:p-3 flex items-center justify-center">
+                  <p className="text-2xl sm:text-4xl font-bold text-gray-900 dark:text-white text-center">{message.id}</p>
                 </div>
-                <div className="bg-white/70 dark:bg-gray-700/70 backdrop-blur-sm rounded-xl border border-gray-200 dark:border-gray-600 p-2 sm:p-3">
-                  <div className="flex flex-wrap gap-1.5 sm:gap-2 justify-center items-center">
+                <div className="bg-white/70 dark:bg-gray-700/70 backdrop-blur-sm rounded-xl border border-gray-200 dark:border-gray-600 p-1.5 sm:p-3">
+                  <div className="flex flex-wrap gap-1 sm:gap-2 justify-center items-center">
                     {uniqueServices.map((service) => {
                       const iconPath = serviceIcons[service];
                       return (
                         <span
                           key={service}
-                          className="inline-flex items-center px-2 sm:px-3 py-1 sm:py-1.5 rounded-xl text-lg sm:text-2xl font-medium bg-blue-50 text-blue-700 dark:bg-transparent dark:text-blue-300"
+                          className="inline-flex items-center px-1.5 sm:px-3 py-0.5 sm:py-1.5 rounded-xl text-base sm:text-2xl font-medium bg-blue-50 text-blue-700 dark:bg-transparent dark:text-blue-300"
                         >
                           {iconPath && (
                             <Image
                               src={iconPath}
                               alt={service}
-                              width={24}
-                              height={24}
-                              className="mr-1.5 sm:mr-2 w-6 h-6 sm:w-10 sm:h-10"
+                              width={20}
+                              height={20}
+                              className="mr-1 sm:mr-2 w-5 h-5 sm:w-10 sm:h-10"
                             />
                           )}
                           {service}
@@ -141,16 +141,16 @@ export function MessageDetail({ message }: MessageDetailProps) {
                     })}
                   </div>
                 </div>
-                <div className="bg-white/70 dark:bg-gray-700/70 backdrop-blur-sm rounded-xl border border-gray-200 dark:border-gray-600 p-3 flex flex-col justify-between">
+                <div className="bg-white/70 dark:bg-gray-700/70 backdrop-blur-sm rounded-xl border border-gray-200 dark:border-gray-600 p-2 sm:p-3 flex flex-col justify-between">
                   <div className="flex items-center">
-                    <span className="w-24 text-sm font-medium text-primary-600 dark:text-primary-400">Published:</span>
-                    <p className="text-base font-medium text-gray-900 dark:text-white ml-4">
+                    <span className="w-20 sm:w-24 text-xs sm:text-sm font-medium text-primary-600 dark:text-primary-400">Published:</span>
+                    <p className="text-sm sm:text-base font-medium text-gray-900 dark:text-white ml-2 sm:ml-4">
                       {format(new Date(message.published), 'MMM d, yyyy')}
                     </p>
                   </div>
-                  <div className="flex items-center mt-2">
-                    <span className="w-24 text-sm font-medium text-primary-600 dark:text-primary-400">Updated:</span>
-                    <p className="text-base font-medium text-gray-900 dark:text-white ml-4">
+                  <div className="flex items-center mt-1 sm:mt-2">
+                    <span className="w-20 sm:w-24 text-xs sm:text-sm font-medium text-primary-600 dark:text-primary-400">Updated:</span>
+                    <p className="text-sm sm:text-base font-medium text-gray-900 dark:text-white ml-2 sm:ml-4">
                       {format(new Date(message.lastUpdated), 'MMM d, yyyy')}
                     </p>
                   </div>
