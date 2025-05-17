@@ -86,7 +86,7 @@ export const MessageCard: React.FC<MessageCardProps> = ({ message, onClick }) =>
               return (
                 <div
                   key={service}
-                  className="inline-flex items-center px-2 py-1 rounded-lg text-xs font-medium bg-blue-50 text-blue-700 dark:bg-transparent dark:text-blue-300 border border-blue-200 dark:border-blue-800 min-w-[160px] justify-center"
+                  className="inline-flex items-center px-3 py-1.5 rounded-xl text-sm font-medium bg-blue-50 text-blue-700 dark:bg-transparent dark:text-blue-300 border border-blue-200 dark:border-blue-800 min-w-[160px] justify-center"
                 >
                   {iconPath && (
                     <Image
