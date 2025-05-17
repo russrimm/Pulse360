@@ -122,9 +122,9 @@ export const MessageCard: React.FC<MessageCardProps> = ({ message, onClick }) =>
                 const getTagStyle = (tag: string) => {
                   const tagLower = tag.toLowerCase();
                   if (tagLower.includes('new feature')) return 'bg-emerald-50/90 text-emerald-700 dark:bg-emerald-900/20 dark:text-emerald-200 border border-emerald-200/30 dark:border-emerald-700/20';
+                  if (tagLower.includes('update')) return 'bg-teal-50/90 text-teal-700 dark:bg-teal-900/20 dark:text-teal-200 border border-teal-200/30 dark:border-teal-700/20';
                   if (tagLower.includes('user impact')) return 'bg-amber-50/90 text-amber-700 dark:bg-amber-900/20 dark:text-amber-200 border border-amber-200/30 dark:border-amber-700/20';
                   if (tagLower.includes('admin impact')) return 'bg-orange-50/90 text-orange-700 dark:bg-orange-900/20 dark:text-orange-200 border border-orange-200/30 dark:border-orange-700/20';
-                  if (tagLower.includes('update')) return 'bg-teal-50/90 text-teal-700 dark:bg-teal-900/20 dark:text-teal-200 border border-teal-200/30 dark:border-teal-700/20';
                   return 'bg-gray-50/90 text-gray-600 dark:bg-gray-800/20 dark:text-gray-300 border border-gray-200/30 dark:border-gray-700/20';
                 };
 
