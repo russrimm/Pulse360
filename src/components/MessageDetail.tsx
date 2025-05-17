@@ -212,21 +212,18 @@ export function MessageDetail({ message }: MessageDetailProps) {
                   {/* Dates Section */}
                   <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
                     <div className="space-y-3">
-                      <div className="flex items-center">
-                        <span className="w-24 text-base font-medium text-primary-600 dark:text-primary-400">Published</span>
-                        <p className="text-base font-medium text-gray-900 dark:text-white">
-                          {formatDate(message.published)}
-                        </p>
-                      </div>
-
-                      {!isSameDate(message.published, message.lastUpdated) && (
-                        <div className="flex items-center">
-                          <span className="w-24 text-base font-medium text-primary-600 dark:text-primary-400">Updated</span>
-                          <p className="text-base font-medium text-gray-900 dark:text-white">
-                            {formatDate(message.lastUpdated)}
-                          </p>
+                      <div className="flex items-center justify-between text-[11px] text-gray-500 dark:text-gray-400 mb-4">
+                        <div className="flex items-center gap-1.5">
+                          <span className="font-medium">Published</span>
+                          <span>{format(new Date(message.published), 'MMM d, yyyy')}</span>
                         </div>
-                      )}
+                        {format(new Date(message.published), 'MMM d, yyyy') !== format(new Date(message.lastUpdated), 'MMM d, yyyy') && (
+                          <div className="flex items-center gap-1.5">
+                            <span className="font-medium">Updated</span>
+                            <span>{format(new Date(message.lastUpdated), 'MMM d, yyyy')}</span>
+                          </div>
+                        )}
+                      </div>
 
                       {message.actionRequiredByDateTime && (
                         <div className="flex items-center">
