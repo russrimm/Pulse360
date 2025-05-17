@@ -72,40 +72,51 @@ export const MessageCard: React.FC<MessageCardProps> = ({ message, onClick }) =>
             </div>
           </div>
         )}
-        <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-900/50 border-b border-gray-200 dark:border-gray-700/50">
-          <div className="flex items-center gap-2">
+        <div className="flex flex-col p-3 pb-1 bg-gray-50 dark:bg-gray-900/50 border-b border-gray-200 dark:border-gray-700/50">
+          <div className="flex items-center justify-between mb-1">
             <div className="inline-flex items-center px-3 py-1.5 rounded-xl text-sm font-medium bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-md transition-all duration-200">
               {message.id}
             </div>
+            <div className="flex flex-wrap gap-2 justify-end">
+              {uniqueServices.map((service) => {
+                const iconPath = service.startsWith('Microsoft 365') 
+                  ? '/icons/m365.svg' 
+                  : serviceIcons[service];
+                return (
+                  <div
+                    key={service}
+                    className="inline-flex items-center px-3 py-1.5 rounded-xl text-sm font-medium bg-blue-50 text-blue-700 dark:bg-transparent dark:text-blue-300 border border-blue-200 dark:border-blue-800 min-w-[160px] justify-center"
+                  >
+                    {iconPath && (
+                      <Image
+                        src={iconPath}
+                        alt={service}
+                        width={16}
+                        height={16}
+                        className="mr-1.5 w-4 h-4"
+                      />
+                    )}
+                    <span className="truncate">{service}</span>
+                  </div>
+                );
+              })}
+            </div>
           </div>
-          <div className="flex flex-wrap gap-2 justify-end">
-            {uniqueServices.map((service) => {
-              const iconPath = service.startsWith('Microsoft 365') 
-                ? '/icons/m365.svg' 
-                : serviceIcons[service];
-              return (
-                <div
-                  key={service}
-                  className="inline-flex items-center px-3 py-1.5 rounded-xl text-sm font-medium bg-blue-50 text-blue-700 dark:bg-transparent dark:text-blue-300 border border-blue-200 dark:border-blue-800 min-w-[160px] justify-center"
-                >
-                  {iconPath && (
-                    <Image
-                      src={iconPath}
-                      alt={service}
-                      width={16}
-                      height={16}
-                      className="mr-1.5 w-4 h-4"
-                    />
-                  )}
-                  <span className="truncate">{service}</span>
-                </div>
-              );
-            })}
+          <div className="flex items-center justify-center text-[10px] text-gray-500 dark:text-gray-400 gap-1.5">
+            <span className="font-medium">Published</span>
+            <span>{format(new Date(message.published), 'MMM d, yyyy')}</span>
+            {format(new Date(message.published), 'MMM d, yyyy') !== format(new Date(message.lastUpdated), 'MMM d, yyyy') && (
+              <>
+                <span>•</span>
+                <span className="font-medium">Updated</span>
+                <span>{format(new Date(message.lastUpdated), 'MMM d, yyyy')}</span>
+              </>
+            )}
           </div>
         </div>
-        <div className="p-6 flex flex-col flex-grow">
+        <div className="p-6 pt-4 flex flex-col flex-grow">
           {message.tags.length > 0 && (
-            <div className="flex flex-wrap justify-center gap-1.5 mb-3 -mt-6">
+            <div className="flex flex-wrap justify-center gap-1.5 mb-2 -mt-1">
               {message.tags.map((tag) => {
                 // Map tags to appropriate icons
                 const getTagIcon = (tag: string) => {
@@ -122,9 +133,9 @@ export const MessageCard: React.FC<MessageCardProps> = ({ message, onClick }) =>
                 const getTagStyle = (tag: string) => {
                   const tagLower = tag.toLowerCase();
                   if (tagLower.includes('new feature')) return 'bg-emerald-50/90 text-emerald-700 dark:bg-emerald-900/20 dark:text-emerald-200 border border-emerald-200/30 dark:border-emerald-700/20';
+                  if (tagLower.includes('update')) return 'bg-teal-50/90 text-teal-700 dark:bg-teal-900/20 dark:text-teal-200 border border-teal-200/30 dark:border-teal-700/20';
                   if (tagLower.includes('user impact')) return 'bg-amber-50/90 text-amber-700 dark:bg-amber-900/20 dark:text-amber-200 border border-amber-200/30 dark:border-amber-700/20';
                   if (tagLower.includes('admin impact')) return 'bg-orange-50/90 text-orange-700 dark:bg-orange-900/20 dark:text-orange-200 border border-orange-200/30 dark:border-orange-700/20';
-                  if (tagLower.includes('update')) return 'bg-teal-50/90 text-teal-700 dark:bg-teal-900/20 dark:text-teal-200 border border-teal-200/30 dark:border-teal-700/20';
                   return 'bg-gray-50/90 text-gray-600 dark:bg-gray-800/20 dark:text-gray-300 border border-gray-200/30 dark:border-gray-700/20';
                 };
 
@@ -138,10 +149,10 @@ export const MessageCard: React.FC<MessageCardProps> = ({ message, onClick }) =>
                 return (
                   <span
                     key={tag}
-                    className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium tracking-wide whitespace-nowrap shrink-0 shadow-sm hover:shadow transition-all duration-200 ${getTagStyle(tag)}`}
+                    className={`inline-flex items-center px-1.5 py-[1px] rounded-full text-[9px] font-medium tracking-wide whitespace-nowrap shrink-0 shadow-sm hover:shadow transition-all duration-200 ${getTagStyle(tag)}`}
                   >
                     <svg
-                      className="w-2.5 h-2.5 mr-1 text-current opacity-70"
+                      className="w-2 h-2 mr-0.5 text-current opacity-70"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -159,20 +170,8 @@ export const MessageCard: React.FC<MessageCardProps> = ({ message, onClick }) =>
               })}
             </div>
           )}
-
-          <div className="flex items-center text-xs text-gray-500 dark:text-gray-400 gap-2 -mt-2 mb-4">
-            <span className="font-medium">Published</span>
-            <span>{format(new Date(message.published), 'MMM d, yyyy')}</span>
-            {format(new Date(message.published), 'MMM d, yyyy') !== format(new Date(message.lastUpdated), 'MMM d, yyyy') && (
-              <>
-                <span>•</span>
-                <span className="font-medium">Updated</span>
-                <span>{format(new Date(message.lastUpdated), 'MMM d, yyyy')}</span>
-              </>
-            )}
-          </div>
-
-          <div className="flex flex-col gap-4">
+          
+          <div className="flex flex-col flex-grow justify-end">
             <h3 className="text-base font-medium text-gray-900 dark:text-white group-hover:text-primary-700 dark:group-hover:text-primary-400 transition-colors tracking-tight">{message.title}</h3>
           </div>
         </div>
