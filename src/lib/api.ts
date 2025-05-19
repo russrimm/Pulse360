@@ -1,4 +1,5 @@
 import { Message, M365Update } from './types';
+import { XMLParser } from 'fast-xml-parser';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://graphapirim.azure-api.net/v1.0';
 const API_KEY = process.env.NEXT_PUBLIC_API_KEY;
@@ -348,5 +349,241 @@ export async function getM365Update(id: string): Promise<M365Update> {
   } catch (error) {
     console.error('Error fetching Microsoft 365 update:', error);
     throw error;
+  }
+}
+
+export interface ProductNews {
+  id: string;
+  title: string;
+  link: string;
+  description: string;
+  publishDate: string;
+  author: string;
+  categories: string[];
+}
+
+export async function getPowerAppsNews(): Promise<ProductNews[]> {
+  try {
+    const response = await fetch('https://powerapps.microsoft.com/en-us/blog/feed', {
+      next: { revalidate: 3600 } // Cache for 1 hour
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const xmlText = await response.text();
+    const parser = new XMLParser({
+      ignoreAttributes: false,
+      attributeNamePrefix: '@_'
+    });
+    const result = parser.parse(xmlText);
+    const items = result.rss.channel.item;
+
+    const news: ProductNews[] = items.map((item: any) => ({
+      id: item.guid?.['#text'] || item.link,
+      title: item.title,
+      link: item.link,
+      description: item.description,
+      publishDate: item.pubDate,
+      author: item['dc:creator'] || '',
+      categories: Array.isArray(item.category) ? item.category : [item.category].filter(Boolean)
+    }));
+
+    // Sort by publish date, newest first
+    return news.sort((a, b) => 
+      new Date(b.publishDate).getTime() - new Date(a.publishDate).getTime()
+    );
+  } catch (error) {
+    console.error('Error fetching Power Apps news:', error);
+    throw error;
+  }
+}
+
+export async function getPowerPlatformNews(): Promise<ProductNews[]> {
+  try {
+    const response = await fetch('https://www.microsoft.com/en-us/power-platform/blog/feed', {
+      next: { revalidate: 3600 } // Cache for 1 hour
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const xmlText = await response.text();
+    const parser = new XMLParser({
+      ignoreAttributes: false,
+      attributeNamePrefix: '@_'
+    });
+    const result = parser.parse(xmlText);
+    const items = result.rss.channel.item;
+
+    const news: ProductNews[] = items.map((item: any) => ({
+      id: item.guid?.['#text'] || item.link,
+      title: item.title,
+      link: item.link,
+      description: item.description,
+      publishDate: item.pubDate,
+      author: item['dc:creator'] || '',
+      categories: Array.isArray(item.category) ? item.category : [item.category].filter(Boolean)
+    }));
+
+    // Sort by publish date, newest first
+    return news.sort((a, b) => 
+      new Date(b.publishDate).getTime() - new Date(a.publishDate).getTime()
+    );
+  } catch (error) {
+    console.error('Error fetching Power Platform news:', error);
+    throw error;
+  }
+}
+
+export async function getPowerAutomateNews(): Promise<ProductNews[]> {
+  try {
+    const response = await fetch('https://flow.microsoft.com/en-us/blog/feed', {
+      next: { revalidate: 3600 } // Cache for 1 hour
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to fetch Power Automate news');
+    }
+
+    const xml = await response.text();
+    const parser = new XMLParser({
+      ignoreAttributes: false,
+      attributeNamePrefix: '@_'
+    });
+    const result = parser.parse(xml);
+
+    if (!result.rss?.channel?.item) {
+      return [];
+    }
+
+    return result.rss.channel.item.map((item: any) => ({
+      id: item.guid?.['#text'] || item.link,
+      title: item.title,
+      description: item.description,
+      link: item.link,
+      publishDate: item.pubDate,
+      author: item['dc:creator'] || 'Microsoft Power Automate',
+      categories: Array.isArray(item.category) ? item.category : [item.category].filter(Boolean)
+    })).sort((a: ProductNews, b: ProductNews) => 
+      new Date(b.publishDate).getTime() - new Date(a.publishDate).getTime()
+    );
+  } catch (error) {
+    console.error('Error fetching Power Automate news:', error);
+    return [];
+  }
+}
+
+export async function getPowerBINews(): Promise<ProductNews[]> {
+  try {
+    const response = await fetch('https://powerbi.microsoft.com/en-us/blog/feed', {
+      next: { revalidate: 3600 } // Cache for 1 hour
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to fetch Power BI news');
+    }
+
+    const xml = await response.text();
+    const parser = new XMLParser({
+      ignoreAttributes: false,
+      attributeNamePrefix: '@_'
+    });
+    const result = parser.parse(xml);
+
+    if (!result.rss?.channel?.item) {
+      return [];
+    }
+
+    return result.rss.channel.item.map((item: any) => ({
+      id: item.guid?.['#text'] || item.link,
+      title: item.title,
+      description: item.description,
+      link: item.link,
+      publishDate: item.pubDate,
+      author: item['dc:creator'] || 'Microsoft Power BI',
+      categories: Array.isArray(item.category) ? item.category : [item.category].filter(Boolean)
+    })).sort((a: ProductNews, b: ProductNews) => 
+      new Date(b.publishDate).getTime() - new Date(a.publishDate).getTime()
+    );
+  } catch (error) {
+    console.error('Error fetching Power BI news:', error);
+    return [];
+  }
+}
+
+export async function getCopilotStudioNews(): Promise<ProductNews[]> {
+  try {
+    const response = await fetch('https://learn.microsoft.com/en-us/power-platform/release-plan/2024wave2/microsoft-copilot-studio/planned-features', {
+      next: { revalidate: 3600 } // Cache for 1 hour
+    });
+
+    if (!response.ok) {
+      console.error('Failed to fetch Copilot Studio release plan:', {
+        status: response.status,
+        statusText: response.statusText,
+        url: response.url
+      });
+      return [];
+    }
+
+    const html = await response.text();
+    
+    // Extract the table data using regex
+    const tableRegex = /<table[^>]*>([\s\S]*?)<\/table>/g;
+    const rowRegex = /<tr[^>]*>([\s\S]*?)<\/tr>/g;
+    const cellRegex = /<td[^>]*>([\s\S]*?)<\/td>/g;
+    
+    const tables = html.match(tableRegex) || [];
+    const features: ProductNews[] = [];
+
+    for (const table of tables) {
+      const rows = table.match(rowRegex) || [];
+      
+      // Skip header row
+      for (let i = 1; i < rows.length; i++) {
+        const cells = rows[i].match(cellRegex);
+        if (cells && cells.length >= 4) {
+          const featureCell = cells[0];
+          const enabledFor = cells[1].replace(/<[^>]*>/g, '').trim();
+          const publicPreview = cells[2].replace(/<[^>]*>/g, '').trim();
+          const generalAvailability = cells[3].replace(/<[^>]*>/g, '').trim();
+
+          // Extract feature name and link
+          let feature = featureCell.replace(/<[^>]*>/g, '').trim();
+          let link = 'https://learn.microsoft.com/en-us/power-platform/release-plan/2024wave2/microsoft-copilot-studio/planned-features';
+          
+          // Try to find a link in the feature cell
+          const linkMatch = featureCell.match(/<a[^>]*href="([^"]*)"[^>]*>([^<]*)<\/a>/);
+          if (linkMatch && linkMatch[1]) {
+            const href = linkMatch[1];
+            if (href.startsWith('/')) {
+              link = `https://learn.microsoft.com${href}`;
+            } else if (href.startsWith('http')) {
+              link = href;
+            }
+            // Update feature name to match the link text
+            feature = linkMatch[2].trim();
+          }
+
+          features.push({
+            id: `feature-${features.length + 1}`,
+            title: feature,
+            description: `Enabled for: ${enabledFor}\nPublic Preview: ${publicPreview}\nGeneral Availability: ${generalAvailability}`,
+            link: link,
+            publishDate: new Date().toISOString(), // Use current date since these are planned features
+            author: '', // Remove author information
+            categories: ['Release Plan', '2024 Wave 2']
+          });
+        }
+      }
+    }
+
+    return features;
+  } catch (error) {
+    console.error('Error fetching Copilot Studio release plan:', error);
+    return [];
   }
 } 
