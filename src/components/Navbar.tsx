@@ -46,7 +46,7 @@ const Navbar = () => {
                 </svg>
               </a>
               <a
-                href="https://github.com/russrimmerman"
+                href="https://github.com/russrimm"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
