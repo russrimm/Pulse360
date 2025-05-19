@@ -11,13 +11,23 @@ interface SearchableItem {
 interface SearchBarProps<T extends SearchableItem> {
   messages: T[];
   onSearch: (filteredMessages: T[]) => void;
+  searchQuery?: string;
+  onSearchQueryChange?: (query: string) => void;
 }
 
-export function SearchBar<T extends SearchableItem>({ messages, onSearch }: SearchBarProps<T>) {
-  const [searchTerm, setSearchTerm] = useState('');
+export function SearchBar<T extends SearchableItem>({ 
+  messages, 
+  onSearch,
+  searchQuery,
+  onSearchQueryChange 
+}: SearchBarProps<T>) {
+  const [searchTerm, setSearchTerm] = useState(searchQuery || '');
 
   const handleSearch = (value: string) => {
     setSearchTerm(value);
+    if (onSearchQueryChange) {
+      onSearchQueryChange(value);
+    }
     
     if (!value.trim()) {
       onSearch(messages);
