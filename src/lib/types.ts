@@ -51,4 +51,14 @@ export interface M365Update {
   cloudInstances: string[];
   platforms: string[];
   releaseRings: string[];
+}
+
+export interface ProductNews {
+  id: string;
+  title: string;
+  link: string;
+  description: string;
+  publishDate: string;
+  author: string;
+  categories: string[];
 } 

@@ -1,4 +1,4 @@
-import { Message, M365Update } from './types';
+import { Message, M365Update, ProductNews } from './types';
 import { XMLParser } from 'fast-xml-parser';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://graphapirim.azure-api.net/v1.0';
@@ -350,16 +350,6 @@ export async function getM365Update(id: string): Promise<M365Update> {
     console.error('Error fetching Microsoft 365 update:', error);
     throw error;
   }
-}
-
-export interface ProductNews {
-  id: string;
-  title: string;
-  link: string;
-  description: string;
-  publishDate: string;
-  author: string;
-  categories: string[];
 }
 
 export async function getPowerAppsNews(): Promise<ProductNews[]> {
