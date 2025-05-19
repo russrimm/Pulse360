@@ -1,12 +1,19 @@
 import React, { useState } from 'react';
 import { Message } from '@/lib/types';
 
-interface SearchBarProps {
-  messages: Message[];
-  onSearch: (filteredMessages: Message[]) => void;
+interface SearchableItem {
+  id: string;
+  title: string;
+  service?: string[];
+  product?: string;
 }
 
-export function SearchBar({ messages, onSearch }: SearchBarProps) {
+interface SearchBarProps<T extends SearchableItem> {
+  messages: T[];
+  onSearch: (filteredMessages: T[]) => void;
+}
+
+export function SearchBar<T extends SearchableItem>({ messages, onSearch }: SearchBarProps<T>) {
   const [searchTerm, setSearchTerm] = useState('');
 
   const handleSearch = (value: string) => {
@@ -21,7 +28,8 @@ export function SearchBar({ messages, onSearch }: SearchBarProps) {
     const filtered = messages.filter(message => 
       message.id.toLowerCase().includes(searchLower) ||
       message.title.toLowerCase().includes(searchLower) ||
-      message.service.some(service => service.toLowerCase().includes(searchLower))
+      (message.service?.some(service => service.toLowerCase().includes(searchLower)) || false) ||
+      (message.product?.toLowerCase().includes(searchLower) || false)
     );
     
     onSearch(filtered);
@@ -34,7 +42,7 @@ export function SearchBar({ messages, onSearch }: SearchBarProps) {
           type="text"
           value={searchTerm}
           onChange={(e) => handleSearch(e.target.value)}
-          placeholder="Search by Message ID, Title, or Product..."
+          placeholder="Search by ID, Title, or Product..."
           className="w-full px-4 py-3 pl-12 text-gray-900 dark:text-white bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border border-gray-200 dark:border-gray-700 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200"
         />
         <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">

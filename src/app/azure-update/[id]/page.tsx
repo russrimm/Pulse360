@@ -10,9 +10,15 @@ export const metadata = {
   description: 'View detailed information about Azure updates and changes.',
 };
 
-export default async function AzureUpdatePage({ params }: { params: { id: string } }) {
+interface PageProps {
+  params: Promise<{ id: string }>;
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+}
+
+export default async function AzureUpdatePage({ params }: PageProps) {
+  const resolvedParams = await params;
   const updates = await getAzureUpdates();
-  const update = updates.find(u => u.id === params.id);
+  const update = updates.find(u => u.id === resolvedParams.id);
 
   if (!update) {
     notFound();
