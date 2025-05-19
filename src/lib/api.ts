@@ -1,4 +1,4 @@
-import { Message, M365Update } from './types';
+import { Message, M365Update, ProductNews } from './types';
 import { XMLParser } from 'fast-xml-parser';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://graphapirim.azure-api.net/v1.0';
@@ -352,24 +352,19 @@ export async function getM365Update(id: string): Promise<M365Update> {
   }
 }
 
-export interface ProductNews {
-  id: string;
-  title: string;
-  link: string;
-  description: string;
-  publishDate: string;
-  author: string;
-  categories: string[];
-}
-
 export async function getPowerAppsNews(): Promise<ProductNews[]> {
   try {
-    const response = await fetch('https://powerapps.microsoft.com/en-us/blog/feed', {
+    const response = await fetch('/api/power-apps-news', {
       next: { revalidate: 3600 } // Cache for 1 hour
     });
 
     if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+      console.error('Failed to fetch Power Apps news:', {
+        status: response.status,
+        statusText: response.statusText,
+        url: response.url
+      });
+      return [];
     }
 
     const xmlText = await response.text();
@@ -396,18 +391,23 @@ export async function getPowerAppsNews(): Promise<ProductNews[]> {
     );
   } catch (error) {
     console.error('Error fetching Power Apps news:', error);
-    throw error;
+    return [];
   }
 }
 
 export async function getPowerPlatformNews(): Promise<ProductNews[]> {
   try {
-    const response = await fetch('https://www.microsoft.com/en-us/power-platform/blog/feed', {
+    const response = await fetch('/api/power-platform-news', {
       next: { revalidate: 3600 } // Cache for 1 hour
     });
 
     if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+      console.error('Failed to fetch Power Platform news:', {
+        status: response.status,
+        statusText: response.statusText,
+        url: response.url
+      });
+      return [];
     }
 
     const xmlText = await response.text();
@@ -434,18 +434,23 @@ export async function getPowerPlatformNews(): Promise<ProductNews[]> {
     );
   } catch (error) {
     console.error('Error fetching Power Platform news:', error);
-    throw error;
+    return [];
   }
 }
 
 export async function getPowerAutomateNews(): Promise<ProductNews[]> {
   try {
-    const response = await fetch('https://flow.microsoft.com/en-us/blog/feed', {
+    const response = await fetch('/api/power-automate-news', {
       next: { revalidate: 3600 } // Cache for 1 hour
     });
 
     if (!response.ok) {
-      throw new Error('Failed to fetch Power Automate news');
+      console.error('Failed to fetch Power Automate news:', {
+        status: response.status,
+        statusText: response.statusText,
+        url: response.url
+      });
+      return [];
     }
 
     const xml = await response.text();
@@ -456,6 +461,7 @@ export async function getPowerAutomateNews(): Promise<ProductNews[]> {
     const result = parser.parse(xml);
 
     if (!result.rss?.channel?.item) {
+      console.error('Invalid RSS feed format for Power Automate news');
       return [];
     }
 
@@ -478,12 +484,17 @@ export async function getPowerAutomateNews(): Promise<ProductNews[]> {
 
 export async function getPowerBINews(): Promise<ProductNews[]> {
   try {
-    const response = await fetch('https://powerbi.microsoft.com/en-us/blog/feed', {
+    const response = await fetch('/api/power-bi-news', {
       next: { revalidate: 3600 } // Cache for 1 hour
     });
 
     if (!response.ok) {
-      throw new Error('Failed to fetch Power BI news');
+      console.error('Failed to fetch Power BI news:', {
+        status: response.status,
+        statusText: response.statusText,
+        url: response.url
+      });
+      return [];
     }
 
     const xml = await response.text();
@@ -494,6 +505,7 @@ export async function getPowerBINews(): Promise<ProductNews[]> {
     const result = parser.parse(xml);
 
     if (!result.rss?.channel?.item) {
+      console.error('Invalid RSS feed format for Power BI news');
       return [];
     }
 
@@ -516,12 +528,12 @@ export async function getPowerBINews(): Promise<ProductNews[]> {
 
 export async function getCopilotStudioNews(): Promise<ProductNews[]> {
   try {
-    const response = await fetch('https://learn.microsoft.com/en-us/power-platform/release-plan/2024wave2/microsoft-copilot-studio/planned-features', {
+    const response = await fetch('/api/copilot-studio-news', {
       next: { revalidate: 3600 } // Cache for 1 hour
     });
 
     if (!response.ok) {
-      console.error('Failed to fetch Copilot Studio release plan:', {
+      console.error('Failed to fetch Copilot Studio news:', {
         status: response.status,
         statusText: response.statusText,
         url: response.url
@@ -583,7 +595,7 @@ export async function getCopilotStudioNews(): Promise<ProductNews[]> {
 
     return features;
   } catch (error) {
-    console.error('Error fetching Copilot Studio release plan:', error);
+    console.error('Error fetching Copilot Studio news:', error);
     return [];
   }
 } 

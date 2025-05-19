@@ -1,6 +1,6 @@
 'use client';
 
-import { ProductNews } from '@/lib/api';
+import { ProductNews } from '@/lib/types';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
