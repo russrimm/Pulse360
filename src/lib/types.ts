@@ -19,4 +19,19 @@ export interface Message {
 export interface MessageResponse {
   messages: Message[];
   total: number;
+}
+
+export interface AzureUpdate {
+  id: string;
+  title: string;
+  description: string;
+  productCategories: string[];
+  tags: string[];
+  products: string[];
+  generalAvailabilityDate: string | null;
+  previewAvailabilityDate: string | null;
+  privatePreviewAvailabilityDate: string | null;
+  status: string;
+  created: string;
+  modified: string;
 } 

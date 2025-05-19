@@ -3,17 +3,35 @@ import { ReleasePlanDetail } from '@/components/ReleasePlanDetail';
 import { notFound } from 'next/navigation';
 
 interface PageProps {
-  params: {
-    id: string;
-  };
+  params: Promise<{ id: string }>;
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+}
+
+interface ReleasePlan {
+  id: string;
+  title: string;
+  content: string;
+  product: string;
+  investmentArea: string;
+  businessValue: string;
+  enabledFor: string;
+  publicPreviewDate: string;
+  gaDate: string;
+  publicPreviewWave: string;
+  gaWave: string;
+  published: string;
+  lastUpdated: string;
+  tags: string[];
+  service: string[];
 }
 
 export default async function ReleasePlanPage({ params }: PageProps) {
+  const resolvedParams = await params;
   const releasePlans = await getReleasePlans();
-  const plan = releasePlans.find(p => p.id === params.id);
+  const plan = releasePlans.find((p: ReleasePlan) => p.id === resolvedParams.id);
 
   if (!plan) {
-    return notFound();
+    notFound();
   }
 
   return <ReleasePlanDetail plan={plan} />;
