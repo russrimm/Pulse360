@@ -12,23 +12,17 @@ export default async function MessageCenterPage() {
   const messages = await getMessages();
 
   return (
-    <div className="min-h-screen">
-      <div className="absolute inset-0 bg-[radial-gradient(#1f2937_1px,transparent_1px)] [background-size:16px_16px]" />
-      <div className="relative">
-        <div className="px-4 sm:px-6 lg:px-8 py-8">
-          <div className="max-w-7xl mx-auto">
-            <div className="text-center">
-              <p className="text-lg text-gray-600 dark:text-gray-400">
-                Stay informed about Microsoft 365 service updates and changes
-              </p>
-            </div>
-          </div>
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="text-center mb-8">
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+            Message Center
+          </h1>
+          <p className="text-gray-600 dark:text-gray-400">
+            Stay informed about Microsoft 365 service updates and changes
+          </p>
         </div>
-      </div>
-      <div className="relative px-4 sm:px-6 lg:px-8 py-6">
-        <div className="max-w-7xl mx-auto">
-          <HomeContent messages={messages} />
-        </div>
+        <HomeContent messages={messages} />
       </div>
     </div>
   );
