@@ -8,6 +8,15 @@ import { ThemeToggle } from './ThemeToggle';
 const Navbar = () => {
   const pathname = usePathname();
 
+  const navigation = [
+    { name: 'Home', href: '/' },
+    { name: 'Message Center', href: '/message-center' },
+    { name: 'Microsoft 365 Updates', href: '/m365-updates' },
+    { name: 'Azure Updates', href: '/azure-updates' },
+    { name: 'Release Plans', href: '/release-plans' },
+    { name: 'Product News', href: '/product-news' },
+  ];
+
   return (
     <nav className="sticky top-0 z-50 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm border-b border-gray-200 dark:border-gray-700">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

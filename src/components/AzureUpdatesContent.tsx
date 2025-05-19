@@ -12,11 +12,12 @@ import Image from 'next/image';
 
 interface AzureUpdatesContentProps {
   updates: AzureUpdate[];
+  searchQuery?: string;
 }
 
 const ITEMS_PER_PAGE = 12;
 
-export function AzureUpdatesContent({ updates }: AzureUpdatesContentProps) {
+export function AzureUpdatesContent({ updates, searchQuery = '' }: AzureUpdatesContentProps) {
   const router = useRouter();
   const [filteredUpdates, setFilteredUpdates] = useState<AzureUpdate[]>(updates);
   const [visibleUpdates, setVisibleUpdates] = useState<AzureUpdate[]>([]);
@@ -46,6 +47,23 @@ export function AzureUpdatesContent({ updates }: AzureUpdatesContentProps) {
       return dateB - dateA; // Descending order (most recent first)
     });
   }, [updates]);
+
+  // Filter updates based on search query
+  useEffect(() => {
+    if (searchQuery) {
+      const query = searchQuery.toLowerCase();
+      const filtered = sortedUpdates.filter(update => 
+        update.title.toLowerCase().includes(query) ||
+        update.description.toLowerCase().includes(query) ||
+        update.products.some(product => product.toLowerCase().includes(query)) ||
+        update.productCategories.some(category => category.toLowerCase().includes(query)) ||
+        update.tags.some(tag => tag.toLowerCase().includes(query))
+      );
+      setFilteredUpdates(filtered);
+    } else {
+      setFilteredUpdates(sortedUpdates);
+    }
+  }, [searchQuery, sortedUpdates]);
 
   // Get unique categories and tags
   const uniqueCategories = useMemo(() => {
