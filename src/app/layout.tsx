@@ -48,11 +48,13 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <Navbar />
-          <NavigationTabs />
-          <main className="pt-2">
-            {children}
-          </main>
+          <div className="min-h-screen flex flex-col">
+            <Navbar />
+            <NavigationTabs />
+            <main className="flex-1">
+              {children}
+            </main>
+          </div>
         </ThemeProvider>
       </body>
     </html>
