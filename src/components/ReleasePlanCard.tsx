@@ -33,6 +33,8 @@ const serviceIcons: Record<string, string> = {
   'Power Automate': '/icons/PowerAutomate_scalable.svg',
   'Microsoft Power Automate': '/icons/PowerAutomate_scalable.svg',
   'Power Platform': '/icons/PowerPlatform_scalable.svg',
+  'Power Platform Governance and Administration': '/icons/PowerPlatform_scalable.svg',
+  'Microsoft Power Platform governance and administration': '/icons/PowerPlatform_scalable.svg',
   'Power Pages': '/icons/PowerPages_scalable.svg',
   'Microsoft Dataverse': '/icons/Dataverse_scalable.svg',
   'Power BI': '/icons/PowerBI_scalable.svg',
@@ -88,6 +90,15 @@ export const ReleasePlanCard: React.FC<ReleasePlanCardProps> = ({ plan, onClick 
   // Deduplicate and normalize services
   const uniqueServices = Array.from(new Set(plan.service));
 
+  // Map service names to their display names
+  const getDisplayName = (service: string) => {
+    if (service === 'Microsoft Power Platform governance and administration' || 
+        service === 'Power Platform Governance and Administration') {
+      return 'Power Platform Governance and Administration';
+    }
+    return service;
+  };
+
   return (
     <Link href={`/release-plan/${plan.id}`}>
       <div 
@@ -120,7 +131,7 @@ export const ReleasePlanCard: React.FC<ReleasePlanCardProps> = ({ plan, onClick 
                         className="mr-1.5 w-4 h-4"
                       />
                     )}
-                    <span className="truncate">{service}</span>
+                    <span className="truncate">{getDisplayName(service)}</span>
                   </div>
                 );
               })}
@@ -139,25 +150,15 @@ export const ReleasePlanCard: React.FC<ReleasePlanCardProps> = ({ plan, onClick 
           </div>
         </div>
         <div className="p-6 pt-4 flex flex-col flex-grow">
-          {plan.tags.length > 0 && (
-            <div className="flex flex-wrap justify-center gap-1.5 mb-2 -mt-1">
-              {plan.tags.map((tag) => (
-                <span
-                  key={tag}
-                  className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-primary-50 text-primary-700 dark:bg-primary-900/30 dark:text-primary-300 border border-primary-200 dark:border-primary-800"
-                >
-                  {tag}
-                </span>
-              ))}
-            </div>
-          )}
-          
           <div className="flex flex-col flex-grow justify-end">
             <div className="flex items-center gap-2 mb-1">
               <h3 className="text-base font-medium text-gray-900 dark:text-white group-hover:text-primary-700 dark:group-hover:text-primary-400 transition-colors tracking-tight">{plan.title}</h3>
             </div>
             <div className="mt-2 text-sm text-gray-600 dark:text-gray-400">
-              <p className="line-clamp-3">{plan.businessValue}</p>
+              <div 
+                className="line-clamp-3 prose dark:prose-invert prose-sm max-w-none"
+                dangerouslySetInnerHTML={{ __html: plan.businessValue }}
+              />
             </div>
           </div>
         </div>

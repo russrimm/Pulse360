@@ -1,44 +1,41 @@
 'use client';
 
 import { useState, useEffect, useRef, useMemo } from 'react';
-import { ReleasePlanCard } from '@/components/ReleasePlanCard';
+import { M365UpdateCard } from '@/components/M365UpdateCard';
 import { ProductFilter } from '@/components/ProductFilter';
-import { AreaFilter } from '@/components/AreaFilter';
 import { useRouter } from 'next/navigation';
 import { LoadingSpinner } from './LoadingSpinner';
 import { addDays, isAfter, isBefore, parseISO, startOfDay, endOfDay, subDays } from 'date-fns';
 
-interface ReleasePlan {
+interface M365Update {
   id: string;
   title: string;
   content: string;
   product: string;
-  investmentArea: string;
-  businessValue: string;
-  enabledFor: string;
-  publicPreviewDate: string;
-  gaDate: string;
-  publicPreviewWave: string;
-  gaWave: string;
+  status: string;
   published: string;
   lastUpdated: string;
   tags: string[];
   service: string[];
+  generalAvailabilityDate: string;
+  previewAvailabilityDate: string;
+  cloudInstances: string[];
+  platforms: string[];
+  releaseRings: string[];
 }
 
-interface ReleasePlansListProps {
-  releasePlans: ReleasePlan[];
+interface M365UpdatesListProps {
+  updates: M365Update[];
+  searchQuery: string;
 }
 
 const ITEMS_PER_PAGE = 12;
 
-export function ReleasePlansList({ releasePlans }: ReleasePlansListProps) {
+export function M365UpdatesList({ updates, searchQuery }: M365UpdatesListProps) {
   const router = useRouter();
   const [services, setServices] = useState<string[]>([]);
   const [selectedServices, setSelectedServices] = useState<string[]>([]);
-  const [areas, setAreas] = useState<string[]>([]);
-  const [selectedAreas, setSelectedAreas] = useState<string[]>([]);
-  const [visibleReleasePlans, setVisibleReleasePlans] = useState<ReleasePlan[]>([]);
+  const [visibleUpdates, setVisibleUpdates] = useState<M365Update[]>([]);
   const [page, setPage] = useState(1);
   const observerRef = useRef<IntersectionObserver | null>(null);
   const loadMoreRef = useRef<HTMLDivElement>(null);
@@ -51,47 +48,41 @@ export function ReleasePlansList({ releasePlans }: ReleasePlansListProps) {
   // Get unique tags
   const uniqueTags = useMemo(() => {
     const tags = new Set<string>();
-    releasePlans.forEach(plan => {
-      plan.tags.forEach(tag => {
+    updates.forEach(update => {
+      update.tags.forEach(tag => {
         tags.add(tag);
       });
     });
     return Array.from(tags).sort();
-  }, [releasePlans]);
+  }, [updates]);
 
-  // Filter and sort release plans
-  const filteredReleasePlans = useMemo(() => {
-    const normalizeServiceName = (service: string) => {
-      if (service === 'Microsoft Power Platform governance and administration') {
-        return 'Power Platform Governance and Administration';
-      }
-      return service;
-    };
-
-    return releasePlans
-      .filter(plan => {
+  // Filter and sort updates
+  const filteredUpdates = useMemo(() => {
+    return updates
+      .filter(update => {
+        const matchesSearch = searchQuery === '' || 
+          update.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          update.content.toLowerCase().includes(searchQuery.toLowerCase());
         const matchesServices = selectedServices.length === 0 || 
-          plan.service.some(service => selectedServices.includes(normalizeServiceName(service)));
-        const matchesAreas = selectedAreas.length === 0 || 
-          selectedAreas.includes(plan.investmentArea);
+          update.service.some(service => selectedServices.includes(service));
         const matchesTags = selectedTags.length === 0 || 
-          plan.tags.some(tag => selectedTags.includes(tag));
+          update.tags.some(tag => selectedTags.includes(tag));
         // Date filter logic
         let matchesDate = true;
         if (selectedDateFilter === 'last30') {
-          matchesDate = isAfter(parseISO(plan.published), subDays(new Date(), 30));
+          matchesDate = isAfter(parseISO(update.published), subDays(new Date(), 30));
         } else if (selectedDateFilter === 'last7') {
-          matchesDate = isAfter(parseISO(plan.published), subDays(new Date(), 7));
+          matchesDate = isAfter(parseISO(update.published), subDays(new Date(), 7));
         } else if (selectedDateFilter === 'custom' && customDateRange.from && customDateRange.to) {
-          const published = parseISO(plan.published);
+          const published = parseISO(update.published);
           matchesDate =
             isAfter(published, startOfDay(parseISO(customDateRange.from))) &&
             isBefore(published, endOfDay(parseISO(customDateRange.to)));
         }
-        return matchesServices && matchesAreas && matchesTags && matchesDate;
+        return matchesSearch && matchesServices && matchesTags && matchesDate;
       })
       .sort((a, b) => new Date(b.published).getTime() - new Date(a.published).getTime());
-  }, [releasePlans, selectedServices, selectedAreas, selectedTags, selectedDateFilter, customDateRange]);
+  }, [updates, searchQuery, selectedServices, selectedTags, selectedDateFilter, customDateRange]);
 
   // Handle loading state
   useEffect(() => {
@@ -100,65 +91,26 @@ export function ReleasePlansList({ releasePlans }: ReleasePlansListProps) {
       setIsLoading(false);
     });
     return () => cancelAnimationFrame(timer);
-  }, [selectedServices, selectedTags]);
+  }, [searchQuery, selectedServices, selectedTags]);
 
   // Update available services
   useEffect(() => {
-    const normalizeServiceName = (service: string) => {
-      if (service === 'Microsoft Power Platform governance and administration') {
-        return 'Power Platform Governance and Administration';
-      }
-      return service;
-    };
-
-    const uniqueServices = Array.from(new Set(releasePlans.flatMap(p => p.service)))
-      .map(normalizeServiceName)
-      .sort((a, b) => a.localeCompare(b));
+    const uniqueServices = Array.from(new Set(updates.flatMap(u => u.service))).sort((a, b) => a.localeCompare(b));
     setServices(uniqueServices);
-  }, [releasePlans]);
+  }, [updates]);
 
-  // Update available areas based on selected services
-  useEffect(() => {
-    const normalizeServiceName = (service: string) => {
-      if (service === 'Microsoft Power Platform governance and administration') {
-        return 'Power Platform Governance and Administration';
-      }
-      return service;
-    };
-
-    const filteredPlans = selectedServices.length === 0 
-      ? releasePlans 
-      : releasePlans.filter(plan => 
-          plan.service.some(service => 
-            selectedServices.includes(normalizeServiceName(service))
-          )
-        );
-    
-    const uniqueAreas = Array.from(new Set(filteredPlans.map(p => p.investmentArea)))
-      .filter(area => area) // Filter out any null/undefined areas
-      .sort((a, b) => a.localeCompare(b));
-    
-    setAreas(uniqueAreas);
-    
-    // Remove any selected areas that are no longer available
-    const validSelectedAreas = selectedAreas.filter(area => uniqueAreas.includes(area));
-    if (validSelectedAreas.length !== selectedAreas.length) {
-      setSelectedAreas(validSelectedAreas);
-    }
-  }, [releasePlans, selectedServices, selectedAreas]);
-
-  // Update visible release plans when page changes
+  // Update visible updates when page changes
   useEffect(() => {
     const start = 0;
     const end = page * ITEMS_PER_PAGE;
-    setVisibleReleasePlans(filteredReleasePlans.slice(start, end));
-  }, [filteredReleasePlans, page]);
+    setVisibleUpdates(filteredUpdates.slice(start, end));
+  }, [filteredUpdates, page]);
 
   // Setup intersection observer for infinite scroll
   useEffect(() => {
     observerRef.current = new IntersectionObserver(
       (entries) => {
-        if (entries[0].isIntersecting && visibleReleasePlans.length < filteredReleasePlans.length) {
+        if (entries[0].isIntersecting && visibleUpdates.length < filteredUpdates.length) {
           setPage(prev => prev + 1);
         }
       },
@@ -174,13 +126,13 @@ export function ReleasePlansList({ releasePlans }: ReleasePlansListProps) {
         observerRef.current.disconnect();
       }
     };
-  }, [visibleReleasePlans.length, filteredReleasePlans.length]);
+  }, [visibleUpdates.length, filteredUpdates.length]);
 
-  const handleReleasePlanClick = (planId: string) => {
-    router.push(`/release-plan/${planId}`);
+  const handleUpdateClick = (updateId: string) => {
+    router.push(`/m365-update/${updateId}`);
   };
 
-  if (!releasePlans) return null;
+  if (!updates) return null;
 
   return (
     <div className="relative">
@@ -197,11 +149,6 @@ export function ReleasePlansList({ releasePlans }: ReleasePlansListProps) {
               services={services}
               selectedServices={selectedServices}
               onFilterChange={setSelectedServices}
-            />
-            <AreaFilter
-              areas={areas}
-              selectedAreas={selectedAreas}
-              onFilterChange={setSelectedAreas}
             />
             <div className="relative">
               <button
@@ -298,10 +245,10 @@ export function ReleasePlansList({ releasePlans }: ReleasePlansListProps) {
         <div className="mb-0">
           <div className="flex items-center justify-between">
             <p className="text-sm text-gray-600 dark:text-gray-400">
-              Showing {filteredReleasePlans.length} release plan{filteredReleasePlans.length !== 1 ? 's' : ''}
-              {filteredReleasePlans.length !== releasePlans.length && (
+              Showing {filteredUpdates.length} update{filteredUpdates.length !== 1 ? 's' : ''}
+              {filteredUpdates.length !== updates.length && (
                 <span className="ml-1">
-                  (filtered from {releasePlans.length} total)
+                  (filtered from {updates.length} total)
                 </span>
               )}
             </p>
@@ -309,11 +256,11 @@ export function ReleasePlansList({ releasePlans }: ReleasePlansListProps) {
         </div>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pt-4">
-        {visibleReleasePlans.map((plan) => (
-          <ReleasePlanCard 
-            key={plan.id} 
-            plan={plan} 
-            onClick={handleReleasePlanClick}
+        {visibleUpdates.map((update) => (
+          <M365UpdateCard 
+            key={update.id} 
+            update={update} 
+            onClick={handleUpdateClick}
           />
         ))}
       </div>
