@@ -163,7 +163,8 @@ export async function getMessages(): Promise<Message[]> {
       summary: message.details?.find(v => v.name === 'Summary')?.value || '',
       details: message.details || [],
       isMajorChange: message.isMajorChange || false,
-      actionRequiredByDateTime: message.actionRequiredByDateTime
+      actionRequiredByDateTime: message.actionRequiredByDateTime,
+      severity: message.severity
     }));
   } catch (error) {
     console.error('Error fetching messages:', error);
@@ -211,10 +212,74 @@ export async function getMessage(id: string): Promise<Message> {
       summary: message.details?.find(v => v.name === 'Summary')?.value || '',
       details: message.details?.filter(detail => !['RoadmapIds', 'FeatureStatusJson'].includes(detail.name)) || [],
       isMajorChange: message.isMajorChange || false,
-      actionRequiredByDateTime: message.actionRequiredByDateTime
+      actionRequiredByDateTime: message.actionRequiredByDateTime,
+      severity: message.severity
     };
   } catch (error) {
     console.error('Error fetching message:', error);
+    throw error;
+  }
+}
+
+export async function getReleasePlans() {
+  try {
+    const response = await fetch('https://releaseplans.microsoft.com/en-US/allreleaseplans/');
+    if (!response.ok) {
+      throw new Error('Failed to fetch release plans');
+    }
+    const data = await response.json();
+    return data.results.map((plan: any) => ({
+      id: plan['Release Plan ID'],
+      title: plan['Feature name'],
+      content: plan['Feature details'],
+      product: plan['Product name'],
+      investmentArea: plan['Investment area'],
+      businessValue: plan['Business value'],
+      enabledFor: plan['Enabled for'],
+      publicPreviewDate: plan['Public preview date'],
+      gaDate: plan['GA date'],
+      publicPreviewWave: plan['Public Preview Release Wave'],
+      gaWave: plan['GA Release Wave'],
+      published: plan['Last Gitcommit date'],
+      lastUpdated: plan['Last Gitcommit date'],
+      tags: [plan['Investment area']],
+      service: [plan['Product name']]
+    }));
+  } catch (error) {
+    console.error('Error fetching release plans:', error);
+    return [];
+  }
+}
+
+export interface AzureUpdate {
+  id: string;
+  title: string;
+  description: string;
+  productCategories: string[];
+  tags: string[];
+  products: string[];
+  generalAvailabilityDate: string | null;
+  previewAvailabilityDate: string | null;
+  privatePreviewAvailabilityDate: string | null;
+  status: string;
+  created: string;
+  modified: string;
+}
+
+export async function getAzureUpdates(): Promise<AzureUpdate[]> {
+  try {
+    const response = await fetch('https://www.microsoft.com/releasecommunications/api/v2/azure', {
+      next: { revalidate: 3600 } // Revalidate every hour
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data = await response.json();
+    return data.value;
+  } catch (error) {
+    console.error('Error fetching Azure updates:', error);
     throw error;
   }
 } 

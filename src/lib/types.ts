@@ -13,6 +13,7 @@ export interface Message {
   }[];
   isMajorChange: boolean;
   actionRequiredByDateTime?: string;
+  severity: string;
 }
 
 export interface MessageResponse {

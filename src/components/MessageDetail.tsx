@@ -25,6 +25,7 @@ const serviceIcons: Record<string, string> = {
   'Microsoft Intune': '/icons/intune.svg',
   'Microsoft Planner': '/icons/planner.svg',
   'Microsoft Entra': '/icons/entra.svg',
+  'Microsoft Bookings': '/icons/Bookings.svg',
   'Dynamics 365 Apps': '/icons/Dynamics365_scalable.svg',
   'Microsoft Viva': '/icons/viva.svg',
   'Microsoft Purview': '/icons/purview.svg',

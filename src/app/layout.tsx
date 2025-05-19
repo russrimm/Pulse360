@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { ThemeToggle } from '@/components/ThemeToggle'
 import { ThemeProvider } from 'next-themes'
 import Navbar from '@/components/Navbar'
+import { NavigationTabs } from '@/components/NavigationTabs'
 
 const inter = Inter({ 
   subsets: ['latin'],
@@ -48,6 +49,7 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <Navbar />
+          <NavigationTabs />
           <main className="pt-2">
             {children}
           </main>

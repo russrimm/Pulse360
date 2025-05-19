@@ -12,7 +12,7 @@ const Navbar = () => {
     <nav className="sticky top-0 z-50 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm border-b border-gray-200 dark:border-gray-700">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-12 sm:h-16">
-          <div className="flex items-center">
+          <div className="flex items-center space-x-8">
             <Link href="/" className="flex items-center">
               <span className="text-2xl sm:text-4xl font-bold bg-gradient-to-r from-primary-600 to-primary-400 dark:from-primary-400 dark:to-primary-300 bg-clip-text text-transparent">
                 Pulse 360°
@@ -21,6 +21,28 @@ const Navbar = () => {
                 Stay ahead. Stay informed. Stay in control.
               </span>
             </Link>
+            <div className="hidden sm:flex items-center space-x-4">
+              <Link
+                href="/"
+                className={`text-sm font-medium transition-colors ${
+                  pathname === '/'
+                    ? 'text-primary-600 dark:text-primary-400'
+                    : 'text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400'
+                }`}
+              >
+                Message Center
+              </Link>
+              <Link
+                href="/release-plans"
+                className={`text-sm font-medium transition-colors ${
+                  pathname === '/release-plans'
+                    ? 'text-primary-600 dark:text-primary-400'
+                    : 'text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400'
+                }`}
+              >
+                Release Plans
+              </Link>
+            </div>
           </div>
           <div className="hidden sm:flex items-center space-x-4">
             <div className="text-right mr-4">

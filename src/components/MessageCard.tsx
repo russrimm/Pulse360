@@ -31,6 +31,7 @@ const serviceIcons: Record<string, string> = {
   'Microsoft Intune': '/icons/intune.svg',
   'Planner': '/icons/planner.svg',
   'Microsoft Entra': '/icons/entra.svg',
+  'Microsoft Bookings': '/icons/Bookings.svg',
   'Dynamics 365 Apps': '/icons/Dynamics365_scalable.svg',
   'Microsoft Viva': '/icons/viva.svg',
   'Microsoft Purview': '/icons/purview.svg',
@@ -172,7 +173,17 @@ export const MessageCard: React.FC<MessageCardProps> = ({ message, onClick }) =>
           )}
           
           <div className="flex flex-col flex-grow justify-end">
-            <h3 className="text-base font-medium text-gray-900 dark:text-white group-hover:text-primary-700 dark:group-hover:text-primary-400 transition-colors tracking-tight">{message.title}</h3>
+            <div className="flex items-center gap-2 mb-1">
+              <h3 className="text-base font-medium text-gray-900 dark:text-white group-hover:text-primary-700 dark:group-hover:text-primary-400 transition-colors tracking-tight">{message.title}</h3>
+              {message.severity && message.severity.toLowerCase() !== 'normal' && (
+                <span
+                  className="inline-block px-2 py-0.5 rounded-full text-xs font-semibold border ml-1 bg-red-100 text-red-800 border-red-300 dark:bg-red-900/30 dark:text-red-200 dark:border-red-700"
+                  aria-label="Critical Alert"
+                >
+                  Critical Alert
+                </span>
+              )}
+            </div>
           </div>
         </div>
       </div>
