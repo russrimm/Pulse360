@@ -218,9 +218,9 @@ export function AzureUpdatesContent({ updates }: AzureUpdatesContentProps) {
           <LoadingSpinner />
         </div>
       )}
-      <div className="sticky top-0 z-10 bg-white dark:bg-gray-900 pt-16 pb-4 border-b border-gray-200 dark:border-gray-700">
-        <div className="mb-6">
-          <h2 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Filters</h2>
+      <div className="sticky top-32 z-40 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm pt-0 pb-4 border-b border-gray-200 dark:border-gray-700">
+        <div className="mb-3">
+          <h2 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Filters</h2>
           <div className="flex flex-wrap gap-4">
             {/* Categories Filter */}
             <div className="relative">
@@ -551,7 +551,7 @@ export function AzureUpdatesContent({ updates }: AzureUpdatesContentProps) {
             </div>
           </div>
         </div>
-        <div className="mb-6">
+        <div className="mb-0">
           <div className="flex items-center justify-between">
             <p className="text-sm text-gray-600 dark:text-gray-400">
               Showing {filteredUpdatesList.length} update{filteredUpdatesList.length !== 1 ? 's' : ''}

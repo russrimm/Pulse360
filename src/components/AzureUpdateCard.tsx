@@ -40,7 +40,7 @@ export function getProductIcon(product: string): string | null {
   }
 
   // Azure service mappings with exact icon filenames
-  const azureMappings: { [key: string]: string } = {
+  const azureMappings: Record<string, string> = {
     // Integration
     'api management': '/icons/azure/integration/10042-icon-service-API-Management-Services.svg',
     'logic apps': '/icons/azure/integration/02631-icon-service-Logic-Apps.svg',
@@ -156,6 +156,8 @@ export function getProductIcon(product: string): string | null {
     'databox gateway': '/icons/azure/storage/00691-icon-service-Azure-Databox-Gateway.svg',
     'azure stack edge': '/icons/azure/storage/10095-icon-service-Azure-Stack-Edge.svg',
     'stack edge': '/icons/azure/storage/10095-icon-service-Azure-Stack-Edge.svg',
+    'azure container storage': '/icons/azure/storage/10839-icon-service-Storage-Container.svg',
+    'container storage': '/icons/azure/storage/10839-icon-service-Storage-Container.svg',
 
     // Containers
     'container registry': '/icons/azure/containers/10105-icon-service-Container-Registries.svg',

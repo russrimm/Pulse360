@@ -37,27 +37,27 @@ export function NavigationTabs() {
   ];
 
   return (
-    <div className="border-b border-gray-200 dark:border-gray-700 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm sticky top-0 z-50">
+    <div className="sticky top-16 z-40 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm border-b border-gray-200 dark:border-gray-700">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex space-x-8">
+        <div className="flex space-x-4 py-2">
           {tabs.map((tab) => {
             const isActive = pathname === tab.href;
             return (
               <Link
-                key={tab.name}
+                key={tab.href}
                 href={tab.href}
-                className={`
-                  group inline-flex items-center py-4 px-1 border-b-2 font-medium text-sm
-                  ${isActive
-                    ? 'border-primary-500 text-primary-600 dark:text-primary-400'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300 dark:hover:border-gray-600'
-                  }
-                `}
+                className={`group relative flex items-center gap-2 px-4 py-2.5 text-sm font-medium rounded-lg transition-all duration-200 ${
+                  isActive
+                    ? 'bg-primary-50 text-primary-700 dark:bg-primary-900/30 dark:text-primary-300'
+                    : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800/50'
+                }`}
               >
-                <span className="mr-2">{tab.icon}</span>
-                {tab.name}
+                <span className={`transition-transform duration-200 ${isActive ? 'text-primary-600 dark:text-primary-400' : 'text-gray-500 dark:text-gray-400 group-hover:text-primary-600 dark:group-hover:text-primary-400'}`}>
+                  {tab.icon}
+                </span>
+                <span>{tab.name}</span>
                 {isActive && (
-                  <span className="absolute bottom-0 left-0 w-full h-0.5 bg-primary-500 rounded-full" />
+                  <span className="absolute bottom-0 left-0 w-full h-0.5 bg-primary-600 dark:bg-primary-400 rounded-full" />
                 )}
               </Link>
             );

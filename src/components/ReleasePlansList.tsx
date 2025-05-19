@@ -162,108 +162,122 @@ export function ReleasePlansList({ releasePlans }: ReleasePlansListProps) {
           <LoadingSpinner />
         </div>
       )}
-      <div className="mb-6">
-        <h2 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Filters</h2>
-        <div className="flex flex-wrap gap-4">
-          <ProductFilter
-            services={services}
-            selectedServices={selectedServices}
-            onFilterChange={setSelectedServices}
-          />
-          <AreaFilter
-            areas={areas}
-            selectedAreas={selectedAreas}
-            onFilterChange={setSelectedAreas}
-          />
-          <div className="relative">
-            <button
-              onClick={() => setDateFilterOpen(!dateFilterOpen)}
-              className="flex items-center justify-center gap-2 px-4 h-10 text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-primary-500 relative"
-              aria-label="Filter by date"
-            >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-              </svg>
-              <span className="text-sm font-medium">Date</span>
-              {selectedDateFilter !== 'all' && (
-                <span className="absolute -top-1 -right-1 flex items-center justify-center w-5 h-5 text-xs font-medium text-white bg-primary-600 rounded-full">
-                  1
+      <div className="sticky top-32 z-40 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm pt-0 pb-4 border-b border-gray-200 dark:border-gray-700">
+        <div className="mb-3">
+          <h2 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Filters</h2>
+          <div className="flex flex-wrap gap-4">
+            <ProductFilter
+              services={services}
+              selectedServices={selectedServices}
+              onFilterChange={setSelectedServices}
+            />
+            <AreaFilter
+              areas={areas}
+              selectedAreas={selectedAreas}
+              onFilterChange={setSelectedAreas}
+            />
+            <div className="relative">
+              <button
+                onClick={() => setDateFilterOpen(!dateFilterOpen)}
+                className="flex items-center justify-center gap-2 px-4 h-10 text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-primary-500 relative"
+                aria-label="Filter by date"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+                <span className="text-sm font-medium">Date</span>
+                {selectedDateFilter !== 'all' && (
+                  <span className="absolute -top-1 -right-1 flex items-center justify-center w-5 h-5 text-xs font-medium text-white bg-primary-600 rounded-full">
+                    1
+                  </span>
+                )}
+              </button>
+              {dateFilterOpen && (
+                <div className="absolute z-10 w-72 mt-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow-lg">
+                  <div className="p-4 border-b border-gray-200 dark:border-gray-700">
+                    <h3 className="text-sm font-medium text-gray-900 dark:text-white">Filter by Date</h3>
+                  </div>
+                  <div className="p-4 flex flex-col gap-2">
+                    <label className="flex items-center gap-2 cursor-pointer">
+                      <input
+                        type="radio"
+                        checked={selectedDateFilter === 'all'}
+                        onChange={() => setSelectedDateFilter('all')}
+                        className="text-primary-600"
+                      />
+                      <span className="text-sm text-gray-700 dark:text-gray-200">All Dates</span>
+                    </label>
+                    <label className="flex items-center gap-2 cursor-pointer">
+                      <input
+                        type="radio"
+                        checked={selectedDateFilter === 'last30'}
+                        onChange={() => setSelectedDateFilter('last30')}
+                        className="text-primary-600"
+                      />
+                      <span className="text-sm text-gray-700 dark:text-gray-200">Last 30 days</span>
+                    </label>
+                    <label className="flex items-center gap-2 cursor-pointer">
+                      <input
+                        type="radio"
+                        checked={selectedDateFilter === 'last7'}
+                        onChange={() => setSelectedDateFilter('last7')}
+                        className="text-primary-600"
+                      />
+                      <span className="text-sm text-gray-700 dark:text-gray-200">Last 7 days</span>
+                    </label>
+                    <label className="flex items-center gap-2 cursor-pointer">
+                      <input
+                        type="radio"
+                        checked={selectedDateFilter === 'custom'}
+                        onChange={() => setSelectedDateFilter('custom')}
+                        className="text-primary-600"
+                      />
+                      <span className="text-sm text-gray-700 dark:text-gray-200">Custom Range</span>
+                    </label>
+                    {selectedDateFilter === 'custom' && (
+                      <div className="flex flex-col gap-2 mt-2">
+                        <input
+                          type="date"
+                          value={customDateRange.from}
+                          onChange={e => setCustomDateRange({ ...customDateRange, from: e.target.value })}
+                          className="border rounded px-2 py-1 text-sm text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600"
+                        />
+                        <input
+                          type="date"
+                          value={customDateRange.to}
+                          onChange={e => setCustomDateRange({ ...customDateRange, to: e.target.value })}
+                          className="border rounded px-2 py-1 text-sm text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600"
+                        />
+                      </div>
+                    )}
+                  </div>
+                  <div className="p-3 border-t border-gray-200 dark:border-gray-700">
+                    <button
+                      onClick={() => {
+                        setSelectedDateFilter('all');
+                        setCustomDateRange({ from: '', to: '' });
+                        setDateFilterOpen(false);
+                      }}
+                      className="w-full px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
+                    >
+                      Clear all
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+        <div className="mb-0">
+          <div className="flex items-center justify-between">
+            <p className="text-sm text-gray-600 dark:text-gray-400">
+              Showing {filteredReleasePlans.length} release plan{filteredReleasePlans.length !== 1 ? 's' : ''}
+              {filteredReleasePlans.length !== releasePlans.length && (
+                <span className="ml-1">
+                  (filtered from {releasePlans.length} total)
                 </span>
               )}
-            </button>
-            {dateFilterOpen && (
-              <div className="absolute z-10 w-72 mt-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow-lg">
-                <div className="p-4 border-b border-gray-200 dark:border-gray-700">
-                  <h3 className="text-sm font-medium text-gray-900 dark:text-white">Filter by Date</h3>
-                </div>
-                <div className="p-4 flex flex-col gap-2">
-                  <label className="flex items-center gap-2 cursor-pointer">
-                    <input
-                      type="radio"
-                      checked={selectedDateFilter === 'all'}
-                      onChange={() => setSelectedDateFilter('all')}
-                      className="text-primary-600"
-                    />
-                    <span className="text-sm text-gray-700 dark:text-gray-200">All Dates</span>
-                  </label>
-                  <label className="flex items-center gap-2 cursor-pointer">
-                    <input
-                      type="radio"
-                      checked={selectedDateFilter === 'last30'}
-                      onChange={() => setSelectedDateFilter('last30')}
-                      className="text-primary-600"
-                    />
-                    <span className="text-sm text-gray-700 dark:text-gray-200">Last 30 days</span>
-                  </label>
-                  <label className="flex items-center gap-2 cursor-pointer">
-                    <input
-                      type="radio"
-                      checked={selectedDateFilter === 'last7'}
-                      onChange={() => setSelectedDateFilter('last7')}
-                      className="text-primary-600"
-                    />
-                    <span className="text-sm text-gray-700 dark:text-gray-200">Last 7 days</span>
-                  </label>
-                  <label className="flex items-center gap-2 cursor-pointer">
-                    <input
-                      type="radio"
-                      checked={selectedDateFilter === 'custom'}
-                      onChange={() => setSelectedDateFilter('custom')}
-                      className="text-primary-600"
-                    />
-                    <span className="text-sm text-gray-700 dark:text-gray-200">Custom Range</span>
-                  </label>
-                  {selectedDateFilter === 'custom' && (
-                    <div className="flex flex-col gap-2 mt-2">
-                      <input
-                        type="date"
-                        value={customDateRange.from}
-                        onChange={e => setCustomDateRange({ ...customDateRange, from: e.target.value })}
-                        className="border rounded px-2 py-1 text-sm text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600"
-                      />
-                      <input
-                        type="date"
-                        value={customDateRange.to}
-                        onChange={e => setCustomDateRange({ ...customDateRange, to: e.target.value })}
-                        className="border rounded px-2 py-1 text-sm text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600"
-                      />
-                    </div>
-                  )}
-                </div>
-                <div className="p-3 border-t border-gray-200 dark:border-gray-700">
-                  <button
-                    onClick={() => {
-                      setSelectedDateFilter('all');
-                      setCustomDateRange({ from: '', to: '' });
-                      setDateFilterOpen(false);
-                    }}
-                    className="w-full px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
-                  >
-                    Clear all
-                  </button>
-                </div>
-              </div>
-            )}
+            </p>
           </div>
         </div>
       </div>
