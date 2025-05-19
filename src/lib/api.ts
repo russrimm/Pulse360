@@ -1,4 +1,4 @@
-import { Message } from './types';
+import { Message, M365Update } from './types';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://graphapirim.azure-api.net/v1.0';
 const API_KEY = process.env.NEXT_PUBLIC_API_KEY;
@@ -280,6 +280,73 @@ export async function getAzureUpdates(): Promise<AzureUpdate[]> {
     return data.value;
   } catch (error) {
     console.error('Error fetching Azure updates:', error);
+    throw error;
+  }
+}
+
+export async function getM365Updates(): Promise<M365Update[]> {
+  try {
+    const response = await fetch('https://www.microsoft.com/releasecommunications/api/v2/m365', {
+      next: { revalidate: 3600 } // Revalidate every hour
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data = await response.json();
+    console.log('API Response products:', data.value[0]?.products); // Log the first update's products
+    return data.value.map((update: any) => ({
+      id: update.id.toString(),
+      title: update.title,
+      content: update.description,
+      product: update.products?.[0] || '',
+      status: update.status,
+      published: update.created,
+      lastUpdated: update.modified,
+      tags: update.tags || [],
+      service: update.products || [],
+      generalAvailabilityDate: update.generalAvailabilityDate,
+      previewAvailabilityDate: update.previewAvailabilityDate,
+      cloudInstances: update.cloudInstances || [],
+      platforms: update.platforms || [],
+      releaseRings: update.releaseRings || [],
+    }));
+  } catch (error) {
+    console.error('Error fetching Microsoft 365 updates:', error);
+    throw error;
+  }
+}
+
+export async function getM365Update(id: string): Promise<M365Update> {
+  try {
+    const response = await fetch(`https://www.microsoft.com/releasecommunications/api/v2/m365/${id}`, {
+      next: { revalidate: 3600 } // Revalidate every hour
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data = await response.json();
+    return {
+      id: data.id.toString(),
+      title: data.title,
+      content: data.description,
+      product: data.products?.[0] || '',
+      status: data.status,
+      published: data.created,
+      lastUpdated: data.modified,
+      tags: data.tags || [],
+      service: data.products || [],
+      generalAvailabilityDate: data.generalAvailabilityDate,
+      previewAvailabilityDate: data.previewAvailabilityDate,
+      cloudInstances: data.cloudInstances || [],
+      platforms: data.platforms || [],
+      releaseRings: data.releaseRings || [],
+    };
+  } catch (error) {
+    console.error('Error fetching Microsoft 365 update:', error);
     throw error;
   }
 } 
