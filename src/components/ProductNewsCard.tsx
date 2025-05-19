@@ -31,14 +31,16 @@ export function ProductNewsCard({ news, productIcon = '/icons/PowerPlatform_scal
     <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden hover:shadow-md transition-shadow duration-200">
       <div className="p-6">
         <div className="flex items-center gap-3 mb-4">
-          <div className="w-10 h-10 rounded-lg bg-primary-50 dark:bg-primary-900/30 flex items-center justify-center">
-            <Image
-              src={productIcon}
-              alt="Product Icon"
-              width={24}
-              height={24}
-              className="w-6 h-6"
-            />
+          <div className="w-12 h-12 rounded-lg bg-primary-50 dark:bg-primary-900/30 flex items-center justify-center p-1.5">
+            <div className="relative w-8 h-8">
+              <Image
+                src={productIcon}
+                alt="Product Icon"
+                fill
+                className="object-contain"
+                sizes="32px"
+              />
+            </div>
           </div>
           <div>
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white line-clamp-2">
