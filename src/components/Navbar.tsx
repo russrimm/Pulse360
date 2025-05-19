@@ -26,9 +26,9 @@ const Navbar = () => {
           <div className="flex items-center space-x-4">
             <div className="hidden sm:block text-right mr-4">
               <div className="text-xs text-gray-500 dark:text-gray-400">Crafted with care by</div>
-              <a 
-                href="mailto:russ.rimmerman@microsoft.com?subject=Feedback re: Message Center [MC-${Math.floor(Math.random() * 10000).toString().padStart(4, '0')}]"
-                className="text-sm font-medium text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 transition-colors"
+              <a
+                href="mailto:russ.rimmerman@microsoft.com?subject=Feedback about Pulse 360"
+                className="text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 transition-colors"
               >
                 Russ Rimmerman
               </a>
