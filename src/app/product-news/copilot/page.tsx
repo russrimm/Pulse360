@@ -1,6 +1,6 @@
 'use client';
 
-import { getPowerBINews } from '@/lib/api';
+import { getCopilotNews } from '@/lib/api';
 import { ProductNewsCard } from '@/components/ProductNewsCard';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -24,7 +24,7 @@ const products = [
     name: 'Power BI',
     icon: '/icons/PowerBI_scalable.svg',
     href: '/product-news/power-bi',
-    current: true
+    current: false
   },
   {
     name: 'Power Platform',
@@ -36,7 +36,7 @@ const products = [
     name: 'Copilot Studio',
     icon: '/icons/CopilotStudio_scalable.svg',
     href: '/product-news/copilot',
-    current: false
+    current: true
   },
   {
     name: 'Learn Blog',
@@ -57,7 +57,7 @@ const products = [
   }
 ];
 
-export default function PowerBINewsPage() {
+export default function CopilotNewsPage() {
   const [news, setNews] = useState<ProductNews[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -65,13 +65,12 @@ export default function PowerBINewsPage() {
   useEffect(() => {
     const fetchNews = async () => {
       try {
-        setLoading(true);
-        const data = await getPowerBINews();
+        const data = await getCopilotNews();
         setNews(data);
         setError(null);
       } catch (err) {
-        console.error('Error fetching news:', err);
-        setError('Failed to load news. Please try again later.');
+        setError('Failed to load Copilot Studio news. Please try again later.');
+        console.error('Error fetching Copilot Studio news:', err);
       } finally {
         setLoading(false);
       }
@@ -81,23 +80,23 @@ export default function PowerBINewsPage() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className="container mx-auto px-4 py-8">
+      <div className="max-w-7xl mx-auto">
         <div className="mb-8">
           <div className="flex items-center gap-3 mb-2">
             <Image
-              src="/icons/PowerBI_scalable.svg"
-              alt="Power BI"
+              src="/icons/CopilotStudio_scalable.svg"
+              alt="Copilot Studio"
               width={32}
               height={32}
               className="w-8 h-8"
             />
             <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-              Power BI News
+              Copilot Studio News
             </h1>
           </div>
           <p className="text-gray-600 dark:text-gray-400">
-            Stay up to date with the latest news and announcements from Microsoft Power BI.
+            Stay up to date with the latest news and announcements from Microsoft Copilot Studio.
           </p>
         </div>
 
@@ -154,7 +153,7 @@ export default function PowerBINewsPage() {
               <ProductNewsCard 
                 key={item.id} 
                 news={item} 
-                productIcon="/icons/PowerBI_scalable.svg"
+                productIcon="/icons/CopilotStudio_scalable.svg"
               />
             ))}
           </div>

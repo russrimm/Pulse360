@@ -35,7 +35,7 @@ const products = [
   {
     name: 'Copilot Studio',
     icon: '/icons/CopilotStudio_scalable.svg',
-    href: '/product-news/copilot-studio',
+    href: '/product-news/copilot',
     current: false
   },
   {

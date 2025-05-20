@@ -39,6 +39,12 @@ const products = [
     current: true
   },
   {
+    name: 'Copilot',
+    icon: '/icons/CopilotStudio_scalable.svg',
+    href: '/product-news/copilot',
+    current: false
+  },
+  {
     name: 'Learn Blog',
     icon: '/icons/m365.svg',
     href: '/product-news/learn-blog',
