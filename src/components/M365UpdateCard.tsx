@@ -73,10 +73,6 @@ const serviceIcons: Record<string, string> = {
 };
 
 export const M365UpdateCard: React.FC<M365UpdateCardProps> = ({ update, onClick }) => {
-  const handleClick = () => {
-    onClick(update.id);
-  };
-
   // Deduplicate and normalize services
   const uniqueServices = Array.from(new Set(update.service));
 
@@ -84,9 +80,8 @@ export const M365UpdateCard: React.FC<M365UpdateCardProps> = ({ update, onClick 
     <Link href={`/m365-update/${update.id}`}>
       <div 
         className="group bg-white/80 dark:bg-gray-800/50 backdrop-blur-sm rounded-xl shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-200 dark:border-gray-700/50 hover:border-primary-200 dark:hover:border-primary-800 hover:-translate-y-1 h-full cursor-pointer flex flex-col"
-        onClick={handleClick}
       >
-        <div className="flex flex-col">
+        <div className="flex flex-col flex-grow">
           <div className="flex items-center justify-center w-full bg-gradient-to-b from-gray-50 to-transparent dark:from-gray-900/50 dark:to-transparent py-3 px-4">
             <div className="flex flex-wrap gap-2 justify-center">
               {uniqueServices.map((service) => {
@@ -122,17 +117,17 @@ export const M365UpdateCard: React.FC<M365UpdateCardProps> = ({ update, onClick 
               </>
             )}
           </div>
-        </div>
-        <div className="p-6 pt-4 flex flex-col flex-grow">
-          <div className="flex flex-col flex-grow justify-end">
-            <div className="flex items-center gap-2 mb-1">
-              <h3 className="text-base font-medium text-gray-900 dark:text-white group-hover:text-primary-700 dark:group-hover:text-primary-400 transition-colors tracking-tight">{update.title}</h3>
-            </div>
-            <div className="mt-2 text-sm text-gray-600 dark:text-gray-400">
-              <div 
-                className="line-clamp-3 prose dark:prose-invert prose-sm max-w-none"
-                dangerouslySetInnerHTML={{ __html: update.content }}
-              />
+          <div className="p-6 pt-4 flex flex-col flex-grow">
+            <div className="flex flex-col flex-grow">
+              <div className="flex items-center gap-2 mb-1">
+                <h3 className="text-base font-medium text-gray-900 dark:text-white group-hover:text-primary-700 dark:group-hover:text-primary-400 transition-colors tracking-tight">{update.title}</h3>
+              </div>
+              <div className="mt-2 text-sm text-gray-600 dark:text-gray-400 flex-grow">
+                <div 
+                  className="prose dark:prose-invert prose-sm max-w-none line-clamp-[8]"
+                  dangerouslySetInnerHTML={{ __html: update.content }}
+                />
+              </div>
             </div>
           </div>
         </div>

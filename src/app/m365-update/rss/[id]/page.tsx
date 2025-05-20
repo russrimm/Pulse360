@@ -1,4 +1,4 @@
-import { getM365Updates } from '@/lib/api';
+import { getM365Update } from '@/lib/api';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { format } from 'date-fns';
@@ -12,8 +12,7 @@ interface PageProps {
 
 export default async function M365UpdatePage({ params }: PageProps) {
   const { id } = await params;
-  const updates = await getM365Updates();
-  const update = updates.find(u => u.id === id);
+  const update = await getM365Update(id);
 
   if (!update) {
     notFound();
