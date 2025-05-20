@@ -37,6 +37,18 @@ const products = [
     icon: '/icons/CopilotStudio_scalable.svg',
     href: '/product-news/copilot-studio',
     current: true
+  },
+  {
+    name: 'Learn Blog',
+    icon: '/icons/m365.svg',
+    href: '/product-news/learn-blog',
+    current: false
+  },
+  {
+    name: 'Microsoft News',
+    icon: '/icons/Windows.svg',
+    href: '/product-news/microsoft-news',
+    current: false
   }
 ];
 
@@ -67,9 +79,18 @@ export default function CopilotStudioNewsPage() {
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-            Copilot Studio News
-          </h1>
+          <div className="flex items-center gap-3 mb-2">
+            <Image
+              src="/icons/CopilotStudio_scalable.svg"
+              alt="Copilot Studio"
+              width={32}
+              height={32}
+              className="w-8 h-8"
+            />
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+              Copilot Studio News
+            </h1>
+          </div>
           <p className="text-gray-600 dark:text-gray-400">
             Stay up to date with the latest news and announcements from Microsoft Copilot Studio.
           </p>
@@ -90,9 +111,9 @@ export default function CopilotStudioNewsPage() {
                 <Image
                   src={product.icon}
                   alt={product.name}
-                  width={20}
-                  height={20}
-                  className="w-5 h-5"
+                  width={product.current ? 32 : 20}
+                  height={product.current ? 32 : 20}
+                  className={`${product.current ? 'w-8 h-8' : 'w-5 h-5'} ${product.current ? 'opacity-100' : 'opacity-70'}`}
                 />
                 <span className={`text-sm font-medium ${
                   product.current

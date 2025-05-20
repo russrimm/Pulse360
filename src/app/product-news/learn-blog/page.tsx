@@ -1,6 +1,6 @@
 'use client';
 
-import { getPowerAutomateNews } from '@/lib/api';
+import { getLearnBlogNews } from '@/lib/api';
 import { ProductNewsCard } from '@/components/ProductNewsCard';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -18,7 +18,7 @@ const products = [
     name: 'Power Automate',
     icon: '/icons/PowerAutomate_scalable.svg',
     href: '/product-news/power-automate',
-    current: true
+    current: false
   },
   {
     name: 'Power BI',
@@ -42,7 +42,7 @@ const products = [
     name: 'Learn Blog',
     icon: '/icons/m365.svg',
     href: '/product-news/learn-blog',
-    current: false
+    current: true
   },
   {
     name: 'Microsoft News',
@@ -52,7 +52,7 @@ const products = [
   }
 ];
 
-export default function PowerAutomateNewsPage() {
+export default function LearnBlogNewsPage() {
   const [news, setNews] = useState<ProductNews[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -61,7 +61,7 @@ export default function PowerAutomateNewsPage() {
     const fetchNews = async () => {
       try {
         setLoading(true);
-        const data = await getPowerAutomateNews();
+        const data = await getLearnBlogNews();
         setNews(data);
         setError(null);
       } catch (err) {
@@ -81,18 +81,18 @@ export default function PowerAutomateNewsPage() {
         <div className="mb-8">
           <div className="flex items-center gap-3 mb-2">
             <Image
-              src="/icons/PowerAutomate_scalable.svg"
-              alt="Power Automate"
+              src="/icons/m365.svg"
+              alt="Learn Blog"
               width={32}
               height={32}
               className="w-8 h-8"
             />
             <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-              Power Automate News
+              Learn Blog
             </h1>
           </div>
           <p className="text-gray-600 dark:text-gray-400">
-            Stay up to date with the latest news and announcements from Microsoft Power Automate.
+            Stay up to date with the latest news and announcements from Microsoft Learn.
           </p>
         </div>
 
@@ -147,7 +147,7 @@ export default function PowerAutomateNewsPage() {
               <ProductNewsCard 
                 key={item.id} 
                 news={item} 
-                productIcon="/icons/PowerAutomate_scalable.svg"
+                productIcon="/icons/m365.svg"
               />
             ))}
           </div>

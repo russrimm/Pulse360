@@ -598,4 +598,86 @@ export async function getCopilotStudioNews(): Promise<ProductNews[]> {
     console.error('Error fetching Copilot Studio news:', error);
     return [];
   }
+}
+
+export async function getLearnBlogNews(): Promise<ProductNews[]> {
+  try {
+    const response = await fetch('/api/learn-blog-news', {
+      next: { revalidate: 3600 } // Cache for 1 hour
+    });
+
+    if (!response.ok) {
+      console.error('Failed to fetch Learn Blog news:', {
+        status: response.status,
+        statusText: response.statusText,
+        url: response.url
+      });
+      return [];
+    }
+
+    const xmlText = await response.text();
+    const parser = new XMLParser({
+      ignoreAttributes: false,
+      attributeNamePrefix: '@_'
+    });
+    const result = parser.parse(xmlText);
+    const items = result.rss.channel.item;
+
+    const news: ProductNews[] = items.map((item: any) => ({
+      id: item.guid?.['#text'] || item.link,
+      title: item.title,
+      link: item.link,
+      description: item.description,
+      publishDate: item.pubDate,
+      author: item['dc:creator'] || '',
+      categories: Array.isArray(item.category) ? item.category : [item.category].filter(Boolean)
+    }));
+
+    // Sort by publish date, newest first
+    return news.sort((a, b) => 
+      new Date(b.publishDate).getTime() - new Date(a.publishDate).getTime()
+    );
+  } catch (error) {
+    console.error('Error fetching Learn Blog news:', error);
+    return [];
+  }
+}
+
+export async function getMicrosoftNews(): Promise<ProductNews[]> {
+  try {
+    const response = await fetch('/api/microsoft-news');
+    if (!response.ok) {
+      throw new Error('Failed to fetch Microsoft Blog news');
+    }
+
+    const xml = await response.text();
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(xml, 'text/xml');
+    const items = doc.querySelectorAll('item');
+
+    const news: ProductNews[] = Array.from(items).map((item) => {
+      const title = item.querySelector('title')?.textContent || '';
+      const link = item.querySelector('link')?.textContent || '';
+      const description = item.querySelector('description')?.textContent || '';
+      const pubDate = item.querySelector('pubDate')?.textContent || '';
+      const author = item.querySelector('dc\\:creator')?.textContent || 'Microsoft';
+      const categories = Array.from(item.querySelectorAll('category')).map(cat => cat.textContent || '');
+      const publishDate = new Date(pubDate).toISOString();
+
+      return {
+        id: `${link}-${publishDate}`, // Create unique ID by combining link and publish date
+        title,
+        link,
+        description,
+        publishDate,
+        author,
+        categories
+      };
+    });
+
+    return news.sort((a, b) => new Date(b.publishDate).getTime() - new Date(a.publishDate).getTime());
+  } catch (error) {
+    console.error('Error fetching Microsoft Blog news:', error);
+    throw error;
+  }
 } 

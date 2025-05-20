@@ -1,6 +1,6 @@
 'use client';
 
-import { getPowerAutomateNews } from '@/lib/api';
+import { getMicrosoftNews } from '@/lib/api';
 import { ProductNewsCard } from '@/components/ProductNewsCard';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -18,7 +18,7 @@ const products = [
     name: 'Power Automate',
     icon: '/icons/PowerAutomate_scalable.svg',
     href: '/product-news/power-automate',
-    current: true
+    current: false
   },
   {
     name: 'Power BI',
@@ -48,11 +48,11 @@ const products = [
     name: 'Microsoft News',
     icon: '/icons/Windows.svg',
     href: '/product-news/microsoft-news',
-    current: false
+    current: true
   }
 ];
 
-export default function PowerAutomateNewsPage() {
+export default function MicrosoftNewsPage() {
   const [news, setNews] = useState<ProductNews[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -61,7 +61,7 @@ export default function PowerAutomateNewsPage() {
     const fetchNews = async () => {
       try {
         setLoading(true);
-        const data = await getPowerAutomateNews();
+        const data = await getMicrosoftNews();
         setNews(data);
         setError(null);
       } catch (err) {
@@ -79,20 +79,18 @@ export default function PowerAutomateNewsPage() {
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
-          <div className="flex items-center gap-3 mb-2">
+          <div className="flex items-center gap-3 mb-8">
             <Image
-              src="/icons/PowerAutomate_scalable.svg"
-              alt="Power Automate"
+              src="/icons/Windows.svg"
+              alt="Microsoft News"
               width={32}
               height={32}
               className="w-8 h-8"
             />
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-              Power Automate News
-            </h1>
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Microsoft News</h1>
           </div>
           <p className="text-gray-600 dark:text-gray-400">
-            Stay up to date with the latest news and announcements from Microsoft Power Automate.
+            Stay up to date with the latest news and announcements from Microsoft.
           </p>
         </div>
 
@@ -147,7 +145,7 @@ export default function PowerAutomateNewsPage() {
               <ProductNewsCard 
                 key={item.id} 
                 news={item} 
-                productIcon="/icons/PowerAutomate_scalable.svg"
+                productIcon="/icons/m365.svg"
               />
             ))}
           </div>
