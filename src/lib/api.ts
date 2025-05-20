@@ -296,7 +296,6 @@ export async function getM365Updates(): Promise<M365Update[]> {
     }
 
     const data = await response.json();
-    console.log('API Response products:', data.value[0]?.products); // Log the first update's products
     return data.value.map((update: any) => ({
       id: update.id.toString(),
       title: update.title,
@@ -321,7 +320,7 @@ export async function getM365Updates(): Promise<M365Update[]> {
 
 export async function getM365Update(id: string): Promise<M365Update> {
   try {
-    const response = await fetch(`https://www.microsoft.com/releasecommunications/api/v2/m365/${id}`, {
+    const response = await fetch(`https://www.microsoft.com/releasecommunications/api/v2/m365/rss/${id}`, {
       next: { revalidate: 3600 } // Revalidate every hour
     });
 
@@ -329,22 +328,91 @@ export async function getM365Update(id: string): Promise<M365Update> {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
 
-    const data = await response.json();
+    const xmlText = await response.text();
+    const parser = new XMLParser({
+      ignoreAttributes: false,
+      attributeNamePrefix: "@_",
+      textNodeName: "#text"
+    });
+    const result = parser.parse(xmlText);
+    const item = result.rss.channel.item;
+
+    // Extract the content from the description
+    const content = item.description || '';
+    
+    // Extract services from the content
+    const servicesMatch = content.match(/<strong>Services<\/strong>: (.*?)(?:<br>|<\/p>)/);
+    const services = servicesMatch ? 
+      servicesMatch[1].replace(/<[^>]*>/g, '').split(',').map((s: string) => s.trim()) : 
+      [];
+
+    // Extract status from the content
+    const statusMatch = content.match(/<strong>Status<\/strong>: (.*?)(?:<br>|<\/p>)/);
+    const status = statusMatch ? statusMatch[1].replace(/<[^>]*>/g, '').trim() : '';
+
+    // Extract dates from the content
+    const gaDateMatch = content.match(/<strong>GA date<\/strong>: (.*?)(?:<br>|<\/p>)/);
+    const previewDateMatch = content.match(/<strong>Preview date<\/strong>: (.*?)(?:<br>|<\/p>)/);
+    const gaDate = gaDateMatch ? gaDateMatch[1].replace(/<[^>]*>/g, '').trim() : '';
+    const previewDate = previewDateMatch ? previewDateMatch[1].replace(/<[^>]*>/g, '').trim() : '';
+
+    // Extract tags from the content
+    const tagsMatch = content.match(/<strong>Tags<\/strong>: (.*?)(?:<br>|<\/p>)/);
+    const tags = tagsMatch ? 
+      tagsMatch[1].replace(/<[^>]*>/g, '').split(',').map((tag: string) => tag.trim()) : 
+      [];
+
+    // Extract platforms from the content
+    const platformsMatch = content.match(/<strong>Platforms<\/strong>: (.*?)(?:<br>|<\/p>)/);
+    const platforms = platformsMatch ? 
+      platformsMatch[1].replace(/<[^>]*>/g, '').split(',').map((p: string) => p.trim()) : 
+      [];
+
+    // Extract cloud instances from the content
+    const cloudInstancesMatch = content.match(/<strong>Cloud Instances<\/strong>: (.*?)(?:<br>|<\/p>)/);
+    const cloudInstances = cloudInstancesMatch ? 
+      cloudInstancesMatch[1].replace(/<[^>]*>/g, '').split(',').map((c: string) => c.trim()) : 
+      [];
+
+    // Extract release rings from the content
+    const releaseRingsMatch = content.match(/<strong>Release Rings<\/strong>: (.*?)(?:<br>|<\/p>)/);
+    const releaseRings = releaseRingsMatch ? 
+      releaseRingsMatch[1].replace(/<[^>]*>/g, '').split(',').map((r: string) => r.trim()) : 
+      [];
+
+    // Extract the actual content by removing all metadata sections
+    const metadataSections = [
+      /<strong>Services<\/strong>:.*?(?:<br>|<\/p>)/,
+      /<strong>Status<\/strong>:.*?(?:<br>|<\/p>)/,
+      /<strong>GA date<\/strong>:.*?(?:<br>|<\/p>)/,
+      /<strong>Preview date<\/strong>:.*?(?:<br>|<\/p>)/,
+      /<strong>Tags<\/strong>:.*?(?:<br>|<\/p>)/,
+      /<strong>Platforms<\/strong>:.*?(?:<br>|<\/p>)/,
+      /<strong>Cloud Instances<\/strong>:.*?(?:<br>|<\/p>)/,
+      /<strong>Release Rings<\/strong>:.*?(?:<br>|<\/p>)/
+    ];
+
+    let finalContent = content;
+    metadataSections.forEach(section => {
+      finalContent = finalContent.replace(section, '');
+    });
+    finalContent = finalContent.replace(/<[^>]*>/g, '').trim();
+
     return {
-      id: data.id.toString(),
-      title: data.title,
-      content: data.description,
-      product: data.products?.[0] || '',
-      status: data.status,
-      published: data.created,
-      lastUpdated: data.modified,
-      tags: data.tags || [],
-      service: data.products || [],
-      generalAvailabilityDate: data.generalAvailabilityDate,
-      previewAvailabilityDate: data.previewAvailabilityDate,
-      cloudInstances: data.cloudInstances || [],
-      platforms: data.platforms || [],
-      releaseRings: data.releaseRings || [],
+      id: id,
+      title: item.title,
+      content: finalContent,
+      product: services[0] || '',
+      status: status,
+      published: item.pubDate,
+      lastUpdated: item.pubDate,
+      tags: tags,
+      service: services,
+      generalAvailabilityDate: gaDate,
+      previewAvailabilityDate: previewDate,
+      cloudInstances: cloudInstances,
+      platforms: platforms,
+      releaseRings: releaseRings,
     };
   } catch (error) {
     console.error('Error fetching Microsoft 365 update:', error);

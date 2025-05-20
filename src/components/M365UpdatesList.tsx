@@ -128,10 +128,6 @@ export function M365UpdatesList({ updates, searchQuery }: M365UpdatesListProps) 
     };
   }, [visibleUpdates.length, filteredUpdates.length]);
 
-  const handleUpdateClick = (updateId: string) => {
-    router.push(`/m365-update/${updateId}`);
-  };
-
   if (!updates) return null;
 
   return (
@@ -260,7 +256,6 @@ export function M365UpdatesList({ updates, searchQuery }: M365UpdatesListProps) 
           <M365UpdateCard 
             key={update.id} 
             update={update} 
-            onClick={handleUpdateClick}
           />
         ))}
       </div>
