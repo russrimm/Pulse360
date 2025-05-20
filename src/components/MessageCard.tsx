@@ -74,34 +74,34 @@ export const MessageCard: React.FC<MessageCardProps> = ({ message, onClick }) =>
           </div>
         )}
         <div className="flex flex-col p-3 pb-1 bg-gray-50 dark:bg-gray-900/50 border-b border-gray-200 dark:border-gray-700/50">
-          <div className="flex items-center justify-between mb-1">
+          <div className="flex items-center justify-between mb-4">
             <div className="inline-flex items-center px-3 py-1.5 rounded-xl text-sm font-medium bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-md transition-all duration-200">
               {message.id}
             </div>
-          </div>
-          <div className="flex flex-wrap gap-2 justify-center mb-4">
-            {uniqueServices.map((service) => {
-              const iconPath = service.startsWith('Microsoft 365') 
-                ? '/icons/m365.svg' 
-                : serviceIcons[service];
-              return (
-                <div
-                  key={service}
-                  className="inline-flex items-center px-1.5 py-0.5 rounded-md text-[10px] font-medium bg-blue-50 text-blue-700 dark:bg-transparent dark:text-blue-300 border border-blue-200 dark:border-blue-800 min-w-[100px] justify-center"
-                >
-                  {iconPath && (
-                    <Image
-                      src={iconPath}
-                      alt={service}
-                      width={10}
-                      height={10}
-                      className="mr-0.5 w-2.5 h-2.5"
-                    />
-                  )}
-                  <span className="truncate">{service}</span>
-                </div>
-              );
-            })}
+            <div className="flex flex-wrap gap-2 justify-end">
+              {uniqueServices.map((service) => {
+                const iconPath = service.startsWith('Microsoft 365') 
+                  ? '/icons/m365.svg' 
+                  : serviceIcons[service];
+                return (
+                  <div
+                    key={service}
+                    className="inline-flex items-center px-1.5 py-0.5 rounded-md text-[10px] font-medium bg-blue-50 text-blue-700 dark:bg-transparent dark:text-blue-300 border border-blue-200 dark:border-blue-800 min-w-[100px] justify-center"
+                  >
+                    {iconPath && (
+                      <Image
+                        src={iconPath}
+                        alt={service}
+                        width={10}
+                        height={10}
+                        className="mr-0.5 w-2.5 h-2.5"
+                      />
+                    )}
+                    <span className="truncate">{service}</span>
+                  </div>
+                );
+              })}
+            </div>
           </div>
           <div className="flex items-center justify-center text-[10px] text-gray-500 dark:text-gray-400 gap-1.5">
             <span className="font-medium">Published</span>
