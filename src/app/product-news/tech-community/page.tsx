@@ -1,6 +1,6 @@
 'use client';
 
-import { getLearnBlogNews } from '@/lib/api';
+import { getTechCommunityNews } from '@/lib/api';
 import { ProductNewsCard } from '@/components/ProductNewsCard';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -42,7 +42,7 @@ const products = [
     name: 'Learn Blog',
     icon: '/icons/m365.svg',
     href: '/product-news/learn-blog',
-    current: true
+    current: false
   },
   {
     name: 'Microsoft News',
@@ -53,11 +53,11 @@ const products = [
   {
     name: 'Tech Community',
     href: '/product-news/tech-community',
-    current: false
+    current: true
   }
 ];
 
-export default function LearnBlogNewsPage() {
+export default function TechCommunityPage() {
   const [news, setNews] = useState<ProductNews[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -66,7 +66,7 @@ export default function LearnBlogNewsPage() {
     const fetchNews = async () => {
       try {
         setLoading(true);
-        const data = await getLearnBlogNews();
+        const data = await getTechCommunityNews();
         setNews(data);
         setError(null);
       } catch (err) {
@@ -84,20 +84,18 @@ export default function LearnBlogNewsPage() {
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
-          <div className="flex items-center gap-3 mb-2">
+          <div className="flex items-center gap-3 mb-8">
             <Image
               src="/icons/m365.svg"
-              alt="Learn Blog"
+              alt="Tech Community"
               width={32}
               height={32}
               className="w-8 h-8"
             />
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-              Learn Blog
-            </h1>
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Tech Community Blog</h1>
           </div>
           <p className="text-gray-600 dark:text-gray-400">
-            Stay up to date with the latest news and announcements from Microsoft Learn.
+            Stay up to date with the latest news and announcements from the Microsoft Tech Community.
           </p>
         </div>
 
@@ -109,22 +107,22 @@ export default function LearnBlogNewsPage() {
                 href={product.href}
                 className={`flex items-center gap-2 px-4 py-2 rounded-lg border transition-all duration-200 ${
                   product.current
-                    ? 'bg-primary-50 border-primary-200 dark:bg-primary-900/30 dark:border-primary-800'
+                    ? 'bg-primary-100 border-primary-300 dark:bg-primary-900/50 dark:border-primary-700 shadow-sm ring-1 ring-primary-200 dark:ring-primary-800'
                     : 'bg-white/80 dark:bg-gray-800/50 border-gray-200 dark:border-gray-700 hover:border-primary-200 dark:hover:border-primary-800 hover:bg-primary-50/50 dark:hover:bg-primary-900/20'
                 }`}
               >
-                {product.icon && product.icon !== '' && (
+                {product.icon && (
                   <Image
                     src={product.icon}
                     alt={product.name}
-                    width={product.current ? 32 : 20}
-                    height={product.current ? 32 : 20}
-                    className={`${product.current ? 'w-8 h-8' : 'w-5 h-5'} ${product.current ? 'opacity-100' : 'opacity-70'}`}
+                    width={product.current ? 24 : 20}
+                    height={product.current ? 24 : 20}
+                    className={`${product.current ? 'w-6 h-6' : 'w-5 h-5'} ${product.current ? 'opacity-100' : 'opacity-70'}`}
                   />
                 )}
                 <span className={`text-sm font-medium ${
                   product.current
-                    ? 'text-primary-700 dark:text-primary-300'
+                    ? 'text-primary-800 dark:text-primary-200 font-semibold'
                     : 'text-gray-700 dark:text-gray-300'
                 }`}>
                   {product.name}

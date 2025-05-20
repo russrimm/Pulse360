@@ -49,6 +49,11 @@ const products = [
     icon: '/icons/Windows.svg',
     href: '/product-news/microsoft-news',
     current: false
+  },
+  {
+    name: 'Tech Community',
+    href: '/product-news/tech-community',
+    current: false
   }
 ];
 
@@ -108,13 +113,15 @@ export default function PowerAutomateNewsPage() {
                     : 'bg-white/80 dark:bg-gray-800/50 border-gray-200 dark:border-gray-700 hover:border-primary-200 dark:hover:border-primary-800 hover:bg-primary-50/50 dark:hover:bg-primary-900/20'
                 }`}
               >
-                <Image
-                  src={product.icon}
-                  alt={product.name}
-                  width={product.current ? 32 : 20}
-                  height={product.current ? 32 : 20}
-                  className={`${product.current ? 'w-8 h-8' : 'w-5 h-5'} ${product.current ? 'opacity-100' : 'opacity-70'}`}
-                />
+                {product.icon && product.icon !== '' && (
+                  <Image
+                    src={product.icon}
+                    alt={product.name}
+                    width={product.current ? 32 : 20}
+                    height={product.current ? 32 : 20}
+                    className={`${product.current ? 'w-8 h-8' : 'w-5 h-5'} ${product.current ? 'opacity-100' : 'opacity-70'}`}
+                  />
+                )}
                 <span className={`text-sm font-medium ${
                   product.current
                     ? 'text-primary-700 dark:text-primary-300'

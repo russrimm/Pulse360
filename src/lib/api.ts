@@ -680,4 +680,41 @@ export async function getMicrosoftNews(): Promise<ProductNews[]> {
     console.error('Error fetching Microsoft Blog news:', error);
     throw error;
   }
+}
+
+export async function getTechCommunityNews(): Promise<ProductNews[]> {
+  try {
+    const response = await fetch('/api/tech-community-news');
+    if (!response.ok) {
+      throw new Error('Failed to fetch Tech Community news');
+    }
+    const xmlText = await response.text();
+    const parser = new DOMParser();
+    const xmlDoc = parser.parseFromString(xmlText, 'text/xml');
+    const items = xmlDoc.getElementsByTagName('item');
+    
+    const news: ProductNews[] = Array.from(items).map((item) => {
+      const title = item.getElementsByTagName('title')[0]?.textContent || '';
+      const link = item.getElementsByTagName('link')[0]?.textContent || '';
+      const description = item.getElementsByTagName('description')[0]?.textContent || '';
+      const pubDate = item.getElementsByTagName('pubDate')[0]?.textContent || '';
+      const author = item.getElementsByTagName('dc:creator')[0]?.textContent || '';
+      const categories = Array.from(item.getElementsByTagName('category')).map(cat => cat.textContent || '');
+      
+      return {
+        id: `${link}-${pubDate}`,
+        title,
+        link,
+        description,
+        publishDate: new Date(pubDate).toISOString(),
+        author,
+        categories
+      };
+    });
+
+    return news.sort((a, b) => new Date(b.publishDate).getTime() - new Date(a.publishDate).getTime());
+  } catch (error) {
+    console.error('Error fetching Tech Community news:', error);
+    throw error;
+  }
 } 
