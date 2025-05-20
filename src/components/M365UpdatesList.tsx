@@ -253,9 +253,10 @@ export function M365UpdatesList({ updates, searchQuery }: M365UpdatesListProps) 
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pt-4">
         {visibleUpdates.map((update) => (
-          <M365UpdateCard 
-            key={update.id} 
-            update={update} 
+          <M365UpdateCard
+            key={update.id}
+            update={update}
+            onClick={(id) => router.push(`/m365-update/${id}`)}
           />
         ))}
       </div>
