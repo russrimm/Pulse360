@@ -113,7 +113,7 @@ export default function PowerAutomateNewsPage() {
                     : 'bg-white/80 dark:bg-gray-800/50 border-gray-200 dark:border-gray-700 hover:border-primary-200 dark:hover:border-primary-800 hover:bg-primary-50/50 dark:hover:bg-primary-900/20'
                 }`}
               >
-                {product.icon && (
+                {product.icon && product.icon !== '' && (
                   <Image
                     src={product.icon}
                     alt={product.name}
