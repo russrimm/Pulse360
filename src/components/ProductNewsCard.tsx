@@ -87,7 +87,7 @@ export function ProductNewsCard({ news, productIcon = '/icons/PowerPlatform_scal
 
         <div className="flex items-center justify-between mt-auto">
           <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
-            {!productIcon.includes('CopilotStudio') && productIcon !== '/icons/Windows.svg' && news.categories && news.categories.length > 0 && (
+            {!productIcon.includes('CopilotStudio') && !productIcon.includes('PowerPlatform') && productIcon !== '/icons/Windows.svg' && news.categories && news.categories.length > 0 && (
               <span>{news.categories.join(', ')}</span>
             )}
           </div>

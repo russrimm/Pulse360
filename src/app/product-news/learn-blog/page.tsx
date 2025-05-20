@@ -49,6 +49,11 @@ const products = [
     icon: '/icons/Windows.svg',
     href: '/product-news/microsoft-news',
     current: false
+  },
+  {
+    name: 'Tech Community',
+    href: '/product-news/tech-community',
+    current: false
   }
 ];
 
