@@ -117,7 +117,7 @@ export const MessageCard: React.FC<MessageCardProps> = ({ message, onClick }) =>
         </div>
         <div className="p-6 pt-4 flex flex-col flex-grow">
           {message.tags.length > 0 && (
-            <div className="flex flex-wrap justify-center gap-1.5 mb-2 -mt-1">
+            <div className="flex flex-wrap justify-center gap-1.5 mb-4 -mt-1">
               {message.tags.map((tag) => {
                 // Map tags to appropriate icons
                 const getTagIcon = (tag: string) => {
