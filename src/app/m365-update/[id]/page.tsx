@@ -5,15 +5,15 @@ import { format } from 'date-fns';
 import { ProductBadge } from '@/components/ProductBadge';
 
 interface PageProps {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
 }
 
 export default async function M365UpdatePage({ params }: PageProps) {
-  const resolvedParams = await params;
+  const { id } = await params;
   const updates = await getM365Updates();
-  const update = updates.find(u => u.id === resolvedParams.id);
+  const update = updates.find(u => u.id === id);
 
   if (!update) {
     notFound();
