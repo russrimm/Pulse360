@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { Message } from '@/types/message';
+import { Message } from '@/lib/types';
 
 interface TagsFilterProps {
   messages: Message[];
