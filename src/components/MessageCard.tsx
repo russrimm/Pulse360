@@ -58,7 +58,7 @@ export const MessageCard: React.FC<MessageCardProps> = ({ message, onClick }) =>
   return (
     <Link href={`/message/${message.id}`}>
       <div 
-        className="group bg-white/80 dark:bg-gray-800/50 backdrop-blur-sm rounded-xl shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-200 dark:border-gray-700/50 hover:border-primary-200 dark:hover:border-primary-800 hover:-translate-y-1 h-full cursor-pointer flex flex-col"
+        className="group bg-white/80 dark:bg-gray-800/50 backdrop-blur-sm rounded-xl shadow-[inset_0_2px_4px_rgba(0,0,0,0.05)] dark:shadow-[inset_0_2px_4px_rgba(0,0,0,0.2)] hover:shadow-[inset_0_2px_4px_rgba(0,0,0,0.1)] dark:hover:shadow-[inset_0_2px_4px_rgba(0,0,0,0.3)] transition-all duration-300 border border-gray-200 dark:border-gray-700/50 hover:border-primary-200 dark:hover:border-primary-800 hover:-translate-y-0.5 h-full cursor-pointer flex flex-col"
         onClick={handleClick}
       >
         {message.isMajorChange && (
@@ -74,8 +74,8 @@ export const MessageCard: React.FC<MessageCardProps> = ({ message, onClick }) =>
           </div>
         )}
         <div className="flex flex-col p-3 pb-1 bg-gray-50 dark:bg-gray-900/50 border-b border-gray-200 dark:border-gray-700/50">
-          <div className="flex items-center justify-between mb-4">
-            <div className="inline-flex items-center px-3 py-1.5 rounded-xl text-sm font-medium bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-md transition-all duration-200">
+          <div className="flex items-center justify-between mb-2">
+            <div className="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-md transition-all duration-200">
               {message.id}
             </div>
             <div className="flex flex-wrap gap-2 justify-end">
@@ -86,15 +86,15 @@ export const MessageCard: React.FC<MessageCardProps> = ({ message, onClick }) =>
                 return (
                   <div
                     key={service}
-                    className="inline-flex items-center px-1.5 py-0.5 rounded-md text-[10px] font-medium bg-blue-50 text-blue-700 dark:bg-transparent dark:text-blue-300 border border-blue-200 dark:border-blue-800 min-w-[100px] justify-center"
+                    className="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-blue-50 text-blue-700 dark:bg-transparent dark:text-blue-300 border border-blue-200 dark:border-blue-800 min-w-[120px] justify-center"
                   >
                     {iconPath && (
                       <Image
                         src={iconPath}
                         alt={service}
-                        width={10}
-                        height={10}
-                        className="mr-0.5 w-2.5 h-2.5"
+                        width={14}
+                        height={14}
+                        className="mr-1 w-3.5 h-3.5"
                       />
                     )}
                     <span className="truncate">{service}</span>
@@ -103,23 +103,9 @@ export const MessageCard: React.FC<MessageCardProps> = ({ message, onClick }) =>
               })}
             </div>
           </div>
-          <div className="flex items-center justify-center text-[10px] text-gray-500 dark:text-gray-400 gap-1.5">
-            <span className="font-medium">Published</span>
-            <span>{format(new Date(message.published), 'MMM d, yyyy')}</span>
-            {format(new Date(message.published), 'MMM d, yyyy') !== format(new Date(message.lastUpdated), 'MMM d, yyyy') && (
-              <>
-                <span>•</span>
-                <span className="font-medium">Updated</span>
-                <span>{format(new Date(message.lastUpdated), 'MMM d, yyyy')}</span>
-              </>
-            )}
-          </div>
-        </div>
-        <div className="p-6 pt-4 flex flex-col flex-grow">
           {message.tags.length > 0 && (
-            <div className="flex flex-wrap justify-center gap-1.5 mb-4 -mt-1">
+            <div className="flex flex-wrap justify-center gap-1.5 mb-2">
               {message.tags.map((tag) => {
-                // Map tags to appropriate icons
                 const getTagIcon = (tag: string) => {
                   const tagLower = tag.toLowerCase();
                   if (tagLower.includes('feature')) return 'M12 6v6m0 0v6m0-6h6m-6 0H6';
@@ -135,7 +121,7 @@ export const MessageCard: React.FC<MessageCardProps> = ({ message, onClick }) =>
                   const tagLower = tag.toLowerCase();
                   if (tagLower.includes('new feature')) return 'bg-emerald-50/90 text-emerald-700 dark:bg-emerald-900/20 dark:text-emerald-200 border border-emerald-200/30 dark:border-emerald-700/20';
                   if (tagLower.includes('update')) return 'bg-teal-50/90 text-teal-700 dark:bg-teal-900/20 dark:text-teal-200 border border-teal-200/30 dark:border-teal-700/20';
-                  if (tagLower.includes('user impact')) return 'bg-amber-50/90 text-amber-700 dark:bg-amber-900/20 dark:text-amber-200 border border-amber-200/30 dark:border-amber-700/20';
+                  if (tagLower.includes('user impact')) return 'bg-yellow-50/90 text-yellow-700 dark:bg-yellow-900/20 dark:text-yellow-200 border border-yellow-200/30 dark:border-yellow-700/20';
                   if (tagLower.includes('admin impact')) return 'bg-orange-50/90 text-orange-700 dark:bg-orange-900/20 dark:text-orange-200 border border-orange-200/30 dark:border-orange-700/20';
                   return 'bg-gray-50/90 text-gray-600 dark:bg-gray-800/20 dark:text-gray-300 border border-gray-200/30 dark:border-gray-700/20';
                 };
@@ -150,7 +136,7 @@ export const MessageCard: React.FC<MessageCardProps> = ({ message, onClick }) =>
                 return (
                   <span
                     key={tag}
-                    className={`inline-flex items-center px-1.5 py-[1px] rounded-full text-[9px] font-medium tracking-wide whitespace-nowrap shrink-0 shadow-sm hover:shadow transition-all duration-200 ${getTagStyle(tag)}`}
+                    className={`inline-flex items-center px-1.5 py-0.5 rounded-full text-[9px] font-medium tracking-wide whitespace-nowrap shrink-0 shadow-sm hover:shadow transition-all duration-200 ${getTagStyle(tag)}`}
                   >
                     <svg
                       className="w-2 h-2 mr-0.5 text-current opacity-70"
@@ -171,9 +157,21 @@ export const MessageCard: React.FC<MessageCardProps> = ({ message, onClick }) =>
               })}
             </div>
           )}
-          
-          <div className="flex flex-col flex-grow justify-start">
-            <div className="flex items-start gap-2">
+          <div className="flex items-center justify-center text-[10px] text-gray-500 dark:text-gray-400 gap-1.5">
+            <span className="font-medium">Published</span>
+            <span>{format(new Date(message.published), 'MMM d, yyyy')}</span>
+            {format(new Date(message.published).setHours(0,0,0,0), 'yyyy-MM-dd') !== format(new Date(message.lastUpdated).setHours(0,0,0,0), 'yyyy-MM-dd') && (
+              <>
+                <span>•</span>
+                <span className="font-medium">Updated</span>
+                <span>{format(new Date(message.lastUpdated), 'MMM d, yyyy')}</span>
+              </>
+            )}
+          </div>
+        </div>
+        <div className="p-6 pt-4 flex flex-col flex-grow">
+          <div className="flex flex-col flex-grow justify-center">
+            <div className="flex items-center gap-2">
               <h3 className="text-base font-medium text-gray-900 dark:text-white group-hover:text-primary-700 dark:group-hover:text-primary-400 transition-colors tracking-tight">{message.title}</h3>
               {message.severity && message.severity.toLowerCase() !== 'normal' && (
                 <span

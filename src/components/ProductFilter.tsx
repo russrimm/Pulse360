@@ -14,6 +14,7 @@ const serviceIconMap: Record<string, string> = {
   'Power Automate': '/icons/PowerAutomate_scalable.svg',
   'Microsoft Power Automate': '/icons/PowerAutomate_scalable.svg',
   'Power Platform': '/icons/PowerPlatform_scalable.svg',
+  'Power Platform Governance and Administration': '/icons/PowerPlatform_scalable.svg',
   'Power Pages': '/icons/PowerPages_scalable.svg',
   'Microsoft Dataverse': '/icons/Dataverse_scalable.svg',
   'Power BI': '/icons/PowerBI_scalable.svg',
@@ -33,6 +34,12 @@ const serviceIconMap: Record<string, string> = {
   'Planner': '/icons/planner.svg',
   'Microsoft Entra': '/icons/entra.svg',
   'Microsoft Bookings': '/icons/Bookings.svg',
+  'Excel': '/icons/Excel.svg',
+  'Exchange': '/icons/exchange.svg',
+  'Forms': '/icons/forms.svg',
+  'Bookings': '/icons/Bookings.svg',
+  'Access': '/icons/Access.svg',
+  'Azure Information Protection': '/icons/azure/security/10229-icon-service-Azure-Information-Protection.svg',
   'Dynamics 365 Apps': '/icons/Dynamics365_scalable.svg',
   'Dynamics 365 Sales': '/icons/Sales_scalable.svg',
   'Dynamics 365 Marketing': '/icons/Marketing_scalable.svg',
@@ -171,7 +178,7 @@ export function ProductFilter({ services, selectedServices, onFilterChange }: Pr
     <div className="relative inline-block" ref={dropdownRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center justify-center gap-2 px-4 h-10 text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-primary-500 relative"
+        className="flex items-center justify-center gap-2 px-4 h-8 text-gray-700 dark:text-gray-200 bg-white/80 dark:bg-gray-800/50 backdrop-blur-sm border border-gray-200 dark:border-gray-700/50 rounded-lg shadow-[inset_0_2px_4px_rgba(0,0,0,0.05)] dark:shadow-[inset_0_2px_4px_rgba(0,0,0,0.2)] hover:shadow-[inset_0_2px_4px_rgba(0,0,0,0.1)] dark:hover:shadow-[inset_0_2px_4px_rgba(0,0,0,0.3)] hover:border-primary-200 dark:hover:border-primary-800 hover:shadow-[0_0_0_1px_rgba(59,130,246,0.5)] dark:hover:shadow-[0_0_0_1px_rgba(59,130,246,0.5)] transition-all duration-300 relative min-h-[32px]"
         aria-label="Filter products"
       >
         <svg

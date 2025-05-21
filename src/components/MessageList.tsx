@@ -7,6 +7,7 @@ import { Message } from '@/lib/types';
 import { useRouter } from 'next/navigation';
 import { LoadingSpinner } from './LoadingSpinner';
 import { SearchBar } from '@/components/SearchBar';
+import { TagsFilter } from '@/components/TagsFilter';
 import { addDays, isAfter, isBefore, parseISO, startOfDay, endOfDay, subDays } from 'date-fns';
 
 interface MessageListProps {
@@ -30,6 +31,7 @@ export function MessageList({ messages }: MessageListProps) {
   const [dateFilterOpen, setDateFilterOpen] = useState(false);
   const [selectedDateFilter, setSelectedDateFilter] = useState<'all' | 'last30' | 'last7' | 'custom'>('all');
   const [customDateRange, setCustomDateRange] = useState<{ from: string; to: string }>({ from: '', to: '' });
+  const [showMajorChangesOnly, setShowMajorChangesOnly] = useState(false);
 
   // Get unique tags
   const uniqueTags = useMemo(() => {
@@ -53,6 +55,10 @@ export function MessageList({ messages }: MessageListProps) {
           message.service.some(service => selectedServices.includes(service));
         const matchesTags = selectedTags.length === 0 || 
           message.tags.some(tag => selectedTags.includes(tag));
+        // Major changes filter
+        if (showMajorChangesOnly && !message.isMajorChange) {
+          return false;
+        }
         // Date filter logic
         let matchesDate = true;
         if (selectedDateFilter === 'last30') {
@@ -68,7 +74,7 @@ export function MessageList({ messages }: MessageListProps) {
         return matchesSearch && matchesServices && matchesTags && matchesDate;
       })
       .sort((a, b) => new Date(b.lastUpdated).getTime() - new Date(a.lastUpdated).getTime());
-  }, [messages, searchQuery, selectedServices, selectedTags, selectedDateFilter, customDateRange]);
+  }, [messages, searchQuery, selectedServices, selectedTags, showMajorChangesOnly, selectedDateFilter, customDateRange]);
 
   // Handle loading state
   useEffect(() => {
@@ -133,8 +139,8 @@ export function MessageList({ messages }: MessageListProps) {
           <LoadingSpinner />
         </div>
       )}
-      <div className="sticky top-32 z-40 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm pt-0 pb-4 border-b border-gray-200 dark:border-gray-700">
-        <div className="mb-3">
+      <div className="sticky top-28 z-40 backdrop-blur-md pt-3 pb-2 border-b border-gray-200/50 dark:border-gray-700/50 -mt-4">
+        <div className="mb-2">
           <h2 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Filters</h2>
           <div className="flex flex-wrap gap-4">
             <ProductFilter
@@ -145,11 +151,21 @@ export function MessageList({ messages }: MessageListProps) {
             <div className="relative">
               <button
                 onClick={() => setDateFilterOpen(!dateFilterOpen)}
-                className="flex items-center justify-center gap-2 px-4 h-10 text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-primary-500 relative"
+                className="flex items-center justify-center gap-2 px-4 min-h-[32px] text-gray-700 dark:text-gray-200 bg-white/80 dark:bg-gray-800/50 backdrop-blur-sm border border-gray-200 dark:border-gray-700/50 rounded-lg shadow-[inset_0_2px_4px_rgba(0,0,0,0.05)] dark:shadow-[inset_0_2px_4px_rgba(0,0,0,0.2)] hover:shadow-[inset_0_2px_4px_rgba(0,0,0,0.1)] dark:hover:shadow-[inset_0_2px_4px_rgba(0,0,0,0.3)] hover:border-primary-200 dark:hover:border-primary-800 hover:shadow-[0_0_0_1px_rgba(59,130,246,0.5)] dark:hover:shadow-[0_0_0_1px_rgba(59,130,246,0.5)] transition-all duration-300 relative"
                 aria-label="Filter by date"
               >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                <svg
+                  className="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                  />
                 </svg>
                 <span className="text-sm font-medium">Date</span>
                 {selectedDateFilter !== 'all' && (
@@ -202,18 +218,26 @@ export function MessageList({ messages }: MessageListProps) {
                     </label>
                     {selectedDateFilter === 'custom' && (
                       <div className="flex flex-col gap-2 mt-2">
-                        <input
-                          type="date"
-                          value={customDateRange.from}
-                          onChange={e => setCustomDateRange({ ...customDateRange, from: e.target.value })}
-                          className="border rounded px-2 py-1 text-sm text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600"
-                        />
-                        <input
-                          type="date"
-                          value={customDateRange.to}
-                          onChange={e => setCustomDateRange({ ...customDateRange, to: e.target.value })}
-                          className="border rounded px-2 py-1 text-sm text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600"
-                        />
+                        <div className="flex flex-col gap-1">
+                          <label htmlFor="date-from" className="text-sm text-gray-700 dark:text-gray-200">From</label>
+                          <input
+                            id="date-from"
+                            type="date"
+                            value={customDateRange.from}
+                            onChange={e => setCustomDateRange({ ...customDateRange, from: e.target.value })}
+                            className="border rounded px-2 py-1 text-sm text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600"
+                          />
+                        </div>
+                        <div className="flex flex-col gap-1">
+                          <label htmlFor="date-to" className="text-sm text-gray-700 dark:text-gray-200">To</label>
+                          <input
+                            id="date-to"
+                            type="date"
+                            value={customDateRange.to}
+                            onChange={e => setCustomDateRange({ ...customDateRange, to: e.target.value })}
+                            className="border rounded px-2 py-1 text-sm text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600"
+                          />
+                        </div>
                       </div>
                     )}
                   </div>
@@ -232,81 +256,29 @@ export function MessageList({ messages }: MessageListProps) {
                 </div>
               )}
             </div>
-            <div className="relative">
-              <button
-                onClick={() => setIsTagDropdownOpen(!isTagDropdownOpen)}
-                className="flex items-center justify-center gap-2 px-4 h-10 text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-primary-500 relative"
-                aria-label="Filter tags"
-              >
-                <svg
-                  className="w-5 h-5"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"
-                  />
-                </svg>
-                <span className="text-sm font-medium">Tags</span>
-                {selectedTags.length > 0 && (
-                  <span className="absolute -top-1 -right-1 flex items-center justify-center w-5 h-5 text-xs font-medium text-white bg-primary-600 rounded-full">
-                    {selectedTags.length}
-                  </span>
-                )}
-              </button>
-              {isTagDropdownOpen && (
-                <div className="absolute z-10 w-72 mt-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow-lg">
-                  <div className="p-4 border-b border-gray-200 dark:border-gray-700">
-                    <h3 className="text-sm font-medium text-gray-900 dark:text-white">Filter Tags</h3>
-                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                      {selectedTags.length} tag{selectedTags.length !== 1 ? 's' : ''} selected
-                    </p>
-                  </div>
-                  <div className="max-h-60 overflow-y-auto p-2">
-                    {uniqueTags.map((tag) => (
-                      <label
-                        key={tag}
-                        className="flex items-center px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md cursor-pointer"
-                      >
-                        <input
-                          type="checkbox"
-                          checked={selectedTags.includes(tag)}
-                          onChange={(e) => {
-                            if (e.target.checked) {
-                              setSelectedTags([...selectedTags, tag]);
-                            } else {
-                              setSelectedTags(selectedTags.filter(t => t !== tag));
-                            }
-                          }}
-                          className="w-4 h-4 text-primary-600 border-gray-300 rounded focus:ring-primary-500"
-                        />
-                        <span className="ml-2 text-sm text-gray-700 dark:text-gray-200">{tag}</span>
-                      </label>
-                    ))}
-                  </div>
-                  <div className="p-3 border-t border-gray-200 dark:border-gray-700">
-                    <button
-                      onClick={() => {
-                        setSelectedTags([]);
-                        setIsTagDropdownOpen(false);
-                      }}
-                      className="w-full px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
-                    >
-                      Clear all
-                    </button>
-                  </div>
-                </div>
-              )}
-            </div>
+            <button
+              onClick={() => setShowMajorChangesOnly(!showMajorChangesOnly)}
+              className={`flex items-center justify-center gap-2 px-4 min-h-[32px] text-gray-700 dark:text-gray-200 bg-white/80 dark:bg-gray-800/50 backdrop-blur-sm border border-gray-200 dark:border-gray-700/50 rounded-lg shadow-[inset_0_2px_4px_rgba(0,0,0,0.05)] dark:shadow-[inset_0_2px_4px_rgba(0,0,0,0.2)] hover:shadow-[inset_0_2px_4px_rgba(0,0,0,0.1)] dark:hover:shadow-[inset_0_2px_4px_rgba(0,0,0,0.3)] hover:border-primary-200 dark:hover:border-primary-800 hover:shadow-[0_0_0_1px_rgba(59,130,246,0.5)] dark:hover:shadow-[0_0_0_1px_rgba(59,130,246,0.5)] transition-all duration-300 relative ${showMajorChangesOnly ? 'bg-red-50 dark:bg-red-900/30 border-red-200 dark:border-red-800 text-red-700 dark:text-red-300' : ''}`}
+              aria-label="Filter major changes"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
+              <span className="text-sm font-medium">Major Changes</span>
+              <span className="absolute -top-1 -right-1 flex items-center justify-center w-5 h-5 text-xs font-medium text-white bg-primary-600 rounded-full opacity-0">
+                0
+              </span>
+            </button>
+            <TagsFilter
+              messages={messages}
+              selectedTags={selectedTags}
+              onFilterChange={setSelectedTags}
+            />
           </div>
         </div>
         <div className="mb-0">
           <div className="flex items-center justify-between">
-            <p className="text-sm text-gray-600 dark:text-gray-400">
+            <p className="text-xs text-gray-600 dark:text-gray-400">
               Showing {filteredMessages.length} message{filteredMessages.length !== 1 ? 's' : ''}
               {filteredMessages.length !== messages.length && (
                 <span className="ml-1">
