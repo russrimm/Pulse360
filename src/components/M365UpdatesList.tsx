@@ -137,7 +137,7 @@ export function M365UpdatesList({ updates, searchQuery }: M365UpdatesListProps) 
           <LoadingSpinner />
         </div>
       )}
-      <div className="sticky top-32 z-40 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm pt-0 pb-4 border-b border-gray-200 dark:border-gray-700">
+      <div className="sticky top-32 z-40 backdrop-blur-md pt-0 pb-4 border-b border-gray-200/50 dark:border-gray-700/50">
         <div className="mb-3">
           <h2 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Filters</h2>
           <div className="flex flex-wrap gap-4">
@@ -149,7 +149,7 @@ export function M365UpdatesList({ updates, searchQuery }: M365UpdatesListProps) 
             <div className="relative">
               <button
                 onClick={() => setDateFilterOpen(!dateFilterOpen)}
-                className="flex items-center justify-center gap-2 px-4 h-10 text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-primary-500 relative"
+                className="flex items-center justify-center gap-2 px-4 min-h-[32px] text-gray-700 dark:text-gray-200 bg-white/80 dark:bg-gray-800/50 backdrop-blur-sm border border-gray-200 dark:border-gray-700/50 rounded-lg shadow-[inset_0_2px_4px_rgba(0,0,0,0.05)] dark:shadow-[inset_0_2px_4px_rgba(0,0,0,0.2)] hover:shadow-[inset_0_2px_4px_rgba(0,0,0,0.1)] dark:hover:shadow-[inset_0_2px_4px_rgba(0,0,0,0.3)] hover:border-primary-200 dark:hover:border-primary-800 hover:shadow-[0_0_0_1px_rgba(59,130,246,0.5)] dark:hover:shadow-[0_0_0_1px_rgba(59,130,246,0.5)] transition-all duration-300 relative"
                 aria-label="Filter by date"
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -206,18 +206,26 @@ export function M365UpdatesList({ updates, searchQuery }: M365UpdatesListProps) 
                     </label>
                     {selectedDateFilter === 'custom' && (
                       <div className="flex flex-col gap-2 mt-2">
-                        <input
-                          type="date"
-                          value={customDateRange.from}
-                          onChange={e => setCustomDateRange({ ...customDateRange, from: e.target.value })}
-                          className="border rounded px-2 py-1 text-sm text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600"
-                        />
-                        <input
-                          type="date"
-                          value={customDateRange.to}
-                          onChange={e => setCustomDateRange({ ...customDateRange, to: e.target.value })}
-                          className="border rounded px-2 py-1 text-sm text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600"
-                        />
+                        <div className="flex flex-col gap-1">
+                          <label htmlFor="date-from" className="text-sm text-gray-700 dark:text-gray-200">From</label>
+                          <input
+                            id="date-from"
+                            type="date"
+                            value={customDateRange.from}
+                            onChange={e => setCustomDateRange({ ...customDateRange, from: e.target.value })}
+                            className="border rounded px-2 py-1 text-sm text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600"
+                          />
+                        </div>
+                        <div className="flex flex-col gap-1">
+                          <label htmlFor="date-to" className="text-sm text-gray-700 dark:text-gray-200">To</label>
+                          <input
+                            id="date-to"
+                            type="date"
+                            value={customDateRange.to}
+                            onChange={e => setCustomDateRange({ ...customDateRange, to: e.target.value })}
+                            className="border rounded px-2 py-1 text-sm text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600"
+                          />
+                        </div>
                       </div>
                     )}
                   </div>
