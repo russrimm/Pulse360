@@ -61,4 +61,15 @@ export interface ProductNews {
   publishDate: string;
   author: string;
   categories: string[];
+}
+
+export interface AzureServiceHealth {
+  id: string;
+  name: string;
+  status: string;
+  services: Array<{
+    id: string;
+    name: string;
+    status: string;
+  }>;
 } 
