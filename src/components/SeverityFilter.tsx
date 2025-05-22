@@ -11,7 +11,7 @@ const STORAGE_KEY = 'message-center-severity-filters';
 export function SeverityFilter({ severities, selectedSeverities, onFilterChange }: SeverityFilterProps) {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
-  const saveTimeoutRef = useRef<NodeJS.Timeout>();
+  const saveTimeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
 
   const isSeveritySelected = useCallback((severity: string): boolean => {
     return selectedSeverities.includes(severity);
