@@ -236,7 +236,7 @@ export function AzureUpdatesContent({ updates, searchQuery = '' }: AzureUpdatesC
           <LoadingSpinner />
         </div>
       )}
-      <div className="md:sticky md:top-28 z-40 backdrop-blur-md pt-3 pb-2 border-b border-gray-200/50 dark:border-gray-700/50 -mt-4">
+      <div className="md:sticky md:top-28 z-40 backdrop-blur-md pt-0 pb-2 border-b border-gray-200/50 dark:border-gray-700/50 -mt-4">
         <div className="mb-2">
           <h2 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Filters</h2>
           <div className="flex flex-wrap gap-4">

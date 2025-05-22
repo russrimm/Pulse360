@@ -189,6 +189,7 @@ export function getProductIcon(product: string): string | null {
     'cost management': '/icons/azure/management + governance/00004-icon-service-Cost-Management-and-Billing.svg',
     'cloud shell': '/icons/azure/other/00559-icon-service-Azure-Cloud-Shell.svg',
     'azure cloud shell': '/icons/azure/other/00559-icon-service-Azure-Cloud-Shell.svg',
+    'Microsoft OneDrive': '/icons/onedrive.svg',
   };
 
   // Check for Azure service mappings
