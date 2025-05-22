@@ -1,33 +1,13 @@
-import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
-import Link from 'next/link'
-import { ThemeToggle } from '@/components/ThemeToggle'
 import { ThemeProvider } from '@/components/ThemeProvider'
-import Navbar from '@/components/Navbar'
-import { NavigationTabs } from '@/components/NavigationTabs'
+import { Navbar } from '@/components/Navbar'
 
-const inter = Inter({ 
-  subsets: ['latin'],
-  display: 'swap',
-  preload: true,
-  fallback: ['system-ui', 'arial'],
-  adjustFontFallback: true,
-  variable: '--font-inter'
-})
+const inter = Inter({ subsets: ['latin'] })
 
-export const metadata: Metadata = {
-  title: 'Pulse 360°',
-  description: 'Stay informed about Microsoft 365 service updates and changes',
-  metadataBase: new URL('https://www.russrimmerman.com'),
-  icons: {
-    icon: '/siteicon.png',
-    shortcut: '/siteicon.png',
-    apple: '/siteicon.png',
-  },
-  other: {
-    'apple-touch-icon': '/siteicon.png',
-  }
+export const metadata = {
+  title: 'Message Center',
+  description: 'Microsoft 365 Message Center',
 }
 
 export default function RootLayout({
@@ -37,11 +17,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <head>
-        <link rel="icon" href="/favicon.ico" sizes="any" />
-        <link rel="icon" href="/icons/m365.svg" type="image/svg+xml" />
-      </head>
-      <body className={`${inter.className} min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-200`} suppressHydrationWarning>
+      <body className={`${inter.className} bg-gray-50 dark:bg-gray-900`}>
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
@@ -49,13 +25,10 @@ export default function RootLayout({
           disableTransitionOnChange={true}
           storageKey="theme"
         >
-          <div className="min-h-screen flex flex-col">
-            <Navbar />
-            <NavigationTabs />
-            <main className="flex-1">
-              {children}
-            </main>
-          </div>
+          <Navbar />
+          <main className="container mx-auto px-4 py-8">
+            {children}
+          </main>
         </ThemeProvider>
       </body>
     </html>

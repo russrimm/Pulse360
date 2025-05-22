@@ -102,6 +102,12 @@ interface GraphApiResponse {
   value: GraphApiMessage[];
 }
 
+interface ApiError {
+  message: string;
+  code?: string;
+  details?: unknown;
+}
+
 export async function getMessages(): Promise<Message[]> {
   if (!hasRequiredEnvVars) {
     console.error('Missing required environment variables in production');
@@ -826,5 +832,19 @@ export async function getCopilotNews(): Promise<ProductNews[]> {
   } catch (error) {
     console.error('Error fetching Copilot news:', error);
     return [];
+  }
+}
+
+export async function fetchMessages(): Promise<Message[]> {
+  try {
+    const response = await fetch('/api/messages');
+    if (!response.ok) {
+      const error: ApiError = await response.json();
+      throw new Error(error.message || 'Failed to fetch messages');
+    }
+    return response.json();
+  } catch (error) {
+    console.error('Error fetching messages:', error);
+    throw error;
   }
 } 
