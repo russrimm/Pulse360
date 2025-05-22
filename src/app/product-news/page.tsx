@@ -101,13 +101,13 @@ export default function PowerAppsNewsPage() {
           </p>
         </div>
 
-        <div className="mt-8 mb-6">
-          <div className="flex flex-wrap gap-4">
+        <div className="mt-4 mb-4">
+          <div className="flex flex-wrap gap-3">
             {products.map((product) => (
               <Link
                 key={product.name}
                 href={product.href}
-                className={`flex items-center gap-2 px-4 py-2 rounded-lg border transition-all duration-200 ${
+                className={`flex items-center justify-center gap-2 px-2.5 py-1 rounded-lg border transition-all duration-200 w-32 ${
                   product.current
                     ? 'bg-primary-100 border-primary-300 dark:bg-primary-900/50 dark:border-primary-700 shadow-sm ring-1 ring-primary-200 dark:ring-primary-800'
                     : 'bg-white/80 dark:bg-gray-800/50 border-gray-200 dark:border-gray-700 hover:border-primary-200 dark:hover:border-primary-800 hover:bg-primary-50/50 dark:hover:bg-primary-900/20'
@@ -117,12 +117,12 @@ export default function PowerAppsNewsPage() {
                   <Image
                     src={product.icon}
                     alt={product.name}
-                    width={product.current ? 24 : 20}
-                    height={product.current ? 24 : 20}
-                    className={`${product.current ? 'w-6 h-6' : 'w-5 h-5'} ${product.current ? 'opacity-100' : 'opacity-70'}`}
+                    width={product.current ? 20 : 16}
+                    height={product.current ? 20 : 16}
+                    className={`${product.current ? 'w-5 h-5' : 'w-4 h-4'} ${product.current ? 'opacity-100' : 'opacity-70'}`}
                   />
                 )}
-                <span className={`text-sm font-medium ${
+                <span className={`text-xs font-medium ${
                   product.current
                     ? 'text-primary-800 dark:text-primary-200 font-semibold'
                     : 'text-gray-700 dark:text-gray-300'
