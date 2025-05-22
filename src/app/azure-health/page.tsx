@@ -7,13 +7,13 @@ import { LoadingSpinner } from '@/components/LoadingSpinner';
 const getStatusColor = (status: string) => {
   switch (status.toLowerCase()) {
     case 'healthy':
-      return 'bg-green-500';
+      return 'bg-green-500 dark:bg-green-400';
     case 'degraded':
-      return 'bg-yellow-500';
+      return 'bg-yellow-500 dark:bg-yellow-400';
     case 'unhealthy':
-      return 'bg-red-500';
+      return 'bg-red-500 dark:bg-red-400';
     default:
-      return 'bg-gray-500';
+      return 'bg-gray-500 dark:bg-gray-400';
   }
 };
 
@@ -73,7 +73,7 @@ export default function AzureHealthPage() {
 
   if (error) {
     return (
-      <div className="text-center text-red-500 p-4">
+      <div className="text-center text-red-500 dark:text-red-400 p-4">
         <p className="font-semibold">Error loading Azure health data</p>
         <p className="text-sm mt-2">{error}</p>
       </div>
@@ -86,11 +86,11 @@ export default function AzureHealthPage() {
         {regions.map((region) => (
           <div
             key={region.id}
-            className="bg-white rounded shadow-sm border border-gray-200"
+            className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 hover:shadow-md dark:hover:shadow-gray-700/50 transition-shadow"
           >
             <div className="p-2">
               <div className="flex items-center justify-between mb-1">
-                <h2 className="text-xs font-medium text-gray-900 truncate">
+                <h2 className="text-xs font-medium text-gray-900 dark:text-gray-100 truncate">
                   {region.name}
                 </h2>
                 <div className={`w-2 h-2 rounded-full ${getStatusColor(region.status)} ml-1 flex-shrink-0`} />
@@ -102,12 +102,12 @@ export default function AzureHealthPage() {
                     key={service.id}
                     className="flex items-center justify-between text-xs"
                   >
-                    <span className="text-gray-600 truncate">
+                    <span className="text-gray-600 dark:text-gray-300 truncate">
                       {service.name}
                     </span>
                     <div className="flex items-center gap-1 ml-1">
                       <div className={`w-1.5 h-1.5 rounded-full ${getStatusColor(service.status)} flex-shrink-0`} />
-                      <span className="text-gray-500 text-[10px] flex-shrink-0">
+                      <span className="text-gray-500 dark:text-gray-400 text-[10px] flex-shrink-0">
                         {getStatusText(service.status)}
                       </span>
                     </div>

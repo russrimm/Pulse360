@@ -3,7 +3,7 @@ import { Inter } from 'next/font/google'
 import './globals.css'
 import Link from 'next/link'
 import { ThemeToggle } from '@/components/ThemeToggle'
-import { ThemeProvider } from 'next-themes'
+import { ThemeProvider } from '@/components/ThemeProvider'
 import Navbar from '@/components/Navbar'
 import { NavigationTabs } from '@/components/NavigationTabs'
 
@@ -36,17 +36,18 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en" className="dark text-base" suppressHydrationWarning>
+    <html lang="en" suppressHydrationWarning>
       <head>
         <link rel="icon" href="/favicon.ico" sizes="any" />
         <link rel="icon" href="/icons/m365.svg" type="image/svg+xml" />
       </head>
-      <body className={`${inter.className} min-h-screen bg-gray-900 dark:bg-black transition-colors duration-200`} suppressHydrationWarning>
+      <body className={`${inter.className} min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-200`} suppressHydrationWarning>
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
+          enableSystem={true}
+          disableTransitionOnChange={true}
+          storageKey="theme"
         >
           <div className="min-h-screen flex flex-col">
             <Navbar />

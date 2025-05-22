@@ -89,7 +89,7 @@ export function ReleasePlanDetail({ plan }: ReleasePlanDetailProps) {
               <div className="flex items-center justify-center mb-1.5 sm:mb-4">
                 <div className="flex flex-col items-center">
                   <h1 className="text-xl sm:text-3xl font-bold bg-gradient-to-r from-primary-600 to-primary-400 dark:from-primary-400 dark:to-primary-300 bg-clip-text text-transparent text-center">
-                    {plan.id} - {plan.title}
+                    {plan.title}
                   </h1>
                 </div>
               </div>
@@ -210,7 +210,7 @@ export function ReleasePlanDetail({ plan }: ReleasePlanDetailProps) {
                 {/* Business Value */}
                 <div className="bg-white/70 dark:bg-gray-700/70 backdrop-blur-sm rounded-xl p-4 sm:p-6 border border-gray-200 dark:border-gray-600">
                   <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-4">Business Value</h2>
-                  <div className="prose dark:prose-invert max-w-none" dangerouslySetInnerHTML={{ __html: plan.businessValue }} />
+                  <div className="prose dark:prose-invert max-w-none text-gray-700 dark:text-gray-200" dangerouslySetInnerHTML={{ __html: plan.businessValue }} />
                 </div>
 
                 {/* Feature Details */}
