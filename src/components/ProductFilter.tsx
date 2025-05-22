@@ -81,7 +81,7 @@ const STORAGE_KEY = 'message-center-filters';
 export function ProductFilter({ services, selectedServices, onFilterChange }: ProductFilterProps) {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
-  const saveTimeoutRef = useRef<NodeJS.Timeout>();
+  const saveTimeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
 
   // Log services for debugging
   useEffect(() => {
