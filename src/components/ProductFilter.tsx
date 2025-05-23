@@ -240,7 +240,7 @@ export function ProductFilter({ services, selectedServices, onFilterChange }: Pr
 
       {isOpen && (
         <div 
-          className="absolute z-10 w-72 mt-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow-lg"
+          className="absolute z-10 w-72 mt-1 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow-lg"
           role="dialog"
           aria-label="Product filter options"
         >
@@ -273,9 +273,6 @@ export function ProductFilter({ services, selectedServices, onFilterChange }: Pr
                   key={service}
                   className="flex items-center px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary-500"
                   role="option"
-                  aria-selected={isServiceSelected(service) ? "true" : "false"}
-                  tabIndex={0}
-                  data-service={service}
                 >
                   <input
                     type="checkbox"
@@ -288,9 +285,9 @@ export function ProductFilter({ services, selectedServices, onFilterChange }: Pr
                       <img 
                         src={iconSrc} 
                         alt={`${service} icon`}
-                        className="w-3.5 h-3.5 object-contain"
-                        width={14}
-                        height={14}
+                        className="w-4 h-4 object-contain"
+                        width={16}
+                        height={16}
                         loading="lazy"
                         onError={(e) => {
                           e.currentTarget.style.display = 'none';

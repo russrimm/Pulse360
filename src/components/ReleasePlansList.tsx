@@ -190,9 +190,19 @@ export function ReleasePlansList({ releasePlans }: ReleasePlansListProps) {
         </div>
       )}
       
-      <div className="md:sticky md:top-28 z-40 backdrop-blur-md pt-3 pb-2 border-b border-gray-200/50 dark:border-gray-700/50 -mt-4">
+      <div className="relative md:sticky md:top-28 z-40 backdrop-blur-md pt-0 pb-0 border-b border-gray-200/50 dark:border-gray-700/50 mt-20">
         <div className="mb-2">
-          <h2 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Filters</h2>
+          <div className="flex items-center mb-2">
+            <h2 className="text-sm font-medium text-gray-700 dark:text-gray-300">Filters</h2>
+            <p className="text-xs text-gray-600 dark:text-gray-400 ml-8">
+              Showing {filteredReleasePlans.length} release plan{filteredReleasePlans.length !== 1 ? 's' : ''}
+              {filteredReleasePlans.length !== releasePlans.length && (
+                <span className="ml-1">
+                  (filtered from {releasePlans.length} total)
+                </span>
+              )}
+            </p>
+          </div>
           <div className="flex flex-wrap gap-4">
             <ProductFilter
               services={services}
@@ -302,18 +312,6 @@ export function ReleasePlansList({ releasePlans }: ReleasePlansListProps) {
                 </div>
               )}
             </div>
-          </div>
-        </div>
-        <div className="mb-0">
-          <div className="flex items-center justify-between">
-            <p className="text-sm text-gray-600 dark:text-gray-400">
-              Showing {filteredReleasePlans.length} release plan{filteredReleasePlans.length !== 1 ? 's' : ''}
-              {filteredReleasePlans.length !== releasePlans.length && (
-                <span className="ml-1">
-                  (filtered from {releasePlans.length} total)
-                </span>
-              )}
-            </p>
           </div>
         </div>
       </div>
