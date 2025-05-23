@@ -70,6 +70,10 @@ const serviceIcons: Record<string, string> = {
   'Power Pages': '/icons/PowerPages_scalable.svg',
   'Dataverse': '/icons/Dataverse_scalable.svg',
   'Copilot': '/icons/CopilotStudio_scalable.svg',
+  'Microsoft Purview compliance portal': '/icons/purview.svg',
+  'Microsoft Edge': '/icons/edge.svg',
+  'Windows 365': '/icons/Windows.svg',
+  'Microsoft Defender for Office 365': '/icons/defender.svg',
 };
 
 export const M365UpdateCard: React.FC<M365UpdateCardProps> = ({ update, onClick }) => {
