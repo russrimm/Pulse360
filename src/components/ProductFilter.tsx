@@ -27,6 +27,7 @@ const serviceIconMap: Record<string, string> = {
   'Microsoft 365 for Education': '/icons/m365.svg',
   'Microsoft 365 for Government': '/icons/m365.svg',
   'OneDrive for Business': '/icons/onedrive.svg',
+  'Microsoft OneDrive': '/icons/onedrive.svg',
   'Microsoft Stream': '/icons/stream.svg',
   'Exchange Online': '/icons/exchange.svg',
   'Microsoft Forms': '/icons/forms.svg',

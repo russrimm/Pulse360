@@ -6,6 +6,7 @@ import { ThemeToggle } from '@/components/ThemeToggle'
 import { ThemeProvider } from 'next-themes'
 import Navbar from '@/components/Navbar'
 import { NavigationTabs } from '@/components/NavigationTabs'
+import { ErrorBoundary } from '@/components/ErrorBoundary'
 
 const inter = Inter({ 
   subsets: ['latin'],
@@ -48,13 +49,15 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <div className="min-h-screen flex flex-col">
-            <Navbar />
-            <NavigationTabs />
-            <main className="flex-1">
-              {children}
-            </main>
-          </div>
+          <ErrorBoundary>
+            <div className="min-h-screen flex flex-col">
+              <Navbar />
+              <NavigationTabs />
+              <main className="flex-1">
+                {children}
+              </main>
+            </div>
+          </ErrorBoundary>
         </ThemeProvider>
       </body>
     </html>
