@@ -64,7 +64,6 @@ const serviceIcons: Record<string, string> = {
   'Entra ID': '/icons/entra.svg',
   'Defender': '/icons/defender.svg',
   'Intune': '/icons/intune.svg',
-  'Power Platform': '/icons/PowerPlatform_scalable.svg',
   'Power Apps': '/icons/PowerApps_scalable.svg',
   'Power Automate': '/icons/PowerAutomate_scalable.svg',
   'Power BI': '/icons/PowerBI_scalable.svg',
@@ -75,7 +74,6 @@ const serviceIcons: Record<string, string> = {
   'Windows 365': '/icons/Windows.svg',
   'Microsoft Defender for Office 365': '/icons/defender.svg',
   'Microsoft Defender for Cloud Apps': '/icons/defender.svg',
-  'Microsoft Clipchamp': '/icons/clipchamp.svg',
 };
 
 export const M365UpdateCard: React.FC<M365UpdateCardProps> = ({ update, onClick }) => {
