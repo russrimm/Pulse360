@@ -81,8 +81,9 @@ const STORAGE_KEY = 'message-center-filters';
 
 export function ProductFilter({ services, selectedServices, onFilterChange }: ProductFilterProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
   const dropdownRef = useRef<HTMLDivElement>(null);
-  const saveTimeoutRef = useRef<NodeJS.Timeout>();
+  const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Log services for debugging
   useEffect(() => {
@@ -126,10 +127,36 @@ export function ProductFilter({ services, selectedServices, onFilterChange }: Pr
     }
   }, []);
 
+  // Handle keyboard navigation
+  const handleKeyDown = useCallback((event: KeyboardEvent) => {
+    if (!isOpen) return;
+    
+    if (event.key === 'Escape') {
+      setIsOpen(false);
+    } else if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+      event.preventDefault();
+      const options = Array.from(document.querySelectorAll('[role="option"]'));
+      const currentIndex = options.findIndex(option => option === document.activeElement);
+      const nextIndex = event.key === 'ArrowDown' 
+        ? Math.min(currentIndex + 1, options.length - 1)
+        : Math.max(currentIndex - 1, 0);
+      (options[nextIndex] as HTMLElement)?.focus();
+    } else if (event.key === 'Enter' && document.activeElement?.getAttribute('role') === 'option') {
+      const service = document.activeElement.getAttribute('data-service');
+      if (service) {
+        toggleService(service);
+      }
+    }
+  }, [isOpen, toggleService]);
+
   useEffect(() => {
     document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [handleClickOutside]);
+    document.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [handleClickOutside, handleKeyDown]);
 
   // Load saved filters on mount
   useEffect(() => {
@@ -175,6 +202,14 @@ export function ProductFilter({ services, selectedServices, onFilterChange }: Pr
     };
   }, [selectedServices]);
 
+  // Memoize filtered services
+  const filteredServices = useMemo(() => 
+    sortedServices.filter(service => 
+      service.toLowerCase().includes(searchQuery.toLowerCase())
+    ),
+    [sortedServices, searchQuery]
+  );
+
   return (
     <div className="relative inline-block" ref={dropdownRef}>
       <button
@@ -204,16 +239,28 @@ export function ProductFilter({ services, selectedServices, onFilterChange }: Pr
       </button>
 
       {isOpen && (
-        <div className="absolute z-10 w-72 mt-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow-lg">
+        <div 
+          className="absolute z-10 w-72 mt-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow-lg"
+          role="dialog"
+          aria-label="Product filter options"
+        >
           <div className="p-4 border-b border-gray-200 dark:border-gray-700">
             <h3 className="text-sm font-medium text-gray-900 dark:text-white">Filter Products</h3>
             <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
               {selectedServices.length} product{selectedServices.length !== 1 ? 's' : ''} selected
             </p>
+            <div className="mt-2">
+              <input
+                type="text"
+                placeholder="Search products..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full px-3 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white"
+              />
+            </div>
           </div>
-          <div className="max-h-60 overflow-y-auto p-2">
-            {sortedServices.map((service) => {
-              // Use the same icon path logic as ReleasePlanCard
+          <div className="max-h-60 overflow-y-auto p-2" role="listbox">
+            {filteredServices.map((service) => {
               const iconSrc = service.startsWith('Microsoft 365')
                 ? '/icons/m365.svg'
                 : service === 'Microsoft Power Automate'
@@ -224,7 +271,11 @@ export function ProductFilter({ services, selectedServices, onFilterChange }: Pr
               return (
                 <label
                   key={service}
-                  className="flex items-center px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md cursor-pointer"
+                  className="flex items-center px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary-500"
+                  role="option"
+                  aria-selected={isServiceSelected(service) ? "true" : "false"}
+                  tabIndex={0}
+                  data-service={service}
                 >
                   <input
                     type="checkbox"
@@ -240,6 +291,10 @@ export function ProductFilter({ services, selectedServices, onFilterChange }: Pr
                         className="w-3.5 h-3.5 object-contain"
                         width={14}
                         height={14}
+                        loading="lazy"
+                        onError={(e) => {
+                          e.currentTarget.style.display = 'none';
+                        }}
                       />
                     )}
                     {service}
