@@ -40,7 +40,10 @@ const serviceIcons: Record<string, string> = {
   'Microsoft Defender XDR': '/icons/defender.svg',
   'Windows': '/icons/Windows.svg',
   'Microsoft Power Automate in Microsoft 365': '/icons/PowerAutomate_scalable.svg',
-  'Power Apps in Microsoft 365': '/icons/PowerApps_scalable.svg'
+  'Power Apps in Microsoft 365': '/icons/PowerApps_scalable.svg',
+  'Microsoft Defender for Cloud Apps': '/icons/defender.svg',
+  'Microsoft Clipchamp': '/icons/clipchamp.svg',
+  'Microsoft Copilot (Microsoft 365)': '/icons/copilot.svg',
 };
 
 // Normalize service names

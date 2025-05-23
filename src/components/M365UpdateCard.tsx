@@ -47,7 +47,8 @@ const serviceIcons: Record<string, string> = {
   'Microsoft Power BI': '/icons/PowerBI_scalable.svg',
   'Microsoft Power Pages': '/icons/PowerPages_scalable.svg',
   'Microsoft Dataverse': '/icons/Dataverse_scalable.svg',
-  'Microsoft Copilot (Microsoft 365)': '/icons/CopilotStudio_scalable.svg',
+  'Microsoft Clipchamp': '/icons/clipchamp.svg',
+  'Microsoft Copilot (Microsoft 365)': '/icons/copilot.svg',
   'Outlook': '/icons/Outlook.svg',
   'OneDrive': '/icons/onedrive.svg',
   'OneDrive for Business': '/icons/onedrive.svg',
@@ -69,11 +70,12 @@ const serviceIcons: Record<string, string> = {
   'Power BI': '/icons/PowerBI_scalable.svg',
   'Power Pages': '/icons/PowerPages_scalable.svg',
   'Dataverse': '/icons/Dataverse_scalable.svg',
-  'Copilot': '/icons/CopilotStudio_scalable.svg',
   'Microsoft Purview compliance portal': '/icons/purview.svg',
   'Microsoft Edge': '/icons/edge.svg',
   'Windows 365': '/icons/Windows.svg',
   'Microsoft Defender for Office 365': '/icons/defender.svg',
+  'Microsoft Defender for Cloud Apps': '/icons/defender.svg',
+  'Microsoft Clipchamp': '/icons/clipchamp.svg',
 };
 
 export const M365UpdateCard: React.FC<M365UpdateCardProps> = ({ update, onClick }) => {
