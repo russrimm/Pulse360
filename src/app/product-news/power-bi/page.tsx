@@ -6,58 +6,52 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { ProductNews } from '@/lib/types';
+import { usePathname } from 'next/navigation';
 
 const products = [
   {
     name: 'Power Apps',
     icon: '/icons/PowerApps_scalable.svg',
     href: '/product-news',
-    current: false
   },
   {
     name: 'Power Automate',
     icon: '/icons/PowerAutomate_scalable.svg',
     href: '/product-news/power-automate',
-    current: false
   },
   {
     name: 'Power BI',
     icon: '/icons/PowerBI_scalable.svg',
     href: '/product-news/power-bi',
-    current: true
   },
   {
     name: 'Power Platform',
     icon: '/icons/PowerPlatform_scalable.svg',
     href: '/product-news/power-platform',
-    current: false
   },
   {
     name: 'Copilot Studio',
     icon: '/icons/CopilotStudio_scalable.svg',
     href: '/product-news/copilot',
-    current: false
   },
   {
     name: 'Learn Blog',
     icon: '/icons/m365.svg',
     href: '/product-news/learn-blog',
-    current: false
   },
   {
     name: 'Microsoft News',
     icon: '/icons/Windows.svg',
     href: '/product-news/microsoft-news',
-    current: false
   },
   {
     name: 'Tech Community',
     href: '/product-news/tech-community',
-    current: false
   }
 ];
 
 export default function PowerBINewsPage() {
+  const pathname = usePathname();
   const [news, setNews] = useState<ProductNews[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -101,15 +95,18 @@ export default function PowerBINewsPage() {
           </p>
         </div>
 
-        <div className="mt-8 mb-6">
-          <div className="flex flex-wrap gap-4">
+        <div className="mt-4 mb-2">
+          <div className="flex items-center justify-between mb-2">
+            <h2 className="text-sm font-medium text-gray-700 dark:text-gray-300">Filters</h2>
+          </div>
+          <div className="flex flex-wrap gap-3">
             {products.map((product) => (
               <Link
                 key={product.name}
                 href={product.href}
-                className={`flex items-center gap-2 px-4 py-2 rounded-lg border transition-all duration-200 ${
-                  product.current
-                    ? 'bg-primary-50 border-primary-200 dark:bg-primary-900/30 dark:border-primary-800'
+                className={`flex items-center justify-center gap-2 px-2.5 py-1 rounded-lg border transition-all duration-200 w-32 ${
+                  pathname === product.href
+                    ? 'bg-primary-100 border-primary-300 dark:bg-primary-900/50 dark:border-primary-700 shadow-sm ring-1 ring-primary-200 dark:ring-primary-800'
                     : 'bg-white/80 dark:bg-gray-800/50 border-gray-200 dark:border-gray-700 hover:border-primary-200 dark:hover:border-primary-800 hover:bg-primary-50/50 dark:hover:bg-primary-900/20'
                 }`}
               >
@@ -117,14 +114,14 @@ export default function PowerBINewsPage() {
                   <Image
                     src={product.icon}
                     alt={product.name}
-                    width={product.current ? 32 : 20}
-                    height={product.current ? 32 : 20}
-                    className={`${product.current ? 'w-8 h-8' : 'w-5 h-5'} ${product.current ? 'opacity-100' : 'opacity-70'}`}
+                    width={16}
+                    height={16}
+                    className={`w-4 h-4 ${pathname === product.href ? 'opacity-100' : 'opacity-70'}`}
                   />
                 )}
-                <span className={`text-sm font-medium ${
-                  product.current
-                    ? 'text-primary-700 dark:text-primary-300'
+                <span className={`text-xs font-medium ${
+                  pathname === product.href
+                    ? 'text-primary-800 dark:text-primary-200 font-semibold'
                     : 'text-gray-700 dark:text-gray-300'
                 }`}>
                   {product.name}

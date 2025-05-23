@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { M365UpdatesList } from '@/components/M365UpdatesList';
 import { SearchBar } from '@/components/SearchBar';
 
@@ -28,7 +28,7 @@ interface M365UpdatesContentProps {
 export function M365UpdatesContent({ updates }: M365UpdatesContentProps) {
   const [filteredUpdates, setFilteredUpdates] = useState<M365Update[]>(updates);
 
-  return (
+  const content = useMemo(() => (
     <div className="space-y-6">
       <div className="flex justify-center">
         <div className="w-full max-w-2xl">
@@ -37,5 +37,7 @@ export function M365UpdatesContent({ updates }: M365UpdatesContentProps) {
       </div>
       <M365UpdatesList updates={filteredUpdates} searchQuery="" />
     </div>
-  );
+  ), [updates, filteredUpdates]);
+
+  return content;
 } 

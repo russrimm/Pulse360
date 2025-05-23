@@ -25,6 +25,7 @@ const serviceIcons: Record<string, string> = {
   'Microsoft 365 for Education': '/icons/m365.svg',
   'Microsoft 365 for Government': '/icons/m365.svg',
   'OneDrive for Business': '/icons/onedrive.svg',
+  'Microsoft OneDrive': '/icons/onedrive.svg',
   'Microsoft Stream': '/icons/stream.svg',
   'Exchange Online': '/icons/exchange.svg',
   'Microsoft Forms': '/icons/forms.svg',
@@ -157,17 +158,6 @@ export const MessageCard: React.FC<MessageCardProps> = ({ message, onClick }) =>
               })}
             </div>
           )}
-          <div className="flex items-center justify-center text-[10px] text-gray-500 dark:text-gray-400 gap-1.5">
-            <span className="font-medium">Published</span>
-            <span>{format(new Date(message.published), 'MMM d, yyyy')}</span>
-            {format(new Date(message.published).setHours(0,0,0,0), 'yyyy-MM-dd') !== format(new Date(message.lastUpdated).setHours(0,0,0,0), 'yyyy-MM-dd') && (
-              <>
-                <span>•</span>
-                <span className="font-medium">Updated</span>
-                <span>{format(new Date(message.lastUpdated), 'MMM d, yyyy')}</span>
-              </>
-            )}
-          </div>
         </div>
         <div className="p-6 pt-4 flex flex-col flex-grow">
           <div className="flex flex-col flex-grow justify-center">
@@ -180,6 +170,17 @@ export const MessageCard: React.FC<MessageCardProps> = ({ message, onClick }) =>
                 >
                   Critical Alert
                 </span>
+              )}
+            </div>
+            <div className="flex items-center text-[10px] text-gray-500 dark:text-gray-400 gap-1.5 mt-1">
+              <span className="font-medium">Published</span>
+              <span>{format(new Date(message.published), 'MMM d, yyyy')}</span>
+              {format(new Date(message.published).setHours(0,0,0,0), 'yyyy-MM-dd') !== format(new Date(message.lastUpdated).setHours(0,0,0,0), 'yyyy-MM-dd') && (
+                <>
+                  <span>•</span>
+                  <span className="font-medium">Updated</span>
+                  <span>{format(new Date(message.lastUpdated), 'MMM d, yyyy')}</span>
+                </>
               )}
             </div>
           </div>
