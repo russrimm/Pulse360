@@ -32,8 +32,8 @@ export default function TechCommunityNewsPage() {
   return (
     <ProductNewsLayout
       title="Tech Community"
-      description="Stay up to date with the latest news and announcements from the Microsoft Tech Community."
-      icon="/icons/m365.svg"
+      description="Latest updates from the Microsoft Tech Community."
+      icon="/icons/techcommunity.svg"
     >
       {loading ? (
         <div className="flex justify-center items-center py-12">
