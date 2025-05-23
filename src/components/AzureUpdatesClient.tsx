@@ -34,28 +34,26 @@ export function AzureUpdatesClient({ initialUpdates }: AzureUpdatesClientProps) 
   };
 
   return (
-    <div>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-            Azure Updates
-          </h1>
-          <p className="text-gray-600 dark:text-gray-400">
-            Stay informed about the latest Azure updates and changes.
-          </p>
-        </div>
-        <div className="flex justify-center mb-8">
-          <div className="w-full max-w-2xl">
-            <SearchBar 
-              messages={updates} 
-              onSearch={handleSearch}
-              searchQuery={searchQuery}
-              onSearchQueryChange={setSearchQuery}
-            />
-          </div>
-        </div>
-        <AzureUpdatesContent updates={filteredUpdates} searchQuery={searchQuery} />
+    <>
+      <div className="text-center mb-8">
+        <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+          Azure Updates
+        </h1>
+        <p className="text-gray-600 dark:text-gray-400">
+          Stay informed about the latest Azure updates and changes.
+        </p>
       </div>
-    </div>
+      <div className="flex justify-center mb-8">
+        <div className="w-full max-w-2xl">
+          <SearchBar 
+            messages={updates} 
+            onSearch={handleSearch}
+            searchQuery={searchQuery}
+            onSearchQueryChange={setSearchQuery}
+          />
+        </div>
+      </div>
+      <AzureUpdatesContent updates={filteredUpdates} searchQuery={searchQuery} />
+    </>
   );
 } 
