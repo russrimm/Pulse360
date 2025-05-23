@@ -112,12 +112,12 @@ export function ProductNewsLayout({ children, title, description, icon }: Produc
           </div>
           {/* Desktop: split into two rows */}
           <div className="hidden lg:flex w-full justify-center">
-            <div className="grid lg:grid-cols-5 lg:gap-4 w-full max-w-7xl">
+            <div className="grid lg:grid-cols-5 lg:gap-2 w-full max-w-7xl">
               {products.slice(0, 5).map((product) => (
                 <Link
                   key={product.name}
                   href={product.href}
-                  className={`flex items-center justify-center gap-2 px-2.5 py-1 rounded-lg border transition-all duration-200 w-full h-10 lg:w-40 flex-shrink-0 ${
+                  className={`flex items-center justify-center gap-2 px-2.5 py-1 rounded-lg border transition-all duration-200 h-12 min-w-0 flex-shrink-0 lg:w-48 ${
                     pathname === product.href
                       ? 'bg-primary-50 border-primary-300 dark:bg-primary-900/50 dark:border-primary-700 shadow-sm ring-1 ring-primary-200 dark:ring-primary-800'
                       : 'bg-white/80 dark:bg-gray-800/50 border-gray-200 dark:border-gray-700 hover:border-primary-200 dark:hover:border-primary-800 hover:bg-primary-50/50 dark:hover:bg-primary-900/20'
@@ -144,12 +144,14 @@ export function ProductNewsLayout({ children, title, description, icon }: Produc
             </div>
           </div>
           <div className="hidden lg:flex w-full justify-center mt-3">
-            <div className="flex lg:gap-4 max-w-7xl w-full justify-center">
-              {products.slice(5).map((product) => (
+            <div className="grid lg:grid-cols-5 lg:gap-2 w-full max-w-7xl">
+              {products.slice(5).map((product, i) => (
                 <Link
                   key={product.name}
                   href={product.href}
-                  className={`flex items-center justify-center gap-2 px-2.5 py-1 rounded-lg border transition-all duration-200 w-full h-10 lg:w-40 flex-shrink-0 ${
+                  className={`flex items-center justify-center gap-2 px-2.5 py-1 rounded-lg border transition-all duration-200 h-12 min-w-0 flex-shrink-0 lg:w-48 ${
+                    i === 0 ? 'col-start-2' : ''
+                  } ${
                     pathname === product.href
                       ? 'bg-primary-50 border-primary-300 dark:bg-primary-900/50 dark:border-primary-700 shadow-sm ring-1 ring-primary-200 dark:ring-primary-800'
                       : 'bg-white/80 dark:bg-gray-800/50 border-gray-200 dark:border-gray-700 hover:border-primary-200 dark:hover:border-primary-800 hover:bg-primary-50/50 dark:hover:bg-primary-900/20'
