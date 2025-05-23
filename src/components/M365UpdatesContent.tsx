@@ -35,7 +35,9 @@ export function M365UpdatesContent({ updates }: M365UpdatesContentProps) {
           <SearchBar messages={updates} onSearch={setFilteredUpdates} />
         </div>
       </div>
-      <M365UpdatesList updates={filteredUpdates} searchQuery="" />
+      <div className="mt-20">
+        <M365UpdatesList updates={filteredUpdates} searchQuery="" />
+      </div>
     </div>
   ), [updates, filteredUpdates]);
 

@@ -87,6 +87,9 @@ const serviceIconMap: Record<string, string> = {
   'Microsoft Purview compliance portal': '/icons/purview.svg',
   'Microsoft Edge': '/icons/edge.svg',
   'Microsoft Defender for Office 365': '/icons/defender.svg',
+  'Microsoft Defender for Cloud Apps': '/icons/defender.svg',
+  'Microsoft Clipchamp': '/icons/clipchamp.svg',
+  'Microsoft Copilot (Microsoft 365)': '/icons/copilot.svg',
 };
 
 // Storage key for persisting filter settings
