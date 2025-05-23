@@ -3,6 +3,7 @@
 import { ProductNews } from '@/lib/types';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
+import { Card } from './Card';
 
 interface ProductNewsCardProps {
   news: ProductNews;
@@ -39,7 +40,7 @@ export function ProductNewsCard({ news, productIcon = '/icons/PowerPlatform_scal
   };
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden hover:shadow-md transition-shadow duration-200">
+    <Card>
       <div className="p-6 flex flex-col h-full">
         <p className="text-sm text-gray-500 dark:text-gray-400 text-center mb-3">
           {new Date(news.publishDate).toLocaleDateString('en-US', {
@@ -49,7 +50,7 @@ export function ProductNewsCard({ news, productIcon = '/icons/PowerPlatform_scal
           })}
         </p>
         
-        <h3 className="text-base font-semibold text-gray-900 dark:text-white mb-4 pb-4 border-b border-gray-200 dark:border-gray-700">
+        <h3 className="text-base font-medium text-gray-900 dark:text-white group-hover:text-primary-700 dark:group-hover:text-primary-400 transition-colors tracking-tight mb-4 pb-4 border-b border-gray-200 dark:border-gray-700">
           {decodedTitle}
         </h3>
         
@@ -102,6 +103,6 @@ export function ProductNewsCard({ news, productIcon = '/icons/PowerPlatform_scal
           Read more →
         </Link>
       </div>
-    </div>
+    </Card>
   );
 } 
