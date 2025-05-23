@@ -78,13 +78,14 @@ export function ProductNewsLayout({ children, title, description, icon }: Produc
           </p>
         </div>
 
-        <div className="mt-4 mb-2">
-          <div className="flex flex-wrap gap-3">
+        <div className="mt-4 mb-2 w-full">
+          {/* Mobile: show all buttons in a single grid */}
+          <div className="grid grid-cols-2 gap-3 w-full lg:hidden">
             {products.map((product) => (
               <Link
                 key={product.name}
                 href={product.href}
-                className={`flex items-center justify-center gap-2 px-2.5 py-1 rounded-lg border transition-all duration-200 w-32 ${
+                className={`flex items-center justify-center gap-2 px-2.5 py-1 rounded-lg border transition-all duration-200 h-10 min-w-0 flex-shrink-0 ${
                   pathname === product.href
                     ? 'bg-primary-50 border-primary-300 dark:bg-primary-900/50 dark:border-primary-700 shadow-sm ring-1 ring-primary-200 dark:ring-primary-800'
                     : 'bg-white/80 dark:bg-gray-800/50 border-gray-200 dark:border-gray-700 hover:border-primary-200 dark:hover:border-primary-800 hover:bg-primary-50/50 dark:hover:bg-primary-900/20'
@@ -108,6 +109,71 @@ export function ProductNewsLayout({ children, title, description, icon }: Produc
                 </span>
               </Link>
             ))}
+          </div>
+          {/* Desktop: split into two rows */}
+          <div className="hidden lg:flex w-full justify-center">
+            <div className="grid lg:grid-cols-5 lg:gap-4 w-full max-w-7xl">
+              {products.slice(0, 5).map((product) => (
+                <Link
+                  key={product.name}
+                  href={product.href}
+                  className={`flex items-center justify-center gap-2 px-2.5 py-1 rounded-lg border transition-all duration-200 w-full h-10 lg:w-40 flex-shrink-0 ${
+                    pathname === product.href
+                      ? 'bg-primary-50 border-primary-300 dark:bg-primary-900/50 dark:border-primary-700 shadow-sm ring-1 ring-primary-200 dark:ring-primary-800'
+                      : 'bg-white/80 dark:bg-gray-800/50 border-gray-200 dark:border-gray-700 hover:border-primary-200 dark:hover:border-primary-800 hover:bg-primary-50/50 dark:hover:bg-primary-900/20'
+                  }`}
+                >
+                  {product.icon && product.icon !== '' && (
+                    <Image
+                      src={product.icon}
+                      alt={product.name}
+                      width={16}
+                      height={16}
+                      className={`w-4 h-4 ${pathname === product.href ? 'opacity-100' : 'opacity-70'}`}
+                    />
+                  )}
+                  <span className={`text-xs font-medium ${
+                    pathname === product.href
+                      ? 'text-primary-800 dark:text-primary-200 font-semibold'
+                      : 'text-gray-700 dark:text-gray-300'
+                  }`}>
+                    {product.name}
+                  </span>
+                </Link>
+              ))}
+            </div>
+          </div>
+          <div className="hidden lg:flex w-full justify-center mt-3">
+            <div className="flex lg:gap-4 max-w-7xl w-full justify-center">
+              {products.slice(5).map((product) => (
+                <Link
+                  key={product.name}
+                  href={product.href}
+                  className={`flex items-center justify-center gap-2 px-2.5 py-1 rounded-lg border transition-all duration-200 w-full h-10 lg:w-40 flex-shrink-0 ${
+                    pathname === product.href
+                      ? 'bg-primary-50 border-primary-300 dark:bg-primary-900/50 dark:border-primary-700 shadow-sm ring-1 ring-primary-200 dark:ring-primary-800'
+                      : 'bg-white/80 dark:bg-gray-800/50 border-gray-200 dark:border-gray-700 hover:border-primary-200 dark:hover:border-primary-800 hover:bg-primary-50/50 dark:hover:bg-primary-900/20'
+                  }`}
+                >
+                  {product.icon && product.icon !== '' && (
+                    <Image
+                      src={product.icon}
+                      alt={product.name}
+                      width={16}
+                      height={16}
+                      className={`w-4 h-4 ${pathname === product.href ? 'opacity-100' : 'opacity-70'}`}
+                    />
+                  )}
+                  <span className={`text-xs font-medium ${
+                    pathname === product.href
+                      ? 'text-primary-800 dark:text-primary-200 font-semibold'
+                      : 'text-gray-700 dark:text-gray-300'
+                  }`}>
+                    {product.name}
+                  </span>
+                </Link>
+              ))}
+            </div>
           </div>
         </div>
 

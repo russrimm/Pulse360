@@ -70,6 +70,7 @@ const serviceIconMap: Record<string, string> = {
   'Microsoft Purview': '/icons/purview.svg',
   'Microsoft Defender XDR': '/icons/defender.svg',
   'Windows': '/icons/Windows.svg',
+  'Windows 365': '/icons/Windows.svg',
   'Microsoft Power Automate in Microsoft 365': '/icons/PowerAutomate_scalable.svg',
   'Power Apps in Microsoft 365': '/icons/PowerApps_scalable.svg',
   'Microsoft Copilot Studio': '/icons/CopilotStudio_scalable.svg',
@@ -84,6 +85,8 @@ const serviceIconMap: Record<string, string> = {
   'Word': '/icons/Word.svg',
   'Microsoft Project': '/icons/Project.svg',
   'Microsoft Purview compliance portal': '/icons/purview.svg',
+  'Microsoft Edge': '/icons/edge.svg',
+  'Microsoft Defender for Office 365': '/icons/defender.svg',
 };
 
 // Storage key for persisting filter settings

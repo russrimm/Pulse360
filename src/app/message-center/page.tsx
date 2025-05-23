@@ -14,8 +14,8 @@ export default async function MessageCenterPage() {
   return (
     <div className="min-h-screen">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="text-center mb-2">
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-0.5">
+        <div className="text-center mb-8">
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
             Message Center
           </h1>
           <p className="text-gray-600 dark:text-gray-400 mb-2">
