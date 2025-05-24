@@ -1,11 +1,15 @@
 import { getReleasePlans } from '@/lib/api';
 import { ReleasePlansContent } from '@/components/ReleasePlansContent';
+import { ReleasePlannerAgentChat } from '@/components/ReleasePlannerAgentChat'
 
 export default async function ReleasePlansPage() {
   const releasePlans = await getReleasePlans();
+  const connectionString = process.env.NEXT_PUBLIC_COPILOT_CONNECTION_STRING as string;
+  const endpoint = 'https://18571ae92db1e2fc97ef2398a6944c.06.environment.api.powerplatform.com/copilotstudio/dataverse-backed/authenticated/bots/cr7d6_agent/conversations?api-version=2022-03-01-preview';
 
   return (
     <div className="min-h-screen">
+      <ReleasePlannerAgentChat connectionString={connectionString} endpoint={endpoint} />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex flex-col lg:flex-row items-center justify-between mb-8 gap-4">
           <div className="text-center lg:text-left">
@@ -15,17 +19,6 @@ export default async function ReleasePlansPage() {
             <p className="text-gray-600 dark:text-gray-400">
               Stay informed about upcoming Microsoft 365 features and changes
             </p>
-          </div>
-          <div className="hidden lg:block sticky top-24 z-30" style={{ width: 340, height: 320 }}>
-            <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm w-full h-full flex items-center justify-center">
-              <iframe
-                src="https://copilotstudio.preview.microsoft.com/environments/18571ae9-2db1-e2fc-97ef-2398a6944c06/bots/cr7d6_agent/webchat?__version__=2"
-                frameBorder="0"
-                style={{ width: '100%', height: '100%' }}
-                title="Copilot Studio Agent Chat"
-                allow="clipboard-write;"
-              />
-            </div>
           </div>
         </div>
         <ReleasePlansContent releasePlans={releasePlans} />

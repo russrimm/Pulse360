@@ -184,17 +184,7 @@ export function ReleasePlansList({ releasePlans }: ReleasePlansListProps) {
 
   return (
     <div className="relative">
-      <div className="absolute right-0 top-0 mt-24 mr-4 z-30 hidden lg:block" style={{ width: 340, height: 320 }}>
-        <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm w-full h-full flex items-center justify-center">
-          <iframe
-            src="https://copilotstudio.preview.microsoft.com/environments/18571ae9-2db1-e2fc-97ef-2398a6944c06/bots/cr7d6_agent/webchat?__version__=2"
-            frameBorder="0"
-            style={{ width: '100%', height: '100%' }}
-            title="Copilot Studio Agent Chat"
-            allow="clipboard-write;"
-          />
-        </div>
-      </div>
+      {/* Copilot Studio agent chat iframe removed */}
       {isLoading && (
         <div className="fixed inset-0 bg-black/20 dark:bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center">
           <LoadingSpinner />

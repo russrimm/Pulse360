@@ -106,35 +106,32 @@ export const ReleasePlanCard: React.FC<ReleasePlanCardProps> = ({ plan, onClick 
         onClick={handleClick}
       >
         <div className="flex flex-col">
-          <div className="flex items-center justify-center w-full bg-gradient-to-b from-gray-50 to-transparent dark:from-gray-900/50 dark:to-transparent py-3 px-4">
-            <div className="flex flex-wrap gap-2 justify-center">
-              {uniqueServices.map((service) => {
-                // Handle Microsoft 365 and Power Automate variations
-                const iconPath = service.startsWith('Microsoft 365') 
-                  ? '/icons/m365.svg' 
-                  : service === 'Microsoft Power Automate'
-                  ? '/icons/PowerAutomate_scalable.svg'
-                  : service.startsWith('Dynamics 365 Customer Insights')
-                  ? '/icons/CustomerInsights_scalable.svg'
-                  : serviceIcons[service];
-                return (
-                  <div
-                    key={service}
-                    className="inline-flex items-center px-3 py-1.5 rounded-xl text-sm font-medium bg-blue-50 text-blue-700 dark:bg-transparent dark:text-blue-300 border border-blue-200 dark:border-blue-800 min-w-[160px] justify-center"
-                  >
-                    {iconPath && (
-                      <Image
-                        src={iconPath}
-                        alt={service}
-                        width={16}
-                        height={16}
-                        className="mr-1.5 w-4 h-4"
-                      />
-                    )}
-                    <span className="truncate">{getDisplayName(service)}</span>
-                  </div>
-                );
-              })}
+          <div className="flex flex-col w-full bg-gradient-to-b from-gray-50 to-transparent dark:from-gray-900/50 dark:to-transparent py-3 px-4 gap-1">
+            <div className="flex flex-wrap gap-2 justify-start w-full">
+              {plan.tags.filter(tag => {
+                const tagLower = tag.toLowerCase()
+                return tagLower.includes('new feature') || tagLower.includes('update')
+              }).map(tag => (
+                <span
+                  key={tag}
+                  className="inline-flex items-center px-3 py-1.5 rounded-xl text-sm font-medium bg-emerald-50 text-emerald-700 dark:bg-emerald-900/20 dark:text-emerald-200 border border-emerald-200/30 dark:border-emerald-700/20 min-w-[120px] justify-center"
+                >
+                  {tag}
+                </span>
+              ))}
+            </div>
+            <div className="flex flex-wrap gap-2 justify-end w-full">
+              {plan.tags.filter(tag => {
+                const tagLower = tag.toLowerCase()
+                return tagLower.includes('user impact') || tagLower.includes('admin impact')
+              }).map(tag => (
+                <span
+                  key={tag}
+                  className={`inline-flex items-center px-3 py-1.5 rounded-xl text-sm font-medium ${tag.toLowerCase().includes('user impact') ? 'bg-yellow-50 text-yellow-700 dark:bg-yellow-900/20 dark:text-yellow-200 border border-yellow-200/30 dark:border-yellow-700/20' : 'bg-orange-50 text-orange-700 dark:bg-orange-900/20 dark:text-orange-200 border border-orange-200/30 dark:border-orange-700/20'} min-w-[120px] justify-center`}
+                >
+                  {tag}
+                </span>
+              ))}
             </div>
           </div>
           <div className="flex items-center justify-center text-[10px] text-gray-500 dark:text-gray-400 gap-1.5 py-1.5">
