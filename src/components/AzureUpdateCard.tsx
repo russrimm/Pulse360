@@ -237,7 +237,7 @@ export function AzureUpdateCard({ update, onClick }: AzureUpdateCardProps) {
               );
             })}
           </div>
-          <h3 className="text-base font-medium text-gray-900 dark:text-white group-hover:text-primary-700 dark:group-hover:text-primary-400 transition-colors tracking-tight">{update.title}</h3>
+          <h3 className="text-base font-medium text-gray-900 dark:text-white group-hover:text-primary-700 dark:group-hover:text-primary-400 transition-colors tracking-tight text-center">{update.title}</h3>
         </div>
         <div className="flex flex-col">
           <div className="flex items-center text-[10px] text-gray-500 dark:text-gray-400 gap-1.5 px-6">

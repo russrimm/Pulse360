@@ -28,7 +28,7 @@ export function NavigationTabs() {
 
   const tabs = [
     {
-      name: 'Message Center',
+      name: 'Microsoft 365 Message Center',
       href: '/message-center',
       icon: (
         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

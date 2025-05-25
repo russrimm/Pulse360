@@ -43,17 +43,17 @@ export function ProductNewsCard({ news, productIcon = '/icons/PowerPlatform_scal
     <Card>
       <div className="p-4 flex flex-col h-full">
         <div className="flex-1">
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white group-hover:text-primary-600 dark:group-hover:text-primary-400 mb-2">
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-white group-hover:text-primary-600 dark:group-hover:text-primary-400 mb-2 text-center">
             {decodedTitle}
           </h3>
-          <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">
+          <p className="text-xs text-gray-500 dark:text-gray-400 mb-2 text-center">
             {new Date(news.publishDate).toLocaleDateString('en-US', {
               year: 'numeric',
               month: 'long',
               day: 'numeric'
             })}
           </p>
-          <p className="text-sm text-gray-600 dark:text-gray-300 line-clamp-3">
+          <p className="text-sm text-gray-600 dark:text-gray-300 line-clamp-3 text-center">
             {decodedDescription}
           </p>
         </div>

@@ -250,68 +250,6 @@ export function AzureUpdatesContent({ updates, searchQuery = '' }: AzureUpdatesC
             </p>
           </div>
           <div className="flex flex-wrap gap-4">
-            {/* Categories Filter */}
-            <div className="relative">
-              <button
-                onClick={() => setIsCategoryDropdownOpen(!isCategoryDropdownOpen)}
-                className="flex items-center justify-center gap-2 px-4 h-10 text-gray-700 dark:text-gray-200 bg-white/80 dark:bg-gray-800/50 backdrop-blur-sm border border-gray-200 dark:border-gray-700/50 rounded-lg shadow-[inset_0_2px_4px_rgba(0,0,0,0.05)] dark:shadow-[inset_0_2px_4px_rgba(0,0,0,0.2)] hover:shadow-[inset_0_2px_4px_rgba(0,0,0,0.1)] dark:hover:shadow-[inset_0_2px_4px_rgba(0,0,0,0.3)] hover:border-primary-200 dark:hover:border-primary-800 hover:shadow-[0_0_0_1px_rgba(59,130,246,0.5)] dark:hover:shadow-[0_0_0_1px_rgba(59,130,246,0.5)] transition-all duration-300 relative"
-                aria-label="Filter categories"
-              >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-                </svg>
-                <span className="text-sm font-medium">Categories</span>
-                {selectedCategories.length > 0 && (
-                  <span className="absolute -top-1 -right-1 flex items-center justify-center w-5 h-5 text-xs font-medium text-white bg-primary-600 rounded-full">
-                    {selectedCategories.length}
-                  </span>
-                )}
-              </button>
-              {isCategoryDropdownOpen && (
-                <div className="absolute z-10 w-72 mt-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow-lg">
-                  <div className="p-4 border-b border-gray-200 dark:border-gray-700">
-                    <h3 className="text-sm font-medium text-gray-900 dark:text-white">Filter Categories</h3>
-                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                      {selectedCategories.length} category{selectedCategories.length !== 1 ? 'ies' : ''} selected
-                    </p>
-                  </div>
-                  <div className="max-h-60 overflow-y-auto p-2">
-                    {availableCategories.map((category) => (
-                      <label
-                        key={category}
-                        className="flex items-center px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md cursor-pointer"
-                      >
-                        <input
-                          type="checkbox"
-                          checked={selectedCategories.includes(category)}
-                          onChange={(e) => {
-                            if (e.target.checked) {
-                              setSelectedCategories([...selectedCategories, category]);
-                            } else {
-                              setSelectedCategories(selectedCategories.filter(c => c !== category));
-                            }
-                          }}
-                          className="w-4 h-4 text-primary-600 border-gray-300 rounded focus:ring-primary-500"
-                        />
-                        <span className="ml-2 text-sm text-gray-700 dark:text-gray-200">{category}</span>
-                      </label>
-                    ))}
-                  </div>
-                  <div className="p-3 border-t border-gray-200 dark:border-gray-700">
-                    <button
-                      onClick={() => {
-                        setSelectedCategories([]);
-                        setIsCategoryDropdownOpen(false);
-                      }}
-                      className="w-full px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
-                    >
-                      Clear all
-                    </button>
-                  </div>
-                </div>
-              )}
-            </div>
-
             {/* Products Filter */}
             <div className="relative">
               <button
@@ -378,6 +316,67 @@ export function AzureUpdatesContent({ updates, searchQuery = '' }: AzureUpdatesC
                       onClick={() => {
                         setSelectedProducts([]);
                         setIsProductDropdownOpen(false);
+                      }}
+                      className="w-full px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
+                    >
+                      Clear all
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+            {/* Categories Filter */}
+            <div className="relative">
+              <button
+                onClick={() => setIsCategoryDropdownOpen(!isCategoryDropdownOpen)}
+                className="flex items-center justify-center gap-2 px-4 h-10 text-gray-700 dark:text-gray-200 bg-white/80 dark:bg-gray-800/50 backdrop-blur-sm border border-gray-200 dark:border-gray-700/50 rounded-lg shadow-[inset_0_2px_4px_rgba(0,0,0,0.05)] dark:shadow-[inset_0_2px_4px_rgba(0,0,0,0.2)] hover:shadow-[inset_0_2px_4px_rgba(0,0,0,0.1)] dark:hover:shadow-[inset_0_2px_4px_rgba(0,0,0,0.3)] hover:border-primary-200 dark:hover:border-primary-800 hover:shadow-[0_0_0_1px_rgba(59,130,246,0.5)] dark:hover:shadow-[0_0_0_1px_rgba(59,130,246,0.5)] transition-all duration-300 relative"
+                aria-label="Filter categories"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                </svg>
+                <span className="text-sm font-medium">Categories</span>
+                {selectedCategories.length > 0 && (
+                  <span className="absolute -top-1 -right-1 flex items-center justify-center w-5 h-5 text-xs font-medium text-white bg-primary-600 rounded-full">
+                    {selectedCategories.length}
+                  </span>
+                )}
+              </button>
+              {isCategoryDropdownOpen && (
+                <div className="absolute z-10 w-72 mt-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow-lg">
+                  <div className="p-4 border-b border-gray-200 dark:border-gray-700">
+                    <h3 className="text-sm font-medium text-gray-900 dark:text-white">Filter Categories</h3>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                      {selectedCategories.length} category{selectedCategories.length !== 1 ? 'ies' : ''} selected
+                    </p>
+                  </div>
+                  <div className="max-h-60 overflow-y-auto p-2">
+                    {availableCategories.map((category) => (
+                      <label
+                        key={category}
+                        className="flex items-center px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md cursor-pointer"
+                      >
+                        <input
+                          type="checkbox"
+                          checked={selectedCategories.includes(category)}
+                          onChange={(e) => {
+                            if (e.target.checked) {
+                              setSelectedCategories([...selectedCategories, category]);
+                            } else {
+                              setSelectedCategories(selectedCategories.filter(c => c !== category));
+                            }
+                          }}
+                          className="w-4 h-4 text-primary-600 border-gray-300 rounded focus:ring-primary-500"
+                        />
+                        <span className="ml-2 text-sm text-gray-700 dark:text-gray-200">{category}</span>
+                      </label>
+                    ))}
+                  </div>
+                  <div className="p-3 border-t border-gray-200 dark:border-gray-700">
+                    <button
+                      onClick={() => {
+                        setSelectedCategories([]);
+                        setIsCategoryDropdownOpen(false);
                       }}
                       className="w-full px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
                     >
