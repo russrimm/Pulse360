@@ -91,6 +91,7 @@ export function ReleasePlansContent({ releasePlans }: ReleasePlansContentProps) 
         messages={releasePlans}
         searchQuery={searchTerm}
         onSearchQueryChange={setSearchTerm}
+        onSearch={() => {}}
       />
       <div className="flex flex-wrap gap-4 mt-4 mb-4 items-center">
         <ProductFilter
