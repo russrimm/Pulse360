@@ -2,9 +2,29 @@
 
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
+import * as Popover from '@radix-ui/react-popover';
+import { ChevronDownIcon } from '@radix-ui/react-icons';
+import { useState, useCallback } from 'react';
+
+const PRODUCTS = [
+  {
+    label: 'Dynamics/Power Platform',
+    href: '/release-plans',
+    icon: '/icons/PowerPlatform_scalable.svg',
+  },
+  {
+    label: 'Fabric',
+    href: '/fabric-roadmap',
+    icon: '/icons/fabric_48_color.svg',
+  },
+];
 
 export function NavigationTabs() {
   const pathname = usePathname();
+  const [open, setOpen] = useState(false)
+
+  const handleOpenChange = useCallback((nextOpen: boolean) => setOpen(nextOpen), [])
+  const handleMenuItemClick = useCallback(() => setOpen(false), [])
 
   const tabs = [
     {
@@ -13,15 +33,6 @@ export function NavigationTabs() {
       icon: (
         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-        </svg>
-      )
-    },
-    {
-      name: 'Release Planner',
-      href: '/release-plans',
-      icon: (
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
         </svg>
       )
     },
@@ -60,6 +71,7 @@ export function NavigationTabs() {
         <div className="flex flex-wrap justify-center gap-1.5 py-2 sm:gap-2">
           {tabs.map((tab) => {
             const isActive = pathname === tab.href;
+            if (tab.name === 'Release Planner') return null;
             return (
               <Link
                 key={tab.href}
@@ -78,6 +90,48 @@ export function NavigationTabs() {
               </Link>
             );
           })}
+          {/* Release Planner Popover */}
+          <Popover.Root open={open} onOpenChange={handleOpenChange}>
+            <Popover.Trigger asChild>
+              <button
+                className={`flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-lg transition-colors relative ${
+                  pathname.startsWith('/release-plans') || pathname.startsWith('/fabric-roadmap')
+                    ? 'bg-primary-50 text-primary-700 dark:bg-primary-900/50 dark:text-primary-300'
+                    : 'text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200'
+                }`}
+                aria-label="Release Planner"
+              >
+                <span className={`transition-transform duration-200 ${
+                  pathname.startsWith('/release-plans') || pathname.startsWith('/fabric-roadmap')
+                    ? 'text-primary-600 dark:text-primary-400'
+                    : 'text-gray-500 dark:text-gray-400 group-hover:text-primary-600 dark:group-hover:text-primary-400'
+                }`}>
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                  </svg>
+                </span>
+                <span>Release Planner</span>
+                <ChevronDownIcon className="w-4 h-4" />
+                <span className="absolute bottom-0 left-0 w-full h-0.5 bg-primary-600 dark:bg-primary-400 rounded-full" />
+              </button>
+            </Popover.Trigger>
+            <Popover.Portal>
+              <Popover.Content sideOffset={8} className="z-50 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl shadow-2xl p-2 min-w-[220px] flex flex-col gap-1 animate-fade-in">
+                {PRODUCTS.map(product => (
+                  <Link
+                    key={product.href}
+                    href={product.href}
+                    className={`flex items-center gap-3 px-4 py-3 rounded-lg font-medium text-base transition-colors duration-150 hover:bg-primary-50 dark:hover:bg-primary-900/30 focus:outline-none focus:bg-primary-100 dark:focus:bg-primary-800/40 ${product.href === pathname ? 'bg-primary-600 text-white pointer-events-none' : 'text-gray-900 dark:text-gray-100'}`}
+                    aria-current={product.href === pathname ? 'page' : undefined}
+                    onClick={handleMenuItemClick}
+                  >
+                    <img src={product.icon} alt="" className="w-6 h-6" />
+                    {product.label}
+                  </Link>
+                ))}
+              </Popover.Content>
+            </Popover.Portal>
+          </Popover.Root>
         </div>
       </div>
     </div>

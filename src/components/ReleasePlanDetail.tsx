@@ -68,8 +68,7 @@ export function ReleasePlanDetail({ plan }: ReleasePlanDetailProps) {
   }
 
   return (
-    <div className="min-h-screen">
-      <div className="absolute inset-0 bg-[radial-gradient(#1f2937_1px,transparent_1px)] [background-size:16px_16px]" />
+    <div className="min-h-screen bg-gray-900 dark:bg-black">
       <div className="relative px-3 sm:px-6 lg:px-8 pt-0 pb-2 sm:py-4">
         <div className="max-w-7xl mx-auto">
           <div className="mb-0.5 sm:mb-3">
@@ -84,17 +83,17 @@ export function ReleasePlanDetail({ plan }: ReleasePlanDetailProps) {
             </Link>
           </div>
 
-          <article className="bg-white/90 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
+          <article className="bg-white/90 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden text-gray-900 dark:text-gray-100">
             <div className="p-1.5 sm:p-6">
               <div className="flex items-center justify-center mb-1.5 sm:mb-4">
                 <div className="flex flex-col items-center">
-                  <h1 className="text-xl sm:text-3xl font-bold bg-gradient-to-r from-primary-600 to-primary-400 dark:from-primary-400 dark:to-primary-300 bg-clip-text text-transparent text-center">
-                    {plan.id} - {plan.title}
+                  <h1 className="text-xl sm:text-3xl font-bold bg-gradient-to-r from-primary-600 to-primary-400 dark:from-primary-400 dark:to-primary-300 bg-clip-text text-transparent text-center dark:text-white">
+                    {plan.title}
                   </h1>
                 </div>
               </div>
 
-              <div className="bg-white/70 dark:bg-gray-700/70 backdrop-blur-sm rounded-xl border border-gray-200 dark:border-gray-600 overflow-hidden mb-4 sm:mb-6">
+              <div className="bg-white/70 dark:bg-gray-700/70 backdrop-blur-sm rounded-xl border border-gray-200 dark:border-gray-600 overflow-hidden mb-4 sm:mb-6 text-gray-900 dark:text-gray-100">
                 <div className="p-3 sm:p-4">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     {/* Left Column */}
@@ -119,13 +118,13 @@ export function ReleasePlanDetail({ plan }: ReleasePlanDetailProps) {
                                   className="mr-2 w-5 h-5"
                                 />
                               )}
-                              <span className="truncate max-w-[200px]">{service}</span>
+                              <span>{service}</span>
                             </span>
                           );
                         })}
                       </div>
 
-                      {/* Tags */}
+                      {/* Tags and Enabled For */}
                       {plan.tags.length > 0 && (
                         <div>
                           <h3 className="text-base font-medium text-primary-600 dark:text-primary-400 mb-2">Investment Area</h3>
@@ -139,6 +138,14 @@ export function ReleasePlanDetail({ plan }: ReleasePlanDetailProps) {
                               </span>
                             ))}
                           </div>
+                        </div>
+                      )}
+                      {plan.enabledFor && (
+                        <div className="mt-2">
+                          <h3 className="text-base font-medium text-primary-600 dark:text-primary-400 mb-2">Enabled For</h3>
+                          <span className="inline-flex items-center px-2 py-1 rounded-lg text-base font-medium bg-green-50 text-green-700 dark:bg-green-900/50 dark:text-green-300">
+                            {plan.enabledFor}
+                          </span>
                         </div>
                       )}
                     </div>
@@ -216,13 +223,7 @@ export function ReleasePlanDetail({ plan }: ReleasePlanDetailProps) {
                 {/* Feature Details */}
                 <div className="bg-white/70 dark:bg-gray-700/70 backdrop-blur-sm rounded-xl p-4 sm:p-6 border border-gray-200 dark:border-gray-600">
                   <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-4">Feature Details</h2>
-                  <div className="prose dark:prose-invert max-w-none" dangerouslySetInnerHTML={{ __html: plan.content }} />
-                </div>
-
-                {/* Enabled For */}
-                <div className="bg-white/70 dark:bg-gray-700/70 backdrop-blur-sm rounded-xl p-4 sm:p-6 border border-gray-200 dark:border-gray-600">
-                  <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-4">Enabled For</h2>
-                  <div className="prose dark:prose-invert max-w-none" dangerouslySetInnerHTML={{ __html: plan.enabledFor }} />
+                  <div className="mt-4 prose dark:prose-invert prose-sm max-w-none" style={{ color: 'inherit' }} dangerouslySetInnerHTML={{ __html: plan.content }} />
                 </div>
               </div>
             </div>

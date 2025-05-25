@@ -25,6 +25,7 @@ interface ReleasePlan {
 interface ReleasePlanCardProps {
   plan: ReleasePlan;
   onClick: (id: string) => void;
+  drillthroughBasePath?: string;
 }
 
 // Map of service names to their icon paths
@@ -82,7 +83,7 @@ const serviceIcons: Record<string, string> = {
   'AI Builder': '/icons/AIBuilder_scalable.svg'
 };
 
-export const ReleasePlanCard: React.FC<ReleasePlanCardProps> = ({ plan, onClick }) => {
+export const ReleasePlanCard: React.FC<ReleasePlanCardProps> = ({ plan, onClick, drillthroughBasePath = '/release-plan' }) => {
   const handleClick = () => {
     onClick(plan.id);
   };
@@ -100,7 +101,7 @@ export const ReleasePlanCard: React.FC<ReleasePlanCardProps> = ({ plan, onClick 
   };
 
   return (
-    <Link href={`/release-plan/${plan.id}`}>
+    <Link href={`${drillthroughBasePath}/${plan.id}`}>
       <div 
         className="group bg-white/80 dark:bg-gray-800/50 backdrop-blur-sm rounded-xl shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-200 dark:border-gray-700/50 hover:border-primary-200 dark:hover:border-primary-800 hover:-translate-y-1 h-full cursor-pointer flex flex-col"
         onClick={handleClick}
@@ -147,7 +148,7 @@ export const ReleasePlanCard: React.FC<ReleasePlanCardProps> = ({ plan, onClick 
           </div>
         </div>
         <div className="p-6 pt-4 flex flex-col flex-grow">
-          <div className="flex flex-col flex-grow justify-end">
+          <div className="flex flex-col flex-grow justify-start">
             <div className="flex items-center gap-2 mb-1">
               <h3 className="text-base font-medium text-gray-900 dark:text-white group-hover:text-primary-700 dark:group-hover:text-primary-400 transition-colors tracking-tight">{plan.title}</h3>
             </div>
