@@ -98,8 +98,8 @@ export default async function FabricRoadmapPage() {
   return (
     <div className="min-h-screen">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="flex flex-col lg:flex-row items-center justify-between mb-8 gap-4">
-          <div className="text-center lg:text-left">
+        <div className="flex flex-col items-center justify-center mb-8 gap-4">
+          <div className="text-center">
             <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
               Fabric Roadmap
             </h1>

@@ -27,8 +27,8 @@ export default async function ReleasePlansPage() {
     <div className="min-h-screen bg-gray-900 dark:bg-black">
       <ReleasePlannerAgentChat />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="flex flex-col lg:flex-row items-center justify-between mb-8 gap-4">
-          <div className="text-center lg:text-left">
+        <div className="flex flex-col items-center justify-center mb-8 gap-4">
+          <div className="text-center">
             <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
               Dynamics & Power Platform Roadmap
             </h1>
