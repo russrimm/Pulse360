@@ -108,18 +108,23 @@ export function ProductFilter({ services, selectedServices, onFilterChange }: Pr
   }, [services]);
 
   // Memoize selection check
-  const isServiceSelected = useCallback((service: string): boolean => {
-    return selectedServices.includes(service);
-  }, [selectedServices]);
+  const isServiceSelected = useCallback(
+    (service: string): boolean =>
+      selectedServices.some(
+        s => s.trim().toLowerCase() === service.trim().toLowerCase()
+      ),
+    [selectedServices]
+  );
 
   // Memoize toggle function
   const toggleService = useCallback((service: string) => {
     if (isServiceSelected(service)) {
       // Remove the service
-      const newSelection = selectedServices.filter(s => s !== service);
+      const newSelection = selectedServices.filter(
+        s => s.trim().toLowerCase() !== service.trim().toLowerCase()
+      );
       onFilterChange(newSelection);
     } else {
-      // Add the service
       onFilterChange([...selectedServices, service]);
     }
   }, [selectedServices, onFilterChange, isServiceSelected]);
@@ -184,14 +189,17 @@ export function ProductFilter({ services, selectedServices, onFilterChange }: Pr
         const validFilters = parsedFilters.filter((filter: string) => 
           services.includes(filter)
         );
-        if (validFilters.length > 0) {
+        if (
+          validFilters.length > 0 &&
+          selectedServices.length === 0
+        ) {
           onFilterChange(validFilters);
         }
       }
     } catch (error) {
       console.error('Error loading saved filters:', error);
     }
-  }, [services, onFilterChange]);
+  }, []);
 
   // Save filters with debounce
   useEffect(() => {
