@@ -11,7 +11,7 @@ interface ProductNewsLayoutProps {
   icon: string;
 }
 
-const products = [
+let products = [
   {
     name: 'Power Apps',
     icon: '/icons/PowerApps_scalable.svg',
@@ -54,6 +54,13 @@ const products = [
   }
 ];
 
+// Move 'Finance and Operations cross-app capabilities' to the end if present
+const idx = products.findIndex(p => p.name === 'Finance and Operations cross-app capabilities')
+if (idx !== -1) {
+  const [item] = products.splice(idx, 1)
+  products.push(item)
+}
+
 export function ProductNewsLayout({ children, title, description, icon }: ProductNewsLayoutProps) {
   const pathname = usePathname();
 
@@ -80,12 +87,12 @@ export function ProductNewsLayout({ children, title, description, icon }: Produc
 
         <div className="mt-4 mb-2 w-full">
           {/* Mobile: show all buttons in a single grid */}
-          <div className="grid grid-cols-2 gap-3 w-full lg:hidden">
+          <div className="grid grid-cols-2 gap-3 w-full max-w-xs mx-auto lg:hidden">
             {products.map((product) => (
               <Link
                 key={product.name}
                 href={product.href}
-                className={`flex items-center justify-center gap-2 px-2.5 py-1 rounded-lg border transition-all duration-200 h-10 min-w-[140px] max-w-[140px] w-full flex-shrink-0
+                className={`flex items-center justify-center gap-2 px-2.5 py-1 rounded-lg border transition-all duration-200 h-10 min-w-[120px] max-w-[160px] w-full flex-shrink-0
                   ${
                     pathname === product.href
                       ? 'bg-primary-50 border-primary-300 dark:bg-primary-900/50 dark:border-primary-700 shadow-sm ring-1 ring-primary-200 dark:ring-primary-800'
