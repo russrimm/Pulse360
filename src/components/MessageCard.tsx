@@ -66,6 +66,50 @@ export const MessageCard: React.FC<MessageCardProps> = ({ message, onClick }) =>
   return (
     <Link href={`/message/${message.id}`}>
       <Card onClick={handleClick}>
+        {/* Top row: Message ID and New/Updated label left-justified, service badges right */}
+        <div className="w-full flex items-start justify-between relative px-4 pt-2">
+          <div className="flex items-center gap-2">
+            <span className="text-xs font-semibold text-blue-700 dark:text-blue-300">{message.id}</span>
+            {(() => {
+              const isNew = message.tags.some(tag => tag.toLowerCase().includes('new feature'))
+              const isUpdated = message.tags.some(tag => tag.toLowerCase().includes('update'))
+              if (!isNew && !isUpdated) return null
+              let label = ''
+              if (isNew && isUpdated) label = 'New - Updated'
+              else if (isNew) label = 'New'
+              else if (isUpdated) label = 'Updated'
+              return (
+                <span className="rounded bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-200 px-2 py-0.5 text-[10px] font-semibold" title={label}>{label}</span>
+              )
+            })()}
+          </div>
+          <div className="flex flex-col items-end gap-1">
+            {uniqueServices.length > 0 && uniqueServices.map((service, idx) => (
+              <span
+                key={service}
+                className={
+                  `rounded-tr-lg rounded-bl-lg bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-200 px-2 py-0.5 text-xs font-medium flex items-center gap-1 z-10 min-w-[80px] max-w-[160px] justify-center` +
+                  (idx === 0 ? '' : ` mt-1`)
+                }
+                style={{ marginLeft: '8px' }}
+              >
+                {(() => {
+                  const iconPath = service.startsWith('Microsoft 365') ? '/icons/m365.svg' : serviceIcons[service]
+                  return iconPath && (
+                    <Image
+                      src={iconPath}
+                      alt={service}
+                      width={14}
+                      height={14}
+                      className="inline-block w-3.5 h-3.5 mr-1"
+                    />
+                  )
+                })()}
+                <span className="truncate">{service}</span>
+              </span>
+            ))}
+          </div>
+        </div>
         {message.isMajorChange && (
           <div className="w-full bg-red-50 dark:bg-red-900/30 border-b border-red-200 dark:border-red-800 animate-pulse-subtle">
             <div className="flex items-center justify-center py-1.5">
@@ -82,21 +126,7 @@ export const MessageCard: React.FC<MessageCardProps> = ({ message, onClick }) =>
         <div className="p-6 flex flex-col h-full">
           <div className="flex items-center justify-between mb-0">
             <div className="flex flex-col items-center min-w-[120px] gap-0">
-              <div className="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-blue-50 text-blue-700 dark:bg-transparent dark:text-blue-300 w-full justify-center mb-px">
-                {message.id}
-              </div>
-              {(() => {
-                const isNew = message.tags.some(tag => tag.toLowerCase().includes('new feature'))
-                const isUpdated = message.tags.some(tag => tag.toLowerCase().includes('update'))
-                if (!isNew && !isUpdated) return null
-                let label = ''
-                if (isNew && isUpdated) label = 'New - Updated'
-                else if (isNew) label = 'New'
-                else if (isUpdated) label = 'Updated'
-                return (
-                  <span className="text-[10px] font-semibold text-emerald-700 mt-px" title={label}>{label}</span>
-                )
-              })()}
+              {/* Impact pills left-justified */}
               {(() => {
                 const hasImpact = message.tags.some(tag => {
                   const tagLower = tag.toLowerCase()
@@ -104,10 +134,10 @@ export const MessageCard: React.FC<MessageCardProps> = ({ message, onClick }) =>
                 })
                 if (!hasImpact) return null
                 return (
-                  <div className="flex flex-row items-center mt-px gap-px">
+                  <div className="flex flex-row items-center gap-px self-start w-full">
                     <span className="text-[10px] font-medium text-primary-600 dark:text-primary-400 whitespace-nowrap mr-2">Impact</span>
                     <div className="flex flex-row gap-px">
-                      {['user impact', 'admin impact'].map(impactType => {
+                      {['user impact', 'admin impact'].map((impactType, idx, arr) => {
                         const tag = message.tags.find(t => t.toLowerCase().includes(impactType))
                         if (!tag) return null
                         let pillClass = ''
@@ -123,42 +153,27 @@ export const MessageCard: React.FC<MessageCardProps> = ({ message, onClick }) =>
                           pillText = 'Admin'
                         }
                         return (
-                          <span
-                            key={impactType}
-                            className={`inline-flex items-center justify-center w-8 h-4 px-1 py-0 rounded-md text-[9px] tracking-wide whitespace-nowrap shadow-lg transition-all duration-200 ${pillClass} ${borderClass}`}
-                            style={{textOverflow:'ellipsis',overflow:'hidden'}}>
-                            {pillText}
-                          </span>
+                          <React.Fragment key={impactType}>
+                            <span
+                              className={`inline-flex items-center justify-center w-8 h-4 px-1 py-0 rounded-md text-[9px] tracking-wide whitespace-nowrap shadow-lg transition-all duration-200 ${pillClass} ${borderClass}`}
+                              style={{textOverflow:'ellipsis',overflow:'hidden'}}>
+                              {pillText}
+                            </span>
+                            {idx === 0 && arr.length > 1 && message.tags.find(t => t.toLowerCase().includes('admin impact')) && (
+                              <span className="w-px h-3 bg-gray-300 dark:bg-gray-600 mx-1" />
+                            )}
+                          </React.Fragment>
                         )
                       })}
                     </div>
+                    {message.tags.some(tag => tag.toLowerCase().includes('retirement')) && (
+                      <span className="inline-flex items-center justify-center w-auto h-4 px-1 py-0 rounded-md text-[9px] tracking-wide whitespace-nowrap shadow-lg transition-all duration-200 bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-200 border border-blue-400 ml-4">
+                        Retirement
+                      </span>
+                    )}
                   </div>
                 )
               })()}
-            </div>
-            <div className="flex flex-wrap gap-px justify-end">
-              {uniqueServices.map((service) => {
-                const iconPath = service.startsWith('Microsoft 365') 
-                  ? '/icons/m365.svg' 
-                  : serviceIcons[service];
-                return (
-                  <div
-                    key={service}
-                    className="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-blue-50 text-blue-700 dark:bg-transparent dark:text-blue-300 w-[120px] justify-center mb-px"
-                  >
-                    {iconPath && (
-                      <Image
-                        src={iconPath}
-                        alt={service}
-                        width={14}
-                        height={14}
-                        className="mr-1 w-3.5 h-3.5"
-                      />
-                    )}
-                    <span className="whitespace-nowrap">{service}</span>
-                  </div>
-                );
-              })}
             </div>
           </div>
           
@@ -167,7 +182,7 @@ export const MessageCard: React.FC<MessageCardProps> = ({ message, onClick }) =>
               <div className="flex flex-nowrap gap-1 min-w-0 flex-1">
                 {message.tags.filter(tag => {
                   const tagLower = tag.toLowerCase()
-                  return !tagLower.includes('user impact') && !tagLower.includes('admin impact') && !tagLower.includes('new feature') && !tagLower.includes('update')
+                  return !tagLower.includes('user impact') && !tagLower.includes('admin impact') && !tagLower.includes('new feature') && !tagLower.includes('update') && !tagLower.includes('retirement')
                 }).map(tag => {
                   const tagLower = tag.toLowerCase()
                   let pillClass = 'bg-gray-50/90 text-gray-600 dark:bg-gray-800/20 dark:text-gray-300 border border-gray-200/30 dark:border-gray-700/20'
@@ -196,7 +211,7 @@ export const MessageCard: React.FC<MessageCardProps> = ({ message, onClick }) =>
             </div>
           </div>
 
-          <div className="flex items-center justify-center text-[10px] text-gray-500 dark:text-gray-400 gap-1.5 mb-1">
+          <div className="flex items-center justify-center text-[10px] text-gray-500 dark:text-gray-400 gap-1.5 mb-0">
             <span className="font-medium">Published</span>
             <span>{format(new Date(message.published), 'MMM d, yyyy')}</span>
             {format(new Date(message.published).setHours(0,0,0,0), 'yyyy-MM-dd') !== format(new Date(message.lastUpdated).setHours(0,0,0,0), 'yyyy-MM-dd') && (
