@@ -2,6 +2,8 @@ import { getAzureUpdates } from '@/lib/api';
 import { notFound } from 'next/navigation';
 import { format } from 'date-fns';
 import Link from 'next/link';
+import Image from 'next/image';
+import { getProductIcon } from '@/lib/getProductIcon';
 
 export const revalidate = 3600; // Revalidate every hour
 
@@ -25,7 +27,7 @@ export default async function AzureUpdatePage({ params }: PageProps) {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
+    <div className="min-h-screen bg-white dark:bg-black">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-6">
           <Link
@@ -42,6 +44,31 @@ export default async function AzureUpdatePage({ params }: PageProps) {
           <div className="p-6 sm:p-8">
             {/* Header */}
             <div className="mb-6">
+              {/* Move products here, above the title */}
+              {update.products.length > 0 && (
+                <div className="flex flex-wrap gap-2 md:gap-4 mb-4 md:mb-6">
+                  {update.products.map((product) => {
+                    const iconPath = getProductIcon(product);
+                    return (
+                      <span
+                        key={product}
+                        className="inline-flex items-center gap-2 md:gap-3 px-3 py-1 md:px-6 md:py-3 rounded-lg md:rounded-2xl text-base md:text-xl font-bold bg-gray-50 text-gray-800 dark:bg-gray-700/70 dark:text-gray-100 border border-gray-200 md:border-2 md:border-gray-300 dark:border-gray-500 shadow md:shadow-lg"
+                      >
+                        {iconPath && (
+                          <Image
+                            src={iconPath}
+                            alt=""
+                            width={20}
+                            height={20}
+                            className="w-5 h-5 md:w-8 md:h-8"
+                          />
+                        )}
+                        {product}
+                      </span>
+                    );
+                  })}
+                </div>
+              )}
               <div className="flex flex-wrap gap-2 mb-4">
                 {update.productCategories.map((category) => (
                   <span
@@ -70,7 +97,7 @@ export default async function AzureUpdatePage({ params }: PageProps) {
                 {update.title}
               </h1>
 
-              <div className="flex items-center text-sm text-gray-500 dark:text-gray-400 gap-2">
+              <div className="flex items-center text-sm text-gray-500 dark:text-gray-400 gap-2 mb-2">
                 <span>Created: {format(new Date(update.created), 'MMM d, yyyy')}</span>
                 {format(new Date(update.created), 'yyyy-MM-dd') !== format(new Date(update.modified), 'yyyy-MM-dd') && (
                   <>
@@ -79,6 +106,26 @@ export default async function AzureUpdatePage({ params }: PageProps) {
                   </>
                 )}
               </div>
+              {/* Availability dates under meta info */}
+              {(update.generalAvailabilityDate || update.previewAvailabilityDate || update.privatePreviewAvailabilityDate) && (
+                <div className="flex flex-wrap items-center text-sm text-gray-500 dark:text-gray-400 gap-4 mb-2">
+                  {update.generalAvailabilityDate && (
+                    <span>
+                      <span className="font-medium">General Availability:</span> {format(new Date(update.generalAvailabilityDate), 'MMMM yyyy')}
+                    </span>
+                  )}
+                  {update.previewAvailabilityDate && (
+                    <span>
+                      <span className="font-medium">Preview:</span> {format(new Date(update.previewAvailabilityDate), 'MMMM yyyy')}
+                    </span>
+                  )}
+                  {update.privatePreviewAvailabilityDate && (
+                    <span>
+                      <span className="font-medium">Private Preview:</span> {format(new Date(update.privatePreviewAvailabilityDate), 'MMMM yyyy')}
+                    </span>
+                  )}
+                </div>
+              )}
             </div>
 
             {/* Content */}
@@ -87,52 +134,10 @@ export default async function AzureUpdatePage({ params }: PageProps) {
             </div>
 
             {/* Products */}
-            {update.products.length > 0 && (
-              <div className="mt-8 pt-6 border-t border-gray-200 dark:border-gray-700">
-                <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Affected Products</h2>
-                <div className="flex flex-wrap gap-2">
-                  {update.products.map((product) => (
-                    <span
-                      key={product}
-                      className="inline-flex items-center px-2 py-1 rounded-lg text-sm font-medium bg-gray-50 text-gray-700 dark:bg-gray-700/50 dark:text-gray-300 border border-gray-200 dark:border-gray-600"
-                    >
-                      {product}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            )}
+            {/* Removed Affected Products section, now handled above */}
 
             {/* Dates */}
-            <div className="mt-8 pt-6 border-t border-gray-200 dark:border-gray-700">
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Availability</h2>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                {update.generalAvailabilityDate && (
-                  <div>
-                    <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300">General Availability</h3>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">
-                      {format(new Date(update.generalAvailabilityDate), 'MMMM yyyy')}
-                    </p>
-                  </div>
-                )}
-                {update.previewAvailabilityDate && (
-                  <div>
-                    <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300">Preview</h3>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">
-                      {format(new Date(update.previewAvailabilityDate), 'MMMM yyyy')}
-                    </p>
-                  </div>
-                )}
-                {update.privatePreviewAvailabilityDate && (
-                  <div>
-                    <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300">Private Preview</h3>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">
-                      {format(new Date(update.privatePreviewAvailabilityDate), 'MMMM yyyy')}
-                    </p>
-                  </div>
-                )}
-              </div>
-            </div>
+            {/* Removed Availability section, now handled above */}
           </div>
         </div>
       </div>
