@@ -7,7 +7,7 @@ import { SearchBar } from './SearchBar';
 import { LoadingSpinner } from './LoadingSpinner';
 import { useRouter } from 'next/navigation';
 import { format, parseISO, isWithinInterval, startOfDay, endOfDay } from 'date-fns';
-import { getProductIcon } from './AzureUpdateCard';
+import { getProductIcon } from '@/lib/getProductIcon';
 import Image from 'next/image';
 
 interface AzureUpdatesContentProps {
