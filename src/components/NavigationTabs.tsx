@@ -76,17 +76,18 @@ export function NavigationTabs() {
               <Link
                 key={tab.href}
                 href={tab.href}
-                className={`flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-lg transition-colors relative w-full md:w-auto
+                className={`flex flex-col items-center justify-center md:flex-row md:items-center gap-1 md:gap-2 px-3 py-2 text-sm font-medium rounded-lg transition-colors relative w-full md:w-auto text-center
                   ${
                     isActive
                       ? 'bg-primary-50 text-primary-700 dark:bg-primary-900/50 dark:text-primary-300'
                       : 'text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200'
                   }`}
               >
-                <span className={`transition-transform duration-200 ${isActive ? 'text-primary-600 dark:text-primary-400' : 'text-gray-500 dark:text-gray-400 group-hover:text-primary-600 dark:group-hover:text-primary-400'}`}>
+                <span className={`transition-transform duration-200 ${isActive ? 'text-primary-600 dark:text-primary-400' : 'text-gray-500 dark:text-gray-400 group-hover:text-primary-600 dark:group-hover:text-primary-400'}`}
+                  >
                   {tab.icon}
                 </span>
-                <span>{tab.name}</span>
+                <span className="text-center w-full md:w-auto">{tab.name}</span>
                 <span className="absolute bottom-0 left-0 w-full h-0.5 bg-primary-600 dark:bg-primary-400 rounded-full" />
               </Link>
             );
@@ -95,7 +96,7 @@ export function NavigationTabs() {
           <Popover.Root open={open} onOpenChange={handleOpenChange}>
             <Popover.Trigger asChild>
               <button
-                className={`flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-lg transition-colors relative w-full md:w-auto
+                className={`flex flex-col items-center justify-center md:flex-row md:items-center gap-1 md:gap-2 px-3 py-2 text-sm font-medium rounded-lg transition-colors relative w-full md:w-auto text-center
                   ${
                     pathname.startsWith('/release-plans') || pathname.startsWith('/fabric-roadmap')
                       ? 'bg-primary-50 text-primary-700 dark:bg-primary-900/50 dark:text-primary-300'
@@ -112,7 +113,7 @@ export function NavigationTabs() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                   </svg>
                 </span>
-                <span>Release Planner</span>
+                <span className="text-center w-full md:w-auto">Release Planner</span>
                 <ChevronDownIcon className="w-4 h-4" />
                 <span className="absolute bottom-0 left-0 w-full h-0.5 bg-primary-600 dark:bg-primary-400 rounded-full" />
               </button>

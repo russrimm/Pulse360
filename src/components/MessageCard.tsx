@@ -4,6 +4,9 @@ import Link from 'next/link';
 import { Message } from '@/lib/types';
 import Image from 'next/image';
 import { Card } from './Card';
+import { FiRefreshCw } from 'react-icons/fi'
+import { MdFiberNew } from 'react-icons/md'
+import { BsStars } from 'react-icons/bs'
 
 interface MessageCardProps {
   message: Message;
@@ -77,8 +80,20 @@ export const MessageCard: React.FC<MessageCardProps> = ({ message, onClick }) =>
         )}
         
         <div className="p-6 flex flex-col h-full">
-          <div className="flex items-center justify-between mb-2">
-            <div className="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-md transition-all duration-200">
+          <div className="flex items-center justify-between mb-2 relative">
+            {/* Overlay New/Updated icons above the Message ID box */}
+            {(() => {
+              const isNew = message.tags.some(tag => tag.toLowerCase().includes('new feature'))
+              const isUpdated = message.tags.some(tag => tag.toLowerCase().includes('update'))
+              if (!isNew && !isUpdated) return null
+              return (
+                <span className="absolute -top-3 left-1/2 -translate-x-1/2 flex gap-1 z-10">
+                  {isNew && <MdFiberNew className="w-5 h-5 text-emerald-500 drop-shadow-[0_0_6px_#34d399] bg-white rounded-full" title="New" />}
+                  {isUpdated && <FiRefreshCw className="w-5 h-5 text-sky-500 drop-shadow-[0_0_6px_#0ea5e9] bg-white rounded-full" title="Updated" />}
+                </span>
+              )
+            })()}
+            <div className="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-md transition-all duration-200 relative">
               {message.id}
             </div>
             <div className="flex flex-wrap gap-2 justify-end">
@@ -112,7 +127,7 @@ export const MessageCard: React.FC<MessageCardProps> = ({ message, onClick }) =>
               <div className="flex flex-nowrap gap-1 min-w-0 flex-1">
                 {message.tags.filter(tag => {
                   const tagLower = tag.toLowerCase()
-                  return !tagLower.includes('user impact') && !tagLower.includes('admin impact')
+                  return !tagLower.includes('user impact') && !tagLower.includes('admin impact') && !tagLower.includes('new feature') && !tagLower.includes('update')
                 }).map(tag => {
                   const tagLower = tag.toLowerCase()
                   let pillClass = 'bg-gray-50/90 text-gray-600 dark:bg-gray-800/20 dark:text-gray-300 border border-gray-200/30 dark:border-gray-700/20'
@@ -134,38 +149,44 @@ export const MessageCard: React.FC<MessageCardProps> = ({ message, onClick }) =>
                   )
                 })}
               </div>
-              <div className="flex flex-nowrap gap-1 min-w-0 flex-shrink-0 justify-end w-auto ml-auto items-center">
-                {(() => {
-                  const hasImpact = message.tags.some(tag => {
-                    const tagLower = tag.toLowerCase()
-                    return tagLower.includes('user impact') || tagLower.includes('admin impact')
-                  })
-                  if (!hasImpact) return null
-                  return <span className="text-xs font-semibold text-gray-500 mr-1">Impact:</span>
-                })()}
-                {message.tags.filter(tag => {
-                  const tagLower = tag.toLowerCase()
-                  return tagLower.includes('user impact') || tagLower.includes('admin impact')
-                }).map(tag => {
-                  const tagLower = tag.toLowerCase()
-                  let pillClass = ''
-                  let pillText = ''
-                  if (tagLower.includes('user impact')) {
-                    pillClass = 'bg-yellow-50/90 text-yellow-700 dark:bg-yellow-900/20 dark:text-yellow-200 border border-yellow-200/30 dark:border-yellow-700/20'
-                    pillText = 'User'
-                  } else if (tagLower.includes('admin impact')) {
-                    pillClass = 'bg-orange-50/90 text-orange-700 dark:bg-orange-900/20 dark:text-orange-200 border border-orange-200/30 dark:border-orange-700/20'
-                    pillText = 'Admin'
-                  }
-                  return (
-                    <span
-                      key={tag}
-                      className={`inline-flex items-center min-w-0 max-w-[120px] justify-center px-2.5 py-0.5 rounded-full text-[11px] font-medium tracking-wide whitespace-nowrap shrink shadow-sm hover:shadow transition-all duration-200 ${pillClass}`}
-                      style={{textOverflow:'ellipsis',overflow:'hidden'}}>
-                      {pillText}
-                    </span>
-                  )
-                })}
+              <div className="flex flex-row gap-2 min-w-0 flex-shrink-0 justify-end w-auto ml-auto items-center">
+                {/* Impact pills, larger, neon borders, User orange, Admin red */}
+                <div className="flex flex-row items-center gap-2 mx-2 min-w-0">
+                  {(() => {
+                    const hasImpact = message.tags.some(tag => {
+                      const tagLower = tag.toLowerCase()
+                      return tagLower.includes('user impact') || tagLower.includes('admin impact')
+                    })
+                    if (!hasImpact) return null
+                    return <span className="text-sm font-bold text-primary-600 dark:text-primary-400 mr-2 whitespace-nowrap">Impact</span>
+                  })()}
+                  <div className="flex flex-col gap-1">
+                    {['user impact', 'admin impact'].map(impactType => {
+                      const tag = message.tags.find(t => t.toLowerCase().includes(impactType))
+                      if (!tag) return null
+                      let pillClass = ''
+                      let pillText = ''
+                      let borderClass = ''
+                      if (impactType === 'user impact') {
+                        pillClass = 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-200'
+                        borderClass = 'border-4 border-orange-400 shadow-[0_0_8px_2px_#fb923c] dark:border-orange-300'
+                        pillText = 'User'
+                      } else if (impactType === 'admin impact') {
+                        pillClass = 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-200'
+                        borderClass = 'border-4 border-red-500 shadow-[0_0_8px_2px_#ef4444] dark:border-red-300'
+                        pillText = 'Admin'
+                      }
+                      return (
+                        <span
+                          key={impactType}
+                          className={`inline-flex items-center justify-center w-10 h-5 px-2 py-0 rounded-md text-[12px] font-bold tracking-wide whitespace-nowrap shadow-lg transition-all duration-200 ${pillClass} ${borderClass.replace('border-4', 'border-2')}`}
+                          style={{textOverflow:'ellipsis',overflow:'hidden'}}>
+                          {pillText}
+                        </span>
+                      )
+                    })}
+                  </div>
+                </div>
               </div>
             </div>
           </div>

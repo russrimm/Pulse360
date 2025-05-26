@@ -139,9 +139,9 @@ export function M365UpdatesList({ updates, searchQuery }: M365UpdatesListProps) 
       )}
       <div className="md:sticky md:top-28 z-40 backdrop-blur-md pt-0 pb-2 border-b border-gray-200/50 dark:border-gray-700/50 -mt-4">
         <div className="mb-2">
-          <div className="flex items-center mb-2">
+          <div className="flex flex-wrap items-center mb-2 justify-between">
             <h2 className="text-sm font-medium text-gray-700 dark:text-gray-300">Filters</h2>
-            <p className="text-xs text-gray-600 dark:text-gray-400 ml-8">
+            <p className="text-xs text-gray-600 dark:text-gray-400 ml-0 md:ml-8 text-right w-full md:w-auto md:flex-shrink-0 md:justify-end">
               Showing {filteredUpdates.length} update{filteredUpdates.length !== 1 ? 's' : ''}
               {filteredUpdates.length !== updates.length && (
                 <span className="ml-1">
