@@ -12,7 +12,7 @@ export default async function AzureUpdatesPage() {
   const updates = await getAzureUpdates();
 
   return (
-    <div className="min-h-screen bg-gray-900 dark:bg-black">
+    <div className="min-h-screen bg-white dark:bg-black">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <AzureUpdatesClient initialUpdates={updates} />
       </div>

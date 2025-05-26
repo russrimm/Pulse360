@@ -80,26 +80,63 @@ export const MessageCard: React.FC<MessageCardProps> = ({ message, onClick }) =>
         )}
         
         <div className="p-6 flex flex-col h-full">
-          <div className="flex items-center justify-between mb-2">
-            <div className="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-md transition-all duration-200 relative">
-              {message.id}
-              {/* New/Updated pill/icon logic */}
+          <div className="flex items-center justify-between mb-0">
+            <div className="flex flex-col items-center min-w-[120px] gap-0">
+              <div className="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-blue-50 text-blue-700 dark:bg-transparent dark:text-blue-300 w-full justify-center mb-px">
+                {message.id}
+              </div>
               {(() => {
                 const isNew = message.tags.some(tag => tag.toLowerCase().includes('new feature'))
                 const isUpdated = message.tags.some(tag => tag.toLowerCase().includes('update'))
-                if (isNew && isUpdated) {
-                  return <span className="ml-2 inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-400 shadow-sm" title="New & Updated">New &amp; Updated</span>
-                }
-                if (isNew) {
-                  return <span className="ml-2 inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-400 shadow-sm" title="New">New</span>
-                }
-                if (isUpdated) {
-                  return <span className="ml-2 inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-sky-50 text-sky-700 border border-sky-400 shadow-sm" title="Updated">Updated</span>
-                }
-                return null
+                if (!isNew && !isUpdated) return null
+                let label = ''
+                if (isNew && isUpdated) label = 'New - Updated'
+                else if (isNew) label = 'New'
+                else if (isUpdated) label = 'Updated'
+                return (
+                  <span className="text-[10px] font-semibold text-emerald-700 mt-px" title={label}>{label}</span>
+                )
+              })()}
+              {(() => {
+                const hasImpact = message.tags.some(tag => {
+                  const tagLower = tag.toLowerCase()
+                  return tagLower.includes('user impact') || tagLower.includes('admin impact')
+                })
+                if (!hasImpact) return null
+                return (
+                  <div className="flex flex-row items-center mt-px gap-px">
+                    <span className="text-[10px] font-medium text-primary-600 dark:text-primary-400 whitespace-nowrap mr-2">Impact</span>
+                    <div className="flex flex-row gap-px">
+                      {['user impact', 'admin impact'].map(impactType => {
+                        const tag = message.tags.find(t => t.toLowerCase().includes(impactType))
+                        if (!tag) return null
+                        let pillClass = ''
+                        let pillText = ''
+                        let borderClass = ''
+                        if (impactType === 'user impact') {
+                          pillClass = 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-200'
+                          borderClass = 'border border-orange-400 shadow-[0_0_8px_2px_#fb923c] dark:border-orange-300'
+                          pillText = 'User'
+                        } else if (impactType === 'admin impact') {
+                          pillClass = 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-200'
+                          borderClass = 'border border-red-500 shadow-[0_0_8px_2px_#ef4444] dark:border-red-300'
+                          pillText = 'Admin'
+                        }
+                        return (
+                          <span
+                            key={impactType}
+                            className={`inline-flex items-center justify-center w-8 h-4 px-1 py-0 rounded-md text-[9px] tracking-wide whitespace-nowrap shadow-lg transition-all duration-200 ${pillClass} ${borderClass}`}
+                            style={{textOverflow:'ellipsis',overflow:'hidden'}}>
+                            {pillText}
+                          </span>
+                        )
+                      })}
+                    </div>
+                  </div>
+                )
               })()}
             </div>
-            <div className="flex flex-wrap gap-2 justify-end">
+            <div className="flex flex-wrap gap-px justify-end">
               {uniqueServices.map((service) => {
                 const iconPath = service.startsWith('Microsoft 365') 
                   ? '/icons/m365.svg' 
@@ -107,7 +144,7 @@ export const MessageCard: React.FC<MessageCardProps> = ({ message, onClick }) =>
                 return (
                   <div
                     key={service}
-                    className="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-blue-50 text-blue-700 dark:bg-transparent dark:text-blue-300 border border-blue-200 dark:border-blue-800 min-w-[120px] justify-center"
+                    className="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-blue-50 text-blue-700 dark:bg-transparent dark:text-blue-300 w-[120px] justify-center mb-px"
                   >
                     {iconPath && (
                       <Image
@@ -118,7 +155,7 @@ export const MessageCard: React.FC<MessageCardProps> = ({ message, onClick }) =>
                         className="mr-1 w-3.5 h-3.5"
                       />
                     )}
-                    <span className="truncate">{service}</span>
+                    <span className="whitespace-nowrap">{service}</span>
                   </div>
                 );
               })}
@@ -154,42 +191,7 @@ export const MessageCard: React.FC<MessageCardProps> = ({ message, onClick }) =>
               </div>
               <div className="flex flex-row gap-2 min-w-0 flex-shrink-0 justify-end w-auto ml-auto items-center">
                 {/* Impact pills, larger, neon borders, User orange, Admin red */}
-                <div className="flex flex-row items-center gap-2 mx-2 min-w-0">
-                  {(() => {
-                    const hasImpact = message.tags.some(tag => {
-                      const tagLower = tag.toLowerCase()
-                      return tagLower.includes('user impact') || tagLower.includes('admin impact')
-                    })
-                    if (!hasImpact) return null
-                    return <span className="text-sm font-bold text-primary-600 dark:text-primary-400 mr-2 whitespace-nowrap">Impact</span>
-                  })()}
-                  <div className="flex flex-col gap-1">
-                    {['user impact', 'admin impact'].map(impactType => {
-                      const tag = message.tags.find(t => t.toLowerCase().includes(impactType))
-                      if (!tag) return null
-                      let pillClass = ''
-                      let pillText = ''
-                      let borderClass = ''
-                      if (impactType === 'user impact') {
-                        pillClass = 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-200'
-                        borderClass = 'border-4 border-orange-400 shadow-[0_0_8px_2px_#fb923c] dark:border-orange-300'
-                        pillText = 'User'
-                      } else if (impactType === 'admin impact') {
-                        pillClass = 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-200'
-                        borderClass = 'border-4 border-red-500 shadow-[0_0_8px_2px_#ef4444] dark:border-red-300'
-                        pillText = 'Admin'
-                      }
-                      return (
-                        <span
-                          key={impactType}
-                          className={`inline-flex items-center justify-center w-10 h-5 px-2 py-0 rounded-md text-[12px] font-bold tracking-wide whitespace-nowrap shadow-lg transition-all duration-200 ${pillClass} ${borderClass.replace('border-4', 'border-2')}`}
-                          style={{textOverflow:'ellipsis',overflow:'hidden'}}>
-                          {pillText}
-                        </span>
-                      )
-                    })}
-                  </div>
-                </div>
+                {/* Moved to left column under New/Updated label */}
               </div>
             </div>
           </div>
@@ -208,7 +210,7 @@ export const MessageCard: React.FC<MessageCardProps> = ({ message, onClick }) =>
           
           <div className="flex flex-col flex-grow justify-center">
             <div className="flex items-center gap-2">
-              <h3 className="text-base font-medium text-gray-900 dark:text-white group-hover:text-primary-700 dark:group-hover:text-primary-400 transition-colors tracking-tight text-center">{message.title}</h3>
+              <h3 className="text-sm font-medium text-gray-900 dark:text-white group-hover:text-primary-700 dark:group-hover:text-primary-400 transition-colors tracking-tight text-center">{message.title}</h3>
               {message.severity && message.severity.toLowerCase() !== 'normal' && (
                 <span
                   className="inline-block px-2 py-0.5 rounded-full text-xs font-semibold border ml-1 bg-red-100 text-red-800 border-red-300 dark:bg-red-900/30 dark:text-red-200 dark:border-red-700"

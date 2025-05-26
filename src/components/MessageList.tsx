@@ -141,16 +141,14 @@ export function MessageList({ messages }: MessageListProps) {
       )}
       <div className="relative md:sticky md:top-28 z-40 backdrop-blur-md pt-0 pb-0 border-b border-gray-200/50 dark:border-gray-700/50 mt-20">
         <div className="mb-2">
-          <div className="flex flex-wrap items-center mb-2 justify-between">
-            <h2 className="text-sm font-medium text-gray-700 dark:text-gray-300">Filters</h2>
-            <p className="text-xs text-gray-600 dark:text-gray-400 ml-0 md:ml-8 text-right w-full md:w-auto md:flex-shrink-0 md:justify-end">
-              Showing {filteredMessages.length} message{filteredMessages.length !== 1 ? 's' : ''}
-              {filteredMessages.length !== messages.length && (
-                <span className="ml-1">
-                  (filtered from {messages.length} total)
-                </span>
-              )}
-            </p>
+          <div className="flex flex-wrap items-center mb-2 gap-2">
+            <h2 className="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center">
+              Filters
+              <span className="ml-2 text-xs text-gray-600 dark:text-gray-400 font-normal">
+                (Showing {filteredMessages.length} message{filteredMessages.length !== 1 ? 's' : ''}
+                {filteredMessages.length !== messages.length && `, filtered from ${messages.length} total`})
+              </span>
+            </h2>
           </div>
           <div className="flex flex-wrap gap-4">
             <ProductFilter
@@ -268,7 +266,7 @@ export function MessageList({ messages }: MessageListProps) {
             </div>
             <button
               onClick={() => setShowMajorChangesOnly(!showMajorChangesOnly)}
-              className={`flex items-center justify-center gap-2 px-4 min-h-[32px] text-gray-700 dark:text-gray-200 bg-white/80 dark:bg-gray-800/50 backdrop-blur-sm border border-gray-200 dark:border-gray-700/50 rounded-lg shadow-[inset_0_2px_4px_rgba(0,0,0,0.05)] dark:shadow-[inset_0_2px_4px_rgba(0,0,0,0.2)] hover:shadow-[inset_0_2px_4px_rgba(0,0,0,0.1)] dark:hover:shadow-[inset_0_2px_4px_rgba(0,0,0,0.3)] hover:border-primary-200 dark:hover:border-primary-800 hover:shadow-[0_0_0_1px_rgba(59,130,246,0.5)] dark:hover:shadow-[0_0_0_1px_rgba(59,130,246,0.5)] transition-all duration-300 relative ${showMajorChangesOnly ? 'bg-red-50 dark:bg-red-900/30 border-red-200 dark:border-red-800 text-red-700 dark:text-red-300 animate-pulse-subtle' : ''}`}
+              className={`flex items-center justify-center gap-2 px-4 min-h-[32px] text-gray-700 dark:text-gray-200 bg-white/80 dark:bg-gray-800/50 backdrop-blur-sm border border-gray-200 dark:border-gray-700/50 rounded-lg shadow-[inset_0_2px_4px_rgba(0,0,0,0.05)] dark:shadow-[inset_0_2px_4px_rgba(0,0,0,0.2)] hover:shadow-[inset_0_2px_4px_rgba(0,0,0,0.1)] dark:hover:shadow-[inset_0_2px_4px_rgba(0,0,0,0.3)] hover:border-primary-200 dark:hover:border-primary-800 hover:shadow-[0_0_0_1px_rgba(59,130,246,0.5)] dark:hover:shadow-[0_0_0_1px_rgba(59,130,246,0.5)] transition-all duration-300 relative ${showMajorChangesOnly ? 'bg-red-50 dark:bg-red-900/30 border-red-200 dark:border-red-800 text-red-700 dark:text-red-300 animate-pulse-slow' : ''}`}
               aria-label="Filter major changes"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

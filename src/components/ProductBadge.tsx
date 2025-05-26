@@ -1,7 +1,7 @@
 'use client';
 
 import Image from 'next/image';
-import { getProductIcon } from './AzureUpdateCard';
+import { getProductIcon } from '@/lib/getProductIcon';
 
 interface ProductBadgeProps {
   product: string;

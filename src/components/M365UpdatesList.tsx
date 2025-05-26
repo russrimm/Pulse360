@@ -139,120 +139,120 @@ export function M365UpdatesList({ updates, searchQuery }: M365UpdatesListProps) 
       )}
       <div className="md:sticky md:top-28 z-40 backdrop-blur-md pt-0 pb-2 border-b border-gray-200/50 dark:border-gray-700/50 -mt-4">
         <div className="mb-2">
-          <div className="flex flex-wrap items-center mb-2 justify-between">
-            <h2 className="text-sm font-medium text-gray-700 dark:text-gray-300">Filters</h2>
-            <p className="text-xs text-gray-600 dark:text-gray-400 ml-0 md:ml-8 text-right w-full md:w-auto md:flex-shrink-0 md:justify-end">
-              Showing {filteredUpdates.length} update{filteredUpdates.length !== 1 ? 's' : ''}
-              {filteredUpdates.length !== updates.length && (
-                <span className="ml-1">
-                  (filtered from {updates.length} total)
-                </span>
-              )}
-            </p>
+          <div className="flex flex-wrap items-center mb-2 gap-2">
+            <h2 className="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center">
+              Filters
+              <span className="ml-2 text-xs text-gray-600 dark:text-gray-400 font-normal">
+                (Showing {filteredUpdates.length} update{filteredUpdates.length !== 1 ? 's' : ''}
+                {filteredUpdates.length !== updates.length && `, filtered from ${updates.length} total`})
+              </span>
+            </h2>
           </div>
-          <div className="flex flex-wrap gap-4">
-            <ProductFilter
-              services={services}
-              selectedServices={selectedServices}
-              onFilterChange={setSelectedServices}
-            />
-            <div className="relative">
-              <button
-                onClick={() => setDateFilterOpen(!dateFilterOpen)}
-                className="flex items-center justify-center gap-2 px-4 min-h-[32px] text-gray-700 dark:text-gray-200 bg-white/80 dark:bg-gray-800/50 backdrop-blur-sm border border-gray-200 dark:border-gray-700/50 rounded-lg shadow-[inset_0_2px_4px_rgba(0,0,0,0.05)] dark:shadow-[inset_0_2px_4px_rgba(0,0,0,0.2)] hover:shadow-[inset_0_2px_4px_rgba(0,0,0,0.1)] dark:hover:shadow-[inset_0_2px_4px_rgba(0,0,0,0.3)] hover:border-primary-200 dark:hover:border-primary-800 hover:shadow-[0_0_0_1px_rgba(59,130,246,0.5)] dark:hover:shadow-[0_0_0_1px_rgba(59,130,246,0.5)] transition-all duration-300 relative"
-                aria-label="Filter by date"
-              >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                </svg>
-                <span className="text-sm font-medium">Date</span>
-                {selectedDateFilter !== 'all' && (
-                  <span className="absolute -top-1 -right-1 flex items-center justify-center w-5 h-5 text-xs font-medium text-white bg-primary-600 rounded-full">
-                    1
-                  </span>
+          <div className="w-full mb-2">
+            <div className="flex flex-wrap gap-4">
+              <ProductFilter
+                services={services}
+                selectedServices={selectedServices}
+                onFilterChange={setSelectedServices}
+              />
+              <div className="relative">
+                <button
+                  onClick={() => setDateFilterOpen(!dateFilterOpen)}
+                  className="flex items-center justify-center gap-2 px-4 min-h-[32px] text-gray-700 dark:text-gray-200 bg-white/80 dark:bg-gray-800/50 backdrop-blur-sm border border-gray-200 dark:border-gray-700/50 rounded-lg shadow-[inset_0_2px_4px_rgba(0,0,0,0.05)] dark:shadow-[inset_0_2px_4px_rgba(0,0,0,0.2)] hover:shadow-[inset_0_2px_4px_rgba(0,0,0,0.1)] dark:hover:shadow-[inset_0_2px_4px_rgba(0,0,0,0.3)] hover:border-primary-200 dark:hover:border-primary-800 hover:shadow-[0_0_0_1px_rgba(59,130,246,0.5)] dark:hover:shadow-[0_0_0_1px_rgba(59,130,246,0.5)] transition-all duration-300 relative"
+                  aria-label="Filter by date"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
+                  <span className="text-sm font-medium">Date</span>
+                  {selectedDateFilter !== 'all' && (
+                    <span className="absolute -top-1 -right-1 flex items-center justify-center w-5 h-5 text-xs font-medium text-white bg-primary-600 rounded-full">
+                      1
+                    </span>
+                  )}
+                </button>
+                {dateFilterOpen && (
+                  <div className="absolute z-10 w-72 mt-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow-lg">
+                    <div className="p-4 border-b border-gray-200 dark:border-gray-700">
+                      <h3 className="text-sm font-medium text-gray-900 dark:text-white">Filter by Date</h3>
+                    </div>
+                    <div className="p-4 flex flex-col gap-2">
+                      <label className="flex items-center gap-2 cursor-pointer">
+                        <input
+                          type="radio"
+                          checked={selectedDateFilter === 'all'}
+                          onChange={() => setSelectedDateFilter('all')}
+                          className="text-primary-600"
+                        />
+                        <span className="text-sm text-gray-700 dark:text-gray-200">All Dates</span>
+                      </label>
+                      <label className="flex items-center gap-2 cursor-pointer">
+                        <input
+                          type="radio"
+                          checked={selectedDateFilter === 'last30'}
+                          onChange={() => setSelectedDateFilter('last30')}
+                          className="text-primary-600"
+                        />
+                        <span className="text-sm text-gray-700 dark:text-gray-200">Last 30 days</span>
+                      </label>
+                      <label className="flex items-center gap-2 cursor-pointer">
+                        <input
+                          type="radio"
+                          checked={selectedDateFilter === 'last7'}
+                          onChange={() => setSelectedDateFilter('last7')}
+                          className="text-primary-600"
+                        />
+                        <span className="text-sm text-gray-700 dark:text-gray-200">Last 7 days</span>
+                      </label>
+                      <label className="flex items-center gap-2 cursor-pointer">
+                        <input
+                          type="radio"
+                          checked={selectedDateFilter === 'custom'}
+                          onChange={() => setSelectedDateFilter('custom')}
+                          className="text-primary-600"
+                        />
+                        <span className="text-sm text-gray-700 dark:text-gray-200">Custom Range</span>
+                      </label>
+                      {selectedDateFilter === 'custom' && (
+                        <div className="flex flex-col gap-2 mt-2">
+                          <div className="flex flex-col gap-1">
+                            <label htmlFor="date-from" className="text-sm text-gray-700 dark:text-gray-200">From</label>
+                            <input
+                              id="date-from"
+                              type="date"
+                              value={customDateRange.from}
+                              onChange={e => setCustomDateRange({ ...customDateRange, from: e.target.value })}
+                              className="border rounded px-2 py-1 text-sm text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600"
+                            />
+                          </div>
+                          <div className="flex flex-col gap-1">
+                            <label htmlFor="date-to" className="text-sm text-gray-700 dark:text-gray-200">To</label>
+                            <input
+                              id="date-to"
+                              type="date"
+                              value={customDateRange.to}
+                              onChange={e => setCustomDateRange({ ...customDateRange, to: e.target.value })}
+                              className="border rounded px-2 py-1 text-sm text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600"
+                            />
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                    <div className="p-3 border-t border-gray-200 dark:border-gray-700">
+                      <button
+                        onClick={() => {
+                          setSelectedDateFilter('all');
+                          setCustomDateRange({ from: '', to: '' });
+                          setDateFilterOpen(false);
+                        }}
+                        className="w-full px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
+                      >
+                        Clear all
+                      </button>
+                    </div>
+                  </div>
                 )}
-              </button>
-              {dateFilterOpen && (
-                <div className="absolute z-10 w-72 mt-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow-lg">
-                  <div className="p-4 border-b border-gray-200 dark:border-gray-700">
-                    <h3 className="text-sm font-medium text-gray-900 dark:text-white">Filter by Date</h3>
-                  </div>
-                  <div className="p-4 flex flex-col gap-2">
-                    <label className="flex items-center gap-2 cursor-pointer">
-                      <input
-                        type="radio"
-                        checked={selectedDateFilter === 'all'}
-                        onChange={() => setSelectedDateFilter('all')}
-                        className="text-primary-600"
-                      />
-                      <span className="text-sm text-gray-700 dark:text-gray-200">All Dates</span>
-                    </label>
-                    <label className="flex items-center gap-2 cursor-pointer">
-                      <input
-                        type="radio"
-                        checked={selectedDateFilter === 'last30'}
-                        onChange={() => setSelectedDateFilter('last30')}
-                        className="text-primary-600"
-                      />
-                      <span className="text-sm text-gray-700 dark:text-gray-200">Last 30 days</span>
-                    </label>
-                    <label className="flex items-center gap-2 cursor-pointer">
-                      <input
-                        type="radio"
-                        checked={selectedDateFilter === 'last7'}
-                        onChange={() => setSelectedDateFilter('last7')}
-                        className="text-primary-600"
-                      />
-                      <span className="text-sm text-gray-700 dark:text-gray-200">Last 7 days</span>
-                    </label>
-                    <label className="flex items-center gap-2 cursor-pointer">
-                      <input
-                        type="radio"
-                        checked={selectedDateFilter === 'custom'}
-                        onChange={() => setSelectedDateFilter('custom')}
-                        className="text-primary-600"
-                      />
-                      <span className="text-sm text-gray-700 dark:text-gray-200">Custom Range</span>
-                    </label>
-                    {selectedDateFilter === 'custom' && (
-                      <div className="flex flex-col gap-2 mt-2">
-                        <div className="flex flex-col gap-1">
-                          <label htmlFor="date-from" className="text-sm text-gray-700 dark:text-gray-200">From</label>
-                          <input
-                            id="date-from"
-                            type="date"
-                            value={customDateRange.from}
-                            onChange={e => setCustomDateRange({ ...customDateRange, from: e.target.value })}
-                            className="border rounded px-2 py-1 text-sm text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600"
-                          />
-                        </div>
-                        <div className="flex flex-col gap-1">
-                          <label htmlFor="date-to" className="text-sm text-gray-700 dark:text-gray-200">To</label>
-                          <input
-                            id="date-to"
-                            type="date"
-                            value={customDateRange.to}
-                            onChange={e => setCustomDateRange({ ...customDateRange, to: e.target.value })}
-                            className="border rounded px-2 py-1 text-sm text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600"
-                          />
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                  <div className="p-3 border-t border-gray-200 dark:border-gray-700">
-                    <button
-                      onClick={() => {
-                        setSelectedDateFilter('all');
-                        setCustomDateRange({ from: '', to: '' });
-                        setDateFilterOpen(false);
-                      }}
-                      className="w-full px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
-                    >
-                      Clear all
-                    </button>
-                  </div>
-                </div>
-              )}
+              </div>
             </div>
           </div>
         </div>

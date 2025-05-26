@@ -55,11 +55,16 @@ module.exports = {
       },
       animation: {
         'pulse-subtle': 'pulse-subtle 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+        'pulse-slow': 'pulse-slow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
       },
       keyframes: {
         'pulse-subtle': {
           '0%, 100%': { opacity: '1' },
           '50%': { opacity: '0.7' },
+        },
+        'pulse-slow': {
+          '0%, 100%': { opacity: 1, backgroundColor: 'rgba(254, 202, 202, 0.7)' },
+          '50%': { opacity: 0.5, backgroundColor: 'rgba(239, 68, 68, 0.5)' },
         },
       },
     },
