@@ -41,7 +41,14 @@ export function ProductNewsCard({ news, productIcon = '/icons/PowerPlatform_scal
 
   return (
     <Card>
-      <div className="p-4 flex flex-col h-full">
+      <div
+        className="p-4 flex flex-col h-full cursor-pointer"
+        onClick={() => window.open(news.link, '_blank', 'noopener,noreferrer')}
+        tabIndex={0}
+        role="button"
+        onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') window.open(news.link, '_blank', 'noopener,noreferrer') }}
+        aria-label={`Open news: ${decodedTitle}`}
+      >
         <div className="flex-1">
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white group-hover:text-primary-600 dark:group-hover:text-primary-400 mb-2 text-center">
             {decodedTitle}
@@ -59,14 +66,15 @@ export function ProductNewsCard({ news, productIcon = '/icons/PowerPlatform_scal
         </div>
         <div className="mt-4 flex items-center justify-between">
           <div />
-          <Link
+          <a
             href={news.link}
             target="_blank"
             rel="noopener noreferrer"
             className="text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 text-sm font-medium"
+            tabIndex={-1}
           >
             Read more →
-          </Link>
+          </a>
         </div>
       </div>
     </Card>
