@@ -49,6 +49,7 @@ const serviceIcons: Record<string, string> = {
   'Microsoft Dataverse': '/icons/Dataverse_scalable.svg',
   'Microsoft Clipchamp': '/icons/clipchamp.svg',
   'Microsoft Copilot (Microsoft 365)': '/icons/copilot.svg',
+  'Microsoft 365 Copilot App': '/icons/copilot.svg',
   'Outlook': '/icons/Outlook.svg',
   'OneDrive': '/icons/onedrive.svg',
   'OneDrive for Business': '/icons/onedrive.svg',
