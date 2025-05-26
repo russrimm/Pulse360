@@ -84,6 +84,11 @@ export function ReleasePlansContent({ releasePlans }: ReleasePlansContentProps) 
   }, [plansFiltered]);
   let productNames = Object.keys(plansByProduct);
   if (selectedServices.length > 0) productNames = productNames.filter(p => selectedServices.includes(p));
+  // Move any product with 'Dynamics' in the name to the end
+  productNames = [
+    ...productNames.filter(p => !p.toLowerCase().includes('dynamics')),
+    ...productNames.filter(p => p.toLowerCase().includes('dynamics'))
+  ];
 
   return (
     <>
@@ -208,7 +213,7 @@ export function ReleasePlansContent({ releasePlans }: ReleasePlansContentProps) 
           )}
         </div>
       </div>
-      <Accordion.Root type="multiple" defaultValue={productNames} className="space-y-4 mt-8">
+      <Accordion.Root type="multiple" defaultValue={[]} className="space-y-4 mt-8">
         {productNames.map(product => (
           <Accordion.Item value={product} key={product} className="border border-gray-200 dark:border-gray-700 rounded-xl bg-white/80 dark:bg-gray-900/60">
             <Accordion.Header>

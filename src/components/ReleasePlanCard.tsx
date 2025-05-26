@@ -150,7 +150,7 @@ export const ReleasePlanCard: React.FC<ReleasePlanCardProps> = ({ plan, onClick,
         <div className="p-6 pt-4 flex flex-col flex-grow">
           <div className="flex flex-col flex-grow justify-start">
             <div className="flex items-center gap-2 mb-1">
-              <h3 className="text-base font-medium text-gray-900 dark:text-white group-hover:text-primary-700 dark:group-hover:text-primary-400 transition-colors tracking-tight">{plan.title}</h3>
+              <h3 className="text-base font-medium text-gray-900 dark:text-white group-hover:text-primary-700 dark:group-hover:text-primary-400 transition-colors tracking-tight text-center">{plan.title}</h3>
             </div>
             <div className="mt-2 text-sm text-gray-600 dark:text-gray-400">
               <div 

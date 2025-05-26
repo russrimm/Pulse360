@@ -28,7 +28,7 @@ export function NavigationTabs() {
 
   const tabs = [
     {
-      name: 'Message Center',
+      name: 'Microsoft 365 Message Center',
       href: '/message-center',
       icon: (
         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -68,7 +68,7 @@ export function NavigationTabs() {
   return (
     <div className="md:sticky md:top-16 z-40 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm border-b border-gray-200 dark:border-gray-700">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex flex-wrap justify-center gap-1.5 py-2 sm:gap-2">
+        <div className="flex flex-col md:flex-row flex-wrap justify-center gap-1.5 py-2 sm:gap-2">
           {tabs.map((tab) => {
             const isActive = pathname === tab.href;
             if (tab.name === 'Release Planner') return null;
@@ -76,11 +76,12 @@ export function NavigationTabs() {
               <Link
                 key={tab.href}
                 href={tab.href}
-                className={`flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-lg transition-colors relative ${
-                  isActive
-                    ? 'bg-primary-50 text-primary-700 dark:bg-primary-900/50 dark:text-primary-300'
-                    : 'text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200'
-                }`}
+                className={`flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-lg transition-colors relative w-full md:w-auto
+                  ${
+                    isActive
+                      ? 'bg-primary-50 text-primary-700 dark:bg-primary-900/50 dark:text-primary-300'
+                      : 'text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200'
+                  }`}
               >
                 <span className={`transition-transform duration-200 ${isActive ? 'text-primary-600 dark:text-primary-400' : 'text-gray-500 dark:text-gray-400 group-hover:text-primary-600 dark:group-hover:text-primary-400'}`}>
                   {tab.icon}
@@ -94,11 +95,12 @@ export function NavigationTabs() {
           <Popover.Root open={open} onOpenChange={handleOpenChange}>
             <Popover.Trigger asChild>
               <button
-                className={`flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-lg transition-colors relative ${
-                  pathname.startsWith('/release-plans') || pathname.startsWith('/fabric-roadmap')
-                    ? 'bg-primary-50 text-primary-700 dark:bg-primary-900/50 dark:text-primary-300'
-                    : 'text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200'
-                }`}
+                className={`flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-lg transition-colors relative w-full md:w-auto
+                  ${
+                    pathname.startsWith('/release-plans') || pathname.startsWith('/fabric-roadmap')
+                      ? 'bg-primary-50 text-primary-700 dark:bg-primary-900/50 dark:text-primary-300'
+                      : 'text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200'
+                  }`}
                 aria-label="Release Planner"
               >
                 <span className={`transition-transform duration-200 ${

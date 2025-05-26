@@ -90,6 +90,7 @@ const serviceIconMap: Record<string, string> = {
   'Microsoft Defender for Cloud Apps': '/icons/defender.svg',
   'Microsoft Clipchamp': '/icons/clipchamp.svg',
   'Microsoft Copilot (Microsoft 365)': '/icons/copilot.svg',
+  'Microsoft 365 Copilot App': '/icons/copilot.svg',
 };
 
 // Storage key for persisting filter settings
@@ -238,7 +239,7 @@ export function ProductFilter({ services, selectedServices, onFilterChange }: Pr
     <div className="relative inline-block" ref={dropdownRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center justify-center gap-2 px-4 h-8 text-gray-700 dark:text-gray-200 bg-white/80 dark:bg-gray-800/50 backdrop-blur-sm border border-gray-200 dark:border-gray-700/50 rounded-lg shadow-[inset_0_2px_4px_rgba(0,0,0,0.05)] dark:shadow-[inset_0_2px_4px_rgba(0,0,0,0.2)] hover:shadow-[inset_0_2px_4px_rgba(0,0,0,0.1)] dark:hover:shadow-[inset_0_2px_4px_rgba(0,0,0,0.3)] hover:border-primary-200 dark:hover:border-primary-800 hover:shadow-[0_0_0_1px_rgba(59,130,246,0.5)] dark:hover:shadow-[0_0_0_1px_rgba(59,130,246,0.5)] transition-all duration-300 relative min-h-[32px]"
+        className="flex items-center justify-center gap-2 px-4 h-8 text-gray-700 dark:text-gray-200 bg-white/80 dark:bg-gray-800/50 backdrop-blur-sm border border-gray-200 dark:border-gray-700/50 rounded-lg shadow-[inset_0_2px_4px_rgba(0,0,0,0.05)] dark:shadow-[inset_0_2px_4px_rgba(0,0,0,0.2)] hover:shadow-[inset_0_2px_4px_rgba(0,0,0,0.1)] dark:hover:shadow-[inset_0_2px_4px_rgba(0,0,0,0.3)] hover:border-primary-200 dark:hover:border-primary-800 hover:shadow-[0_0_0_1px_rgba(59,130,246,0.5)] dark:hover:shadow-[0_0_0_1px_rgba(59,130,246,0.5)] transition-all duration-300 relative min-h-[32px] w-full md:w-auto"
         aria-label="Filter products"
       >
         <svg
@@ -285,13 +286,10 @@ export function ProductFilter({ services, selectedServices, onFilterChange }: Pr
           </div>
           <div className="max-h-60 overflow-y-auto p-2" role="listbox">
             {filteredServices.map((service) => {
-              const iconSrc = service.startsWith('Microsoft 365')
-                ? '/icons/m365.svg'
-                : service === 'Microsoft Power Automate'
-                ? '/icons/PowerAutomate_scalable.svg'
-                : service.startsWith('Dynamics 365 Customer Insights')
-                ? '/icons/CustomerInsights_scalable.svg'
-                : serviceIconMap[service];
+              const iconSrc = serviceIconMap[service]
+                || (service === 'Microsoft Power Automate' ? '/icons/PowerAutomate_scalable.svg'
+                : service.startsWith('Dynamics 365 Customer Insights') ? '/icons/CustomerInsights_scalable.svg'
+                : undefined);
               return (
                 <label
                   key={service}

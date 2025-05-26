@@ -43,26 +43,22 @@ export function ProductNewsCard({ news, productIcon = '/icons/PowerPlatform_scal
     <Card>
       <div className="p-4 flex flex-col h-full">
         <div className="flex-1">
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white group-hover:text-primary-600 dark:group-hover:text-primary-400 mb-2">
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-white group-hover:text-primary-600 dark:group-hover:text-primary-400 mb-2 text-center">
             {decodedTitle}
           </h3>
-          <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">
+          <p className="text-xs text-gray-500 dark:text-gray-400 mb-2 text-center">
             {new Date(news.publishDate).toLocaleDateString('en-US', {
               year: 'numeric',
               month: 'long',
               day: 'numeric'
             })}
           </p>
-          <p className="text-sm text-gray-600 dark:text-gray-300 line-clamp-3">
+          <p className="text-sm text-gray-600 dark:text-gray-300 line-clamp-3 text-center">
             {decodedDescription}
           </p>
         </div>
         <div className="mt-4 flex items-center justify-between">
-          <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
-            {!productIcon.includes('CopilotStudio') && !productIcon.includes('PowerPlatform') && productIcon !== '/icons/Windows.svg' && news.categories && news.categories.length > 0 && (
-              <span>{news.categories.join(', ')}</span>
-            )}
-          </div>
+          <div />
           <Link
             href={news.link}
             target="_blank"
