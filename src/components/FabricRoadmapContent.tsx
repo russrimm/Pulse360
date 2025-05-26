@@ -214,7 +214,7 @@ export function FabricRoadmapContent({ allPlans }: { allPlans: ReleasePlan[] }) 
             </div>
           </div>
         </div>
-        <Accordion.Root type="multiple" defaultValue={visibleSections.map(s => s.product)} className="space-y-4">
+        <Accordion.Root type="multiple" defaultValue={[]} className="space-y-4">
           {visibleSections.map(section => (
             <Accordion.Item value={section.product} key={section.product} className="border border-gray-200 dark:border-gray-700 rounded-xl bg-white/80 dark:bg-gray-900/60">
               <Accordion.Header>

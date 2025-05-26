@@ -215,7 +215,7 @@ export function ReleasePlansContent({ releasePlans }: ReleasePlansContentProps) 
       </div>
       <Accordion.Root type="multiple" defaultValue={[]} className="space-y-4 mt-8">
         {productNames.map(product => (
-          <Accordion.Item value={product} key={product} className="border border-gray-200 dark:border-gray-700 rounded-xl bg-white/80 dark:bg-gray-900/60">
+          <Accordion.Item key={product} value={product} className="border border-gray-200 dark:border-gray-700 rounded-xl bg-white/80 dark:bg-gray-900/60">
             <Accordion.Header>
               <Accordion.Trigger className="w-full flex justify-between items-center px-6 py-4 text-2xl font-bold text-gray-900 dark:text-white mb-0 focus:outline-none">
                 {product}
