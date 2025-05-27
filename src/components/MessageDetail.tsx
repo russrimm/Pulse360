@@ -30,7 +30,8 @@ const serviceIcons: Record<string, string> = {
   'Microsoft Viva': '/icons/viva.svg',
   'Microsoft Purview': '/icons/purview.svg',
   'Microsoft Defender XDR': '/icons/defender.svg',
-  'Windows': '/icons/Windows.svg'
+  'Windows': '/icons/Windows.svg',
+  'Azure Databricks': '/icons/databricks.svg'
 };
 
 interface MessageDetailProps {
@@ -119,7 +120,7 @@ export function MessageDetail({ message }: MessageDetailProps) {
 
           {/* Product/Tag Tab attached to More Information box */}
           <div className="flex justify-center mb-0">
-            <div className="relative z-10 -mb-4 flex items-center rounded-t-2xl shadow-lg border-x-2 border-t-2 border-b-0 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 px-8 py-4 min-h-[72px]">
+            <div className="relative z-10 -mb-4 -mt-[2px] flex items-center rounded-t-2xl border-x-2 border-t-2 border-b-0 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-8 py-4 min-h-[72px]">
               {uniqueServices.map((service, idx) => {
                 const iconPath = service.startsWith('Microsoft 365') ? '/icons/m365.svg' : serviceIcons[service]
                 return (
@@ -156,8 +157,11 @@ export function MessageDetail({ message }: MessageDetailProps) {
             </div>
           </div>
 
-          <article className="bg-white dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
-            <div className="p-1.5 sm:p-6">
+          <article className="bg-white dark:bg-gray-800 rounded-b-2xl border border-gray-200 dark:border-gray-700 overflow-hidden">
+            <div className="p-1.5 sm:p-6 relative">
+              <span className="absolute top-4 left-4 inline-flex items-center px-2 py-1 rounded-lg text-xs sm:text-sm font-bold bg-white dark:bg-gray-800 border-2 border-blue-500 text-blue-700 dark:text-blue-300 shadow-sm z-20">
+                {message.id}
+              </span>
               {message.isMajorChange && (
                 <div className="w-full bg-red-50/50 dark:bg-red-900/20 border-b border-red-200/50 dark:border-red-800/50 animate-pulse-subtle mb-2">
                   <div className="flex items-center justify-center py-1.5">
@@ -173,8 +177,8 @@ export function MessageDetail({ message }: MessageDetailProps) {
 
               <div className="flex items-center justify-center mb-0">
                 <div className="flex flex-col items-center">
-                  <h1 className="text-xl sm:text-3xl font-bold bg-gradient-to-r from-primary-600 to-primary-400 dark:from-primary-400 dark:to-primary-300 bg-clip-text text-transparent text-center">
-                    {message.id} - {message.title}
+                  <h1 className="text-lg sm:text-2xl font-bold bg-gradient-to-r from-primary-600 to-primary-400 dark:from-primary-400 dark:to-primary-300 bg-clip-text text-transparent text-center pt-8">
+                    {message.title}
                   </h1>
                 </div>
               </div>
@@ -228,7 +232,6 @@ export function MessageDetail({ message }: MessageDetailProps) {
                     }
                   }}
                 >
-                  <h2 className="text-lg sm:text-2xl font-bold bg-gradient-to-r from-primary-600 to-primary-400 dark:from-primary-400 dark:to-primary-300 bg-clip-text text-transparent mb-3 sm:mb-4">More information</h2>
                   <div className="break-words break-all [&_*]:break-words [&_*]:break-all [&_p]:whitespace-normal [&_*]:whitespace-normal [&_*]:overflow-wrap-anywhere" dangerouslySetInnerHTML={{ __html: processedContent }} />
                 </div>
               </div>

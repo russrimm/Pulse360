@@ -47,6 +47,7 @@ const serviceIcons: Record<string, string> = {
   'Microsoft Defender for Cloud Apps': '/icons/defender.svg',
   'Microsoft Clipchamp': '/icons/clipchamp.svg',
   'Microsoft Copilot (Microsoft 365)': '/icons/copilot.svg',
+  'Azure Databricks': '/icons/databricks.svg',
 };
 
 // Normalize service names
@@ -107,7 +108,7 @@ export const MessageCard: React.FC<MessageCardProps> = ({ message, onClick }) =>
               <span
                 key={service}
                 className={
-                  `rounded-tr-lg rounded-bl-lg bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-200 px-2 py-0.5 text-xs font-medium flex items-center gap-1 z-10 w-32 justify-center items-center` +
+                  `text-blue-700 dark:text-blue-200 px-2 py-0.5 text-xs font-medium flex items-center gap-1 z-10 w-32 justify-center items-center` +
                   (idx === 0 ? '' : ` mt-1`)
                 }
                 style={{ marginLeft: '8px' }}

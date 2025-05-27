@@ -79,6 +79,7 @@ const serviceIcons: Record<string, string> = {
   'Microsoft Purview': '/icons/purview.svg',
   'Microsoft Defender XDR': '/icons/defender.svg',
   'Windows': '/icons/Windows.svg',
+  'Azure Databricks': '/icons/databricks.svg',
   'Microsoft Copilot Studio': '/icons/CopilotStudio_scalable.svg',
   'AI Builder': '/icons/AIBuilder_scalable.svg'
 };

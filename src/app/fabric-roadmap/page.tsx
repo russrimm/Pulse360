@@ -99,9 +99,10 @@ export default async function FabricRoadmapPage() {
     <div className="min-h-screen">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex flex-col items-center justify-center mb-8 gap-4">
+          <img src="/icons/fabric_48_color.svg" alt="Fabric" className="w-12 h-12 mb-2" />
           <div className="text-center">
             <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-              Fabric Roadmap
+              Microsoft Fabric Roadmap
             </h1>
             <p className="text-gray-600 dark:text-gray-400">
               Browse upcoming and shipped features from the Microsoft Fabric public roadmap.

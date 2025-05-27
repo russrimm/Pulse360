@@ -12,7 +12,7 @@ export function ProductBadge({ product }: ProductBadgeProps) {
 
   return (
     <div className="mb-4">
-      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium tracking-wide whitespace-nowrap shrink-0 bg-gray-50/90 text-gray-700 dark:bg-gray-800/20 dark:text-gray-200 border border-gray-200/30 dark:border-gray-700/20">
+      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium tracking-wide whitespace-nowrap shrink-0 text-gray-700 dark:text-gray-200">
         {getProductIcon(product) && (
           <Image
             src={getProductIcon(product) || ''}
