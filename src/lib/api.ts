@@ -288,7 +288,7 @@ export async function getAzureUpdates(): Promise<AzureUpdate[]> {
 export async function getM365Updates(): Promise<M365Update[]> {
   try {
     const response = await fetch('https://www.microsoft.com/releasecommunications/api/v2/m365', {
-      cache: 'no-store'
+      next: { revalidate: 60 }
     });
 
     if (!response.ok) {
