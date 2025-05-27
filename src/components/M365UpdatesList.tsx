@@ -149,16 +149,18 @@ export function M365UpdatesList({ updates, searchQuery }: M365UpdatesListProps) 
             </h2>
           </div>
           <div className="w-full mb-2">
-            <div className="flex flex-wrap gap-4">
-              <ProductFilter
-                services={services}
-                selectedServices={selectedServices}
-                onFilterChange={setSelectedServices}
-              />
-              <div className="relative">
+            <div className="flex flex-col md:flex-row flex-wrap gap-2 md:gap-4 w-full">
+              <div className="w-full md:w-auto">
+                <ProductFilter
+                  services={services}
+                  selectedServices={selectedServices}
+                  onFilterChange={setSelectedServices}
+                />
+              </div>
+              <div className="relative w-full md:w-auto">
                 <button
                   onClick={() => setDateFilterOpen(!dateFilterOpen)}
-                  className="flex items-center justify-center gap-2 px-4 min-h-[32px] text-gray-700 dark:text-gray-200 bg-white/80 dark:bg-gray-800/50 backdrop-blur-sm border border-gray-200 dark:border-gray-700/50 rounded-lg shadow-[inset_0_2px_4px_rgba(0,0,0,0.05)] dark:shadow-[inset_0_2px_4px_rgba(0,0,0,0.2)] hover:shadow-[inset_0_2px_4px_rgba(0,0,0,0.1)] dark:hover:shadow-[inset_0_2px_4px_rgba(0,0,0,0.3)] hover:border-primary-200 dark:hover:border-primary-800 hover:shadow-[0_0_0_1px_rgba(59,130,246,0.5)] dark:hover:shadow-[0_0_0_1px_rgba(59,130,246,0.5)] transition-all duration-300 relative"
+                  className="flex items-center justify-center gap-2 px-4 min-h-[32px] w-full md:w-auto text-gray-700 dark:text-gray-200 bg-white/80 dark:bg-gray-800/50 backdrop-blur-sm border border-gray-200 dark:border-gray-700/50 rounded-lg shadow-[inset_0_2px_4px_rgba(0,0,0,0.05)] dark:shadow-[inset_0_2px_4px_rgba(0,0,0,0.2)] hover:shadow-[inset_0_2px_4px_rgba(0,0,0,0.1)] dark:hover:shadow-[inset_0_2px_4px_rgba(0,0,0,0.3)] hover:border-primary-200 dark:hover:border-primary-800 hover:shadow-[0_0_0_1px_rgba(59,130,246,0.5)] dark:hover:shadow-[0_0_0_1px_rgba(59,130,246,0.5)] transition-all duration-300 relative"
                   aria-label="Filter by date"
                 >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
