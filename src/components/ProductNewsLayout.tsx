@@ -51,7 +51,12 @@ let products = [
     name: 'Tech Community',
     icon: '/icons/techcommunity.svg',
     href: '/product-news/tech-community',
-  }
+  },
+  {
+    name: 'Fabric',
+    icon: '/icons/fabric_48_color.svg',
+    href: '/product-news/fabric-blog',
+  },
 ];
 
 // Move 'Finance and Operations cross-app capabilities' to the end if present
@@ -85,9 +90,9 @@ export function ProductNewsLayout({ children, title, description, icon }: Produc
           </p>
         </div>
 
-        <div className="mt-4 mb-2 w-full">
+        <div className="mt-4 mb-2 w-full overflow-x-hidden">
           {/* Mobile: show all buttons in a single grid */}
-          <div className="grid grid-cols-2 gap-3 w-full max-w-xs mx-auto lg:hidden">
+          <div className="grid grid-cols-2 gap-3 w-full min-w-0 lg:hidden">
             {products.map((product) => (
               <Link
                 key={product.name}
@@ -105,7 +110,7 @@ export function ProductNewsLayout({ children, title, description, icon }: Produc
                     alt={product.name}
                     width={16}
                     height={16}
-                    className={`w-4 h-4 self-center ${pathname === product.href ? 'opacity-100' : 'opacity-70'}`}
+                    className={`w-4 h-4 self-center object-contain ${pathname === product.href ? 'opacity-100' : 'opacity-70'}`}
                   />
                 )}
                 <span className={`text-xs font-medium ${
@@ -119,7 +124,7 @@ export function ProductNewsLayout({ children, title, description, icon }: Produc
             ))}
           </div>
           {/* Desktop: force all buttons into a single horizontal row, shrink if needed */}
-          <div className="hidden lg:flex flex-nowrap gap-2 w-full overflow-x-auto pb-1">
+          <div className="hidden lg:flex flex-wrap gap-2 w-full pb-1">
             {products.map((product) => (
               <Link
                 key={product.name}
@@ -137,7 +142,7 @@ export function ProductNewsLayout({ children, title, description, icon }: Produc
                     alt={product.name}
                     width={16}
                     height={16}
-                    className={`w-4 h-4 ${pathname === product.href ? 'opacity-100' : 'opacity-70'}`}
+                    className={`w-4 h-4 self-center object-contain ${pathname === product.href ? 'opacity-100' : 'opacity-70'}`}
                   />
                 )}
                 <span className={`text-xs font-medium ${
