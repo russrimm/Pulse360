@@ -56,7 +56,8 @@ export function SearchBar<T extends SearchableItem>({
     value: searchTerm,
     onChange: (e: React.ChangeEvent<HTMLInputElement>) => handleSearch(e.target.value),
     placeholder: placeholder || "Search by Title or Product...",
-    className: "w-full px-4 py-3 pl-12 text-gray-900 dark:text-white bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border border-gray-200 dark:border-gray-700 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200"
+    className: "w-full px-4 py-3 pl-12 text-gray-900 dark:text-white bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border border-gray-200 dark:border-gray-700 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200",
+    spellCheck: false
   }), [searchTerm, handleSearch, placeholder]);
 
   return (
