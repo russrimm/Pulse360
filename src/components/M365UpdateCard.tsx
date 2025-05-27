@@ -75,6 +75,9 @@ const serviceIcons: Record<string, string> = {
   'Windows 365': '/icons/Windows.svg',
   'Microsoft Defender for Office 365': '/icons/defender.svg',
   'Microsoft Defender for Cloud Apps': '/icons/defender.svg',
+  'Microsoft Defender XDR': '/icons/defender.svg',
+  'Windows': '/icons/Windows.svg',
+  'Azure Databricks': '/icons/databricks.svg',
 };
 
 export const M365UpdateCard: React.FC<M365UpdateCardProps> = ({ update, onClick }) => {

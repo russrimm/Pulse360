@@ -49,7 +49,8 @@ const serviceIcons: Record<string, string> = {
   'Microsoft Viva': '/icons/viva.svg',
   'Microsoft Purview': '/icons/purview.svg',
   'Microsoft Defender XDR': '/icons/defender.svg',
-  'Windows': '/icons/Windows.svg'
+  'Windows': '/icons/Windows.svg',
+  'Azure Databricks': '/icons/databricks.svg'
 };
 
 export function ReleasePlanDetail({ plan }: ReleasePlanDetailProps) {

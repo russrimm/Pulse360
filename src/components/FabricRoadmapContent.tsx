@@ -7,6 +7,8 @@ import { SearchBar } from '@/components/SearchBar'
 import * as Accordion from '@radix-ui/react-accordion'
 import { AreaFilter } from '@/components/AreaFilter'
 import { addDays, isAfter, isBefore, parseISO, startOfDay, endOfDay, subDays } from 'date-fns'
+import Image from 'next/image'
+import { getProductIcon } from '@/lib/getProductIcon'
 
 interface ReleasePlan {
   id: string
@@ -103,11 +105,6 @@ export function FabricRoadmapContent({ allPlans }: { allPlans: ReleasePlan[] }) 
               services={allServices}
               selectedServices={selectedServices}
               onFilterChange={setSelectedServices}
-            />
-            <AreaFilter
-              areas={allAreas}
-              selectedAreas={selectedAreas}
-              onFilterChange={setSelectedAreas}
             />
             <div className="relative">
               <button
@@ -219,7 +216,16 @@ export function FabricRoadmapContent({ allPlans }: { allPlans: ReleasePlan[] }) 
             <Accordion.Item value={section.product} key={section.product} className="border border-gray-200 dark:border-gray-700 rounded-xl bg-white/80 dark:bg-gray-900/60">
               <Accordion.Header>
                 <Accordion.Trigger className="w-full flex justify-between items-center px-6 py-4 text-2xl font-bold text-gray-900 dark:text-white mb-0 focus:outline-none">
-                  {section.product}
+                  <span className="flex items-center gap-2">
+                    {(() => {
+                      const icon = getProductIcon(section.product)
+                      return icon ? (
+                        <Image src={icon} alt="" width={28} height={28} className="w-7 h-7 mr-2" />
+                      ) : null
+                    })()}
+                    {section.product}
+                    <span className="text-lg font-semibold text-gray-500 dark:text-gray-400 ml-2">{section.plans.length} Updates</span>
+                  </span>
                   <span className="ml-2 transition-transform group-data-[state=open]:rotate-180">
                     <svg width="20" height="20" fill="none" viewBox="0 0 20 20"><path d="M6 8l4 4 4-4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
                   </span>

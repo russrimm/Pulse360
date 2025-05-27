@@ -96,6 +96,12 @@ const serviceIconMap: Record<string, string> = {
 // Storage key for persisting filter settings
 const STORAGE_KEY = 'message-center-filters';
 
+// Get icon for a service, using m365.svg for any 'Microsoft 365' prefix
+function getServiceIcon(service: string): string | undefined {
+  if (service.startsWith('Microsoft 365')) return '/icons/m365.svg'
+  return serviceIconMap[service]
+}
+
 export function ProductFilter({ services, selectedServices, onFilterChange }: ProductFilterProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -286,7 +292,7 @@ export function ProductFilter({ services, selectedServices, onFilterChange }: Pr
           </div>
           <div className="max-h-60 overflow-y-auto p-2" role="listbox">
             {filteredServices.map((service) => {
-              const iconSrc = serviceIconMap[service]
+              const iconSrc = getServiceIcon(service)
                 || (service === 'Microsoft Power Automate' ? '/icons/PowerAutomate_scalable.svg'
                 : service.startsWith('Dynamics 365 Customer Insights') ? '/icons/CustomerInsights_scalable.svg'
                 : undefined);

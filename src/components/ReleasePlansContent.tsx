@@ -7,6 +7,8 @@ import * as Accordion from '@radix-ui/react-accordion';
 import { ProductFilter } from '@/components/ProductFilter';
 import { AreaFilter } from '@/components/AreaFilter';
 import { addDays, isAfter, isBefore, parseISO, startOfDay, endOfDay, subDays } from 'date-fns';
+import Image from 'next/image'
+import { getProductIcon } from '@/lib/getProductIcon'
 
 interface ReleasePlan {
   id: string;
@@ -218,7 +220,16 @@ export function ReleasePlansContent({ releasePlans }: ReleasePlansContentProps) 
           <Accordion.Item key={product} value={product} className="border border-gray-200 dark:border-gray-700 rounded-xl bg-white/80 dark:bg-gray-900/60">
             <Accordion.Header>
               <Accordion.Trigger className="w-full flex justify-between items-center px-6 py-4 text-2xl font-bold text-gray-900 dark:text-white mb-0 focus:outline-none">
-                {product}
+                <span className="flex items-center gap-2">
+                  {(() => {
+                    const icon = getProductIcon(product)
+                    return icon ? (
+                      <Image src={icon} alt="" width={28} height={28} className="w-7 h-7 mr-2" />
+                    ) : null
+                  })()}
+                  {product}
+                  <span className="text-lg font-semibold text-gray-500 dark:text-gray-400 ml-2">{plansByProduct[product]?.length ?? 0} Updates</span>
+                </span>
                 <span className="ml-2 transition-transform group-data-[state=open]:rotate-180">
                   <svg width="20" height="20" fill="none" viewBox="0 0 20 20"><path d="M6 8l4 4 4-4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
                 </span>
