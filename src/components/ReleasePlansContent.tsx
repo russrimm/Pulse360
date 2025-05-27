@@ -106,21 +106,25 @@ export function ReleasePlansContent({ releasePlans }: ReleasePlansContentProps) 
         onSearchQueryChange={setSearchTerm}
         onSearch={() => {}}
       />
-      <div className="flex flex-wrap gap-4 mt-4 mb-4 items-center">
-        <ProductFilter
-          services={allServices}
-          selectedServices={selectedServices}
-          onFilterChange={handleProductFilterChange}
-        />
-        <AreaFilter
-          areas={allAreas}
-          selectedAreas={selectedAreas}
-          onFilterChange={setSelectedAreas}
-        />
-        <div className="relative">
+      <div className="flex flex-col md:flex-row flex-wrap gap-2 md:gap-4 w-full mt-4 mb-4 items-center">
+        <div className="w-full md:w-auto">
+          <ProductFilter
+            services={allServices}
+            selectedServices={selectedServices}
+            onFilterChange={handleProductFilterChange}
+          />
+        </div>
+        <div className="w-full md:w-auto">
+          <AreaFilter
+            areas={allAreas}
+            selectedAreas={selectedAreas}
+            onFilterChange={setSelectedAreas}
+          />
+        </div>
+        <div className="relative w-full md:w-auto">
           <button
             onClick={() => setDateFilterOpen(!dateFilterOpen)}
-            className="flex items-center justify-center gap-2 px-4 h-8 text-gray-700 dark:text-gray-200 bg-white/80 dark:bg-gray-800/50 backdrop-blur-sm border border-gray-200 dark:border-gray-700/50 rounded-lg shadow hover:border-primary-200 dark:hover:border-primary-800 transition-all duration-300 relative"
+            className="flex items-center justify-center gap-2 px-4 h-8 w-full md:w-auto text-gray-700 dark:text-gray-200 bg-white/80 dark:bg-gray-800/50 backdrop-blur-sm border border-gray-200 dark:border-gray-700/50 rounded-lg shadow hover:border-primary-200 dark:hover:border-primary-800 transition-all duration-300 relative"
             aria-label="Filter by date"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -225,18 +229,18 @@ export function ReleasePlansContent({ releasePlans }: ReleasePlansContentProps) 
         {productNames.map(product => (
           <Accordion.Item key={product} value={product} className="border border-gray-200 dark:border-gray-700 rounded-xl bg-white/80 dark:bg-gray-900/60">
             <Accordion.Header>
-              <Accordion.Trigger className="w-full flex justify-between items-center px-6 py-4 text-2xl font-bold text-gray-900 dark:text-white mb-0 focus:outline-none">
-                <span className="flex flex-col sm:flex-row items-start sm:items-center gap-0 sm:gap-2 min-h-[2.5rem]">
-                  <span className="flex items-center gap-2">
+              <Accordion.Trigger className="w-full flex justify-start items-center gap-x-2 px-6 py-4 text-2xl font-bold text-gray-900 dark:text-white mb-0 focus:outline-none">
+                <span className="flex flex-col sm:flex-row items-start sm:items-center gap-0 sm:gap-2 min-h-[2.5rem] text-left w-full">
+                  <span className="flex items-center gap-2 text-left w-full">
                     {(() => {
                       const icon = getProductIcon(product)
                       return icon ? (
                         <Image src={icon} alt="" width={28} height={28} className="w-7 h-7 mr-2" />
                       ) : null
                     })()}
-                    {product}
+                    <span className="text-left w-full">{product}</span>
                   </span>
-                  <span className="text-lg font-semibold text-gray-500 dark:text-gray-400 ml-0 sm:ml-2 self-center">{plansByProduct[product]?.length ?? 0} Updates</span>
+                  <span className="text-lg font-semibold text-gray-500 dark:text-gray-400 ml-0 sm:ml-2 w-full text-left">{plansByProduct[product]?.length ?? 0} Updates</span>
                 </span>
                 <span className="ml-2 transition-transform group-data-[state=open]:rotate-180">
                   <svg width="20" height="20" fill="none" viewBox="0 0 20 20"><path d="M6 8l4 4 4-4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
