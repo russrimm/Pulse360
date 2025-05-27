@@ -14,7 +14,7 @@ export function HomeContent({ messages }: HomeContentProps) {
 
   return (
     <>
-      <SearchBar messages={messages} onSearch={setFilteredMessages} />
+      <SearchBar messages={messages} onSearch={setFilteredMessages} placeholder="Search by Title, Product, or Message ID..." />
       <MessageList messages={filteredMessages} />
     </>
   );

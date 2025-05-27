@@ -13,13 +13,15 @@ interface SearchBarProps<T extends SearchableItem> {
   onSearch: (filteredMessages: T[]) => void;
   searchQuery?: string;
   onSearchQueryChange?: (query: string) => void;
+  placeholder?: string;
 }
 
 export function SearchBar<T extends SearchableItem>({ 
   messages, 
   onSearch,
   searchQuery,
-  onSearchQueryChange 
+  onSearchQueryChange,
+  placeholder
 }: SearchBarProps<T>) {
   const [searchTerm, setSearchTerm] = useState(searchQuery || '');
 
@@ -53,9 +55,9 @@ export function SearchBar<T extends SearchableItem>({
     type: "text",
     value: searchTerm,
     onChange: (e: React.ChangeEvent<HTMLInputElement>) => handleSearch(e.target.value),
-    placeholder: "Search by Title or Product...",
+    placeholder: placeholder || "Search by Title or Product...",
     className: "w-full px-4 py-3 pl-12 text-gray-900 dark:text-white bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border border-gray-200 dark:border-gray-700 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200"
-  }), [searchTerm, handleSearch]);
+  }), [searchTerm, handleSearch, placeholder]);
 
   return (
     <div className="relative w-full max-w-2xl mx-auto mb-8">
