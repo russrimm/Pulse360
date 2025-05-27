@@ -97,148 +97,92 @@ export function MessageDetail({ message }: MessageDetailProps) {
   }
 
   return (
-    <div className="min-h-screen bg-white dark:bg-black">
-      <div className="relative px-3 sm:px-6 lg:px-8 pt-0 pb-2 sm:py-4">
-        <div className="max-w-7xl mx-auto">
-          {selectedImage && (
-            <ImageModal
-              src={selectedImage.src}
-              alt={selectedImage.alt}
-              onClose={() => setSelectedImage(null)}
-            />
+    <div className="min-h-screen bg-gray-50 dark:bg-black flex flex-col items-center py-8 px-2">
+      <div className="w-full max-w-3xl bg-white dark:bg-gray-900 rounded-3xl shadow-xl border border-gray-200 dark:border-gray-800 overflow-hidden relative">
+        {/* Meta info row */}
+        <div className="flex flex-wrap items-center justify-between gap-2 px-6 pt-6 pb-2 border-b border-gray-100 dark:border-gray-800">
+          <span className="inline-flex items-center px-2 py-1 rounded-md text-xs font-semibold bg-gray-100 dark:bg-gray-800 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-700">
+            {message.id}
+          </span>
+          <div className="flex items-center gap-2">
+            {message.isMajorChange && (
+              <span className="inline-flex items-center px-2 py-1 rounded-md text-xs font-semibold bg-red-50 dark:bg-red-900 text-red-700 dark:text-red-300 border border-red-200 dark:border-red-700 animate-pulse-subtle">
+                <svg className="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+                Major Change
+              </span>
+            )}
+            {message.tags.map(tag => (
+              <span key={tag} className="inline-flex items-center px-2 py-1 rounded-md text-xs font-semibold bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-200 border border-gray-200 dark:border-gray-700">
+                {tag}
+              </span>
+            ))}
+          </div>
+        </div>
+        {/* Product row */}
+        <div className="flex items-center gap-4 px-6 pt-4 pb-2">
+          {uniqueServices.map(service => {
+            const iconPath = service.startsWith('Microsoft 365') ? '/icons/m365.svg' : serviceIcons[service]
+            return (
+              <span key={service} className="flex items-center gap-2">
+                {iconPath && (
+                  <Image src={iconPath} alt={service} width={28} height={28} className="w-7 h-7" />
+                )}
+                <span className="text-lg font-semibold text-blue-700 dark:text-blue-300">{service}</span>
+              </span>
+            )
+          })}
+        </div>
+        {/* Title */}
+        <h1 className="px-6 pt-2 pb-2 text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white leading-tight">
+          {message.title}
+        </h1>
+        {/* Dates */}
+        <div className="flex flex-wrap gap-4 px-6 pb-2 text-sm text-gray-500 dark:text-gray-400">
+          <span>Published: {formatDate(message.published)}</span>
+          {!isSameDate(message.published, message.lastUpdated) && (
+            <span>Last updated: {formatDate(message.lastUpdated)}</span>
           )}
-          
-          <Link
-            href="/"
-            className="inline-flex items-center px-3 py-2 text-sm font-medium text-primary-600 hover:text-primary-500 dark:text-primary-400 dark:hover:text-primary-300 transition-colors bg-white/50 dark:bg-gray-800/50 rounded-lg hover:bg-white/80 dark:hover:bg-gray-800/80 mb-4"
-          >
-            <svg className="mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-            </svg>
-            Back to messages
-          </Link>
-
-          {/* Product/Tag Tab attached to More Information box */}
-          <div className="flex justify-center mb-0">
-            <div className="relative z-10 -mb-4 -mt-[2px] flex items-center rounded-t-2xl border-x-2 border-t-2 border-b-0 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-8 py-4 min-h-[72px]">
-              {uniqueServices.map((service, idx) => {
-                const iconPath = service.startsWith('Microsoft 365') ? '/icons/m365.svg' : serviceIcons[service]
-                return (
-                  <span key={service} className="flex items-center gap-3 mr-8">
-                    <span className="inline-flex items-center px-5 py-2 rounded-2xl bg-white dark:bg-gray-800 border-2 border-blue-500 shadow-md">
-                      {iconPath && (
-                        <Image
-                          src={iconPath}
-                          alt={service}
-                          width={40}
-                          height={40}
-                          className="w-10 h-10 mr-3"
-                        />
-                      )}
-                      <span className="text-2xl font-bold text-blue-600 dark:text-blue-300 drop-shadow-sm">
-                        {service}
-                      </span>
-                    </span>
-                  </span>
-                )
-              })}
-              {message.tags.length > 0 && (
-                <div className="flex flex-wrap gap-2 ml-4">
-                  {message.tags.map(tag => (
-                    <span key={tag} className="inline-flex items-center px-3 py-1 rounded-lg text-base font-semibold bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-200 border border-gray-200 dark:border-gray-700">
-                      <svg className="w-4 h-4 mr-1.5 text-gray-500 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
-                      </svg>
-                      {tag}
-                    </span>
-                  ))}
-                </div>
-              )}
+          {message.actionRequiredByDateTime && (
+            <span className="text-red-600 dark:text-red-400 font-semibold">Action required by: {formatDate(message.actionRequiredByDateTime)}</span>
+          )}
+        </div>
+        {/* Platforms */}
+        {platformDetails && (
+          <div className="px-6 pb-2">
+            <div className="flex flex-wrap gap-2 items-center">
+              <span className="text-sm font-medium text-primary-600 dark:text-primary-400">Impacted Platforms:</span>
+              {platformDetails.split(',').map(platform => (
+                <span key={platform} className="inline-flex items-center px-2 py-0.5 rounded bg-primary-50 dark:bg-primary-900/50 text-primary-700 dark:text-primary-300 text-xs font-medium">
+                  {platform.trim()}
+                </span>
+              ))}
             </div>
           </div>
-
-          <article className="bg-white dark:bg-gray-800 rounded-b-2xl border border-gray-200 dark:border-gray-700 overflow-hidden">
-            <div className="p-1.5 sm:p-6 relative">
-              <span className="absolute top-4 left-4 inline-flex items-center px-2 py-1 rounded-lg text-xs sm:text-sm font-bold bg-white dark:bg-gray-800 border-2 border-blue-500 text-blue-700 dark:text-blue-300 shadow-sm z-20">
-                {message.id}
-              </span>
-              {message.isMajorChange && (
-                <div className="w-full bg-red-50/50 dark:bg-red-900/20 border-b border-red-200/50 dark:border-red-800/50 animate-pulse-subtle mb-2">
-                  <div className="flex items-center justify-center py-1.5">
-                    <span className="inline-flex items-center px-3 py-1 text-sm font-medium text-red-700/90 dark:text-red-300/90">
-                      <svg className="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                      </svg>
-                      Major Change
-                    </span>
-                  </div>
-                </div>
-              )}
-
-              <div className="flex items-center justify-center mb-0">
-                <div className="flex flex-col items-center">
-                  <h1 className="text-lg sm:text-2xl font-bold bg-gradient-to-r from-primary-600 to-primary-400 dark:from-primary-400 dark:to-primary-300 bg-clip-text text-transparent text-center pt-8">
-                    {message.title}
-                  </h1>
-                </div>
+        )}
+        {/* Details grid */}
+        {otherDetails && otherDetails.length > 0 && (
+          <div className="px-6 pb-2 grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {otherDetails.map(detail => (
+              <div key={detail.name} className="bg-gray-50 dark:bg-gray-800 rounded-xl p-3 border border-gray-100 dark:border-gray-700">
+                <div className="text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1 uppercase tracking-wide">{detail.name}</div>
+                <div className="text-sm text-gray-900 dark:text-gray-100">{detail.value}</div>
               </div>
-
-              {platformDetails && (
-                <div className="bg-white dark:bg-gray-700/70 backdrop-blur-sm rounded-xl border border-gray-200 dark:border-gray-600 overflow-hidden mb-4 sm:mb-6 p-3 sm:p-4">
-                  <h3 className="text-base font-medium text-primary-600 dark:text-primary-400 mb-2">Impacted Platforms</h3>
-                  <div className="flex flex-wrap gap-1.5">
-                    {platformDetails.split(',').map((platform) => (
-                      <span
-                        key={platform}
-                        className="inline-flex items-center px-2 py-1 rounded-lg text-base font-medium bg-primary-50 text-primary-700 dark:bg-primary-900/50 dark:text-primary-300"
-                      >
-                        {platform.trim()}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              )}
-              {message.actionRequiredByDateTime && (
-                <div className="bg-white dark:bg-gray-700/70 backdrop-blur-sm rounded-xl border border-gray-200 dark:border-gray-600 overflow-hidden mb-4 sm:mb-6 p-3 sm:p-4">
-                  <span className="w-24 text-base font-medium text-primary-600 dark:text-primary-400">Action Required</span>
-                  <p className="text-base font-medium text-gray-900 dark:text-white">
-                    {formatDate(message.actionRequiredByDateTime)}
-                  </p>
-                </div>
-              )}
-
-              {otherDetails && otherDetails.length > 0 && (
-                <div className="border-t border-gray-200 dark:border-gray-700">
-                  <div className="pt-3 sm:pt-4">
-                    <div className="grid gap-2 sm:gap-3">
-                      {otherDetails.map((detail) => (
-                        <div key={detail.name} className="bg-white dark:bg-gray-700/70 backdrop-blur-sm rounded-xl p-3 sm:p-4 border border-gray-200 dark:border-gray-600">
-                          <h3 className="text-lg sm:text-2xl font-bold bg-gradient-to-r from-primary-600 to-primary-400 dark:from-primary-400 dark:to-primary-300 bg-clip-text text-transparent mb-2 capitalize">{detail.name}</h3>
-                          <p className="text-sm text-gray-900 dark:text-gray-100">{detail.value}</p>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              <div className="pt-3 sm:pt-4">
-                <div 
-                  className="prose prose-sm dark:prose-invert max-w-none prose-blue prose-headings:font-semibold prose-headings:text-gray-900 dark:prose-headings:text-white prose-p:text-gray-600 dark:prose-p:text-white prose-a:text-primary-600 dark:prose-a:text-primary-400 prose-strong:text-gray-900 dark:prose-strong:text-white prose-ul:list-disc prose-ul:pl-6 prose-ol:list-decimal prose-ol:pl-6 [&_*]:text-gray-600 dark:[&_*]:text-white [&_a]:text-primary-600 dark:[&_a]:text-primary-400 bg-white dark:bg-gray-700/70 backdrop-blur-sm rounded-xl border border-gray-200 dark:border-gray-600 p-2 sm:p-4 overflow-x-auto"
-                  onClick={(e) => {
-                    const target = e.target as HTMLElement;
-                    if (target.tagName === 'IMG') {
-                      handleImageClick(e as React.MouseEvent<HTMLImageElement>);
-                    }
-                  }}
-                >
-                  <div className="break-words break-all [&_*]:break-words [&_*]:break-all [&_p]:whitespace-normal [&_*]:whitespace-normal [&_*]:overflow-wrap-anywhere" dangerouslySetInnerHTML={{ __html: processedContent }} />
-                </div>
-              </div>
-            </div>
-          </article>
+            ))}
+          </div>
+        )}
+        {/* Main content */}
+        <div className="px-6 pb-8 pt-4">
+          <div className="prose prose-sm dark:prose-invert max-w-none prose-blue prose-headings:font-semibold prose-headings:text-gray-900 dark:prose-headings:text-white prose-p:text-gray-600 dark:prose-p:text-white prose-a:text-primary-600 dark:prose-a:text-primary-400 prose-strong:text-gray-900 dark:prose-strong:text-white prose-ul:list-disc prose-ul:pl-6 prose-ol:list-decimal prose-ol:pl-6 [&_*]:text-gray-600 dark:[&_*]:text-white [&_a]:text-primary-600 dark:[&_a]:text-primary-400 bg-white dark:bg-gray-900 rounded-xl p-4 overflow-x-auto shadow-sm" onClick={e => {
+            const target = e.target as HTMLElement;
+            if (target.tagName === 'IMG') handleImageClick(e as React.MouseEvent<HTMLImageElement>);
+          }}>
+            <div className="break-words break-all [&_*]:break-words [&_*]:break-all [&_p]:whitespace-normal [&_*]:whitespace-normal [&_*]:overflow-wrap-anywhere" dangerouslySetInnerHTML={{ __html: processedContent }} />
+          </div>
         </div>
       </div>
+      {selectedImage && (
+        <ImageModal src={selectedImage.src} alt={selectedImage.alt} onClose={() => setSelectedImage(null)} />
+      )}
     </div>
   );
 } 
