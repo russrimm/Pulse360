@@ -2,6 +2,7 @@ import { getM365Updates } from '@/lib/api';
 import { notFound } from 'next/navigation';
 import { format } from 'date-fns';
 import Image from 'next/image';
+import Link from 'next/link';
 
 // Service icon map (copy from M365UpdateCard)
 const serviceIcons: Record<string, string> = {
@@ -73,6 +74,17 @@ export default async function M365UpdatePage({ params }: PageProps) {
   return (
     <div className="min-h-screen bg-gray-900 dark:bg-black">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="mb-6">
+          <Link
+            href="/m365-updates"
+            className="inline-flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
+            Back to Microsoft 365 Updates
+          </Link>
+        </div>
         <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
           <div className="flex flex-col flex-grow">
             {/* Service badges row */}

@@ -91,6 +91,12 @@ export function ReleasePlansContent({ releasePlans }: ReleasePlansContentProps) 
     ...productNames.filter(p => !p.toLowerCase().includes('dynamics')),
     ...productNames.filter(p => p.toLowerCase().includes('dynamics'))
   ];
+  // Move 'Finance and Operations cross-app capabilities' to the end if present
+  const financeOpsIdx = productNames.findIndex(p => p === 'Finance and Operations cross-app capabilities')
+  if (financeOpsIdx !== -1) {
+    const [financeOps] = productNames.splice(financeOpsIdx, 1)
+    productNames.push(financeOps)
+  }
 
   return (
     <>
@@ -220,15 +226,17 @@ export function ReleasePlansContent({ releasePlans }: ReleasePlansContentProps) 
           <Accordion.Item key={product} value={product} className="border border-gray-200 dark:border-gray-700 rounded-xl bg-white/80 dark:bg-gray-900/60">
             <Accordion.Header>
               <Accordion.Trigger className="w-full flex justify-between items-center px-6 py-4 text-2xl font-bold text-gray-900 dark:text-white mb-0 focus:outline-none">
-                <span className="flex items-center gap-2">
-                  {(() => {
-                    const icon = getProductIcon(product)
-                    return icon ? (
-                      <Image src={icon} alt="" width={28} height={28} className="w-7 h-7 mr-2" />
-                    ) : null
-                  })()}
-                  {product}
-                  <span className="text-lg font-semibold text-gray-500 dark:text-gray-400 ml-2">{plansByProduct[product]?.length ?? 0} Updates</span>
+                <span className="flex flex-col sm:flex-row items-start sm:items-center gap-0 sm:gap-2 min-h-[2.5rem]">
+                  <span className="flex items-center gap-2">
+                    {(() => {
+                      const icon = getProductIcon(product)
+                      return icon ? (
+                        <Image src={icon} alt="" width={28} height={28} className="w-7 h-7 mr-2" />
+                      ) : null
+                    })()}
+                    {product}
+                  </span>
+                  <span className="text-lg font-semibold text-gray-500 dark:text-gray-400 ml-0 sm:ml-2 self-center">{plansByProduct[product]?.length ?? 0} Updates</span>
                 </span>
                 <span className="ml-2 transition-transform group-data-[state=open]:rotate-180">
                   <svg width="20" height="20" fill="none" viewBox="0 0 20 20"><path d="M6 8l4 4 4-4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>

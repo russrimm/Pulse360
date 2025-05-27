@@ -238,7 +238,7 @@ export function AzureUpdatesContent({ updates, searchQuery = '' }: AzureUpdatesC
       )}
       <div className="md:sticky md:top-28 z-40 backdrop-blur-md pt-0 pb-2 border-b border-gray-200/50 dark:border-gray-700/50 -mt-4">
         <div className="mb-2">
-          <div className="flex flex-wrap items-center mb-2 gap-2">
+          <div className="flex flex-col md:flex-row flex-wrap items-center mb-2 gap-2">
             <h2 className="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center">
               Filters
               <span className="ml-2 text-xs text-gray-600 dark:text-gray-400 font-normal">
@@ -247,9 +247,9 @@ export function AzureUpdatesContent({ updates, searchQuery = '' }: AzureUpdatesC
               </span>
             </h2>
           </div>
-          <div className="flex flex-wrap gap-4">
+          <div className="flex flex-col md:flex-row flex-wrap gap-2 md:gap-4 w-full">
             {/* Products Filter */}
-            <div className="relative">
+            <div className="relative w-full md:w-auto">
               <button
                 onClick={() => setIsProductDropdownOpen(!isProductDropdownOpen)}
                 className="flex items-center justify-center gap-2 px-4 h-10 text-gray-700 dark:text-gray-200 bg-white/80 dark:bg-gray-800/50 backdrop-blur-sm border border-gray-200 dark:border-gray-700/50 rounded-lg shadow-[inset_0_2px_4px_rgba(0,0,0,0.05)] dark:shadow-[inset_0_2px_4px_rgba(0,0,0,0.2)] hover:shadow-[inset_0_2px_4px_rgba(0,0,0,0.1)] dark:hover:shadow-[inset_0_2px_4px_rgba(0,0,0,0.3)] hover:border-primary-200 dark:hover:border-primary-800 hover:shadow-[0_0_0_1px_rgba(59,130,246,0.5)] dark:hover:shadow-[0_0_0_1px_rgba(59,130,246,0.5)] transition-all duration-300 relative"
@@ -324,7 +324,7 @@ export function AzureUpdatesContent({ updates, searchQuery = '' }: AzureUpdatesC
               )}
             </div>
             {/* Categories Filter */}
-            <div className="relative">
+            <div className="relative w-full md:w-auto">
               <button
                 onClick={() => setIsCategoryDropdownOpen(!isCategoryDropdownOpen)}
                 className="flex items-center justify-center gap-2 px-4 h-10 text-gray-700 dark:text-gray-200 bg-white/80 dark:bg-gray-800/50 backdrop-blur-sm border border-gray-200 dark:border-gray-700/50 rounded-lg shadow-[inset_0_2px_4px_rgba(0,0,0,0.05)] dark:shadow-[inset_0_2px_4px_rgba(0,0,0,0.2)] hover:shadow-[inset_0_2px_4px_rgba(0,0,0,0.1)] dark:hover:shadow-[inset_0_2px_4px_rgba(0,0,0,0.3)] hover:border-primary-200 dark:hover:border-primary-800 hover:shadow-[0_0_0_1px_rgba(59,130,246,0.5)] dark:hover:shadow-[0_0_0_1px_rgba(59,130,246,0.5)] transition-all duration-300 relative"
@@ -386,7 +386,7 @@ export function AzureUpdatesContent({ updates, searchQuery = '' }: AzureUpdatesC
             </div>
 
             {/* Tags Filter */}
-            <div className="relative">
+            <div className="relative w-full md:w-auto">
               <button
                 onClick={() => setIsTagDropdownOpen(!isTagDropdownOpen)}
                 className="flex items-center justify-center gap-2 px-4 h-10 text-gray-700 dark:text-gray-200 bg-white/80 dark:bg-gray-800/50 backdrop-blur-sm border border-gray-200 dark:border-gray-700/50 rounded-lg shadow-[inset_0_2px_4px_rgba(0,0,0,0.05)] dark:shadow-[inset_0_2px_4px_rgba(0,0,0,0.2)] hover:shadow-[inset_0_2px_4px_rgba(0,0,0,0.1)] dark:hover:shadow-[inset_0_2px_4px_rgba(0,0,0,0.3)] hover:border-primary-200 dark:hover:border-primary-800 hover:shadow-[0_0_0_1px_rgba(59,130,246,0.5)] dark:hover:shadow-[0_0_0_1px_rgba(59,130,246,0.5)] transition-all duration-300 relative"
@@ -448,7 +448,7 @@ export function AzureUpdatesContent({ updates, searchQuery = '' }: AzureUpdatesC
             </div>
 
             {/* Status Filter */}
-            <div className="relative">
+            <div className="relative w-full md:w-auto">
               <button
                 onClick={() => setIsStatusDropdownOpen(!isStatusDropdownOpen)}
                 className="flex items-center justify-center gap-2 px-4 h-10 text-gray-700 dark:text-gray-200 bg-white/80 dark:bg-gray-800/50 backdrop-blur-sm border border-gray-200 dark:border-gray-700/50 rounded-lg shadow-[inset_0_2px_4px_rgba(0,0,0,0.05)] dark:shadow-[inset_0_2px_4px_rgba(0,0,0,0.2)] hover:shadow-[inset_0_2px_4px_rgba(0,0,0,0.1)] dark:hover:shadow-[inset_0_2px_4px_rgba(0,0,0,0.3)] hover:border-primary-200 dark:hover:border-primary-800 hover:shadow-[0_0_0_1px_rgba(59,130,246,0.5)] dark:hover:shadow-[0_0_0_1px_rgba(59,130,246,0.5)] transition-all duration-300 relative"
@@ -510,7 +510,7 @@ export function AzureUpdatesContent({ updates, searchQuery = '' }: AzureUpdatesC
             </div>
 
             {/* Date Range Filter */}
-            <div className="relative">
+            <div className="relative w-full md:w-auto">
               <button
                 onClick={() => setIsDateDropdownOpen(!isDateDropdownOpen)}
                 className="flex items-center justify-center gap-2 px-4 h-10 text-gray-700 dark:text-gray-200 bg-white/80 dark:bg-gray-800/50 backdrop-blur-sm border border-gray-200 dark:border-gray-700/50 rounded-lg shadow-[inset_0_2px_4px_rgba(0,0,0,0.05)] dark:shadow-[inset_0_2px_4px_rgba(0,0,0,0.2)] hover:shadow-[inset_0_2px_4px_rgba(0,0,0,0.1)] dark:hover:shadow-[inset_0_2px_4px_rgba(0,0,0,0.3)] hover:border-primary-200 dark:hover:border-primary-800 hover:shadow-[0_0_0_1px_rgba(59,130,246,0.5)] dark:hover:shadow-[0_0_0_1px_rgba(59,130,246,0.5)] transition-all duration-300 relative"

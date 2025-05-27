@@ -92,7 +92,7 @@ export function ProductNewsLayout({ children, title, description, icon }: Produc
               <Link
                 key={product.name}
                 href={product.href}
-                className={`flex items-center justify-center gap-2 px-2.5 py-1 rounded-lg border transition-all duration-200 h-10 min-w-[120px] max-w-[160px] w-full flex-shrink-0
+                className={`flex flex-row items-center justify-center gap-2 px-2.5 py-1 rounded-lg border transition-all duration-200 h-10 min-h-[2.5rem] min-w-[120px] max-w-[160px] w-full flex-shrink-0
                   ${
                     pathname === product.href
                       ? 'bg-primary-50 border-primary-300 dark:bg-primary-900/50 dark:border-primary-700 shadow-sm ring-1 ring-primary-200 dark:ring-primary-800'
@@ -105,7 +105,7 @@ export function ProductNewsLayout({ children, title, description, icon }: Produc
                     alt={product.name}
                     width={16}
                     height={16}
-                    className={`w-4 h-4 ${pathname === product.href ? 'opacity-100' : 'opacity-70'}`}
+                    className={`w-4 h-4 self-center ${pathname === product.href ? 'opacity-100' : 'opacity-70'}`}
                   />
                 )}
                 <span className={`text-xs font-medium ${
