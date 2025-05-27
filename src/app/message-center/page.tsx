@@ -1,7 +1,7 @@
 import { getMessages } from '@/lib/api';
 import { HomeContent } from '@/components/HomeContent';
 
-export const revalidate = 604800; // Revalidate every 7 days (7 * 24 * 60 * 60)
+export const revalidate = 86400; // Revalidate every 1 day (1 * 24 * 60 * 60)
 
 export const metadata = {
   title: 'Microsoft 365 Message Center',
