@@ -60,12 +60,12 @@ let products = [
   {
     name: 'Semantic Kernel',
     icon: 'https://devblogs.microsoft.com/semantic-kernel/wp-content/uploads/sites/78/2024/10/Microsoft-favicon-48x48.jpg',
-    href: 'https://devblogs.microsoft.com/semantic-kernel/feed/',
+    href: '/product-news/semantic-kernel',
   },
   {
     name: 'Azure AI Foundry',
     icon: 'https://devblogs.microsoft.com/foundry/wp-content/uploads/sites/89/2025/03/cropped-ai-foundry-32x32.png',
-    href: 'https://devblogs.microsoft.com/foundry/feed/',
+    href: '/product-news/azure-ai-foundry',
   },
 ];
 
