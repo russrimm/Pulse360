@@ -863,4 +863,76 @@ export async function getFabricBlogNews(): Promise<ProductNews[]> {
     console.error('Error fetching Fabric Blog news:', error)
     return []
   }
+}
+
+export async function getSemanticKernelNews(): Promise<ProductNews[]> {
+  try {
+    const response = await fetch('/api/semantic-kernel-news', {
+      next: { revalidate: 3600 }
+    })
+    if (!response.ok) {
+      console.error('Failed to fetch Semantic Kernel news:', {
+        status: response.status,
+        statusText: response.statusText,
+        url: response.url
+      })
+      return []
+    }
+    const xmlText = await response.text()
+    const parser = new XMLParser({
+      ignoreAttributes: false,
+      attributeNamePrefix: '@_'
+    })
+    const result = parser.parse(xmlText)
+    const items = result.rss.channel.item
+    const news: ProductNews[] = items.map((item: any) => ({
+      id: item.guid?.['#text'] || item.link,
+      title: item.title,
+      link: item.link,
+      description: item.description,
+      publishDate: item.pubDate,
+      author: item['dc:creator'] || '',
+      categories: Array.isArray(item.category) ? item.category : [item.category].filter(Boolean)
+    }))
+    return news.sort((a, b) => new Date(b.publishDate).getTime() - new Date(a.publishDate).getTime())
+  } catch (error) {
+    console.error('Error fetching Semantic Kernel news:', error)
+    return []
+  }
+}
+
+export async function getAzureAIFoundryNews(): Promise<ProductNews[]> {
+  try {
+    const response = await fetch('/api/azure-ai-foundry-news', {
+      next: { revalidate: 3600 }
+    })
+    if (!response.ok) {
+      console.error('Failed to fetch Azure AI Foundry news:', {
+        status: response.status,
+        statusText: response.statusText,
+        url: response.url
+      })
+      return []
+    }
+    const xmlText = await response.text()
+    const parser = new XMLParser({
+      ignoreAttributes: false,
+      attributeNamePrefix: '@_'
+    })
+    const result = parser.parse(xmlText)
+    const items = result.rss.channel.item
+    const news: ProductNews[] = items.map((item: any) => ({
+      id: item.guid?.['#text'] || item.link,
+      title: item.title,
+      link: item.link,
+      description: item.description,
+      publishDate: item.pubDate,
+      author: item['dc:creator'] || '',
+      categories: Array.isArray(item.category) ? item.category : [item.category].filter(Boolean)
+    }))
+    return news.sort((a, b) => new Date(b.publishDate).getTime() - new Date(a.publishDate).getTime())
+  } catch (error) {
+    console.error('Error fetching Azure AI Foundry news:', error)
+    return []
+  }
 } 

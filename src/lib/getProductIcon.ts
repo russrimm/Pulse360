@@ -167,6 +167,8 @@ export function getProductIcon(product: string): string | null {
     'azure ai speech': '/icons/Azure AI Speech.svg',
     'ai speech': '/icons/Azure AI Speech.svg',
     'azure monitor': '/icons/Azure Monitor.svg',
+    'application gateway': '/icons/Application Gateway.svg',
+    'azure application gateway': '/icons/Application Gateway.svg',
   }
 
   const productLower = product.toLowerCase()
