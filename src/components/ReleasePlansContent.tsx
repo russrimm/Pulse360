@@ -108,18 +108,18 @@ export function ReleasePlansContent({ releasePlans }: ReleasePlansContentProps) 
       />
       <div className="flex flex-col md:flex-row flex-wrap gap-2 md:gap-4 w-full mt-4 mb-4 items-center">
         <div className="w-full md:w-auto">
-          <ProductFilter
-            services={allServices}
-            selectedServices={selectedServices}
-            onFilterChange={handleProductFilterChange}
-          />
+        <ProductFilter
+          services={allServices}
+          selectedServices={selectedServices}
+          onFilterChange={handleProductFilterChange}
+        />
         </div>
         <div className="w-full md:w-auto">
-          <AreaFilter
-            areas={allAreas}
-            selectedAreas={selectedAreas}
-            onFilterChange={setSelectedAreas}
-          />
+        <AreaFilter
+          areas={allAreas}
+          selectedAreas={selectedAreas}
+          onFilterChange={setSelectedAreas}
+        />
         </div>
         <div className="relative w-full md:w-auto">
           <button
@@ -232,12 +232,12 @@ export function ReleasePlansContent({ releasePlans }: ReleasePlansContentProps) 
               <Accordion.Trigger className="w-full flex justify-start items-center gap-x-2 px-6 py-4 text-2xl font-bold text-gray-900 dark:text-white mb-0 focus:outline-none">
                 <span className="flex flex-col sm:flex-row items-start sm:items-center gap-0 sm:gap-2 min-h-[2.5rem] text-left w-full">
                   <span className="flex items-center gap-2 text-left w-full">
-                    {(() => {
-                      const icon = getProductIcon(product)
-                      return icon ? (
-                        <Image src={icon} alt="" width={28} height={28} className="w-7 h-7 mr-2" />
-                      ) : null
-                    })()}
+                  {(() => {
+                    const icon = getProductIcon(product)
+                    return icon ? (
+                      <Image src={icon} alt="" width={28} height={28} className="w-7 h-7 mr-2" />
+                    ) : null
+                  })()}
                     <span className="text-left w-full">{product}</span>
                   </span>
                   <span className="text-lg font-semibold text-gray-500 dark:text-gray-400 ml-0 sm:ml-2 w-full text-left">{plansByProduct[product]?.length ?? 0} Updates</span>

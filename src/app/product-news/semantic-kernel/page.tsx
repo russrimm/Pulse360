@@ -21,7 +21,7 @@ export default function SemanticKernelNewsPage() {
     <ProductNewsLayout
       title="Semantic Kernel"
       description="Latest updates from the Semantic Kernel team."
-      icon="https://devblogs.microsoft.com/semantic-kernel/wp-content/uploads/sites/78/2024/10/Microsoft-favicon-48x48.jpg"
+      icon="/icons/sklogo.svg"
     >
       {loading ? (
         <div className="flex justify-center items-center py-12">
@@ -34,7 +34,7 @@ export default function SemanticKernelNewsPage() {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {news.map((item) => (
-            <ProductNewsCard key={item.id} news={item} productIcon="https://devblogs.microsoft.com/semantic-kernel/wp-content/uploads/sites/78/2024/10/Microsoft-favicon-48x48.jpg" />
+            <ProductNewsCard key={item.id} news={item} productIcon="/icons/sklogo.svg" />
           ))}
         </div>
       )}

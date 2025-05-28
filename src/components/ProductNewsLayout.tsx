@@ -59,7 +59,7 @@ let products = [
   },
   {
     name: 'Semantic Kernel',
-    icon: 'https://devblogs.microsoft.com/semantic-kernel/wp-content/uploads/sites/78/2024/10/Microsoft-favicon-48x48.jpg',
+    icon: '/icons/sklogo.svg',
     href: '/product-news/semantic-kernel',
   },
   {

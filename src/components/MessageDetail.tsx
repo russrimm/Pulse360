@@ -172,7 +172,7 @@ export function MessageDetail({ message }: MessageDetailProps) {
         )}
         {/* Details grid */}
         {otherDetails && otherDetails.length > 0 && (
-          <div className="px-6 pb-2 grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="px-6 pb-2 grid grid-cols-1 gap-4">
             {otherDetails.map(detail => (
               <div key={detail.name} className="bg-gray-50 dark:bg-gray-800 rounded-xl p-3 border border-gray-100 dark:border-gray-700">
                 <div className="text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1 uppercase tracking-wide">{detail.name}</div>

@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Product News | MCViewer',
+  title: 'Pulse 360 | Product News',
   description: 'Stay up to date with the latest news and announcements from Microsoft Power Platform products.',
 };
 

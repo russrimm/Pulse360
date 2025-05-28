@@ -110,9 +110,11 @@ export function ProductFilter({ services, selectedServices, onFilterChange }: Pr
 
   // Log services for debugging
   useEffect(() => {
-    console.log('Available services:', services);
-    console.log('Service icon mapping:', serviceIconMap);
-  }, [services]);
+    if (process.env.NODE_ENV !== 'production') {
+      console.log('Available services:', services)
+      console.log('Service icon mapping:', serviceIconMap)
+    }
+  }, [services])
 
   // Memoize selection check
   const isServiceSelected = useCallback(
