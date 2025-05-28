@@ -1,6 +1,14 @@
 import { Message, M365Update, ProductNews } from './types';
 import { XMLParser } from 'fast-xml-parser';
 
+if (process.env.NODE_ENV === 'production') {
+  console.log = function () {}
+  console.warn = function () {}
+  console.error = function () {}
+  console.info = function () {}
+  console.debug = function () {}
+}
+
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://graphapirim.azure-api.net/v1.0';
 const API_KEY = process.env.NEXT_PUBLIC_API_KEY;
 const TENANT_ID = process.env.NEXT_PUBLIC_TENANT_ID;
