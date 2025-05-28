@@ -157,15 +157,11 @@ export const MessageCard: React.FC<MessageCardProps> = ({ message, onClick }) =>
               )
             })()}
           </div>
-          <div className="flex flex-col items-end gap-1">
-            {uniqueServices.length > 0 && uniqueServices.map((service, idx) => (
+          <div className="flex flex-col items-end gap-y-0.5">
+            {uniqueServices.length > 0 && uniqueServices.map((service) => (
               <span
                 key={service}
-                className={
-                  `text-blue-700 dark:text-blue-200 px-2 py-0.5 text-xs font-medium flex items-center gap-1 z-10 w-32 justify-center items-center` +
-                  (idx === 0 ? '' : ` mt-1`)
-                }
-                style={{ marginLeft: '8px' }}
+                className="text-blue-700 dark:text-blue-200 px-1 py-0.5 text-xs font-medium flex items-center gap-1 z-10 w-32 justify-center"
               >
                 {(() => {
                   const iconPath = service.startsWith('Microsoft 365') ? '/icons/m365.svg' : serviceIcons[service]
