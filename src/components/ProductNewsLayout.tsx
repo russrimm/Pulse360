@@ -57,6 +57,16 @@ let products = [
     icon: '/icons/fabric_48_color.svg',
     href: '/product-news/fabric-blog',
   },
+  {
+    name: 'Semantic Kernel',
+    icon: 'https://devblogs.microsoft.com/semantic-kernel/wp-content/uploads/sites/78/2024/10/Microsoft-favicon-48x48.jpg',
+    href: 'https://devblogs.microsoft.com/semantic-kernel/feed/',
+  },
+  {
+    name: 'Azure AI Foundry',
+    icon: 'https://devblogs.microsoft.com/foundry/wp-content/uploads/sites/89/2025/03/cropped-ai-foundry-32x32.png',
+    href: 'https://devblogs.microsoft.com/foundry/feed/',
+  },
 ];
 
 // Move 'Finance and Operations cross-app capabilities' to the end if present
