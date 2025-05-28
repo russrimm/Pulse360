@@ -74,14 +74,13 @@ export const MessageCard: React.FC<MessageCardProps> = ({ message, onClick }) =>
             {(() => {
               const isNew = message.tags.some(tag => tag.toLowerCase().includes('new feature'))
               const isUpdated = message.tags.some(tag => tag.toLowerCase().includes('update'))
-              if (!isNew && !isUpdated) return null
+              const isRetirement = message.tags.some(tag => tag.toLowerCase().includes('retirement'))
+              if (!isNew && !isUpdated && !isRetirement) return null
               return (
                 <>
                   {isNew && (
                     <span
-                      className={
-                        'inline-flex items-center justify-center w-12 h-4 px-1 py-0 rounded-md text-[9px] tracking-wide whitespace-nowrap shadow-lg transition-all duration-200 font-semibold bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-200 border border-emerald-400 shadow-[0_0_8px_2px_#10b981] dark:border-emerald-300'
-                      }
+                      className={'inline-flex items-center justify-center w-12 h-4 px-1 py-0 rounded-md text-[9px] tracking-wide whitespace-nowrap shadow-lg transition-all duration-200 font-semibold bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-200 border border-emerald-400 shadow-[0_0_8px_2px_#10b981] dark:border-emerald-300'}
                       title="New"
                       style={{textOverflow:'ellipsis',overflow:'hidden'}}
                     >
@@ -90,13 +89,20 @@ export const MessageCard: React.FC<MessageCardProps> = ({ message, onClick }) =>
                   )}
                   {isUpdated && (
                     <span
-                      className={
-                        'inline-flex items-center justify-center w-12 h-4 px-1 py-0 rounded-md text-[9px] tracking-wide whitespace-nowrap shadow-lg transition-all duration-200 font-semibold bg-teal-50 dark:bg-teal-900/20 text-teal-700 dark:text-teal-200 border border-teal-400 shadow-[0_0_8px_2px_#14b8a6] dark:border-teal-300 ml-1'
-                      }
+                      className={'inline-flex items-center justify-center w-12 h-4 px-1 py-0 rounded-md text-[9px] tracking-wide whitespace-nowrap shadow-lg transition-all duration-200 font-semibold bg-teal-50 dark:bg-teal-900/20 text-teal-700 dark:text-teal-200 border border-teal-400 shadow-[0_0_8px_2px_#14b8a6] dark:border-teal-300 ml-1'}
                       title="Updated"
                       style={{textOverflow:'ellipsis',overflow:'hidden'}}
                     >
                       Updated
+                    </span>
+                  )}
+                  {isRetirement && (
+                    <span
+                      className="inline-flex items-center justify-center w-12 h-4 px-1 py-0 rounded-md text-[9px] tracking-wide whitespace-nowrap shadow-lg transition-all duration-200 font-semibold bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-200 border border-blue-400 ml-1"
+                      title="Retirement"
+                      style={{textOverflow:'ellipsis',overflow:'hidden'}}
+                    >
+                      Retirement
                     </span>
                   )}
                 </>
@@ -180,10 +186,6 @@ export const MessageCard: React.FC<MessageCardProps> = ({ message, onClick }) =>
                   )
                 })}
               </div>
-              <div className="flex flex-row gap-2 min-w-0 flex-shrink-0 justify-end w-auto ml-auto items-center">
-                {/* Impact pills, larger, neon borders, User orange, Admin red */}
-                {/* Moved to left column under New/Updated label */}
-              </div>
             </div>
           </div>
 
@@ -198,7 +200,7 @@ export const MessageCard: React.FC<MessageCardProps> = ({ message, onClick }) =>
               </>
             )}
           </div>
-          
+
           <div className="flex flex-col flex-grow justify-center">
             <div className="flex items-center gap-2 mb-3">
               <h3 className="text-sm font-medium text-gray-900 dark:text-white group-hover:text-primary-700 dark:group-hover:text-primary-400 transition-colors tracking-tight text-center">{message.title}</h3>
@@ -220,8 +222,8 @@ export const MessageCard: React.FC<MessageCardProps> = ({ message, onClick }) =>
             })
             if (!hasImpact) return null
             return (
-              <div className="absolute bottom-0 left-0 w-full flex items-center gap-2 px-6 pb-2 pt-3">
-                <span className="text-[10px] font-medium text-primary-600 dark:text-primary-400 whitespace-nowrap mr-2">Impact</span>
+              <div className="flex flex-col items-center gap-1 px-0 pt-2 pb-0">
+                <span className="text-[10px] font-medium text-primary-600 dark:text-primary-400 mb-0.5 text-center">Impact</span>
                 <div className="flex flex-row gap-px">
                   {['user impact', 'admin impact'].map((impactType, idx, arr) => {
                     const tag = message.tags.find(t => t.toLowerCase().includes(impactType))
@@ -252,11 +254,6 @@ export const MessageCard: React.FC<MessageCardProps> = ({ message, onClick }) =>
                     )
                   })}
                 </div>
-                {message.tags.some(tag => tag.toLowerCase().includes('retirement')) && (
-                  <span className="inline-flex items-center justify-center w-auto h-4 px-1 py-0 rounded-md text-[9px] tracking-wide whitespace-nowrap shadow-lg transition-all duration-200 bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-200 border border-blue-400 ml-4">
-                    Retirement
-                  </span>
-                )}
               </div>
             )
           })()}
@@ -264,4 +261,4 @@ export const MessageCard: React.FC<MessageCardProps> = ({ message, onClick }) =>
       </Card>
     </Link>
   );
-}; 
+};
