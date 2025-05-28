@@ -125,6 +125,14 @@ export const M365UpdateCard: React.FC<M365UpdateCardProps> = ({ update, onClick 
               </>
             )}
           </div>
+          <div className="flex items-center justify-center text-[10px] text-gray-500 dark:text-gray-400 gap-2 pb-1">
+            {update.generalAvailabilityDate && (
+              <span><span className="font-medium">GA:</span> {format(new Date(update.generalAvailabilityDate), 'MMM d, yyyy')}</span>
+            )}
+            {update.status && (
+              <span><span className="font-medium">Status:</span> {update.status}</span>
+            )}
+          </div>
           <div className="p-6 pt-4 flex flex-col flex-grow">
             <div className="flex flex-col flex-grow">
               <div className="flex items-center gap-2 mb-1">
