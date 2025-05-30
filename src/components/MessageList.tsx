@@ -47,6 +47,7 @@ export function MessageList({ messages }: MessageListProps) {
   // Filter and sort messages
   const filteredMessages = useMemo(() => {
     return messages
+      .filter(message => message.id !== 'MC1085084')
       .filter(message => {
         const matchesSearch = searchQuery === '' || 
           message.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
