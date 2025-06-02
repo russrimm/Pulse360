@@ -32,7 +32,7 @@ export default function SemanticKernelNewsPage() {
           <p className="text-red-600 dark:text-red-400">{error}</p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 min-w-0">
           {news.map((item) => (
             <ProductNewsCard key={item.id} news={item} productIcon="/icons/sklogo.svg" />
           ))}
