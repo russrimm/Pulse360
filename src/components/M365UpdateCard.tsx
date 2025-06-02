@@ -78,6 +78,8 @@ const serviceIcons: Record<string, string> = {
   'Microsoft Defender XDR': '/icons/defender.svg',
   'Windows': '/icons/Windows.svg',
   'Azure Databricks': '/icons/databricks.svg',
+  'Exchange': '/icons/exchange.svg',
+  'Microsoft Exchange': '/icons/exchange.svg',
 };
 
 export const M365UpdateCard: React.FC<M365UpdateCardProps> = ({ update, onClick }) => {
@@ -136,11 +138,11 @@ export const M365UpdateCard: React.FC<M365UpdateCardProps> = ({ update, onClick 
           <div className="p-6 pt-4 flex flex-col flex-grow">
             <div className="flex flex-col flex-grow">
               <div className="flex items-center gap-2 mb-1">
-                <h3 className="text-base font-medium text-gray-900 dark:text-white group-hover:text-primary-700 dark:group-hover:text-primary-400 transition-colors tracking-tight text-center">{update.title}</h3>
+                <h3 className="w-full break-words whitespace-normal overflow-hidden text-base font-medium text-gray-900 dark:text-white group-hover:text-primary-700 dark:group-hover:text-primary-400 transition-colors tracking-tight text-center">{update.title}</h3>
               </div>
               <div className="mt-2 text-sm text-gray-600 dark:text-gray-400 flex-grow">
                 <div 
-                  className="prose dark:prose-invert prose-sm max-w-none line-clamp-[8]"
+                  className="max-w-none dark:prose-invert"
                   dangerouslySetInnerHTML={{ __html: update.content }}
                 />
               </div>

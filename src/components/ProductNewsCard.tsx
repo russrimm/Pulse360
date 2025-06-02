@@ -40,43 +40,45 @@ export function ProductNewsCard({ news, productIcon = '/icons/PowerPlatform_scal
   };
 
   return (
-    <Card>
-      <div
-        className="p-4 flex flex-col h-full cursor-pointer"
-        onClick={() => window.open(news.link, '_blank', 'noopener,noreferrer')}
-        tabIndex={0}
-        role="button"
-        onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') window.open(news.link, '_blank', 'noopener,noreferrer') }}
-        aria-label={`Open news: ${decodedTitle}`}
-      >
-        <div className="flex-1">
-          <h3 className="text-base font-semibold text-gray-900 dark:text-white group-hover:text-primary-600 dark:group-hover:text-primary-400 mb-2 text-center">
-            {decodedTitle}
-          </h3>
-          <p className="text-[10px] text-gray-500 dark:text-gray-400 mb-2 text-center">
-            {new Date(news.publishDate).toLocaleDateString('en-US', {
-              year: 'numeric',
-              month: 'long',
-              day: 'numeric'
-            })}
-          </p>
-          <p className="text-xs text-gray-600 dark:text-gray-300 line-clamp-3 text-center">
-            {decodedDescription}
-          </p>
+    <div className="w-full max-w-md mx-auto min-w-0">
+      <Card>
+        <div
+          className="p-4 flex flex-col h-full cursor-pointer min-w-0"
+          onClick={() => window.open(news.link, '_blank', 'noopener,noreferrer')}
+          tabIndex={0}
+          role="button"
+          onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') window.open(news.link, '_blank', 'noopener,noreferrer') }}
+          aria-label={`Open news: ${decodedTitle}`}
+        >
+          <div className="flex-1 w-full min-w-0">
+            <h3 className="w-full break-words break-all whitespace-normal overflow-hidden text-base font-semibold text-gray-900 dark:text-white group-hover:text-primary-600 dark:group-hover:text-primary-400 mb-2 text-center">
+              {decodedTitle}
+            </h3>
+            <p className="text-[10px] text-gray-500 dark:text-gray-400 mb-2 text-center">
+              {new Date(news.publishDate).toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+              })}
+            </p>
+            <p className="text-xs text-gray-600 dark:text-gray-300 line-clamp-3 text-center">
+              {decodedDescription}
+            </p>
+          </div>
+          <div className="mt-4 flex items-center justify-between">
+            <div />
+            <a
+              href={news.link}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 text-sm font-medium"
+              tabIndex={-1}
+            >
+              Read more →
+            </a>
+          </div>
         </div>
-        <div className="mt-4 flex items-center justify-between">
-          <div />
-          <a
-            href={news.link}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 text-sm font-medium"
-            tabIndex={-1}
-          >
-            Read more →
-          </a>
-        </div>
-      </div>
-    </Card>
+      </Card>
+    </div>
   );
 } 
