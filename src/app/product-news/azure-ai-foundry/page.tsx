@@ -18,26 +18,28 @@ export default function AzureAIFoundryNewsPage() {
   }, [])
 
   return (
-    <ProductNewsLayout
-      title="Azure AI Foundry"
-      description="Latest updates from the Azure AI Foundry team."
-      icon="https://devblogs.microsoft.com/foundry/wp-content/uploads/sites/89/2025/03/cropped-ai-foundry-32x32.png"
-    >
-      {loading ? (
-        <div className="flex justify-center items-center py-12">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
-        </div>
-      ) : error ? (
-        <div className="text-center py-12">
-          <p className="text-red-600 dark:text-red-400">{error}</p>
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {news.map((item) => (
-            <ProductNewsCard key={item.id} news={item} productIcon="https://devblogs.microsoft.com/foundry/wp-content/uploads/sites/89/2025/03/cropped-ai-foundry-32x32.png" />
-          ))}
-        </div>
-      )}
-    </ProductNewsLayout>
+    <>
+      <ProductNewsLayout
+        title="Azure AI Foundry"
+        description="Latest updates from the Azure AI Foundry team."
+        icon="https://devblogs.microsoft.com/foundry/wp-content/uploads/sites/89/2025/03/cropped-ai-foundry-32x32.png"
+      >
+        {loading ? (
+          <div className="flex justify-center items-center py-12">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
+          </div>
+        ) : error ? (
+          <div className="text-center py-12">
+            <p className="text-red-600 dark:text-red-400">{error}</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {news.map((item) => (
+              <ProductNewsCard key={item.id} news={item} productIcon="https://devblogs.microsoft.com/foundry/wp-content/uploads/sites/89/2025/03/cropped-ai-foundry-32x32.png" />
+            ))}
+          </div>
+        )}
+      </ProductNewsLayout>
+    </>
   )
 } 

@@ -23,16 +23,18 @@ async function fetchRSS(): Promise<ProductNews[]> {
 export default async function AllThingsAzurePage() {
   const posts = await fetchRSS()
   return (
-    <ProductNewsLayout
-      title="All Things Azure"
-      description="Latest posts from the All Things Azure blog."
-      icon="/icons/Azure.svg"
-    >
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {posts.map(post => (
-          <ProductNewsCard key={post.id} news={post} productIcon="/icons/Azure.svg" />
-        ))}
-      </div>
-    </ProductNewsLayout>
+    <>
+      <ProductNewsLayout
+        title="All Things Azure"
+        description="Latest posts from the All Things Azure blog."
+        icon="/icons/Azure.svg"
+      >
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {posts.map(post => (
+            <ProductNewsCard key={post.id} news={post} productIcon="/icons/Azure.svg" />
+          ))}
+        </div>
+      </ProductNewsLayout>
+    </>
   )
 } 
