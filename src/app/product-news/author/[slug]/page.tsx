@@ -70,7 +70,7 @@ export default function AuthorNewsPage() {
 
   return (
     <ProductNewsLayout
-      title={<span className="text-sm md:text-base font-semibold whitespace-nowrap">{titleText}</span>}
+      title={<span className="text-sm md:text-base font-semibold whitespace-normal break-words">{titleText}</span>}
       icon="/icons/Windows.svg"
     >
       {loading ? (
