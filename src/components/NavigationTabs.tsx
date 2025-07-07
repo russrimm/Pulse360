@@ -5,6 +5,7 @@ import Link from 'next/link';
 import * as Popover from '@radix-ui/react-popover';
 import { ChevronDownIcon } from '@radix-ui/react-icons';
 import { useState, useCallback } from 'react';
+import Image from 'next/image';
 
 const PRODUCTS = [
   {
@@ -40,18 +41,14 @@ export function NavigationTabs() {
       name: 'Microsoft 365 Updates',
       href: '/m365-updates',
       icon: (
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-        </svg>
-      )
+        <Image src="/icons/m365.svg" alt="Microsoft 365 Updates" width={20} height={20} className="w-5 h-5" />
+      ),
     },
     {
       name: 'Azure Updates',
       href: '/azure-updates',
       icon: (
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-        </svg>
+        <Image src="/icons/Azure.svg" alt="Azure Updates" width={20} height={20} className="w-5 h-5" />
       ),
     },
     {

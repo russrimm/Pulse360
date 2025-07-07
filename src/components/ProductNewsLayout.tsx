@@ -19,6 +19,11 @@ let products = [
     href: '/product-news/power-platform',
   },
   {
+    name: 'All Things Azure',
+    icon: '/icons/Azure.svg',
+    href: '/product-news/all-things-azure',
+  },
+  {
     name: 'Microsoft Learn',
     icon: '/icons/m365.svg',
     href: '/product-news/learn-blog',
@@ -39,7 +44,7 @@ let products = [
     href: '/product-news/fabric-blog',
   },
   {
-    name: 'Azure AI Foundry',
+    name: 'Development',
     icon: 'https://devblogs.microsoft.com/foundry/wp-content/uploads/sites/89/2025/03/cropped-ai-foundry-32x32.png',
     href: '/product-news/azure-ai-foundry',
   },
@@ -100,7 +105,7 @@ function AuthorButtons() {
   if (authors.length === 0) return null
 
   return (
-    <div className="w-full flex flex-row flex-nowrap gap-2 my-4 items-center overflow-x-visible">
+    <div className="w-full flex flex-row flex-nowrap gap-2 my-4 items-center overflow-x-visible justify-center">
       {authors.map(({ name, title }) => (
         <AuthorButton key={name} author={name} title={title} />
       ))}
@@ -113,10 +118,11 @@ function AuthorButton({ author, title }: { author: string; title?: string }) {
   const slug = getAuthorSlug(author)
   const pathname = usePathname()
   const isSelected = pathname === `/product-news/author/${slug}`
+  const isCorp = author === 'Microsoft Corporate'
   return (
     <Link
       href={`/product-news/author/${slug}`}
-      className={`flex flex-col items-center justify-center gap-0 px-2 py-1 rounded-lg border transition-all duration-200 h-auto w-[260px] text-xs whitespace-normal
+      className={`flex flex-col items-center justify-center gap-0 px-2 py-1 rounded-lg border transition-all duration-200 h-auto w-[260px] text-xs whitespace-normal${isCorp ? ' min-h-[56px]' : ''}
         ${isSelected
           ? 'bg-primary-50 border-primary-300 dark:bg-primary-900/50 dark:border-primary-700 shadow-sm ring-1 ring-primary-200 dark:ring-primary-800 text-primary-800 dark:text-primary-200 font-semibold'
           : 'bg-white/80 dark:bg-gray-800/50 border-gray-200 dark:border-gray-700 hover:border-primary-200 dark:hover:border-primary-800 hover:bg-primary-50/50 dark:hover:bg-primary-900/20 text-gray-900 dark:text-white'}
@@ -154,7 +160,7 @@ export function ProductNewsLayout({ children, title, description, icon }: Produc
 
         <div className="mt-4 mb-2 w-full overflow-x-hidden">
           {/* Mobile: show all buttons in a single grid */}
-          <div className="grid grid-cols-2 gap-3 w-full min-w-0 lg:hidden">
+          <div className="grid grid-cols-2 gap-3 w-full min-w-0 lg:hidden justify-center">
             {products.map((product) => (
               <Link
                 key={product.name}
@@ -188,7 +194,7 @@ export function ProductNewsLayout({ children, title, description, icon }: Produc
             ))}
           </div>
           {/* Desktop: force all buttons into a single horizontal row, shrink if needed */}
-          <div className="hidden lg:flex flex-wrap gap-2 w-full pb-1">
+          <div className="hidden lg:flex flex-wrap gap-2 w-full pb-1 justify-center">
             {products.map((product) => (
               <Link
                 key={product.name}
@@ -224,7 +230,7 @@ export function ProductNewsLayout({ children, title, description, icon }: Produc
 
           {/* Power Platform sub-buttons, only show when Power Platform is selected */}
           {['/product-news/power-platform','/product-news','/product-news/power-automate','/product-news/copilot'].includes(pathname) && (
-            <div className="flex gap-2 mt-2 mb-4">
+            <div className="flex gap-2 mt-2 mb-4 justify-center">
               {[
                 { name: 'Power Apps', icon: '/icons/PowerApps_scalable.svg', href: '/product-news' },
                 { name: 'Power Automate', icon: '/icons/PowerAutomate_scalable.svg', href: '/product-news/power-automate' },
@@ -255,7 +261,7 @@ export function ProductNewsLayout({ children, title, description, icon }: Produc
 
           {/* Azure AI Foundry sub-buttons, only show when Azure AI Foundry is selected */}
           {['/product-news/azure-ai-foundry','/product-news/semantic-kernel'].includes(pathname) && (
-            <div className="flex gap-2 mt-2 mb-4">
+            <div className="flex gap-2 mt-2 mb-4 justify-center">
               {[
                 { name: 'Azure AI Foundry', icon: 'https://devblogs.microsoft.com/foundry/wp-content/uploads/sites/89/2025/03/cropped-ai-foundry-32x32.png', href: '/product-news/azure-ai-foundry' },
                 { name: 'Semantic Kernel', icon: '/icons/sklogo.svg', href: '/product-news/semantic-kernel' },
@@ -284,7 +290,7 @@ export function ProductNewsLayout({ children, title, description, icon }: Produc
 
           {/* Fabric/Power BI sub-buttons */}
           {['/product-news/fabric-blog','/product-news/power-bi'].includes(pathname) && (
-            <div className="flex gap-2 mt-2 mb-4">
+            <div className="flex gap-2 mt-2 mb-4 justify-center">
               {[
                 { name: 'Fabric', icon: '/icons/fabric_48_color.svg', href: '/product-news/fabric-blog' },
                 { name: 'Power BI', icon: '/icons/PowerBI_scalable.svg', href: '/product-news/power-bi' },
