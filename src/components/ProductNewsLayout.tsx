@@ -19,11 +19,6 @@ let products = [
     href: '/product-news/power-platform',
   },
   {
-    name: 'All Things Azure',
-    icon: '/icons/Azure.svg',
-    href: '/product-news/all-things-azure',
-  },
-  {
     name: 'Microsoft Learn',
     icon: '/icons/m365.svg',
     href: '/product-news/learn-blog',
@@ -45,7 +40,7 @@ let products = [
   },
   {
     name: 'Development',
-    icon: 'https://devblogs.microsoft.com/foundry/wp-content/uploads/sites/89/2025/03/cropped-ai-foundry-32x32.png',
+    icon: '/icons/azure/devops/10261-icon-service-Azure-DevOps.svg',
     href: '/product-news/azure-ai-foundry',
   },
 ];
@@ -272,11 +267,12 @@ export function ProductNewsLayout({ children, title, description, icon }: Produc
           )}
 
           {/* Azure AI Foundry sub-buttons, only show when Azure AI Foundry is selected */}
-          {['/product-news/azure-ai-foundry','/product-news/semantic-kernel'].includes(pathname) && (
+          {pathname === '/product-news/azure-ai-foundry' && (
             <div className="flex gap-2 mt-2 mb-4 justify-center">
               {[
-                { name: 'Azure AI Foundry', icon: 'https://devblogs.microsoft.com/foundry/wp-content/uploads/sites/89/2025/03/cropped-ai-foundry-32x32.png', href: '/product-news/azure-ai-foundry' },
-                { name: 'Semantic Kernel', icon: '/icons/sklogo.svg', href: '/product-news/semantic-kernel' },
+                 { name: 'Azure AI Foundry', icon: 'https://devblogs.microsoft.com/foundry/wp-content/uploads/sites/89/2025/03/cropped-ai-foundry-32x32.png', href: '/product-news/azure-ai-foundry' },
+                 { name: 'All Things Azure', icon: '/icons/Azure.svg', href: '/product-news/all-things-azure' },
+                 { name: 'Semantic Kernel', icon: '/icons/sklogo.svg', href: '/product-news/semantic-kernel' },
               ].map((product) => (
                 <Link
                   key={product.name}
