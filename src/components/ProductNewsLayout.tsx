@@ -146,6 +146,11 @@ const powerPlatformPaths = [
   '/product-news/copilot',
 ]
 
+const fabricPaths = [
+  '/product-news/fabric-blog',
+  '/product-news/power-bi',
+]
+
 export function ProductNewsLayout({ children, title, description, icon }: ProductNewsLayoutProps) {
   const pathname = usePathname();
 
@@ -187,9 +192,11 @@ export function ProductNewsLayout({ children, title, description, icon }: Produc
                         ? 'bg-primary-50 border-primary-300 dark:bg-primary-900/50 dark:border-primary-700 shadow-sm ring-1 ring-primary-200 dark:ring-primary-800'
                         : (product.href === '/product-news/power-platform' && powerPlatformPaths.includes(pathname))
                           ? 'bg-primary-50 border-primary-300 dark:bg-primary-900/50 dark:border-primary-700 shadow-sm ring-1 ring-primary-200 dark:ring-primary-800'
-                          : pathname === product.href
+                          : (product.href === '/product-news/fabric-blog' && fabricPaths.includes(pathname))
                             ? 'bg-primary-50 border-primary-300 dark:bg-primary-900/50 dark:border-primary-700 shadow-sm ring-1 ring-primary-200 dark:ring-primary-800'
-                            : 'bg-white/80 dark:bg-gray-800/50 border-gray-200 dark:border-gray-700 hover:border-primary-200 dark:hover:border-primary-800 hover:bg-primary-50/50 dark:hover:bg-primary-900/20'
+                            : pathname === product.href
+                              ? 'bg-primary-50 border-primary-300 dark:bg-primary-900/50 dark:border-primary-700 shadow-sm ring-1 ring-primary-200 dark:ring-primary-800'
+                              : 'bg-white/80 dark:bg-gray-800/50 border-gray-200 dark:border-gray-700 hover:border-primary-200 dark:hover:border-primary-800 hover:bg-primary-50/50 dark:hover:bg-primary-900/20'
                   }`}
               >
                 {product.icon && product.icon !== '' && (
@@ -225,9 +232,11 @@ export function ProductNewsLayout({ children, title, description, icon }: Produc
                         ? 'bg-primary-50 border-primary-300 dark:bg-primary-900/50 dark:border-primary-700 shadow-sm ring-1 ring-primary-200 dark:ring-primary-800'
                         : (product.href === '/product-news/power-platform' && powerPlatformPaths.includes(pathname))
                           ? 'bg-primary-50 border-primary-300 dark:bg-primary-900/50 dark:border-primary-700 shadow-sm ring-1 ring-primary-200 dark:ring-primary-800'
-                          : pathname === product.href
+                          : (product.href === '/product-news/fabric-blog' && fabricPaths.includes(pathname))
                             ? 'bg-primary-50 border-primary-300 dark:bg-primary-900/50 dark:border-primary-700 shadow-sm ring-1 ring-primary-200 dark:ring-primary-800'
-                            : 'bg-white/80 dark:bg-gray-800/50 border-gray-200 dark:border-gray-700 hover:border-primary-200 dark:hover:border-primary-800 hover:bg-primary-50/50 dark:hover:bg-primary-900/20'
+                            : pathname === product.href
+                              ? 'bg-primary-50 border-primary-300 dark:bg-primary-900/50 dark:border-primary-700 shadow-sm ring-1 ring-primary-200 dark:ring-primary-800'
+                              : 'bg-white/80 dark:bg-gray-800/50 border-gray-200 dark:border-gray-700 hover:border-primary-200 dark:hover:border-primary-800 hover:bg-primary-50/50 dark:hover:bg-primary-900/20'
                   }`}
               >
                 {product.icon && product.icon !== '' && (
