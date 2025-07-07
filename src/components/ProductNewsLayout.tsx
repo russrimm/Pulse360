@@ -100,7 +100,7 @@ function AuthorButtons() {
   if (authors.length === 0) return null
 
   return (
-    <div className="w-full flex flex-row flex-nowrap gap-2 my-4 items-center overflow-x-auto justify-start">
+    <div className="w-full flex flex-wrap gap-2 my-4 items-center overflow-x-auto justify-start sm:flex-nowrap">
       {authors.map(({ name, title, slug }) => (
         <AuthorButton key={slug} author={name} title={title} slug={slug} />
       ))}
@@ -127,7 +127,7 @@ function AuthorButton({ author, title, slug }: { author: string; title?: string;
   return (
     <Link
       href={`/product-news/author/${slug}`}
-      className={`flex flex-col items-center justify-center gap-0 px-2 py-1 rounded-lg border transition-all duration-200 h-auto w-[260px] text-xs whitespace-normal${isCorp ? ' min-h-[56px]' : ''}
+      className={`flex flex-col items-center justify-center gap-0 px-2 py-1 rounded-lg border transition-all duration-200 h-auto min-h-[56px] text-xs whitespace-normal sm:w-[260px] w-full
         ${isSelected
           ? 'bg-primary-50 border-primary-300 dark:bg-primary-900/50 dark:border-primary-700 shadow-sm ring-1 ring-primary-200 dark:ring-primary-800 text-primary-800 dark:text-primary-200 font-semibold'
           : 'bg-white/80 dark:bg-gray-800/50 border-gray-200 dark:border-gray-700 hover:border-primary-200 dark:hover:border-primary-800 hover:bg-primary-50/50 dark:hover:bg-primary-900/20 text-gray-900 dark:text-white'}
@@ -138,6 +138,13 @@ function AuthorButton({ author, title, slug }: { author: string; title?: string;
     </Link>
   )
 }
+
+const powerPlatformPaths = [
+  '/product-news',
+  '/product-news/power-platform',
+  '/product-news/power-automate',
+  '/product-news/copilot',
+]
 
 export function ProductNewsLayout({ children, title, description, icon }: ProductNewsLayoutProps) {
   const pathname = usePathname();
@@ -176,9 +183,13 @@ export function ProductNewsLayout({ children, title, description, icon }: Produc
                   ${
                     (product.href === '/product-news/microsoft-news' && (pathname === '/product-news/microsoft-news' || pathname.startsWith('/product-news/author/')))
                       ? 'bg-primary-50 border-primary-300 dark:bg-primary-900/50 dark:border-primary-700 shadow-sm ring-1 ring-primary-200 dark:ring-primary-800'
-                      : pathname === product.href
+                      : (product.href === '/product-news/azure-ai-foundry' && ['/product-news/azure-ai-foundry','/product-news/all-things-azure','/product-news/semantic-kernel'].includes(pathname))
                         ? 'bg-primary-50 border-primary-300 dark:bg-primary-900/50 dark:border-primary-700 shadow-sm ring-1 ring-primary-200 dark:ring-primary-800'
-                        : 'bg-white/80 dark:bg-gray-800/50 border-gray-200 dark:border-gray-700 hover:border-primary-200 dark:hover:border-primary-800 hover:bg-primary-50/50 dark:hover:bg-primary-900/20'
+                        : (product.href === '/product-news/power-platform' && powerPlatformPaths.includes(pathname))
+                          ? 'bg-primary-50 border-primary-300 dark:bg-primary-900/50 dark:border-primary-700 shadow-sm ring-1 ring-primary-200 dark:ring-primary-800'
+                          : pathname === product.href
+                            ? 'bg-primary-50 border-primary-300 dark:bg-primary-900/50 dark:border-primary-700 shadow-sm ring-1 ring-primary-200 dark:ring-primary-800'
+                            : 'bg-white/80 dark:bg-gray-800/50 border-gray-200 dark:border-gray-700 hover:border-primary-200 dark:hover:border-primary-800 hover:bg-primary-50/50 dark:hover:bg-primary-900/20'
                   }`}
               >
                 {product.icon && product.icon !== '' && (
@@ -210,9 +221,13 @@ export function ProductNewsLayout({ children, title, description, icon }: Produc
                   ${
                     (product.href === '/product-news/microsoft-news' && (pathname === '/product-news/microsoft-news' || pathname.startsWith('/product-news/author/')))
                       ? 'bg-primary-50 border-primary-300 dark:bg-primary-900/50 dark:border-primary-700 shadow-sm ring-1 ring-primary-200 dark:ring-primary-800'
-                      : pathname === product.href
+                      : (product.href === '/product-news/azure-ai-foundry' && ['/product-news/azure-ai-foundry','/product-news/all-things-azure','/product-news/semantic-kernel'].includes(pathname))
                         ? 'bg-primary-50 border-primary-300 dark:bg-primary-900/50 dark:border-primary-700 shadow-sm ring-1 ring-primary-200 dark:ring-primary-800'
-                        : 'bg-white/80 dark:bg-gray-800/50 border-gray-200 dark:border-gray-700 hover:border-primary-200 dark:hover:border-primary-800 hover:bg-primary-50/50 dark:hover:bg-primary-900/20'
+                        : (product.href === '/product-news/power-platform' && powerPlatformPaths.includes(pathname))
+                          ? 'bg-primary-50 border-primary-300 dark:bg-primary-900/50 dark:border-primary-700 shadow-sm ring-1 ring-primary-200 dark:ring-primary-800'
+                          : pathname === product.href
+                            ? 'bg-primary-50 border-primary-300 dark:bg-primary-900/50 dark:border-primary-700 shadow-sm ring-1 ring-primary-200 dark:ring-primary-800'
+                            : 'bg-white/80 dark:bg-gray-800/50 border-gray-200 dark:border-gray-700 hover:border-primary-200 dark:hover:border-primary-800 hover:bg-primary-50/50 dark:hover:bg-primary-900/20'
                   }`}
               >
                 {product.icon && product.icon !== '' && (
@@ -237,7 +252,7 @@ export function ProductNewsLayout({ children, title, description, icon }: Produc
 
           {/* Power Platform sub-buttons, only show when Power Platform is selected */}
           {['/product-news/power-platform','/product-news','/product-news/power-automate','/product-news/copilot'].includes(pathname) && (
-            <div className="flex gap-2 mt-2 mb-4 justify-center">
+            <div className="flex flex-wrap gap-2 mt-2 mb-4 justify-center sm:flex-nowrap">
               {[
                 { name: 'Power Apps', icon: '/icons/PowerApps_scalable.svg', href: '/product-news' },
                 { name: 'Power Automate', icon: '/icons/PowerAutomate_scalable.svg', href: '/product-news/power-automate' },
@@ -247,7 +262,7 @@ export function ProductNewsLayout({ children, title, description, icon }: Produc
                 <Link
                   key={product.name}
                   href={product.href}
-                  className={`flex items-center justify-center gap-2 px-2 py-1 rounded-lg border transition-all duration-200 h-10 min-w-[140px] max-w-[140px] text-xs
+                  className={`flex items-center justify-center gap-2 px-2 py-1 rounded-lg border transition-all duration-200 h-10 min-w-[140px] max-w-[140px] text-xs w-full sm:w-auto
                     ${pathname === product.href
                       ? 'bg-primary-50 border-primary-300 dark:bg-primary-900/50 dark:border-primary-700 shadow-sm ring-1 ring-primary-200 dark:ring-primary-800'
                       : 'bg-white/80 dark:bg-gray-800/50 border-gray-200 dark:border-gray-700 hover:border-primary-200 dark:hover:border-primary-800 hover:bg-primary-50/50 dark:hover:bg-primary-900/20'
@@ -266,9 +281,9 @@ export function ProductNewsLayout({ children, title, description, icon }: Produc
             </div>
           )}
 
-          {/* Azure AI Foundry sub-buttons, only show when Azure AI Foundry is selected */}
-          {pathname === '/product-news/azure-ai-foundry' && (
-            <div className="flex gap-2 mt-2 mb-4 justify-center">
+          {/* Azure AI Foundry sub-buttons, only show when Azure AI Foundry or its subpages are selected */}
+          {['/product-news/azure-ai-foundry','/product-news/all-things-azure','/product-news/semantic-kernel'].includes(pathname) && (
+            <div className="flex flex-wrap gap-2 mt-2 mb-6 justify-center sm:flex-nowrap">
               {[
                  { name: 'Azure AI Foundry', icon: 'https://devblogs.microsoft.com/foundry/wp-content/uploads/sites/89/2025/03/cropped-ai-foundry-32x32.png', href: '/product-news/azure-ai-foundry' },
                  { name: 'All Things Azure', icon: '/icons/Azure.svg', href: '/product-news/all-things-azure' },
@@ -277,7 +292,7 @@ export function ProductNewsLayout({ children, title, description, icon }: Produc
                 <Link
                   key={product.name}
                   href={product.href}
-                  className={`flex items-center justify-center gap-2 px-2 py-1 rounded-lg border transition-all duration-200 h-10 min-w-[140px] max-w-[140px] text-xs
+                  className={`flex items-center justify-center gap-2 px-2 py-1 rounded-lg border transition-all duration-200 h-10 min-w-[140px] max-w-[140px] text-xs w-full sm:w-auto
                     ${pathname === product.href
                       ? 'bg-primary-50 border-primary-300 dark:bg-primary-900/50 dark:border-primary-700 shadow-sm ring-1 ring-primary-200 dark:ring-primary-800'
                       : 'bg-white/80 dark:bg-gray-800/50 border-gray-200 dark:border-gray-700 hover:border-primary-200 dark:hover:border-primary-800 hover:bg-primary-50/50 dark:hover:bg-primary-900/20'

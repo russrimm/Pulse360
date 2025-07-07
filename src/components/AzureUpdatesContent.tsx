@@ -9,6 +9,7 @@ import { useRouter } from 'next/navigation';
 import { format, parseISO, isWithinInterval, startOfDay, endOfDay } from 'date-fns';
 import { getProductIcon } from '@/lib/getProductIcon';
 import Image from 'next/image';
+import { createPortal } from 'react-dom';
 
 interface AzureUpdatesContentProps {
   updates: AzureUpdate[];
@@ -38,6 +39,13 @@ export function AzureUpdatesContent({ updates, searchQuery = '' }: AzureUpdatesC
     end: ''
   });
   const [isDateDropdownOpen, setIsDateDropdownOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+  const productBtnRef = useRef<HTMLButtonElement>(null);
+  const categoryBtnRef = useRef<HTMLButtonElement>(null);
+  const tagBtnRef = useRef<HTMLButtonElement>(null);
+  const statusBtnRef = useRef<HTMLButtonElement>(null);
+  const dateBtnRef = useRef<HTMLButtonElement>(null);
+  const [dropdownPos, setDropdownPos] = useState<{left: number, top: number}>({left: 0, top: 0});
 
   // Sort updates by last modified date
   const sortedUpdates = useMemo(() => {
@@ -251,7 +259,22 @@ export function AzureUpdatesContent({ updates, searchQuery = '' }: AzureUpdatesC
             {/* Products Filter */}
             <div className="relative w-full md:w-auto min-w-0">
               <button
-                onClick={() => setIsProductDropdownOpen(!isProductDropdownOpen)}
+                ref={productBtnRef}
+                onClick={() => {
+                  setIsProductDropdownOpen((open) => {
+                    if (!open && productBtnRef.current) {
+                      const rect = productBtnRef.current.getBoundingClientRect();
+                      setDropdownPos({ left: rect.left, top: rect.bottom });
+                    }
+                    if (!open) {
+                      setIsCategoryDropdownOpen(false)
+                      setIsTagDropdownOpen(false)
+                      setIsStatusDropdownOpen(false)
+                      setIsDateDropdownOpen(false)
+                    }
+                    return !open
+                  })
+                }}
                 className="flex items-center justify-center gap-2 px-4 h-10 w-full md:w-auto min-w-0 text-gray-700 dark:text-gray-200 bg-white/80 dark:bg-gray-800/50 backdrop-blur-sm border border-gray-200 dark:border-gray-700/50 rounded-lg shadow-[inset_0_2px_4px_rgba(0,0,0,0.05)] dark:shadow-[inset_0_2px_4px_rgba(0,0,0,0.2)] hover:shadow-[inset_0_2px_4px_rgba(0,0,0,0.1)] dark:hover:shadow-[inset_0_2px_4px_rgba(0,0,0,0.3)] hover:border-primary-200 dark:hover:border-primary-800 hover:shadow-[0_0_0_1px_rgba(59,130,246,0.5)] dark:hover:shadow-[0_0_0_1px_rgba(59,130,246,0.5)] transition-all duration-300 relative"
                 aria-label="Filter products"
               >
@@ -265,8 +288,8 @@ export function AzureUpdatesContent({ updates, searchQuery = '' }: AzureUpdatesC
                   </span>
                 )}
               </button>
-              {isProductDropdownOpen && (
-                <div className="absolute z-10 w-72 mt-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow-lg">
+              {isProductDropdownOpen && createPortal(
+                <div className="fixed z-[9999] w-72 mt-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow-lg" style={{ left: dropdownPos.left, top: dropdownPos.top }}>
                   <div className="p-4 border-b border-gray-200 dark:border-gray-700">
                     <h3 className="text-sm font-medium text-gray-900 dark:text-white">Filter Products</h3>
                     <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
@@ -320,13 +343,29 @@ export function AzureUpdatesContent({ updates, searchQuery = '' }: AzureUpdatesC
                       Clear all
                     </button>
                   </div>
-                </div>
+                </div>,
+                document.body
               )}
             </div>
             {/* Categories Filter */}
             <div className="relative w-full md:w-auto min-w-0">
               <button
-                onClick={() => setIsCategoryDropdownOpen(!isCategoryDropdownOpen)}
+                ref={categoryBtnRef}
+                onClick={() => {
+                  setIsCategoryDropdownOpen((open) => {
+                    if (!open && categoryBtnRef.current) {
+                      const rect = categoryBtnRef.current.getBoundingClientRect();
+                      setDropdownPos({ left: rect.left, top: rect.bottom });
+                    }
+                    if (!open) {
+                      setIsProductDropdownOpen(false)
+                      setIsTagDropdownOpen(false)
+                      setIsStatusDropdownOpen(false)
+                      setIsDateDropdownOpen(false)
+                    }
+                    return !open
+                  })
+                }}
                 className="flex items-center justify-center gap-2 px-4 h-10 w-full md:w-auto min-w-0 text-gray-700 dark:text-gray-200 bg-white/80 dark:bg-gray-800/50 backdrop-blur-sm border border-gray-200 dark:border-gray-700/50 rounded-lg shadow-[inset_0_2px_4px_rgba(0,0,0,0.05)] dark:shadow-[inset_0_2px_4px_rgba(0,0,0,0.2)] hover:shadow-[inset_0_2px_4px_rgba(0,0,0,0.1)] dark:hover:shadow-[inset_0_2px_4px_rgba(0,0,0,0.3)] hover:border-primary-200 dark:hover:border-primary-800 hover:shadow-[0_0_0_1px_rgba(59,130,246,0.5)] dark:hover:shadow-[0_0_0_1px_rgba(59,130,246,0.5)] transition-all duration-300 relative"
                 aria-label="Filter categories"
               >
@@ -340,8 +379,8 @@ export function AzureUpdatesContent({ updates, searchQuery = '' }: AzureUpdatesC
                   </span>
                 )}
               </button>
-              {isCategoryDropdownOpen && (
-                <div className="absolute z-10 w-72 mt-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow-lg">
+              {isCategoryDropdownOpen && createPortal(
+                <div className="fixed z-[9999] w-72 mt-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow-lg" style={{ left: dropdownPos.left, top: dropdownPos.top }}>
                   <div className="p-4 border-b border-gray-200 dark:border-gray-700">
                     <h3 className="text-sm font-medium text-gray-900 dark:text-white">Filter Categories</h3>
                     <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
@@ -381,14 +420,30 @@ export function AzureUpdatesContent({ updates, searchQuery = '' }: AzureUpdatesC
                       Clear all
                     </button>
                   </div>
-                </div>
+                </div>,
+                document.body
               )}
             </div>
 
             {/* Tags Filter */}
             <div className="relative w-full md:w-auto min-w-0">
               <button
-                onClick={() => setIsTagDropdownOpen(!isTagDropdownOpen)}
+                ref={tagBtnRef}
+                onClick={() => {
+                  setIsTagDropdownOpen((open) => {
+                    if (!open && tagBtnRef.current) {
+                      const rect = tagBtnRef.current.getBoundingClientRect();
+                      setDropdownPos({ left: rect.left, top: rect.bottom });
+                    }
+                    if (!open) {
+                      setIsProductDropdownOpen(false)
+                      setIsCategoryDropdownOpen(false)
+                      setIsStatusDropdownOpen(false)
+                      setIsDateDropdownOpen(false)
+                    }
+                    return !open
+                  })
+                }}
                 className="flex items-center justify-center gap-2 px-4 h-10 w-full md:w-auto min-w-0 text-gray-700 dark:text-gray-200 bg-white/80 dark:bg-gray-800/50 backdrop-blur-sm border border-gray-200 dark:border-gray-700/50 rounded-lg shadow-[inset_0_2px_4px_rgba(0,0,0,0.05)] dark:shadow-[inset_0_2px_4px_rgba(0,0,0,0.2)] hover:shadow-[inset_0_2px_4px_rgba(0,0,0,0.1)] dark:hover:shadow-[inset_0_2px_4px_rgba(0,0,0,0.3)] hover:border-primary-200 dark:hover:border-primary-800 hover:shadow-[0_0_0_1px_rgba(59,130,246,0.5)] dark:hover:shadow-[0_0_0_1px_rgba(59,130,246,0.5)] transition-all duration-300 relative"
                 aria-label="Filter tags"
               >
@@ -402,8 +457,8 @@ export function AzureUpdatesContent({ updates, searchQuery = '' }: AzureUpdatesC
                   </span>
                 )}
               </button>
-              {isTagDropdownOpen && (
-                <div className="absolute z-10 w-72 mt-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow-lg">
+              {isTagDropdownOpen && createPortal(
+                <div className="fixed z-[9999] w-72 mt-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow-lg" style={{ left: dropdownPos.left, top: dropdownPos.top }}>
                   <div className="p-4 border-b border-gray-200 dark:border-gray-700">
                     <h3 className="text-sm font-medium text-gray-900 dark:text-white">Filter Tags</h3>
                     <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
@@ -443,14 +498,30 @@ export function AzureUpdatesContent({ updates, searchQuery = '' }: AzureUpdatesC
                       Clear all
                     </button>
                   </div>
-                </div>
+                </div>,
+                document.body
               )}
             </div>
 
             {/* Status Filter */}
             <div className="relative w-full md:w-auto min-w-0">
               <button
-                onClick={() => setIsStatusDropdownOpen(!isStatusDropdownOpen)}
+                ref={statusBtnRef}
+                onClick={() => {
+                  setIsStatusDropdownOpen((open) => {
+                    if (!open && statusBtnRef.current) {
+                      const rect = statusBtnRef.current.getBoundingClientRect();
+                      setDropdownPos({ left: rect.left, top: rect.bottom });
+                    }
+                    if (!open) {
+                      setIsProductDropdownOpen(false)
+                      setIsCategoryDropdownOpen(false)
+                      setIsTagDropdownOpen(false)
+                      setIsDateDropdownOpen(false)
+                    }
+                    return !open
+                  })
+                }}
                 className="flex items-center justify-center gap-2 px-4 h-10 w-full md:w-auto min-w-0 text-gray-700 dark:text-gray-200 bg-white/80 dark:bg-gray-800/50 backdrop-blur-sm border border-gray-200 dark:border-gray-700/50 rounded-lg shadow-[inset_0_2px_4px_rgba(0,0,0,0.05)] dark:shadow-[inset_0_2px_4px_rgba(0,0,0,0.2)] hover:shadow-[inset_0_2px_4px_rgba(0,0,0,0.1)] dark:hover:shadow-[inset_0_2px_4px_rgba(0,0,0,0.3)] hover:border-primary-200 dark:hover:border-primary-800 hover:shadow-[0_0_0_1px_rgba(59,130,246,0.5)] dark:hover:shadow-[0_0_0_1px_rgba(59,130,246,0.5)] transition-all duration-300 relative"
                 aria-label="Filter status"
               >
@@ -464,8 +535,8 @@ export function AzureUpdatesContent({ updates, searchQuery = '' }: AzureUpdatesC
                   </span>
                 )}
               </button>
-              {isStatusDropdownOpen && (
-                <div className="absolute z-10 w-72 mt-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow-lg">
+              {isStatusDropdownOpen && createPortal(
+                <div className="fixed z-[9999] w-72 mt-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow-lg" style={{ left: dropdownPos.left, top: dropdownPos.top }}>
                   <div className="p-4 border-b border-gray-200 dark:border-gray-700">
                     <h3 className="text-sm font-medium text-gray-900 dark:text-white">Filter Status</h3>
                     <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
@@ -505,14 +576,30 @@ export function AzureUpdatesContent({ updates, searchQuery = '' }: AzureUpdatesC
                       Clear all
                     </button>
                   </div>
-                </div>
+                </div>,
+                document.body
               )}
             </div>
 
             {/* Date Range Filter */}
             <div className="relative w-full md:w-auto min-w-0">
               <button
-                onClick={() => setIsDateDropdownOpen(!isDateDropdownOpen)}
+                ref={dateBtnRef}
+                onClick={() => {
+                  setIsDateDropdownOpen((open) => {
+                    if (!open && dateBtnRef.current) {
+                      const rect = dateBtnRef.current.getBoundingClientRect();
+                      setDropdownPos({ left: rect.left, top: rect.bottom });
+                    }
+                    if (!open) {
+                      setIsProductDropdownOpen(false)
+                      setIsCategoryDropdownOpen(false)
+                      setIsTagDropdownOpen(false)
+                      setIsStatusDropdownOpen(false)
+                    }
+                    return !open
+                  })
+                }}
                 className="flex items-center justify-center gap-2 px-4 h-10 w-full md:w-auto min-w-0 text-gray-700 dark:text-gray-200 bg-white/80 dark:bg-gray-800/50 backdrop-blur-sm border border-gray-200 dark:border-gray-700/50 rounded-lg shadow-[inset_0_2px_4px_rgba(0,0,0,0.05)] dark:shadow-[inset_0_2px_4px_rgba(0,0,0,0.2)] hover:shadow-[inset_0_2px_4px_rgba(0,0,0,0.1)] dark:hover:shadow-[inset_0_2px_4px_rgba(0,0,0,0.3)] hover:border-primary-200 dark:hover:border-primary-800 hover:shadow-[0_0_0_1px_rgba(59,130,246,0.5)] dark:hover:shadow-[0_0_0_1px_rgba(59,130,246,0.5)] transition-all duration-300 relative"
                 aria-label="Filter by date range"
               >
@@ -526,8 +613,8 @@ export function AzureUpdatesContent({ updates, searchQuery = '' }: AzureUpdatesC
                   </span>
                 )}
               </button>
-              {isDateDropdownOpen && (
-                <div className="absolute z-10 w-72 mt-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow-lg">
+              {isDateDropdownOpen && createPortal(
+                <div className="fixed z-[9999] w-72 mt-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow-lg" style={{ left: dropdownPos.left, top: dropdownPos.top }}>
                   <div className="p-4 border-b border-gray-200 dark:border-gray-700">
                     <h3 className="text-sm font-medium text-gray-900 dark:text-white">Filter by Date Range</h3>
                     <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
@@ -571,14 +658,15 @@ export function AzureUpdatesContent({ updates, searchQuery = '' }: AzureUpdatesC
                       Clear dates
                     </button>
                   </div>
-                </div>
+                </div>,
+                document.body
               )}
             </div>
           </div>
         </div>
       </div>
       <div className="mt-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 z-0">
           {visibleUpdates.map((update) => (
             <AzureUpdateCard
               key={update.id}
