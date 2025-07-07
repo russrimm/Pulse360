@@ -157,8 +157,8 @@ export function ProductNewsLayout({ children, title, description, icon }: Produc
   return (
     <div className="min-h-screen bg-white dark:bg-gray-950">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="mb-8">
-          <div className="flex items-center gap-3 mb-2">
+        <div className="mb-8 text-center">
+          <div className="flex flex-row items-center gap-3 mb-2 justify-center">
             <Image
               src={icon}
               alt={typeof title === 'string' ? title : ''}
