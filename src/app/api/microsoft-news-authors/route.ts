@@ -52,11 +52,20 @@ export async function GET() {
     const matches = Array.from(xml.matchAll(/<dc:creator><!\[CDATA\[(.*?)\]\]><\/dc:creator>/g))
     const authors = Array.from(new Set(matches.map(m => m[1].trim()).filter(Boolean)))
     // For each author, fetch their title
-    const authorObjs = await Promise.all(authors.map(async name => {
+    let authorObjs = await Promise.all(authors.map(async name => {
       const slug = authorSlugOverrides[name] || name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')
       const title = await getAuthorTitle(slug, name)
       return { name, title }
     }))
+    // Rename 'Microsoft Corporate Blogs' to 'Microsoft Corporate'
+    authorObjs = authorObjs.map(a => a.name === 'Microsoft Corporate Blogs' ? { ...a, name: 'Microsoft Corporate' } : a)
+    // Swap 'Microsoft Corporate' and 'Nicole Dezen' if both exist
+    const idxCorp = authorObjs.findIndex(a => a.name === 'Microsoft Corporate')
+    const idxNicole = authorObjs.findIndex(a => a.name === 'Nicole Dezen')
+    if (idxCorp !== -1 && idxNicole !== -1 && idxNicole > idxCorp) {
+      const [nicole] = authorObjs.splice(idxNicole, 1)
+      authorObjs.splice(idxCorp, 0, nicole)
+    }
     return NextResponse.json(authorObjs)
   } catch (error) {
     return NextResponse.json([], { status: 200 })
