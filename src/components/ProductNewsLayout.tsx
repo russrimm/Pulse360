@@ -7,8 +7,8 @@ import { useEffect, useState } from 'react';
 
 interface ProductNewsLayoutProps {
   children: React.ReactNode;
-  title: string;
-  description: string;
+  title: React.ReactNode;
+  description?: string;
   icon: string;
 }
 
@@ -86,7 +86,7 @@ function useAuthorTitle(author: string) {
   return title
 }
 
-interface AuthorObj { name: string; title: string }
+interface AuthorObj { name: string; title: string; slug: string }
 function AuthorButtons() {
   const [authors, setAuthors] = useState<AuthorObj[] | null>(null)
   useEffect(() => {
@@ -105,17 +105,27 @@ function AuthorButtons() {
   if (authors.length === 0) return null
 
   return (
-    <div className="w-full flex flex-row flex-nowrap gap-2 my-4 items-center overflow-x-visible justify-center">
-      {authors.map(({ name, title }) => (
-        <AuthorButton key={name} author={name} title={title} />
+    <div className="w-full flex flex-row flex-nowrap gap-2 my-4 items-center overflow-x-auto justify-start">
+      {authors.map(({ name, title, slug }) => (
+        <AuthorButton key={slug} author={name} title={title} slug={slug} />
       ))}
     </div>
   )
 }
 
-function AuthorButton({ author, title }: { author: string; title?: string }) {
+function decodeHtmlEntities(text: string) {
+  if (!text) return ''
+  const textarea = typeof window !== 'undefined' ? document.createElement('textarea') : null
+  if (textarea) {
+    textarea.innerHTML = text
+    return textarea.value
+  }
+  // fallback for SSR: replace common entities
+  return text.replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&#39;/g, "'")
+}
+
+function AuthorButton({ author, title, slug }: { author: string; title?: string; slug: string }) {
   if (!author || !author.trim()) return null
-  const slug = getAuthorSlug(author)
   const pathname = usePathname()
   const isSelected = pathname === `/product-news/author/${slug}`
   const isCorp = author === 'Microsoft Corporate'
@@ -128,8 +138,8 @@ function AuthorButton({ author, title }: { author: string; title?: string }) {
           : 'bg-white/80 dark:bg-gray-800/50 border-gray-200 dark:border-gray-700 hover:border-primary-200 dark:hover:border-primary-800 hover:bg-primary-50/50 dark:hover:bg-primary-900/20 text-gray-900 dark:text-white'}
       `}
     >
-      <span className="w-full text-center font-medium leading-tight block">{author}</span>
-      {title && <span className="w-full text-center block text-[10px] text-gray-600 dark:text-gray-300 leading-tight break-words whitespace-normal">{title}</span>}
+      <span className="w-full text-center font-medium leading-tight block">{decodeHtmlEntities(author)}</span>
+      {title && <span className="w-full text-center block text-[10px] text-gray-600 dark:text-gray-300 leading-tight break-words whitespace-normal">{decodeHtmlEntities(title)}</span>}
     </Link>
   )
 }
@@ -144,7 +154,7 @@ export function ProductNewsLayout({ children, title, description, icon }: Produc
           <div className="flex items-center gap-3 mb-2">
             <Image
               src={icon}
-              alt={title}
+              alt={typeof title === 'string' ? title : ''}
               width={32}
               height={32}
               className="w-8 h-8"
@@ -153,9 +163,11 @@ export function ProductNewsLayout({ children, title, description, icon }: Produc
               {title}
             </h1>
           </div>
-          <p className="text-gray-600 dark:text-gray-400">
-            {description}
-          </p>
+          {description && (
+            <p className="text-gray-600 dark:text-gray-400">
+              {description}
+            </p>
+          )}
         </div>
 
         <div className="mt-4 mb-2 w-full overflow-x-hidden">
@@ -316,12 +328,12 @@ export function ProductNewsLayout({ children, title, description, icon }: Produc
               ))}
             </div>
           )}
+
+          {(pathname === '/product-news/microsoft-news' || pathname.startsWith('/product-news/author/')) && <AuthorButtons />}
+
+          {children}
         </div>
-
-        {(pathname === '/product-news/microsoft-news' || pathname.startsWith('/product-news/author/')) && <AuthorButtons />}
-
-        {children}
       </div>
     </div>
-  );
-} 
+  )
+}

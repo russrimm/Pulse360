@@ -741,7 +741,7 @@ export async function getMicrosoftNews(): Promise<ProductNews[]> {
       const publishDate = new Date(pubDate).toISOString();
 
       return {
-        id: `${link}-${publishDate}`, // Create unique ID by combining link and publish date
+        id: `${link}-${publishDate}`,
         title,
         link,
         description,
@@ -751,7 +751,17 @@ export async function getMicrosoftNews(): Promise<ProductNews[]> {
       };
     });
 
-    return news.sort((a, b) => new Date(b.publishDate).getTime() - new Date(a.publishDate).getTime());
+    // Filter to only posts from the past 12 months
+    const twelveMonthsAgo = new Date();
+    twelveMonthsAgo.setMonth(twelveMonthsAgo.getMonth() - 12);
+    const filteredNews = news.filter(n => {
+      const date = new Date(n.publishDate)
+      // Debug log
+      if (date < twelveMonthsAgo) console.log('Filtered out (too old):', n.title, n.publishDate)
+      return date >= twelveMonthsAgo
+    });
+
+    return filteredNews.sort((a, b) => new Date(b.publishDate).getTime() - new Date(a.publishDate).getTime());
   } catch (error) {
     console.error('Error fetching Microsoft Blog news:', error);
     throw error;

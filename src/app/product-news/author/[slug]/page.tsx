@@ -15,6 +15,8 @@ export default function AuthorNewsPage() {
   const [news, setNews] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [authorTitle, setAuthorTitle] = useState<string | null>(null)
+  const [authorName, setAuthorName] = useState<string | null>(null)
 
   useEffect(() => {
     if (!slug) return
@@ -33,10 +35,14 @@ export default function AuthorNewsPage() {
           link: item.querySelector('link')?.textContent,
           description: item.querySelector('description')?.textContent,
           publishDate: new Date(item.querySelector('pubDate')?.textContent || '').toISOString(),
-          author: slugToName(slug),
+          author: authorName || slugToName(slug),
           categories: Array.from(item.querySelectorAll('category')).map(cat => cat.textContent || ''),
         }))
-        setNews(posts)
+        // Filter to only posts from the past 12 months
+        const twelveMonthsAgo = new Date()
+        twelveMonthsAgo.setMonth(twelveMonthsAgo.getMonth() - 12)
+        const filteredPosts = posts.filter(p => new Date(p.publishDate) >= twelveMonthsAgo)
+        setNews(filteredPosts)
       } catch (err) {
         setError('Failed to load author posts.')
       } finally {
@@ -44,12 +50,27 @@ export default function AuthorNewsPage() {
       }
     }
     fetchAuthorFeed()
+  }, [slug, authorName])
+
+  useEffect(() => {
+    if (!slug) return
+    async function fetchTitle() {
+      try {
+        const res = await fetch('/api/microsoft-news-authors')
+        const authors = await res.json()
+        const authorObj = authors.find((a: any) => a.slug === slug)
+        setAuthorTitle(authorObj?.title || null)
+        setAuthorName(authorObj?.name || null)
+      } catch {}
+    }
+    fetchTitle()
   }, [slug])
+
+  const titleText = authorTitle ? `Posts by ${authorName || slugToName(slug || '')} - ${authorTitle}` : `Posts by ${authorName || slugToName(slug || '')}`
 
   return (
     <ProductNewsLayout
-      title={`Posts by ${slugToName(slug || '')}`}
-      description={`Latest blog posts by ${slugToName(slug || '')}`}
+      title={<span className="text-sm md:text-base font-semibold whitespace-nowrap">{titleText}</span>}
       icon="/icons/Windows.svg"
     >
       {loading ? (
