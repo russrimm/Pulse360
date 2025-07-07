@@ -31,7 +31,7 @@ export default function LearnBlogNewsPage() {
 
   return (
     <ProductNewsLayout
-      title="Learn Blog"
+      title="Microsoft Learn"
       description="Stay up to date with the latest news and announcements from Microsoft Learn."
       icon="/icons/m365.svg"
     >

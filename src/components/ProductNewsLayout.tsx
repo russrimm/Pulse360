@@ -13,32 +13,12 @@ interface ProductNewsLayoutProps {
 
 let products = [
   {
-    name: 'Power Apps',
-    icon: '/icons/PowerApps_scalable.svg',
-    href: '/product-news',
-  },
-  {
-    name: 'Power Automate',
-    icon: '/icons/PowerAutomate_scalable.svg',
-    href: '/product-news/power-automate',
-  },
-  {
-    name: 'Power BI',
-    icon: '/icons/PowerBI_scalable.svg',
-    href: '/product-news/power-bi',
-  },
-  {
     name: 'Power Platform',
     icon: '/icons/PowerPlatform_scalable.svg',
     href: '/product-news/power-platform',
   },
   {
-    name: 'Copilot Studio',
-    icon: '/icons/CopilotStudio_scalable.svg',
-    href: '/product-news/copilot',
-  },
-  {
-    name: 'Learn Blog',
+    name: 'Microsoft Learn',
     icon: '/icons/m365.svg',
     href: '/product-news/learn-blog',
   },
@@ -56,11 +36,6 @@ let products = [
     name: 'Fabric',
     icon: '/icons/fabric_48_color.svg',
     href: '/product-news/fabric-blog',
-  },
-  {
-    name: 'Semantic Kernel',
-    icon: '/icons/sklogo.svg',
-    href: '/product-news/semantic-kernel',
   },
   {
     name: 'Azure AI Foundry',
@@ -165,6 +140,95 @@ export function ProductNewsLayout({ children, title, description, icon }: Produc
               </Link>
             ))}
           </div>
+
+          {/* Power Platform sub-buttons, only show when Power Platform is selected */}
+          {pathname === '/product-news/power-platform' && (
+            <div className="flex gap-2 mt-2 mb-4">
+              {[
+                { name: 'Power Apps', icon: '/icons/PowerApps_scalable.svg', href: '/product-news' },
+                { name: 'Power Automate', icon: '/icons/PowerAutomate_scalable.svg', href: '/product-news/power-automate' },
+                { name: 'Copilot Studio', icon: '/icons/CopilotStudio_scalable.svg', href: '/product-news/copilot' },
+                { name: 'Power Platform', icon: '/icons/PowerPlatform_scalable.svg', href: '/product-news/power-platform' },
+              ].map((product) => (
+                <Link
+                  key={product.name}
+                  href={product.href}
+                  className={`flex items-center justify-center gap-2 px-2 py-1 rounded-lg border transition-all duration-200 h-10 min-w-[140px] max-w-[140px] text-xs
+                    ${pathname === product.href
+                      ? 'bg-primary-50 border-primary-300 dark:bg-primary-900/50 dark:border-primary-700 shadow-sm ring-1 ring-primary-200 dark:ring-primary-800'
+                      : 'bg-white/80 dark:bg-gray-800/50 border-gray-200 dark:border-gray-700 hover:border-primary-200 dark:hover:border-primary-800 hover:bg-primary-50/50 dark:hover:bg-primary-900/20'
+                    }`}
+                >
+                  <Image src={product.icon} alt={product.name} width={16} height={16} className="w-4 h-4 object-contain" />
+                  <span className={`text-xs font-medium ${
+                    pathname === product.href
+                      ? 'text-primary-800 dark:text-primary-200 font-semibold'
+                      : 'text-gray-700 dark:text-gray-300'
+                  }`}>
+                    {product.name}
+                  </span>
+                </Link>
+              ))}
+            </div>
+          )}
+
+          {/* Azure AI Foundry sub-buttons, only show when Azure AI Foundry is selected */}
+          {(pathname === '/product-news/azure-ai-foundry' || pathname === '/product-news/semantic-kernel') && (
+            <div className="flex gap-2 mt-2 mb-4">
+              {[
+                { name: 'Azure AI Foundry', icon: 'https://devblogs.microsoft.com/foundry/wp-content/uploads/sites/89/2025/03/cropped-ai-foundry-32x32.png', href: '/product-news/azure-ai-foundry' },
+                { name: 'Semantic Kernel', icon: '/icons/sklogo.svg', href: '/product-news/semantic-kernel' },
+              ].map((product) => (
+                <Link
+                  key={product.name}
+                  href={product.href}
+                  className={`flex items-center justify-center gap-2 px-2 py-1 rounded-lg border transition-all duration-200 h-10 min-w-[140px] max-w-[140px] text-xs
+                    ${pathname === product.href
+                      ? 'bg-primary-50 border-primary-300 dark:bg-primary-900/50 dark:border-primary-700 shadow-sm ring-1 ring-primary-200 dark:ring-primary-800'
+                      : 'bg-white/80 dark:bg-gray-800/50 border-gray-200 dark:border-gray-700 hover:border-primary-200 dark:hover:border-primary-800 hover:bg-primary-50/50 dark:hover:bg-primary-900/20'
+                    }`}
+                >
+                  <Image src={product.icon} alt={product.name} width={16} height={16} className="w-4 h-4 object-contain" />
+                  <span className={`text-xs font-medium ${
+                    pathname === product.href
+                      ? 'text-primary-800 dark:text-primary-200 font-semibold'
+                      : 'text-gray-700 dark:text-gray-300'
+                  }`}>
+                    {product.name}
+                  </span>
+                </Link>
+              ))}
+            </div>
+          )}
+
+          {/* Fabric/Power BI sub-buttons */}
+          {(pathname === '/product-news/fabric-blog' || pathname === '/product-news/power-bi') && (
+            <div className="flex gap-2 mt-2 mb-4">
+              {[
+                { name: 'Fabric', icon: '/icons/fabric_48_color.svg', href: '/product-news/fabric-blog' },
+                { name: 'Power BI', icon: '/icons/PowerBI_scalable.svg', href: '/product-news/power-bi' },
+              ].map((product) => (
+                <Link
+                  key={product.name}
+                  href={product.href}
+                  className={`flex items-center justify-center gap-2 px-2 py-1 rounded-lg border transition-all duration-200 h-10 min-w-[140px] max-w-[140px] text-xs
+                    ${pathname === product.href
+                      ? 'bg-primary-50 border-primary-300 dark:bg-primary-900/50 dark:border-primary-700 shadow-sm ring-1 ring-primary-200 dark:ring-primary-800'
+                      : 'bg-white/80 dark:bg-gray-800/50 border-gray-200 dark:border-gray-700 hover:border-primary-200 dark:hover:border-primary-800 hover:bg-primary-50/50 dark:hover:bg-primary-900/20'
+                    }`}
+                >
+                  <Image src={product.icon} alt={product.name} width={16} height={16} className="w-4 h-4 object-contain" />
+                  <span className={`text-xs font-medium ${
+                    pathname === product.href
+                      ? 'text-primary-800 dark:text-primary-200 font-semibold'
+                      : 'text-gray-700 dark:text-gray-300'
+                  }`}>
+                    {product.name}
+                  </span>
+                </Link>
+              ))}
+            </div>
+          )}
         </div>
 
         {children}
