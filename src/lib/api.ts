@@ -15,15 +15,15 @@ const TENANT_ID = process.env.NEXT_PUBLIC_TENANT_ID;
 const CLIENT_ID = process.env.NEXT_PUBLIC_CLIENT_ID;
 
 // Debug environment variables
-console.log('Environment variables:', {
-  hasApiUrl: !!API_BASE_URL,
-  hasApiKey: !!API_KEY,
-  hasTenantId: !!TENANT_ID,
-  hasClientId: !!CLIENT_ID,
-  tenantId: TENANT_ID,
-  clientId: CLIENT_ID,
-  environment: process.env.NODE_ENV
-});
+// console.log('Environment variables:', {
+//   hasApiUrl: !!API_BASE_URL,
+//   hasApiKey: !!API_KEY,
+//   hasTenantId: !!TENANT_ID,
+//   hasClientId: !!CLIENT_ID,
+//   tenantId: TENANT_ID,
+//   clientId: CLIENT_ID,
+//   environment: process.env.NODE_ENV
+// });
 
 // Only throw in development
 if (process.env.NODE_ENV === 'development' && (!API_KEY || !TENANT_ID || !CLIENT_ID)) {
@@ -40,7 +40,7 @@ async function getToken(): Promise<string> {
 
   try {
     const tokenEndpoint = `https://login.microsoftonline.com/${TENANT_ID}/oauth2/v2.0/token`;
-    console.log('Getting token from:', tokenEndpoint);
+    // console.log('Getting token from:', tokenEndpoint);
     
     const params = new URLSearchParams();
     if (CLIENT_ID) params.append('client_id', CLIENT_ID);
@@ -48,12 +48,12 @@ async function getToken(): Promise<string> {
     if (API_KEY) params.append('client_secret', API_KEY);
     params.append('grant_type', 'client_credentials');
 
-    console.log('Token request params:', {
-      client_id: CLIENT_ID,
-      scope: 'https://graph.microsoft.com/.default',
-      grant_type: 'client_credentials',
-      has_client_secret: !!API_KEY
-    });
+    // console.log('Token request params:', {
+    //   client_id: CLIENT_ID,
+    //   scope: 'https://graph.microsoft.com/.default',
+    //   grant_type: 'client_credentials',
+    //   has_client_secret: !!API_KEY
+    // });
     
     const response = await fetch(tokenEndpoint, {
       method: 'POST',
@@ -65,20 +65,20 @@ async function getToken(): Promise<string> {
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error('Token request failed:', {
-        status: response.status,
-        statusText: response.statusText,
-        error: errorText,
-        endpoint: tokenEndpoint,
-        params: Object.fromEntries(params.entries())
-      });
+      // console.error('Token request failed:', {
+      //   status: response.status,
+      //   statusText: response.statusText,
+      //   error: errorText,
+      //   endpoint: tokenEndpoint,
+      //   params: Object.fromEntries(params.entries())
+      // });
       throw new Error(`Failed to get token: ${response.status} ${response.statusText} - ${errorText}`);
     }
 
     const data = await response.json();
     return data.access_token;
   } catch (error) {
-    console.error('Error getting token:', error);
+    // console.error('Error getting token:', error);
     throw error;
   }
 }
@@ -112,7 +112,7 @@ interface GraphApiResponse {
 
 export async function getMessages(): Promise<Message[]> {
   if (!hasRequiredEnvVars) {
-    console.error('Missing required environment variables in production');
+    // console.error('Missing required environment variables in production');
     return [];
   }
 
@@ -127,12 +127,12 @@ export async function getMessages(): Promise<Message[]> {
       'Ocp-Apim-Subscription-Key': API_KEY || ''
     };
 
-    console.log('Making API call to:', nextLink);
-    console.log('With headers:', {
-      ...headers,
-      'Authorization': 'Bearer ***',
-      'Ocp-Apim-Subscription-Key': '***'
-    });
+    // console.log('Making API call to:', nextLink);
+    // console.log('With headers:', {
+    //   ...headers,
+    //   'Authorization': 'Bearer ***',
+    //   'Ocp-Apim-Subscription-Key': '***'
+    // });
 
     while (nextLink) {
       const response = await fetch(nextLink, {
@@ -142,17 +142,17 @@ export async function getMessages(): Promise<Message[]> {
         }
       });
 
-      console.log('Response status:', response.status);
-      console.log('Response headers:', Object.fromEntries(response.headers.entries()));
+      // console.log('Response status:', response.status);
+      // console.log('Response headers:', Object.fromEntries(response.headers.entries()));
 
       if (!response.ok) {
         const errorText = await response.text();
-        console.error('API Error Response:', {
-          status: response.status,
-          statusText: response.statusText,
-          url: nextLink,
-          errorBody: errorText
-        });
+        // console.error('API Error Response:', {
+        //   status: response.status,
+        //   statusText: response.statusText,
+        //   url: nextLink,
+        //   errorBody: errorText
+        // });
         throw new Error(`Failed to fetch messages: ${response.status} ${response.statusText} - ${errorText}`);
       }
 
@@ -176,7 +176,7 @@ export async function getMessages(): Promise<Message[]> {
       severity: message.severity
     }));
   } catch (error) {
-    console.error('Error fetching messages:', error);
+    // console.error('Error fetching messages:', error);
     throw error;
   }
 }
@@ -225,7 +225,7 @@ export async function getMessage(id: string): Promise<Message> {
       severity: message.severity
     };
   } catch (error) {
-    console.error('Error fetching message:', error);
+    // console.error('Error fetching message:', error);
     throw error;
   }
 }
@@ -255,7 +255,7 @@ export async function getReleasePlans() {
       service: [plan['Product name']]
     }));
   } catch (error) {
-    console.error('Error fetching release plans:', error);
+    // console.error('Error fetching release plans:', error);
     return [];
   }
 }
@@ -288,7 +288,7 @@ export async function getAzureUpdates(): Promise<AzureUpdate[]> {
     const data = await response.json();
     return data.value;
   } catch (error) {
-    console.error('Error fetching Azure updates:', error);
+    // console.error('Error fetching Azure updates:', error);
     throw error;
   }
 }
@@ -321,7 +321,7 @@ export async function getM365Updates(): Promise<M365Update[]> {
       releaseRings: update.releaseRings || [],
     }));
   } catch (error) {
-    console.error('Error fetching Microsoft 365 updates:', error);
+    // console.error('Error fetching Microsoft 365 updates:', error);
     throw error;
   }
 }
@@ -423,7 +423,7 @@ export async function getM365Update(id: string): Promise<M365Update> {
       releaseRings: releaseRings,
     };
   } catch (error) {
-    console.error('Error fetching Microsoft 365 update:', error);
+    // console.error('Error fetching Microsoft 365 update:', error);
     throw error;
   }
 }
@@ -435,11 +435,11 @@ export async function getPowerAppsNews(): Promise<ProductNews[]> {
     });
 
     if (!response.ok) {
-      console.error('Failed to fetch Power Apps news:', {
-        status: response.status,
-        statusText: response.statusText,
-        url: response.url
-      });
+      // console.error('Failed to fetch Power Apps news:', {
+      //   status: response.status,
+      //   statusText: response.statusText,
+      //   url: response.url
+      // });
       return [];
     }
 
@@ -466,7 +466,7 @@ export async function getPowerAppsNews(): Promise<ProductNews[]> {
       new Date(b.publishDate).getTime() - new Date(a.publishDate).getTime()
     );
   } catch (error) {
-    console.error('Error fetching Power Apps news:', error);
+    // console.error('Error fetching Power Apps news:', error);
     return [];
   }
 }
@@ -478,11 +478,11 @@ export async function getPowerPlatformNews(): Promise<ProductNews[]> {
     });
 
     if (!response.ok) {
-      console.error('Failed to fetch Power Platform news:', {
-        status: response.status,
-        statusText: response.statusText,
-        url: response.url
-      });
+      // console.error('Failed to fetch Power Platform news:', {
+      //   status: response.status,
+      //   statusText: response.statusText,
+      //   url: response.url
+      // });
       return [];
     }
 
@@ -509,7 +509,7 @@ export async function getPowerPlatformNews(): Promise<ProductNews[]> {
       new Date(b.publishDate).getTime() - new Date(a.publishDate).getTime()
     );
   } catch (error) {
-    console.error('Error fetching Power Platform news:', error);
+    // console.error('Error fetching Power Platform news:', error);
     return [];
   }
 }
@@ -521,11 +521,11 @@ export async function getPowerAutomateNews(): Promise<ProductNews[]> {
     });
 
     if (!response.ok) {
-      console.error('Failed to fetch Power Automate news:', {
-        status: response.status,
-        statusText: response.statusText,
-        url: response.url
-      });
+      // console.error('Failed to fetch Power Automate news:', {
+      //   status: response.status,
+      //   statusText: response.statusText,
+      //   url: response.url
+      // });
       return [];
     }
 
@@ -537,7 +537,7 @@ export async function getPowerAutomateNews(): Promise<ProductNews[]> {
     const result = parser.parse(xml);
 
     if (!result.rss?.channel?.item) {
-      console.error('Invalid RSS feed format for Power Automate news');
+      // console.error('Invalid RSS feed format for Power Automate news');
       return [];
     }
 
@@ -553,7 +553,7 @@ export async function getPowerAutomateNews(): Promise<ProductNews[]> {
       new Date(b.publishDate).getTime() - new Date(a.publishDate).getTime()
     );
   } catch (error) {
-    console.error('Error fetching Power Automate news:', error);
+    // console.error('Error fetching Power Automate news:', error);
     return [];
   }
 }
@@ -565,11 +565,11 @@ export async function getPowerBINews(): Promise<ProductNews[]> {
     });
 
     if (!response.ok) {
-      console.error('Failed to fetch Power BI news:', {
-        status: response.status,
-        statusText: response.statusText,
-        url: response.url
-      });
+      // console.error('Failed to fetch Power BI news:', {
+      //   status: response.status,
+      //   statusText: response.statusText,
+      //   url: response.url
+      // });
       return [];
     }
 
@@ -581,7 +581,7 @@ export async function getPowerBINews(): Promise<ProductNews[]> {
     const result = parser.parse(xml);
 
     if (!result.rss?.channel?.item) {
-      console.error('Invalid RSS feed format for Power BI news');
+      // console.error('Invalid RSS feed format for Power BI news');
       return [];
     }
 
@@ -597,7 +597,7 @@ export async function getPowerBINews(): Promise<ProductNews[]> {
       new Date(b.publishDate).getTime() - new Date(a.publishDate).getTime()
     );
   } catch (error) {
-    console.error('Error fetching Power BI news:', error);
+    // console.error('Error fetching Power BI news:', error);
     return [];
   }
 }
@@ -609,11 +609,11 @@ export async function getCopilotStudioNews(): Promise<ProductNews[]> {
     });
 
     if (!response.ok) {
-      console.error('Failed to fetch Copilot Studio news:', {
-        status: response.status,
-        statusText: response.statusText,
-        url: response.url
-      });
+      // console.error('Failed to fetch Copilot Studio news:', {
+      //   status: response.status,
+      //   statusText: response.statusText,
+      //   url: response.url
+      // });
       return [];
     }
 
@@ -671,7 +671,7 @@ export async function getCopilotStudioNews(): Promise<ProductNews[]> {
 
     return features;
   } catch (error) {
-    console.error('Error fetching Copilot Studio news:', error);
+    // console.error('Error fetching Copilot Studio news:', error);
     return [];
   }
 }
@@ -683,11 +683,11 @@ export async function getLearnBlogNews(): Promise<ProductNews[]> {
     });
 
     if (!response.ok) {
-      console.error('Failed to fetch Learn Blog news:', {
-        status: response.status,
-        statusText: response.statusText,
-        url: response.url
-      });
+      // console.error('Failed to fetch Learn Blog news:', {
+      //   status: response.status,
+      //   statusText: response.statusText,
+      //   url: response.url
+      // });
       return [];
     }
 
@@ -714,7 +714,7 @@ export async function getLearnBlogNews(): Promise<ProductNews[]> {
       new Date(b.publishDate).getTime() - new Date(a.publishDate).getTime()
     );
   } catch (error) {
-    console.error('Error fetching Learn Blog news:', error);
+    // console.error('Error fetching Learn Blog news:', error);
     return [];
   }
 }
@@ -757,13 +757,13 @@ export async function getMicrosoftNews(): Promise<ProductNews[]> {
     const filteredNews = news.filter(n => {
       const date = new Date(n.publishDate)
       // Debug log
-      if (date < twelveMonthsAgo) console.log('Filtered out (too old):', n.title, n.publishDate)
+      // if (date < twelveMonthsAgo) console.log('Filtered out (too old):', n.title, n.publishDate)
       return date >= twelveMonthsAgo
     });
 
     return filteredNews.sort((a, b) => new Date(b.publishDate).getTime() - new Date(a.publishDate).getTime());
   } catch (error) {
-    console.error('Error fetching Microsoft Blog news:', error);
+    // console.error('Error fetching Microsoft Blog news:', error);
     throw error;
   }
 }
@@ -800,7 +800,7 @@ export async function getTechCommunityNews(): Promise<ProductNews[]> {
 
     return news.sort((a, b) => new Date(b.publishDate).getTime() - new Date(a.publishDate).getTime());
   } catch (error) {
-    console.error('Error fetching Tech Community news:', error);
+    // console.error('Error fetching Tech Community news:', error);
     throw error;
   }
 }
@@ -812,11 +812,11 @@ export async function getCopilotNews(): Promise<ProductNews[]> {
     });
 
     if (!response.ok) {
-      console.error('Failed to fetch Copilot news:', {
-        status: response.status,
-        statusText: response.statusText,
-        url: response.url
-      });
+      // console.error('Failed to fetch Copilot news:', {
+      //   status: response.status,
+      //   statusText: response.statusText,
+      //   url: response.url
+      // });
       return [];
     }
 
@@ -842,7 +842,7 @@ export async function getCopilotNews(): Promise<ProductNews[]> {
       new Date(b.publishDate).getTime() - new Date(a.publishDate).getTime()
     );
   } catch (error) {
-    console.error('Error fetching Copilot news:', error);
+    // console.error('Error fetching Copilot news:', error);
     return [];
   }
 }
@@ -853,11 +853,11 @@ export async function getFabricBlogNews(): Promise<ProductNews[]> {
       next: { revalidate: 3600 } // Cache for 1 hour
     })
     if (!response.ok) {
-      console.error('Failed to fetch Fabric Blog news:', {
-        status: response.status,
-        statusText: response.statusText,
-        url: response.url
-      })
+      // console.error('Failed to fetch Fabric Blog news:', {
+      //   status: response.status,
+      //   statusText: response.statusText,
+      //   url: response.url
+      // })
       return []
     }
     const xmlText = await response.text()
@@ -878,7 +878,7 @@ export async function getFabricBlogNews(): Promise<ProductNews[]> {
     }))
     return news.sort((a, b) => new Date(b.publishDate).getTime() - new Date(a.publishDate).getTime())
   } catch (error) {
-    console.error('Error fetching Fabric Blog news:', error)
+    // console.error('Error fetching Fabric Blog news:', error)
     return []
   }
 }
@@ -889,11 +889,11 @@ export async function getSemanticKernelNews(): Promise<ProductNews[]> {
       next: { revalidate: 3600 }
     })
     if (!response.ok) {
-      console.error('Failed to fetch Semantic Kernel news:', {
-        status: response.status,
-        statusText: response.statusText,
-        url: response.url
-      })
+      // console.error('Failed to fetch Semantic Kernel news:', {
+      //   status: response.status,
+      //   statusText: response.statusText,
+      //   url: response.url
+      // })
       return []
     }
     const xmlText = await response.text()
@@ -914,7 +914,7 @@ export async function getSemanticKernelNews(): Promise<ProductNews[]> {
     }))
     return news.sort((a, b) => new Date(b.publishDate).getTime() - new Date(a.publishDate).getTime())
   } catch (error) {
-    console.error('Error fetching Semantic Kernel news:', error)
+    // console.error('Error fetching Semantic Kernel news:', error)
     return []
   }
 }
@@ -925,11 +925,11 @@ export async function getAzureAIFoundryNews(): Promise<ProductNews[]> {
       next: { revalidate: 3600 }
     })
     if (!response.ok) {
-      console.error('Failed to fetch Azure AI Foundry news:', {
-        status: response.status,
-        statusText: response.statusText,
-        url: response.url
-      })
+      // console.error('Failed to fetch Azure AI Foundry news:', {
+      //   status: response.status,
+      //   statusText: response.statusText,
+      //   url: response.url
+      // })
       return []
     }
     const xmlText = await response.text()
@@ -950,7 +950,7 @@ export async function getAzureAIFoundryNews(): Promise<ProductNews[]> {
     }))
     return news.sort((a, b) => new Date(b.publishDate).getTime() - new Date(a.publishDate).getTime())
   } catch (error) {
-    console.error('Error fetching Azure AI Foundry news:', error)
+    // console.error('Error fetching Azure AI Foundry news:', error)
     return []
   }
 } 

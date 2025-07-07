@@ -17,7 +17,7 @@ async function getFabricRoadmap(productId: string): Promise<FabricRoadmapItem[]>
   const res = await fetch(`${FABRIC_API_BASE}${productId}`, { cache: 'no-store' })
   const text = await res.text()
   if (productId === 'fa3a73cd-dcd6-ee11-9079-000d3a310f67') {
-    console.log('Raw response for Data Warehouse:', text)
+    // console.log('Raw response for Data Warehouse:', text)
   }
   try {
     const data = JSON.parse(text)
@@ -73,10 +73,10 @@ export default async function FabricRoadmapPage() {
     getFabricRoadmap(sqlDatabaseProductId),
     getFabricRoadmap(adminGovSecProductId)
   ])
-  console.log('Fetched dataEngineeringRoadmap', dataEngineeringRoadmap)
-  console.log('Fetched dataFactoryRoadmap', dataFactoryRoadmap)
-  console.log('Fetched dataScienceRoadmap', dataScienceRoadmap)
-  console.log('Fetched dataWarehouseRoadmap', dataWarehouseRoadmap)
+  // console.log('Fetched dataEngineeringRoadmap', dataEngineeringRoadmap)
+  // console.log('Fetched dataFactoryRoadmap', dataFactoryRoadmap)
+  // console.log('Fetched dataScienceRoadmap', dataScienceRoadmap)
+  // console.log('Fetched dataWarehouseRoadmap', dataWarehouseRoadmap)
   const allPlans = [
     ...roadmap.map(mapToReleasePlan),
     ...dataEngineeringRoadmap.map(mapToReleasePlan),
@@ -90,10 +90,10 @@ export default async function FabricRoadmapPage() {
     ...sqlDatabaseRoadmap.map(mapToReleasePlan),
     ...adminGovSecRoadmap.map(mapToReleasePlan),
   ]
-  console.log('Mapped dataEngineeringPlans', dataEngineeringRoadmap)
-  console.log('Mapped dataFactoryPlans', dataFactoryRoadmap)
-  console.log('Mapped dataSciencePlans', dataScienceRoadmap)
-  console.log('Mapped dataWarehousePlans', dataWarehouseRoadmap)
+  // console.log('Mapped dataEngineeringPlans', dataEngineeringRoadmap)
+  // console.log('Mapped dataFactoryPlans', dataFactoryRoadmap)
+  // console.log('Mapped dataSciencePlans', dataScienceRoadmap)
+  // console.log('Mapped dataWarehousePlans', dataWarehouseRoadmap)
 
   return (
     <div className="min-h-screen">

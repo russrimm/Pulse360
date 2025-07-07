@@ -46,10 +46,10 @@ async function getAuthorTitle(slug: string, name: string): Promise<string> {
 async function hasRecentPosts(slug: string, name: string): Promise<boolean> {
   try {
     const url = `https://blogs.microsoft.com/blog/author/${slug}/feed/`
-    console.log('Fetching feed for', name, slug, url)
+    // console.log('Fetching feed for', name, slug, url)
     const res = await fetch(url, { headers: { 'User-Agent': 'Mozilla/5.0' } })
     if (!res.ok) {
-      console.log('Feed not ok for', name, slug, res.status)
+      // console.log('Feed not ok for', name, slug, res.status)
       return false
     }
     const xml = await res.text()
@@ -57,18 +57,18 @@ async function hasRecentPosts(slug: string, name: string): Promise<boolean> {
     const pubDates = Array.from(xml.matchAll(/<pubDate>(.*?)<\/pubDate>/g)).map(m => m[1])
     const twelveMonthsAgo = new Date()
     twelveMonthsAgo.setMonth(twelveMonthsAgo.getMonth() - 12)
-    console.log('All pubDates for', name, ':', pubDates)
+    // console.log('All pubDates for', name, ':', pubDates)
     const recentDates = pubDates.filter(dateStr => {
       const date = new Date(dateStr)
       const isRecent = date >= twelveMonthsAgo
-      console.log('Parsed date for', name, ':', dateStr, '->', date, 'isRecent:', isRecent)
+      // console.log('Parsed date for', name, ':', dateStr, '->', date, 'isRecent:', isRecent)
       return isRecent
     })
     const hasRecent = recentDates.length > 0
-    console.log('Recent for', name, slug, ':', hasRecent, 'Recent dates:', recentDates)
+    // console.log('Recent for', name, slug, ':', hasRecent, 'Recent dates:', recentDates)
     return hasRecent
   } catch (err) {
-    console.error('Error checking posts for', name, slug, err)
+    // console.error('Error checking posts for', name, slug, err)
     return false
   }
 }
@@ -85,9 +85,9 @@ export async function GET() {
     let authorObjs = (await Promise.all(authors.map(async name => {
       const slug = authorSlugOverrides[name] || name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')
       const title = await getAuthorTitle(slug, name) || ''
-      console.log('Checking author:', name, 'slug:', slug)
+      // console.log('Checking author:', name, 'slug:', slug)
       const recent = await hasRecentPosts(slug, name)
-      console.log('Recent for', name, ':', recent)
+      // console.log('Recent for', name, ':', recent)
       if (!recent) return null
       return { name, title: title as string, slug }
     }))).filter((a): a is { name: string; title: string; slug: string } => !!a)

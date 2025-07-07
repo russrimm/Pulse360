@@ -108,14 +108,6 @@ export function ProductFilter({ services, selectedServices, onFilterChange }: Pr
   const dropdownRef = useRef<HTMLDivElement>(null);
   const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Log services for debugging
-  useEffect(() => {
-    if (process.env.NODE_ENV !== 'production') {
-      console.log('Available services:', services)
-      console.log('Service icon mapping:', serviceIconMap)
-    }
-  }, [services])
-
   // Memoize selection check
   const isServiceSelected = useCallback(
     (service: string): boolean =>
