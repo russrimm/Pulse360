@@ -179,7 +179,7 @@ export function ProductNewsLayout({ children, title, description, icon }: Produc
 
         <div className="mt-4 mb-2 w-full overflow-x-hidden">
           {/* Mobile: show all buttons in a single grid */}
-          <div className="grid grid-cols-2 gap-3 w-full min-w-0 lg:hidden justify-center">
+          <div className={`grid grid-cols-2 gap-3 w-full min-w-0 lg:hidden justify-center${!['/product-news/power-platform','/product-news/power-automate','/product-news/copilot','/product-news/azure-ai-foundry','/product-news/all-things-azure','/product-news/semantic-kernel','/product-news/fabric-blog','/product-news/power-bi'].includes(pathname) ? ' mb-8' : ''}`}>
             {products.map((product) => (
               <Link
                 key={product.name}
@@ -219,7 +219,7 @@ export function ProductNewsLayout({ children, title, description, icon }: Produc
             ))}
           </div>
           {/* Desktop: force all buttons into a single horizontal row, shrink if needed */}
-          <div className="hidden lg:flex flex-wrap gap-2 w-full pb-1 justify-center">
+          <div className={`hidden lg:flex flex-wrap gap-2 w-full pb-1 justify-center${!['/product-news/power-platform','/product-news/power-automate','/product-news/copilot','/product-news/azure-ai-foundry','/product-news/all-things-azure','/product-news/semantic-kernel','/product-news/fabric-blog','/product-news/power-bi'].includes(pathname) ? ' mb-8' : ''}`}>
             {products.map((product) => (
               <Link
                 key={product.name}
@@ -259,8 +259,8 @@ export function ProductNewsLayout({ children, title, description, icon }: Produc
             ))}
           </div>
 
-          {/* Power Platform sub-buttons, only show when Power Platform is selected */}
-          {['/product-news/power-platform','/product-news','/product-news/power-automate','/product-news/copilot'].includes(pathname) && (
+          {/* Power Platform sub-buttons, only show when Power Platform is selected and not on /product-news */}
+          {['/product-news/power-platform','/product-news/power-automate','/product-news/copilot'].includes(pathname) && (
             <div className="flex flex-wrap gap-2 mt-2 mb-4 justify-center sm:flex-nowrap">
               {[
                 { name: 'Power Apps', icon: '/icons/PowerApps_scalable.svg', href: '/product-news' },
@@ -320,7 +320,7 @@ export function ProductNewsLayout({ children, title, description, icon }: Produc
             </div>
           )}
 
-          {/* Fabric/Power BI sub-buttons */}
+          {/* Fabric/Power BI sub-buttons, only show when Fabric or Power BI is selected */}
           {['/product-news/fabric-blog','/product-news/power-bi'].includes(pathname) && (
             <div className="flex gap-2 mt-2 mb-4 justify-center">
               {[
