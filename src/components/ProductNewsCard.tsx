@@ -2,12 +2,69 @@
 
 import { ProductNews } from '@/lib/types';
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo, useCallback } from 'react';
 import { Card } from './Card';
 
 interface ProductNewsCardProps {
   news: ProductNews;
   productIcon?: string;
+}
+
+// Helper to get author slug for Microsoft News
+function getAuthorSlug(author: string) {
+  if (!author) return ''
+  return author.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')
+}
+
+// Fetch author title from their blog page
+function useAuthorTitle(author: string | undefined) {
+  const [title, setTitle] = useState<string | null>(null)
+  useEffect(() => {
+    if (!author) return
+    const slug = getAuthorSlug(author)
+    if (!slug) return
+    const url = `https://blogs.microsoft.com/blog/author/${slug}/`
+    fetch(url)
+      .then(res => res.text())
+      .then(html => {
+        const match = html.match(/<title>(.*?)<\/title>/i)
+        if (match && match[1]) setTitle(match[1].replace(/\s*\|.*/, '').trim())
+      })
+      .catch(() => setTitle(null))
+  }, [author])
+  return title
+}
+
+function AuthorWithTitle({ author }: { author: string }) {
+  const [title, setTitle] = useState<string | null>(null)
+  useEffect(() => {
+    if (!author) return
+    const slug = getAuthorSlug(author)
+    if (!slug) return
+    const url = `https://blogs.microsoft.com/blog/author/${slug}/`
+    fetch(url)
+      .then(res => res.text())
+      .then(html => {
+        const match = html.match(/<title>(.*?)<\/title>/i)
+        if (match && match[1]) {
+          const parts = match[1].split('|')
+          if (parts.length > 1) setTitle(parts[0].replace(/^Author: [^-]+- /, '').trim())
+          else setTitle(null)
+        }
+      })
+      .catch(() => setTitle(null))
+  }, [author])
+  const slug = getAuthorSlug(author)
+  const authorUrl = `https://blogs.microsoft.com/blog/author/${slug}/`
+  return (
+    <p className="text-xs text-gray-500 dark:text-gray-400 mb-2 text-center">
+      Published by{' '}
+      <a href={authorUrl} target="_blank" rel="noopener noreferrer" className="underline hover:text-primary-700">
+        {author}
+      </a>
+      {title && <span> – {title}</span>}
+    </p>
+  )
 }
 
 export function ProductNewsCard({ news, productIcon = '/icons/PowerPlatform_scalable.svg' }: ProductNewsCardProps) {
@@ -54,13 +111,14 @@ export function ProductNewsCard({ news, productIcon = '/icons/PowerPlatform_scal
             <h3 className="w-full break-words whitespace-normal overflow-hidden text-base font-semibold text-gray-900 dark:text-white group-hover:text-primary-600 dark:group-hover:text-primary-400 mb-2 text-center">
               {decodedTitle}
             </h3>
-            <p className="text-sm font-semibold text-primary-700 dark:text-primary-300 mb-2 text-center">
+            <p className="text-sm font-semibold text-primary-700 dark:text-primary-300 mb-0 text-center">
               {new Date(news.publishDate).toLocaleDateString('en-US', {
                 year: 'numeric',
                 month: 'long',
                 day: 'numeric'
               })}
             </p>
+            {news.author && <AuthorWithTitle author={news.author} />}
             <p className="text-xs text-gray-600 dark:text-gray-300 line-clamp-3 text-center">
               {decodedDescription}
             </p>

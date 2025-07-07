@@ -736,7 +736,7 @@ export async function getMicrosoftNews(): Promise<ProductNews[]> {
       const link = item.querySelector('link')?.textContent || '';
       const description = item.querySelector('description')?.textContent || '';
       const pubDate = item.querySelector('pubDate')?.textContent || '';
-      const author = item.querySelector('dc\\:creator')?.textContent || 'Microsoft';
+      const author = item.getElementsByTagName('dc:creator')[0]?.textContent?.trim() || '';
       const categories = Array.from(item.querySelectorAll('category')).map(cat => cat.textContent || '');
       const publishDate = new Date(pubDate).toISOString();
 
