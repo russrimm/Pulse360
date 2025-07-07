@@ -26,6 +26,7 @@
     "node-fetch": "^2.7.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-icons": "^5.5.0",
     "xml2js": "^0.6.2"
   },
   "devDependencies": {
@@ -40,8 +41,9 @@
     "@types/node-fetch": "^2.6.12",
     "@types/react": "^18.2.61",
     "@types/react-dom": "^18.2.19",
-    "@typescript-eslint/eslint-plugin": "^7.1.0",
-    "@typescript-eslint/parser": "^7.1.0",
+    "@types/react-icons": "^2.2.7",
+    "@typescript-eslint/eslint-plugin": "^7.18.0",
+    "@typescript-eslint/parser": "^7.18.0",
     "autoprefixer": "^10.4.18",
     "esbuild": "0.25.4",
     "eslint": "^8.57.1",
