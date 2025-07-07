@@ -108,7 +108,7 @@ export function ProductNewsCard({ news, productIcon = '/icons/PowerPlatform_scal
           aria-label={`Open news: ${decodedTitle}`}
         >
           <div className="flex-1 w-full min-w-0">
-            <h3 className="w-full break-words whitespace-normal overflow-hidden text-base font-semibold text-gray-900 dark:text-white group-hover:text-primary-600 dark:group-hover:text-primary-400 mb-2 text-center">
+            <h3 className="w-full overflow-hidden text-base font-semibold text-gray-900 dark:text-white group-hover:text-primary-600 dark:group-hover:text-primary-400 mb-2 text-center" style={{ wordBreak: 'normal', overflowWrap: 'anywhere' }}>
               {decodedTitle}
             </h3>
             <p className="text-sm font-semibold text-primary-700 dark:text-primary-300 mb-0 text-center">
