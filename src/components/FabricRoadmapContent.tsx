@@ -34,7 +34,7 @@ export function FabricRoadmapContent({ allPlans }: { allPlans: ReleasePlan[] }) 
   const [selectedAreas, setSelectedAreas] = useState<string[]>([])
   const [selectedDateFilter, setSelectedDateFilter] = useState<'all' | 'last30' | 'last7' | 'custom'>('all')
   const [customDateRange, setCustomDateRange] = useState<{ from: string; to: string }>({ from: '', to: '' })
-  const [dateFilterOpen, setDateFilterOpen] = useState(false)
+  const [openFilter, setOpenFilter] = useState<null | 'product' | 'date'>(null)
 
   const allServices = useMemo(() => {
     const set = new Set<string>()
@@ -106,11 +106,13 @@ export function FabricRoadmapContent({ allPlans }: { allPlans: ReleasePlan[] }) 
               services={allServices}
               selectedServices={selectedServices}
               onFilterChange={setSelectedServices}
+              isOpen={openFilter === 'product'}
+              setOpen={open => setOpenFilter(open ? 'product' : null)}
             />
             </div>
             <div className="relative w-full md:w-auto">
               <button
-                onClick={() => setDateFilterOpen(!dateFilterOpen)}
+                onClick={() => setOpenFilter(openFilter === 'date' ? null : 'date')}
                 className="flex items-center justify-center gap-2 px-4 h-8 w-full md:w-auto text-gray-700 dark:text-gray-200 bg-white/80 dark:bg-gray-800/50 backdrop-blur-sm border border-gray-200 dark:border-gray-700/50 rounded-lg shadow hover:border-primary-200 dark:hover:border-primary-800 transition-all duration-300 relative"
                 aria-label="Filter by date"
               >
@@ -129,7 +131,7 @@ export function FabricRoadmapContent({ allPlans }: { allPlans: ReleasePlan[] }) 
                   </span>
                 )}
               </button>
-              {dateFilterOpen && (
+              {openFilter === 'date' && (
                 <div className="absolute z-10 w-72 mt-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow-lg">
                   <div className="p-4 border-b border-gray-200 dark:border-gray-700">
                     <h3 className="text-sm font-medium text-gray-900 dark:text-white">Filter by Date</h3>
@@ -139,7 +141,7 @@ export function FabricRoadmapContent({ allPlans }: { allPlans: ReleasePlan[] }) 
                       <input
                         type="radio"
                         checked={selectedDateFilter === 'all'}
-                        onChange={() => { setSelectedDateFilter('all'); setDateFilterOpen(false); }}
+                        onChange={() => { setSelectedDateFilter('all'); setOpenFilter(null); }}
                         className="text-primary-600"
                       />
                       <span className="text-sm text-gray-700 dark:text-gray-200">All Dates</span>
@@ -148,7 +150,7 @@ export function FabricRoadmapContent({ allPlans }: { allPlans: ReleasePlan[] }) 
                       <input
                         type="radio"
                         checked={selectedDateFilter === 'last30'}
-                        onChange={() => { setSelectedDateFilter('last30'); setDateFilterOpen(false); }}
+                        onChange={() => { setSelectedDateFilter('last30'); setOpenFilter(null); }}
                         className="text-primary-600"
                       />
                       <span className="text-sm text-gray-700 dark:text-gray-200">Last 30 days</span>
@@ -157,7 +159,7 @@ export function FabricRoadmapContent({ allPlans }: { allPlans: ReleasePlan[] }) 
                       <input
                         type="radio"
                         checked={selectedDateFilter === 'last7'}
-                        onChange={() => { setSelectedDateFilter('last7'); setDateFilterOpen(false); }}
+                        onChange={() => { setSelectedDateFilter('last7'); setOpenFilter(null); }}
                         className="text-primary-600"
                       />
                       <span className="text-sm text-gray-700 dark:text-gray-200">Last 7 days</span>
@@ -201,7 +203,7 @@ export function FabricRoadmapContent({ allPlans }: { allPlans: ReleasePlan[] }) 
                       onClick={() => {
                         setSelectedDateFilter('all');
                         setCustomDateRange({ from: '', to: '' });
-                        setDateFilterOpen(false);
+                        setOpenFilter(null);
                       }}
                       className="w-full px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
                     >
