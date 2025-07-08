@@ -1,7 +1,7 @@
 export default function Loading() {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-black/20 dark:bg-black/40 backdrop-blur-sm z-50">
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 gap-y-8 px-2 py-8 w-full max-w-7xl">
+    <div className="min-h-screen">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 gap-y-8 px-2 py-8">
         {[1,2,3].map(i => (
           <div key={i} className="w-full max-w-md mx-auto min-w-0">
             <div className="bg-white/80 dark:bg-gray-800/50 rounded-xl shadow-md border border-gray-200 dark:border-gray-700 p-4 animate-pulse flex flex-col h-full">
@@ -16,5 +16,5 @@ export default function Loading() {
         ))}
       </div>
     </div>
-  );
+  )
 } 

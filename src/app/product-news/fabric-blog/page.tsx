@@ -1,6 +1,7 @@
 import { getFabricBlogNews } from '@/lib/api'
 import { ProductNewsLayout } from '@/components/ProductNewsLayout'
 import { ProductNewsCard } from '@/components/ProductNewsCard'
+import { FabricBlogNewsClient } from './FabricBlogNewsClient'
 
 export const revalidate = 3600
 
@@ -13,21 +14,13 @@ function highlightContinueReading(html: string) {
 }
 
 export default async function FabricBlogNewsPage() {
-  const news = await getFabricBlogNews()
   return (
-    <>
-      <ProductNewsLayout
-        title="Fabric News"
-        description="Latest updates, announcements, and features from Microsoft Fabric."
-        icon="/icons/fabric_48_color.svg"
-      >
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
-          {news.length === 0 && <div className="text-gray-500">No news found.</div>}
-          {news.map(item => (
-            <ProductNewsCard key={item.id} news={item} productIcon="/icons/fabric_48_color.svg" />
-          ))}
-        </div>
-      </ProductNewsLayout>
-    </>
+    <ProductNewsLayout
+      title="Fabric Blog News"
+      description="Latest updates from the Fabric Blog."
+      icon="/icons/fabric_48_color.svg"
+    >
+      <FabricBlogNewsClient />
+    </ProductNewsLayout>
   )
 } 

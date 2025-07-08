@@ -848,39 +848,9 @@ export async function getCopilotNews(): Promise<ProductNews[]> {
 }
 
 export async function getFabricBlogNews(): Promise<ProductNews[]> {
-  try {
-    const response = await fetch('https://blog.fabric.microsoft.com/en-us/blog/feed/', {
-      next: { revalidate: 3600 } // Cache for 1 hour
-    })
-    if (!response.ok) {
-      // console.error('Failed to fetch Fabric Blog news:', {
-      //   status: response.status,
-      //   statusText: response.statusText,
-      //   url: response.url
-      // })
-      return []
-    }
-    const xmlText = await response.text()
-    const parser = new XMLParser({
-      ignoreAttributes: false,
-      attributeNamePrefix: '@_'
-    })
-    const result = parser.parse(xmlText)
-    const items = result.rss.channel.item
-    const news: ProductNews[] = items.map((item: any) => ({
-      id: item.guid?.['#text'] || item.link,
-      title: item.title,
-      link: item.link,
-      description: item.description,
-      publishDate: item.pubDate,
-      author: item['dc:creator'] || '',
-      categories: Array.isArray(item.category) ? item.category : [item.category].filter(Boolean)
-    }))
-    return news.sort((a, b) => new Date(b.publishDate).getTime() - new Date(a.publishDate).getTime())
-  } catch (error) {
-    // console.error('Error fetching Fabric Blog news:', error)
-    return []
-  }
+  const res = await fetch('/api/fabric-blog-news')
+  if (!res.ok) throw new Error('Failed to fetch Fabric Blog news')
+  return res.json()
 }
 
 export async function getSemanticKernelNews(): Promise<ProductNews[]> {

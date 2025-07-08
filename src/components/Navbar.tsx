@@ -25,7 +25,7 @@ const Navbar = () => {
 
           <div className="flex items-center space-x-4">
             <div className="hidden sm:block text-right mr-4">
-              <div className="text-xs text-gray-500 dark:text-gray-400">A Microsoft product agnostic update portal developed by</div>
+              <div className="text-xs text-gray-500 dark:text-gray-400">A product-agnostic news and update portal vibe-coded by</div>
               <a
                 href="mailto:russ.rimmerman@microsoft.com?subject=Feedback about Pulse 360"
                 className="text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 transition-colors"

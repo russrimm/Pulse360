@@ -4,12 +4,13 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import type { ReactNode } from 'react';
 
 interface ProductNewsLayoutProps {
   children: React.ReactNode;
   title: React.ReactNode;
   description?: string;
-  icon: string;
+  icon: string | ReactNode;
 }
 
 let products = [
@@ -25,7 +26,14 @@ let products = [
   },
   {
     name: 'Microsoft News',
-    icon: '/icons/Windows.svg',
+    icon: (
+      <svg aria-hidden="true" viewBox="0 0 25 25" fill="none" xmlns="http://www.w3.org/2000/svg" width={16} height={16} style={{display:'inline-block'}}>
+        <path d="M11.5216 0.5H0V11.9067H11.5216V0.5Z" fill="#f25022"></path>
+        <path d="M24.2418 0.5H12.7202V11.9067H24.2418V0.5Z" fill="#7fba00"></path>
+        <path d="M11.5216 13.0933H0V24.5H11.5216V13.0933Z" fill="#00a4ef"></path>
+        <path d="M24.2418 13.0933H12.7202V24.5H24.2418V13.0933Z" fill="#ffb900"></path>
+      </svg>
+    ),
     href: '/product-news/microsoft-news',
   },
   {
@@ -57,28 +65,18 @@ function getAuthorSlug(author: string) {
   return author.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')
 }
 
-// Fetch author title from their blog page
-function useAuthorTitle(author: string) {
-  const [title, setTitle] = useState<string | null>(null)
-  useEffect(() => {
-    if (!author) return
-    const slug = getAuthorSlug(author)
-    if (!slug) return
-    const url = `https://blogs.microsoft.com/blog/author/${slug}/`
-    fetch(url)
-      .then(res => res.text())
-      .then(html => {
-        const match = html.match(/<title>(.*?)<\/title>/i)
-        if (match && match[1]) {
-          // Remove 'Author: ' and keep only the part after the name
-          const parts = match[1].split('|')
-          if (parts.length > 1) setTitle(parts[0].replace(/^Author: [^-]+- /, '').trim())
-          else setTitle(null)
-        }
-      })
-      .catch(() => setTitle(null))
-  }, [author])
-  return title
+// Only show author name, no title fetch
+function AuthorWithTitle({ author }: { author: string }) {
+  const slug = getAuthorSlug(author)
+  const authorUrl = `https://blogs.microsoft.com/blog/author/${slug}/`
+  return (
+    <p className="text-xs text-gray-500 dark:text-gray-400 mb-2 text-center">
+      Published by{' '}
+      <a href={authorUrl} target="_blank" rel="noopener noreferrer" className="underline hover:text-primary-700">
+        {author}
+      </a>
+    </p>
+  )
 }
 
 interface AuthorObj { name: string; title: string; slug: string }
@@ -124,6 +122,7 @@ function AuthorButton({ author, title, slug }: { author: string; title?: string;
   const pathname = usePathname()
   const isSelected = pathname === `/product-news/author/${slug}`
   const isCorp = author === 'Microsoft Corporate'
+  const isJudson = author.toLowerCase().replace(/[^a-z]/g, '').includes('judsonalthoff')
   return (
     <Link
       href={`/product-news/author/${slug}`}
@@ -133,7 +132,12 @@ function AuthorButton({ author, title, slug }: { author: string; title?: string;
           : 'bg-white/80 dark:bg-gray-800/50 border-gray-200 dark:border-gray-700 hover:border-primary-200 dark:hover:border-primary-800 hover:bg-primary-50/50 dark:hover:bg-primary-900/20 text-gray-900 dark:text-white'}
       `}
     >
-      <span className="w-full text-center font-medium leading-tight block">{decodeHtmlEntities(author)}</span>
+      <span className="w-full text-center font-medium leading-tight block flex items-center justify-center gap-2">
+        {isJudson && (
+          <Image src="/judsonalthoff.webp" alt="Judson Althoff" width={36} height={36} className="rounded-full object-cover shrink-0 mr-1" />
+        )}
+        {decodeHtmlEntities(author)}
+      </span>
       {title && <span className="w-full text-center block text-[10px] text-gray-600 dark:text-gray-300 leading-tight break-words whitespace-normal">{decodeHtmlEntities(title)}</span>}
     </Link>
   )
@@ -157,15 +161,19 @@ export function ProductNewsLayout({ children, title, description, icon }: Produc
   return (
     <div className="min-h-screen bg-white dark:bg-gray-950">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="mb-8">
-          <div className="flex items-center gap-3 mb-2">
-            <Image
-              src={icon}
-              alt={typeof title === 'string' ? title : ''}
-              width={32}
-              height={32}
-              className="w-8 h-8"
-            />
+        <div className="mb-8 text-center">
+          <div className="flex flex-row items-center gap-3 mb-2 justify-center">
+            {typeof icon === 'string' ? (
+              <Image
+                src={icon}
+                alt={typeof title === 'string' ? title : ''}
+                width={32}
+                height={32}
+                className="w-8 h-8"
+              />
+            ) : (
+              icon
+            )}
             <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
               {title}
             </h1>
@@ -177,14 +185,14 @@ export function ProductNewsLayout({ children, title, description, icon }: Produc
           )}
         </div>
 
-        <div className="mt-4 mb-2 w-full overflow-x-hidden">
+        <div className="mt-8 mb-2 w-full overflow-x-hidden">
           {/* Mobile: show all buttons in a single grid */}
-          <div className={`grid grid-cols-2 gap-3 w-full min-w-0 lg:hidden justify-center${!['/product-news/power-platform','/product-news/power-automate','/product-news/copilot','/product-news/azure-ai-foundry','/product-news/all-things-azure','/product-news/semantic-kernel','/product-news/fabric-blog','/product-news/power-bi'].includes(pathname) ? ' mb-8' : ''}`}>
+          <div className={`grid grid-cols-2 gap-3 w-full min-w-0 lg:hidden justify-center${!['/product-news/power-platform','/product-news/power-automate','/product-news/copilot','/product-news/azure-ai-foundry','/product-news/all-things-azure','/product-news/semantic-kernel','/product-news/fabric-blog','/product-news/power-bi'].includes(pathname) ? ' mb-12' : ''}`}>
             {products.map((product) => (
               <Link
                 key={product.name}
                 href={product.href}
-                className={`flex flex-row items-center justify-center gap-2 px-2.5 py-1 rounded-lg border transition-all duration-200 h-10 w-full
+                className={`flex flex-row items-center justify-center gap-2 px-2.5 py-1 rounded-lg border transition-all duration-200 h-10 w-full hover:bg-primary-50/80 active:scale-95 transition-all
                   ${
                     (product.href === '/product-news/microsoft-news' && (pathname === '/product-news/microsoft-news' || pathname.startsWith('/product-news/author/')))
                       ? 'bg-primary-50 border-primary-300 dark:bg-primary-900/50 dark:border-primary-700 shadow-sm ring-1 ring-primary-200 dark:ring-primary-800'
@@ -199,7 +207,7 @@ export function ProductNewsLayout({ children, title, description, icon }: Produc
                               : 'bg-white/80 dark:bg-gray-800/50 border-gray-200 dark:border-gray-700 hover:border-primary-200 dark:hover:border-primary-800 hover:bg-primary-50/50 dark:hover:bg-primary-900/20'
                   }`}
               >
-                {product.icon && product.icon !== '' && (
+                {product.icon && typeof product.icon === 'string' && product.icon !== '' ? (
                   <Image
                     src={product.icon}
                     alt={product.name}
@@ -207,7 +215,7 @@ export function ProductNewsLayout({ children, title, description, icon }: Produc
                     height={16}
                     className={`w-4 h-4 self-center object-contain ${pathname === product.href ? 'opacity-100' : 'opacity-70'}`}
                   />
-                )}
+                ) : product.icon}
                 <span className={`text-xs font-medium ${
                   pathname === product.href
                     ? 'text-primary-800 dark:text-primary-200 font-semibold'
@@ -219,12 +227,12 @@ export function ProductNewsLayout({ children, title, description, icon }: Produc
             ))}
           </div>
           {/* Desktop: force all buttons into a single horizontal row, shrink if needed */}
-          <div className={`hidden lg:flex flex-wrap gap-2 w-full pb-1 justify-center${!['/product-news/power-platform','/product-news/power-automate','/product-news/copilot','/product-news/azure-ai-foundry','/product-news/all-things-azure','/product-news/semantic-kernel','/product-news/fabric-blog','/product-news/power-bi'].includes(pathname) ? ' mb-8' : ''}`}>
+          <div className={`hidden lg:flex flex-wrap gap-2 w-full pb-1 justify-center${!['/product-news/power-platform','/product-news/power-automate','/product-news/copilot','/product-news/azure-ai-foundry','/product-news/all-things-azure','/product-news/semantic-kernel','/product-news/fabric-blog','/product-news/power-bi'].includes(pathname) ? ' mb-12' : ''}`}>
             {products.map((product) => (
               <Link
                 key={product.name}
                 href={product.href}
-                className={`flex items-center justify-center gap-2 px-2 py-1 rounded-lg border transition-all duration-200 h-10 min-w-[140px] max-w-[140px] flex-shrink text-xs
+                className={`flex items-center justify-center gap-2 px-2 py-1 rounded-lg border transition-all duration-200 h-10 min-w-[140px] max-w-[140px] flex-shrink text-xs hover:bg-primary-50/80 active:scale-95 transition-all
                   ${
                     (product.href === '/product-news/microsoft-news' && (pathname === '/product-news/microsoft-news' || pathname.startsWith('/product-news/author/')))
                       ? 'bg-primary-50 border-primary-300 dark:bg-primary-900/50 dark:border-primary-700 shadow-sm ring-1 ring-primary-200 dark:ring-primary-800'
@@ -239,7 +247,7 @@ export function ProductNewsLayout({ children, title, description, icon }: Produc
                               : 'bg-white/80 dark:bg-gray-800/50 border-gray-200 dark:border-gray-700 hover:border-primary-200 dark:hover:border-primary-800 hover:bg-primary-50/50 dark:hover:bg-primary-900/20'
                   }`}
               >
-                {product.icon && product.icon !== '' && (
+                {product.icon && typeof product.icon === 'string' && product.icon !== '' ? (
                   <Image
                     src={product.icon}
                     alt={product.name}
@@ -247,7 +255,7 @@ export function ProductNewsLayout({ children, title, description, icon }: Produc
                     height={16}
                     className={`w-4 h-4 self-center object-contain ${pathname === product.href ? 'opacity-100' : 'opacity-70'}`}
                   />
-                )}
+                ) : product.icon}
                 <span className={`text-xs font-medium ${
                   pathname === product.href
                     ? 'text-primary-800 dark:text-primary-200 font-semibold'
@@ -259,8 +267,8 @@ export function ProductNewsLayout({ children, title, description, icon }: Produc
             ))}
           </div>
 
-          {/* Power Platform sub-buttons, only show when Power Platform is selected and not on /product-news */}
-          {['/product-news/power-platform','/product-news/power-automate','/product-news/copilot'].includes(pathname) && (
+          {/* Power Platform sub-buttons, always show when Power Platform button is highlighted/selected */}
+          {powerPlatformPaths.includes(pathname) && (
             <div className="flex flex-wrap gap-2 mt-2 mb-4 justify-center sm:flex-nowrap">
               {[
                 { name: 'Power Apps', icon: '/icons/PowerApps_scalable.svg', href: '/product-news' },
