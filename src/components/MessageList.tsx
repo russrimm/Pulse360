@@ -28,10 +28,10 @@ export function MessageList({ messages }: MessageListProps) {
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [isTagDropdownOpen, setIsTagDropdownOpen] = useState(false);
-  const [dateFilterOpen, setDateFilterOpen] = useState(false);
   const [selectedDateFilter, setSelectedDateFilter] = useState<'all' | 'last30' | 'last7' | 'custom'>('all');
   const [customDateRange, setCustomDateRange] = useState<{ from: string; to: string }>({ from: '', to: '' });
   const [showMajorChangesOnly, setShowMajorChangesOnly] = useState(false);
+  const [openFilter, setOpenFilter] = useState<null | 'product' | 'tags' | 'severity' | 'area' | 'date'>(null)
 
   // Get unique tags
   const uniqueTags = useMemo(() => {
@@ -168,11 +168,13 @@ export function MessageList({ messages }: MessageListProps) {
               services={services}
               selectedServices={selectedServices}
               onFilterChange={setSelectedServices}
+              isOpen={openFilter === 'product'}
+              setOpen={open => setOpenFilter(open ? 'product' : null)}
             />
             </div>
             <div className="relative w-full md:w-auto">
               <button
-                onClick={() => setDateFilterOpen(!dateFilterOpen)}
+                onClick={() => setOpenFilter(openFilter === 'date' ? null : 'date')}
                 className="flex items-center justify-center gap-2 px-4 min-h-[32px] w-full md:w-auto text-gray-700 dark:text-gray-200 bg-white/80 dark:bg-gray-800/50 backdrop-blur-sm border border-gray-200 dark:border-gray-700/50 rounded-lg shadow-[inset_0_2px_4px_rgba(0,0,0,0.05)] dark:shadow-[inset_0_2px_4px_rgba(0,0,0,0.2)] hover:shadow-[inset_0_2px_4px_rgba(0,0,0,0.1)] dark:hover:shadow-[inset_0_2px_4px_rgba(0,0,0,0.3)] hover:border-primary-200 dark:hover:border-primary-800 hover:shadow-[0_0_0_1px_rgba(59,130,246,0.5)] dark:hover:shadow-[0_0_0_1px_rgba(59,130,246,0.5)] transition-all duration-300 relative"
                 aria-label="Filter by date"
               >
@@ -196,7 +198,7 @@ export function MessageList({ messages }: MessageListProps) {
                   </span>
                 )}
               </button>
-              {dateFilterOpen && (
+              {openFilter === 'date' && (
                 <div className="absolute z-10 w-72 mt-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow-lg">
                   <div className="p-4 border-b border-gray-200 dark:border-gray-700">
                     <h3 className="text-sm font-medium text-gray-900 dark:text-white">Filter by Date</h3>
@@ -268,7 +270,7 @@ export function MessageList({ messages }: MessageListProps) {
                       onClick={() => {
                         setSelectedDateFilter('all');
                         setCustomDateRange({ from: '', to: '' });
-                        setDateFilterOpen(false);
+                        setOpenFilter(null);
                       }}
                       className="w-full px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
                     >
@@ -298,6 +300,8 @@ export function MessageList({ messages }: MessageListProps) {
               messages={messages}
               selectedTags={selectedTags}
               onFilterChange={setSelectedTags}
+              isOpen={openFilter === 'tags'}
+              setOpen={open => setOpenFilter(open ? 'tags' : null)}
             />
             </div>
           </div>
