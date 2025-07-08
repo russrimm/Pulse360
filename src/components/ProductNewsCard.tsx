@@ -1,13 +1,14 @@
 'use client';
 
 import { ProductNews } from '@/lib/types';
+import type { ReactNode } from 'react';
 import Link from 'next/link';
 import { useEffect, useState, useMemo, useCallback } from 'react';
 import { Card } from './Card';
 
 interface ProductNewsCardProps {
   news: ProductNews;
-  productIcon?: string;
+  productIcon?: ReactNode;
 }
 
 // Helper to get author slug for Microsoft News
@@ -67,7 +68,7 @@ function AuthorWithTitle({ author }: { author: string }) {
   )
 }
 
-export function ProductNewsCard({ news, productIcon = '/icons/PowerPlatform_scalable.svg' }: ProductNewsCardProps) {
+export function ProductNewsCard({ news, productIcon }: ProductNewsCardProps) {
   const [decodedTitle, setDecodedTitle] = useState(news.title);
   const [decodedDescription, setDecodedDescription] = useState(news.description);
   const [decodedAuthor, setDecodedAuthor] = useState(news.author);
@@ -88,7 +89,7 @@ export function ProductNewsCard({ news, productIcon = '/icons/PowerPlatform_scal
     setDecodedAuthor(decodeHtmlEntities(safeAuthor));
   }, [news]);
 
-  const isCopilotStudio = productIcon?.includes('CopilotStudio');
+  const isCopilotStudio = typeof productIcon === 'string' && productIcon.includes('CopilotStudio');
   const descriptionLines = isCopilotStudio ? news.description.split('\n') : [];
   const enabledFor = descriptionLines.find(line => line.startsWith('Enabled for:'))?.replace('Enabled for:', '').trim();
   const publicPreview = descriptionLines.find(line => line.startsWith('Public Preview:'))?.replace('Public Preview:', '').trim();
@@ -112,6 +113,13 @@ export function ProductNewsCard({ news, productIcon = '/icons/PowerPlatform_scal
           aria-label={`Open news: ${decodedTitle}`}
         >
           <div className="flex-1 w-full min-w-0">
+            {productIcon && (
+              <div className="flex justify-center mb-2">{
+                typeof productIcon === 'string'
+                  ? <img src={productIcon} alt="Product icon" className="h-8 w-8 mr-2 inline-block align-middle" />
+                  : productIcon
+              }</div>
+            )}
             <h3 className="w-full overflow-hidden text-lg font-bold text-gray-900 dark:text-white group-hover:text-primary-600 dark:group-hover:text-primary-400 mb-2 text-center" style={{ wordBreak: 'normal', overflowWrap: 'anywhere' }}>
               {decodedTitle}
             </h3>

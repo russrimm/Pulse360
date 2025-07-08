@@ -4,12 +4,13 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import type { ReactNode } from 'react';
 
 interface ProductNewsLayoutProps {
   children: React.ReactNode;
   title: React.ReactNode;
   description?: string;
-  icon: string;
+  icon: string | ReactNode;
 }
 
 let products = [
@@ -25,7 +26,14 @@ let products = [
   },
   {
     name: 'Microsoft News',
-    icon: '/icons/Windows.svg',
+    icon: (
+      <svg aria-hidden="true" viewBox="0 0 25 25" fill="none" xmlns="http://www.w3.org/2000/svg" width={16} height={16} style={{display:'inline-block'}}>
+        <path d="M11.5216 0.5H0V11.9067H11.5216V0.5Z" fill="#f25022"></path>
+        <path d="M24.2418 0.5H12.7202V11.9067H24.2418V0.5Z" fill="#7fba00"></path>
+        <path d="M11.5216 13.0933H0V24.5H11.5216V13.0933Z" fill="#00a4ef"></path>
+        <path d="M24.2418 13.0933H12.7202V24.5H24.2418V13.0933Z" fill="#ffb900"></path>
+      </svg>
+    ),
     href: '/product-news/microsoft-news',
   },
   {
@@ -165,13 +173,17 @@ export function ProductNewsLayout({ children, title, description, icon }: Produc
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8 text-center">
           <div className="flex flex-row items-center gap-3 mb-2 justify-center">
-            <Image
-              src={icon}
-              alt={typeof title === 'string' ? title : ''}
-              width={32}
-              height={32}
-              className="w-8 h-8"
-            />
+            {typeof icon === 'string' ? (
+              <Image
+                src={icon}
+                alt={typeof title === 'string' ? title : ''}
+                width={32}
+                height={32}
+                className="w-8 h-8"
+              />
+            ) : (
+              icon
+            )}
             <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
               {title}
             </h1>
@@ -205,7 +217,7 @@ export function ProductNewsLayout({ children, title, description, icon }: Produc
                               : 'bg-white/80 dark:bg-gray-800/50 border-gray-200 dark:border-gray-700 hover:border-primary-200 dark:hover:border-primary-800 hover:bg-primary-50/50 dark:hover:bg-primary-900/20'
                   }`}
               >
-                {product.icon && product.icon !== '' && (
+                {product.icon && typeof product.icon === 'string' && product.icon !== '' ? (
                   <Image
                     src={product.icon}
                     alt={product.name}
@@ -213,7 +225,7 @@ export function ProductNewsLayout({ children, title, description, icon }: Produc
                     height={16}
                     className={`w-4 h-4 self-center object-contain ${pathname === product.href ? 'opacity-100' : 'opacity-70'}`}
                   />
-                )}
+                ) : product.icon}
                 <span className={`text-xs font-medium ${
                   pathname === product.href
                     ? 'text-primary-800 dark:text-primary-200 font-semibold'
@@ -245,7 +257,7 @@ export function ProductNewsLayout({ children, title, description, icon }: Produc
                               : 'bg-white/80 dark:bg-gray-800/50 border-gray-200 dark:border-gray-700 hover:border-primary-200 dark:hover:border-primary-800 hover:bg-primary-50/50 dark:hover:bg-primary-900/20'
                   }`}
               >
-                {product.icon && product.icon !== '' && (
+                {product.icon && typeof product.icon === 'string' && product.icon !== '' ? (
                   <Image
                     src={product.icon}
                     alt={product.name}
@@ -253,7 +265,7 @@ export function ProductNewsLayout({ children, title, description, icon }: Produc
                     height={16}
                     className={`w-4 h-4 self-center object-contain ${pathname === product.href ? 'opacity-100' : 'opacity-70'}`}
                   />
-                )}
+                ) : product.icon}
                 <span className={`text-xs font-medium ${
                   pathname === product.href
                     ? 'text-primary-800 dark:text-primary-200 font-semibold'
