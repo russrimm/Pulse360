@@ -4,12 +4,13 @@ interface SeverityFilterProps {
   severities: string[];
   selectedSeverities: string[];
   onFilterChange: (severities: string[]) => void;
+  isOpen: boolean;
+  setOpen: (open: boolean) => void;
 }
 
 const STORAGE_KEY = 'message-center-severity-filters';
 
-export function SeverityFilter({ severities, selectedSeverities, onFilterChange }: SeverityFilterProps) {
-  const [isOpen, setIsOpen] = useState(false);
+export function SeverityFilter({ severities, selectedSeverities, onFilterChange, isOpen, setOpen }: SeverityFilterProps) {
   const dropdownRef = useRef<HTMLDivElement>(null);
   const saveTimeoutRef = useRef<NodeJS.Timeout>();
 
@@ -27,16 +28,16 @@ export function SeverityFilter({ severities, selectedSeverities, onFilterChange 
 
   const handleClearAll = useCallback(() => {
     onFilterChange([]);
-    setIsOpen(false);
-  }, [onFilterChange]);
+    setOpen(false);
+  }, [onFilterChange, setOpen]);
 
   const sortedSeverities = useMemo(() => [...severities].sort(), [severities]);
 
   const handleClickOutside = useCallback((event: MouseEvent) => {
     if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-      setIsOpen(false);
+      setOpen(false);
     }
-  }, []);
+  }, [setOpen]);
 
   useEffect(() => {
     document.addEventListener('mousedown', handleClickOutside);
@@ -83,7 +84,7 @@ export function SeverityFilter({ severities, selectedSeverities, onFilterChange 
   return (
     <div className="relative inline-block" ref={dropdownRef}>
       <button
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={() => setOpen(!isOpen)}
         className="flex items-center justify-center gap-2 px-4 h-10 text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-primary-500 relative"
         aria-label="Filter severity"
       >

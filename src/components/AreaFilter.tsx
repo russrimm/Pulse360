@@ -6,16 +6,17 @@ interface AreaFilterProps {
   areas: string[];
   selectedAreas: string[];
   onFilterChange: (areas: string[]) => void;
+  isOpen: boolean;
+  setOpen: (open: boolean) => void;
 }
 
-export function AreaFilter({ areas, selectedAreas, onFilterChange }: AreaFilterProps) {
-  const [isOpen, setIsOpen] = useState(false);
+export function AreaFilter({ areas, selectedAreas, onFilterChange, isOpen, setOpen }: AreaFilterProps) {
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setIsOpen(false);
+        setOpen(false);
       }
     }
 
@@ -34,7 +35,7 @@ export function AreaFilter({ areas, selectedAreas, onFilterChange }: AreaFilterP
   return (
     <div className="relative w-full md:w-auto" ref={dropdownRef}>
       <button
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={() => setOpen(!isOpen)}
         className="flex items-center justify-center gap-2 px-4 h-8 text-gray-700 dark:text-gray-200 bg-white/80 dark:bg-gray-800/50 backdrop-blur-sm border border-gray-200 dark:border-gray-700/50 rounded-lg shadow-[inset_0_2px_4px_rgba(0,0,0,0.05)] dark:shadow-[inset_0_2px_4px_rgba(0,0,0,0.2)] hover:shadow-[inset_0_2px_4px_rgba(0,0,0,0.1)] dark:hover:shadow-[inset_0_2px_4px_rgba(0,0,0,0.3)] hover:border-primary-200 dark:hover:border-primary-800 hover:shadow-[0_0_0_1px_rgba(59,130,246,0.5)] dark:hover:shadow-[0_0_0_1px_rgba(59,130,246,0.5)] transition-all duration-300 relative w-full md:w-auto min-h-[32px]"
         aria-label="Filter by area"
       >
@@ -73,7 +74,7 @@ export function AreaFilter({ areas, selectedAreas, onFilterChange }: AreaFilterP
             <button
               onClick={() => {
                 onFilterChange([]);
-                setIsOpen(false);
+                setOpen(false);
               }}
               className="w-full px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
             >

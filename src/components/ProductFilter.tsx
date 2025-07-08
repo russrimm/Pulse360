@@ -7,6 +7,8 @@ interface ProductFilterProps {
   services: string[];
   selectedServices: string[];
   onFilterChange: (services: string[]) => void;
+  isOpen: boolean;
+  setOpen: (open: boolean) => void;
 }
 
 // Map of service names to their icons
@@ -103,8 +105,7 @@ function getServiceIcon(service: string): string | undefined {
   return serviceIconMap[service]
 }
 
-export function ProductFilter({ services, selectedServices, onFilterChange }: ProductFilterProps) {
-  const [isOpen, setIsOpen] = useState(false);
+export function ProductFilter({ services, selectedServices, onFilterChange, isOpen, setOpen }: ProductFilterProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const dropdownRef = useRef<HTMLDivElement>(null);
   const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -134,8 +135,8 @@ export function ProductFilter({ services, selectedServices, onFilterChange }: Pr
   // Clear all function
   const handleClearAll = useCallback(() => {
     onFilterChange([]);
-    setIsOpen(false);
-  }, [onFilterChange]);
+    setOpen(false);
+  }, [onFilterChange, setOpen]);
 
   // Memoize sorted services
   const sortedServices = useMemo(() => 
@@ -146,16 +147,16 @@ export function ProductFilter({ services, selectedServices, onFilterChange }: Pr
   // Memoize click outside handler
   const handleClickOutside = useCallback((event: MouseEvent) => {
     if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-      setIsOpen(false);
+      setOpen(false);
     }
-  }, []);
+  }, [setOpen]);
 
   // Handle keyboard navigation
   const handleKeyDown = useCallback((event: KeyboardEvent) => {
     if (!isOpen) return;
     
     if (event.key === 'Escape') {
-      setIsOpen(false);
+      setOpen(false);
     } else if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
       event.preventDefault();
       const options = Array.from(document.querySelectorAll('[role="option"]'));
@@ -170,7 +171,7 @@ export function ProductFilter({ services, selectedServices, onFilterChange }: Pr
         toggleService(service);
       }
     }
-  }, [isOpen, toggleService]);
+  }, [isOpen, setOpen, toggleService]);
 
   useEffect(() => {
     document.addEventListener('mousedown', handleClickOutside);
@@ -239,7 +240,7 @@ export function ProductFilter({ services, selectedServices, onFilterChange }: Pr
   return (
     <div className="relative inline-block w-full md:w-auto" ref={dropdownRef}>
       <button
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={() => setOpen(!isOpen)}
         className="flex items-center justify-center gap-2 px-4 h-8 text-gray-700 dark:text-gray-200 bg-white/80 dark:bg-gray-800/50 backdrop-blur-sm border border-gray-200 dark:border-gray-700/50 rounded-lg shadow-[inset_0_2px_4px_rgba(0,0,0,0.05)] dark:shadow-[inset_0_2px_4px_rgba(0,0,0,0.2)] hover:shadow-[inset_0_2px_4px_rgba(0,0,0,0.1)] dark:hover:shadow-[inset_0_2px_4px_rgba(0,0,0,0.3)] hover:border-primary-200 dark:hover:border-primary-800 hover:shadow-[0_0_0_1px_rgba(59,130,246,0.5)] dark:hover:shadow-[0_0_0_1px_rgba(59,130,246,0.5)] transition-all duration-300 relative w-full md:w-auto min-h-[32px]"
         aria-label="Filter products"
       >

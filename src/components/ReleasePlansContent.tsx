@@ -39,6 +39,7 @@ export function ReleasePlansContent({ releasePlans }: ReleasePlansContentProps) 
   const [selectedDateFilter, setSelectedDateFilter] = useState<'all' | 'last30' | 'last7' | 'custom'>('all');
   const [customDateRange, setCustomDateRange] = useState<{ from: string; to: string }>({ from: '', to: '' });
   const [dateFilterOpen, setDateFilterOpen] = useState(false);
+  const [openFilter, setOpenFilter] = useState<null | 'product' | 'area'>(null)
 
   const handleProductFilterChange = useCallback((services: string[]) => {
     setSelectedServices(services)
@@ -112,6 +113,8 @@ export function ReleasePlansContent({ releasePlans }: ReleasePlansContentProps) 
           services={allServices}
           selectedServices={selectedServices}
           onFilterChange={handleProductFilterChange}
+          isOpen={openFilter === 'product'}
+          setOpen={open => setOpenFilter(open ? 'product' : null)}
         />
         </div>
         <div className="w-full md:w-auto">
@@ -119,6 +122,8 @@ export function ReleasePlansContent({ releasePlans }: ReleasePlansContentProps) 
           areas={allAreas}
           selectedAreas={selectedAreas}
           onFilterChange={setSelectedAreas}
+          isOpen={openFilter === 'area'}
+          setOpen={open => setOpenFilter(open ? 'area' : null)}
         />
         </div>
         <div className="relative w-full md:w-auto">

@@ -5,11 +5,11 @@ interface TagsFilterProps {
   messages: Message[];
   selectedTags: string[];
   onFilterChange: (tags: string[]) => void;
+  isOpen: boolean;
+  setOpen: (open: boolean) => void;
 }
 
-export function TagsFilter({ messages, selectedTags, onFilterChange }: TagsFilterProps) {
-  const [isTagDropdownOpen, setIsTagDropdownOpen] = useState(false);
-
+export function TagsFilter({ messages, selectedTags, onFilterChange, isOpen, setOpen }: TagsFilterProps) {
   // Get unique tags from messages
   const uniqueTags = useMemo(() => {
     const allTags = messages.flatMap(message => message.tags);
@@ -19,7 +19,7 @@ export function TagsFilter({ messages, selectedTags, onFilterChange }: TagsFilte
   return (
     <div className="relative w-full md:w-auto">
       <button
-        onClick={() => setIsTagDropdownOpen(!isTagDropdownOpen)}
+        onClick={() => setOpen(!isOpen)}
         className="flex items-center justify-center gap-2 px-4 h-8 text-gray-700 dark:text-gray-200 bg-white/80 dark:bg-gray-800/50 backdrop-blur-sm border border-gray-200 dark:border-gray-700/50 rounded-lg shadow-[inset_0_2px_4px_rgba(0,0,0,0.05)] dark:shadow-[inset_0_2px_4px_rgba(0,0,0,0.2)] hover:shadow-[inset_0_2px_4px_rgba(0,0,0,0.1)] dark:hover:shadow-[inset_0_2px_4px_rgba(0,0,0,0.3)] hover:border-primary-200 dark:hover:border-primary-800 hover:shadow-[0_0_0_1px_rgba(59,130,246,0.5)] dark:hover:shadow-[0_0_0_1px_rgba(59,130,246,0.5)] transition-all duration-300 relative w-full md:w-auto min-h-[32px]"
         aria-label="Filter tags"
       >
@@ -43,7 +43,7 @@ export function TagsFilter({ messages, selectedTags, onFilterChange }: TagsFilte
           </span>
         )}
       </button>
-      {isTagDropdownOpen && (
+      {isOpen && (
         <div className="absolute z-10 w-72 mt-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow-lg">
           <div className="p-4 border-b border-gray-200 dark:border-gray-700">
             <h3 className="text-sm font-medium text-gray-900 dark:text-white">Filter Tags</h3>
@@ -77,7 +77,7 @@ export function TagsFilter({ messages, selectedTags, onFilterChange }: TagsFilte
             <button
               onClick={() => {
                 onFilterChange([]);
-                setIsTagDropdownOpen(false);
+                setOpen(false);
               }}
               className="w-full px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
             >
