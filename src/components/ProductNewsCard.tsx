@@ -5,6 +5,7 @@ import type { ReactNode } from 'react';
 import Link from 'next/link';
 import { useEffect, useState, useMemo, useCallback } from 'react';
 import { Card } from './Card';
+import Image from 'next/image';
 
 interface ProductNewsCardProps {
   news: ProductNews;
@@ -37,24 +38,6 @@ function useAuthorTitle(author: string | undefined) {
 }
 
 function AuthorWithTitle({ author }: { author: string }) {
-  const [title, setTitle] = useState<string | null>(null)
-  useEffect(() => {
-    if (!author) return
-    const slug = getAuthorSlug(author)
-    if (!slug) return
-    const url = `https://blogs.microsoft.com/blog/author/${slug}/`
-    fetch(url)
-      .then(res => res.text())
-      .then(html => {
-        const match = html.match(/<title>(.*?)<\/title>/i)
-        if (match && match[1]) {
-          const parts = match[1].split('|')
-          if (parts.length > 1) setTitle(parts[0].replace(/^Author: [^-]+- /, '').trim())
-          else setTitle(null)
-        }
-      })
-      .catch(() => setTitle(null))
-  }, [author])
   const slug = getAuthorSlug(author)
   const authorUrl = `https://blogs.microsoft.com/blog/author/${slug}/`
   return (
@@ -63,7 +46,6 @@ function AuthorWithTitle({ author }: { author: string }) {
       <a href={authorUrl} target="_blank" rel="noopener noreferrer" className="underline hover:text-primary-700">
         {author}
       </a>
-      {title && <span> – {title}</span>}
     </p>
   )
 }
@@ -113,13 +95,6 @@ export function ProductNewsCard({ news, productIcon }: ProductNewsCardProps) {
           aria-label={`Open news: ${decodedTitle}`}
         >
           <div className="flex-1 w-full min-w-0">
-            {productIcon && (
-              <div className="flex justify-center mb-2">{
-                typeof productIcon === 'string'
-                  ? <img src={productIcon} alt="Product icon" className="h-8 w-8 mr-2 inline-block align-middle" />
-                  : productIcon
-              }</div>
-            )}
             <h3 className="w-full overflow-hidden text-lg font-bold text-gray-900 dark:text-white group-hover:text-primary-600 dark:group-hover:text-primary-400 mb-2 text-center" style={{ wordBreak: 'normal', overflowWrap: 'anywhere' }}>
               {decodedTitle}
             </h3>

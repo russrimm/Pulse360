@@ -65,28 +65,18 @@ function getAuthorSlug(author: string) {
   return author.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')
 }
 
-// Fetch author title from their blog page
-function useAuthorTitle(author: string) {
-  const [title, setTitle] = useState<string | null>(null)
-  useEffect(() => {
-    if (!author) return
-    const slug = getAuthorSlug(author)
-    if (!slug) return
-    const url = `https://blogs.microsoft.com/blog/author/${slug}/`
-    fetch(url)
-      .then(res => res.text())
-      .then(html => {
-        const match = html.match(/<title>(.*?)<\/title>/i)
-        if (match && match[1]) {
-          // Remove 'Author: ' and keep only the part after the name
-          const parts = match[1].split('|')
-          if (parts.length > 1) setTitle(parts[0].replace(/^Author: [^-]+- /, '').trim())
-          else setTitle(null)
-        }
-      })
-      .catch(() => setTitle(null))
-  }, [author])
-  return title
+// Only show author name, no title fetch
+function AuthorWithTitle({ author }: { author: string }) {
+  const slug = getAuthorSlug(author)
+  const authorUrl = `https://blogs.microsoft.com/blog/author/${slug}/`
+  return (
+    <p className="text-xs text-gray-500 dark:text-gray-400 mb-2 text-center">
+      Published by{' '}
+      <a href={authorUrl} target="_blank" rel="noopener noreferrer" className="underline hover:text-primary-700">
+        {author}
+      </a>
+    </p>
+  )
 }
 
 interface AuthorObj { name: string; title: string; slug: string }
@@ -144,7 +134,7 @@ function AuthorButton({ author, title, slug }: { author: string; title?: string;
     >
       <span className="w-full text-center font-medium leading-tight block flex items-center justify-center gap-2">
         {isJudson && (
-          <Image src="/judsonalthoff.png" alt="Judson Althoff" width={36} height={36} className="rounded-full object-cover shrink-0 mr-1" />
+          <Image src="/judsonalthoff.webp" alt="Judson Althoff" width={36} height={36} className="rounded-full object-cover shrink-0 mr-1" />
         )}
         {decodeHtmlEntities(author)}
       </span>

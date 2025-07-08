@@ -125,7 +125,7 @@ export function NavigationTabs() {
                     aria-current={product.href === pathname ? 'page' : undefined}
                     onClick={handleMenuItemClick}
                   >
-                    <img src={product.icon} alt="" className="w-6 h-6" />
+                    <Image src={product.icon} alt="Product icon" width={24} height={24} className="w-6 h-6" loading="lazy" />
                     {product.label}
                   </Link>
                 ))}

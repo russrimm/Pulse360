@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect, useMemo, useCallback } from 'react';
+import Image from 'next/image';
 
 interface ProductFilterProps {
   services: string[];
@@ -304,7 +305,7 @@ export function ProductFilter({ services, selectedServices, onFilterChange }: Pr
                   />
                   <span className="ml-2 text-sm text-gray-700 dark:text-gray-200 flex items-center gap-2">
                     {iconSrc && (
-                      <img 
+                      <Image
                         src={iconSrc} 
                         alt={`${service} icon`}
                         className="w-4 h-4 object-contain"
