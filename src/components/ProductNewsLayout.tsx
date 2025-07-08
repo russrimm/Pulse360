@@ -124,6 +124,7 @@ function AuthorButton({ author, title, slug }: { author: string; title?: string;
   const pathname = usePathname()
   const isSelected = pathname === `/product-news/author/${slug}`
   const isCorp = author === 'Microsoft Corporate'
+  const isJudson = author.toLowerCase().replace(/[^a-z]/g, '').includes('judsonalthoff')
   return (
     <Link
       href={`/product-news/author/${slug}`}
@@ -133,7 +134,12 @@ function AuthorButton({ author, title, slug }: { author: string; title?: string;
           : 'bg-white/80 dark:bg-gray-800/50 border-gray-200 dark:border-gray-700 hover:border-primary-200 dark:hover:border-primary-800 hover:bg-primary-50/50 dark:hover:bg-primary-900/20 text-gray-900 dark:text-white'}
       `}
     >
-      <span className="w-full text-center font-medium leading-tight block">{decodeHtmlEntities(author)}</span>
+      <span className="w-full text-center font-medium leading-tight block flex items-center justify-center gap-2">
+        {isJudson && (
+          <Image src="/judsonalthoff.png" alt="Judson Althoff" width={36} height={36} className="rounded-full object-cover shrink-0 mr-1" />
+        )}
+        {decodeHtmlEntities(author)}
+      </span>
       {title && <span className="w-full text-center block text-[10px] text-gray-600 dark:text-gray-300 leading-tight break-words whitespace-normal">{decodeHtmlEntities(title)}</span>}
     </Link>
   )
@@ -177,14 +183,14 @@ export function ProductNewsLayout({ children, title, description, icon }: Produc
           )}
         </div>
 
-        <div className="mt-4 mb-2 w-full overflow-x-hidden">
+        <div className="mt-8 mb-2 w-full overflow-x-hidden">
           {/* Mobile: show all buttons in a single grid */}
-          <div className={`grid grid-cols-2 gap-3 w-full min-w-0 lg:hidden justify-center${!['/product-news/power-platform','/product-news/power-automate','/product-news/copilot','/product-news/azure-ai-foundry','/product-news/all-things-azure','/product-news/semantic-kernel','/product-news/fabric-blog','/product-news/power-bi'].includes(pathname) ? ' mb-8' : ''}`}>
+          <div className={`grid grid-cols-2 gap-3 w-full min-w-0 lg:hidden justify-center${!['/product-news/power-platform','/product-news/power-automate','/product-news/copilot','/product-news/azure-ai-foundry','/product-news/all-things-azure','/product-news/semantic-kernel','/product-news/fabric-blog','/product-news/power-bi'].includes(pathname) ? ' mb-12' : ''}`}>
             {products.map((product) => (
               <Link
                 key={product.name}
                 href={product.href}
-                className={`flex flex-row items-center justify-center gap-2 px-2.5 py-1 rounded-lg border transition-all duration-200 h-10 w-full
+                className={`flex flex-row items-center justify-center gap-2 px-2.5 py-1 rounded-lg border transition-all duration-200 h-10 w-full hover:bg-primary-50/80 active:scale-95 transition-all
                   ${
                     (product.href === '/product-news/microsoft-news' && (pathname === '/product-news/microsoft-news' || pathname.startsWith('/product-news/author/')))
                       ? 'bg-primary-50 border-primary-300 dark:bg-primary-900/50 dark:border-primary-700 shadow-sm ring-1 ring-primary-200 dark:ring-primary-800'
@@ -219,12 +225,12 @@ export function ProductNewsLayout({ children, title, description, icon }: Produc
             ))}
           </div>
           {/* Desktop: force all buttons into a single horizontal row, shrink if needed */}
-          <div className={`hidden lg:flex flex-wrap gap-2 w-full pb-1 justify-center${!['/product-news/power-platform','/product-news/power-automate','/product-news/copilot','/product-news/azure-ai-foundry','/product-news/all-things-azure','/product-news/semantic-kernel','/product-news/fabric-blog','/product-news/power-bi'].includes(pathname) ? ' mb-8' : ''}`}>
+          <div className={`hidden lg:flex flex-wrap gap-2 w-full pb-1 justify-center${!['/product-news/power-platform','/product-news/power-automate','/product-news/copilot','/product-news/azure-ai-foundry','/product-news/all-things-azure','/product-news/semantic-kernel','/product-news/fabric-blog','/product-news/power-bi'].includes(pathname) ? ' mb-12' : ''}`}>
             {products.map((product) => (
               <Link
                 key={product.name}
                 href={product.href}
-                className={`flex items-center justify-center gap-2 px-2 py-1 rounded-lg border transition-all duration-200 h-10 min-w-[140px] max-w-[140px] flex-shrink text-xs
+                className={`flex items-center justify-center gap-2 px-2 py-1 rounded-lg border transition-all duration-200 h-10 min-w-[140px] max-w-[140px] flex-shrink text-xs hover:bg-primary-50/80 active:scale-95 transition-all
                   ${
                     (product.href === '/product-news/microsoft-news' && (pathname === '/product-news/microsoft-news' || pathname.startsWith('/product-news/author/')))
                       ? 'bg-primary-50 border-primary-300 dark:bg-primary-900/50 dark:border-primary-700 shadow-sm ring-1 ring-primary-200 dark:ring-primary-800'
@@ -259,8 +265,8 @@ export function ProductNewsLayout({ children, title, description, icon }: Produc
             ))}
           </div>
 
-          {/* Power Platform sub-buttons, only show when Power Platform is selected and not on /product-news */}
-          {['/product-news/power-platform','/product-news/power-automate','/product-news/copilot'].includes(pathname) && (
+          {/* Power Platform sub-buttons, always show when Power Platform button is highlighted/selected */}
+          {powerPlatformPaths.includes(pathname) && (
             <div className="flex flex-wrap gap-2 mt-2 mb-4 justify-center sm:flex-nowrap">
               {[
                 { name: 'Power Apps', icon: '/icons/PowerApps_scalable.svg', href: '/product-news' },

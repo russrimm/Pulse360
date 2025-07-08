@@ -98,7 +98,7 @@ export function ProductNewsCard({ news, productIcon = '/icons/PowerPlatform_scal
 
   return (
     <div className="w-full max-w-md mx-auto min-w-0">
-      <Card>
+      <div className="group bg-white/80 dark:bg-gray-800/50 backdrop-blur-sm rounded-xl shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-200 dark:border-gray-700/50 hover:border-primary-200 dark:hover:border-primary-800 hover:-translate-y-1 h-full cursor-pointer flex flex-col">
         <div
           className="p-4 flex flex-col h-full cursor-pointer min-w-0"
           onClick={() => window.open(news.link, '_blank', 'noopener,noreferrer')}
@@ -108,10 +108,10 @@ export function ProductNewsCard({ news, productIcon = '/icons/PowerPlatform_scal
           aria-label={`Open news: ${decodedTitle}`}
         >
           <div className="flex-1 w-full min-w-0">
-            <h3 className="w-full overflow-hidden text-base font-semibold text-gray-900 dark:text-white group-hover:text-primary-600 dark:group-hover:text-primary-400 mb-2 text-center" style={{ wordBreak: 'normal', overflowWrap: 'anywhere' }}>
+            <h3 className="w-full overflow-hidden text-lg font-bold text-gray-900 dark:text-white group-hover:text-primary-600 dark:group-hover:text-primary-400 mb-2 text-center" style={{ wordBreak: 'normal', overflowWrap: 'anywhere' }}>
               {decodedTitle}
             </h3>
-            <p className="text-sm font-semibold text-primary-700 dark:text-primary-300 mb-0 text-center">
+            <p className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-0 text-center">
               {new Date(news.publishDate).toLocaleDateString('en-US', {
                 year: 'numeric',
                 month: 'long',
@@ -119,7 +119,7 @@ export function ProductNewsCard({ news, productIcon = '/icons/PowerPlatform_scal
               })}
             </p>
             {news.author && <AuthorWithTitle author={news.author} />}
-            <p className="text-xs text-gray-600 dark:text-gray-300 line-clamp-3 text-center">
+            <p className="text-base text-gray-700 dark:text-gray-300 line-clamp-3 text-center mt-2">
               {decodedDescription}
             </p>
           </div>
@@ -136,7 +136,7 @@ export function ProductNewsCard({ news, productIcon = '/icons/PowerPlatform_scal
             </a>
           </div>
         </div>
-      </Card>
+      </div>
     </div>
   );
 } 

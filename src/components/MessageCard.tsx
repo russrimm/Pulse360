@@ -101,7 +101,7 @@ export const MessageCard: React.FC<MessageCardProps> = ({ message, onClick }) =>
 
   return (
     <Link href={`/message/${message.id}`}>
-      <Card onClick={handleClick}>
+      <div onClick={handleClick} className="group bg-white/80 dark:bg-gray-800/50 backdrop-blur-sm rounded-xl shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-200 dark:border-gray-700/50 hover:border-primary-200 dark:hover:border-primary-800 hover:-translate-y-1 h-full cursor-pointer flex flex-col">
         {/* Major Change banner at the very top */}
         {message.isMajorChange && (
           <div className="w-full bg-red-50 dark:bg-red-900/30 border-b border-red-200 dark:border-red-800 animate-pulse-subtle">
@@ -128,7 +128,7 @@ export const MessageCard: React.FC<MessageCardProps> = ({ message, onClick }) =>
                 <>
                   {isNew && (
                     <span
-                      className={'inline-flex items-center justify-center w-12 h-4 px-1 py-0 rounded-md text-[9px] tracking-wide whitespace-nowrap shadow-lg transition-all duration-200 font-semibold bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-200 border border-emerald-400 shadow-[0_0_8px_2px_#10b981] dark:border-emerald-300'}
+                      className="inline-flex items-center justify-center px-3 py-0.5 rounded-full text-xs font-semibold tracking-wide whitespace-nowrap shadow-sm border bg-emerald-50 text-emerald-700 dark:bg-emerald-900/20 dark:text-emerald-200 border-emerald-200/70 dark:border-emerald-700/70"
                       title="New"
                       style={{textOverflow:'ellipsis',overflow:'hidden'}}
                     >
@@ -137,7 +137,7 @@ export const MessageCard: React.FC<MessageCardProps> = ({ message, onClick }) =>
                   )}
                   {isUpdated && (
                     <span
-                      className={'inline-flex items-center justify-center w-12 h-4 px-1 py-0 rounded-md text-[9px] tracking-wide whitespace-nowrap shadow-lg transition-all duration-200 font-semibold bg-teal-50 dark:bg-teal-900/20 text-teal-700 dark:text-teal-200 border border-teal-400 shadow-[0_0_8px_2px_#14b8a6] dark:border-teal-300 ml-1'}
+                      className="inline-flex items-center justify-center px-3 py-0.5 rounded-full text-xs font-semibold tracking-wide whitespace-nowrap shadow-sm border bg-teal-50 text-teal-700 dark:bg-teal-900/20 dark:text-teal-200 border-teal-200/70 dark:border-teal-700/70 ml-1"
                       title="Updated"
                       style={{textOverflow:'ellipsis',overflow:'hidden'}}
                     >
@@ -146,11 +146,12 @@ export const MessageCard: React.FC<MessageCardProps> = ({ message, onClick }) =>
                   )}
                   {isRetirement && (
                     <span
-                      className="inline-flex items-center justify-center w-12 h-4 px-1 py-0 rounded-md text-[9px] tracking-wide whitespace-nowrap shadow-lg transition-all duration-200 font-semibold bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-200 border border-blue-400 ml-1"
-                      title="Retirement"
+                      className="inline-flex items-center justify-center px-3 py-0.5 rounded-full text-xs font-semibold tracking-wide whitespace-nowrap shadow-sm border bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-200 border-red-400 ml-1"
+                      title="Deprecation"
                       style={{textOverflow:'ellipsis',overflow:'hidden'}}
                     >
-                      Retirement
+                      <svg className="w-3.5 h-3.5 mr-1 text-red-500 dark:text-red-300" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+                      Deprecation
                     </span>
                   )}
                 </>
@@ -285,7 +286,7 @@ export const MessageCard: React.FC<MessageCardProps> = ({ message, onClick }) =>
             })()}
           </div>
         </div>
-      </Card>
+      </div>
     </Link>
   );
 };
