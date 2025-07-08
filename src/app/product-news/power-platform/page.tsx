@@ -3,31 +3,14 @@
 import { getPowerPlatformNews } from '@/lib/api';
 import { ProductNewsCard } from '@/components/ProductNewsCard';
 import { ProductNewsLayout } from '@/components/ProductNewsLayout';
-import { useEffect, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { ProductNews } from '@/lib/types';
 
 export default function PowerPlatformNewsPage() {
-  const [news, setNews] = useState<ProductNews[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    const fetchNews = async () => {
-      try {
-        setLoading(true);
-        const data = await getPowerPlatformNews();
-        setNews(data);
-        setError(null);
-      } catch (err) {
-        console.error('Error fetching news:', err);
-        setError('Failed to load news. Please try again later.');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchNews();
-  }, []);
+  const { data: news, isLoading, isError, error, refetch } = useQuery({
+    queryKey: ['powerPlatformNews'],
+    queryFn: getPowerPlatformNews,
+  });
 
   return (
     <ProductNewsLayout
@@ -35,7 +18,7 @@ export default function PowerPlatformNewsPage() {
       description="Stay up to date with the latest news and announcements from Microsoft Power Platform."
       icon="/icons/PowerPlatform_scalable.svg"
     >
-      {loading ? (
+      {isLoading ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 gap-y-8 px-2">
           {[1,2,3].map(i => (
             <div key={i} className="w-full max-w-md mx-auto min-w-0">
@@ -50,11 +33,11 @@ export default function PowerPlatformNewsPage() {
             </div>
           ))}
         </div>
-      ) : error ? (
+      ) : isError ? (
         <div className="text-center py-12">
-          <p className="text-red-600 dark:text-red-400">{error}</p>
+          <p className="text-red-600 dark:text-red-400">{error instanceof Error ? error.message : 'Failed to load news. Please try again later.'}</p>
           <button 
-            onClick={() => window.location.reload()}
+            onClick={() => refetch()}
             className="mt-4 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
           >
             Try Again
@@ -62,7 +45,7 @@ export default function PowerPlatformNewsPage() {
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {news.map((item) => (
+          {news?.map((item) => (
             <ProductNewsCard 
               key={item.id} 
               news={item} 

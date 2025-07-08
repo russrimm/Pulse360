@@ -79,9 +79,13 @@ export function ProductNewsCard({ news, productIcon = '/icons/PowerPlatform_scal
       return textarea.value;
     };
 
-    setDecodedTitle(decodeHtmlEntities(news.title));
-    setDecodedDescription(decodeHtmlEntities(news.description.replace(/<[^>]*>/g, '')));
-    setDecodedAuthor(decodeHtmlEntities(news.author));
+    const safeTitle = typeof news.title === 'string' ? news.title : '';
+    const safeDescription = typeof news.description === 'string' ? news.description : '';
+    const safeAuthor = typeof news.author === 'string' ? news.author : '';
+
+    setDecodedTitle(decodeHtmlEntities(safeTitle));
+    setDecodedDescription(decodeHtmlEntities(safeDescription.replace(/<[^>]*>/g, '')));
+    setDecodedAuthor(decodeHtmlEntities(safeAuthor));
   }, [news]);
 
   const isCopilotStudio = productIcon?.includes('CopilotStudio');

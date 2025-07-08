@@ -7,6 +7,7 @@ import { ThemeProvider } from 'next-themes'
 import Navbar from '@/components/Navbar'
 import { NavigationTabs } from '@/components/NavigationTabs'
 import { ErrorBoundary } from '@/components/ErrorBoundary'
+import { ReactQueryProvider } from '@/components/ReactQueryProvider'
 
 if (process.env.NODE_ENV === 'production') {
   // eslint-disable-next-line no-console
@@ -62,15 +63,17 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <ErrorBoundary>
-            <div className="min-h-screen flex flex-col">
-              <Navbar />
-              <NavigationTabs />
-              <main className="flex-1">
-                {children}
-              </main>
-            </div>
-          </ErrorBoundary>
+          <ReactQueryProvider>
+            <ErrorBoundary>
+              <div className="min-h-screen flex flex-col">
+                <Navbar />
+                <NavigationTabs />
+                <main className="flex-1">
+                  {children}
+                </main>
+              </div>
+            </ErrorBoundary>
+          </ReactQueryProvider>
         </ThemeProvider>
       </body>
     </html>
