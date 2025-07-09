@@ -8,8 +8,14 @@ const nextConfig = {
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
     formats: ['image/webp'],
     minimumCacheTTL: 60,
-    domains: ['devblogs.microsoft.com'],
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'devblogs.microsoft.com',
+        pathname: '**',
+      },
+    ],
   },
 };
 
-module.exports = nextConfig; 
+module.exports = nextConfig;

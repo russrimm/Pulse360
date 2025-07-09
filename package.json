@@ -29,7 +29,9 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-icons": "^5.5.0",
-    "xml2js": "^0.6.2"
+    "rss-parser": "^3.13.0",
+    "xml2js": "^0.6.2",
+    "zustand": "^5.0.6"
   },
   "devDependencies": {
     "@eslint/css": "^0.7.0",

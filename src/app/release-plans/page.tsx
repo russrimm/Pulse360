@@ -24,7 +24,7 @@ export default async function ReleasePlansPage() {
   const endpoint = 'https://18571ae92db1e2fc97ef2398a6944c.06.environment.api.powerplatform.com/copilotstudio/dataverse-backed/authenticated/bots/cr7d6_agent/conversations?api-version=2022-03-01-preview';
 
   return (
-    <div className="min-h-screen bg-gray-900 dark:bg-black">
+    <div className="min-h-screen bg-white dark:bg-black">
       <ReleasePlannerAgentChat />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex flex-col items-center justify-center mb-8 gap-4">

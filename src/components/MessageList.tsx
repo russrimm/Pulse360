@@ -9,6 +9,7 @@ import { LoadingSpinner } from './LoadingSpinner';
 import { SearchBar } from '@/components/SearchBar';
 import { TagsFilter } from '@/components/TagsFilter';
 import { addDays, isAfter, isBefore, parseISO, startOfDay, endOfDay, subDays } from 'date-fns';
+import { useFilterStore } from './filterStore';
 
 interface MessageListProps {
   messages: Message[];
@@ -19,19 +20,26 @@ const ITEMS_PER_PAGE = 12;
 export function MessageList({ messages }: MessageListProps) {
   const router = useRouter();
   const [services, setServices] = useState<string[]>([]);
-  const [selectedServices, setSelectedServices] = useState<string[]>([]);
   const [visibleMessages, setVisibleMessages] = useState<Message[]>([]);
   const [page, setPage] = useState(1);
   const observerRef = useRef<IntersectionObserver | null>(null);
   const loadMoreRef = useRef<HTMLDivElement>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
-  const [isTagDropdownOpen, setIsTagDropdownOpen] = useState(false);
-  const [selectedDateFilter, setSelectedDateFilter] = useState<'all' | 'last30' | 'last7' | 'custom'>('all');
-  const [customDateRange, setCustomDateRange] = useState<{ from: string; to: string }>({ from: '', to: '' });
-  const [showMajorChangesOnly, setShowMajorChangesOnly] = useState(false);
-  const [openFilter, setOpenFilter] = useState<null | 'product' | 'tags' | 'severity' | 'area' | 'date'>(null)
+
+  // Zustand filter state
+  const selectedTags = useFilterStore(state => state.selectedTags);
+  const setSelectedTags = useFilterStore(state => state.setSelectedTags);
+  const selectedServices = useFilterStore(state => state.selectedServices);
+  const setSelectedServices = useFilterStore(state => state.setSelectedServices);
+  const openFilter = useFilterStore(state => state.openFilter);
+  const setOpenFilter = useFilterStore(state => state.setOpenFilter);
+  const selectedDateFilter = useFilterStore(state => state.selectedDateFilter);
+  const setSelectedDateFilter = useFilterStore(state => state.setSelectedDateFilter);
+  const customDateRange = useFilterStore(state => state.customDateRange);
+  const setCustomDateRange = useFilterStore(state => state.setCustomDateRange);
+  const showMajorChangesOnly = useFilterStore(state => state.showMajorChangesOnly);
+  const setShowMajorChangesOnly = useFilterStore(state => state.setShowMajorChangesOnly);
 
   // Get unique tags
   const uniqueTags = useMemo(() => {
@@ -92,10 +100,14 @@ export function MessageList({ messages }: MessageListProps) {
     setServices(uniqueServices);
   }, [messages]);
 
-  // Update available tags
+  // Update available tags only if necessary
   useEffect(() => {
     const uniqueTags = Array.from(new Set(messages.flatMap(m => m.tags))).sort((a, b) => a.localeCompare(b));
-    setSelectedTags([]);
+    // Only reset selectedTags if any selected tag is no longer available
+    if (selectedTags.some(tag => !uniqueTags.includes(tag))) {
+      setSelectedTags(selectedTags.filter(tag => uniqueTags.includes(tag)));
+    }
+    // Do NOT reset selectedTags on every messages change
   }, [messages]);
 
   // Update visible messages when page changes
@@ -126,6 +138,12 @@ export function MessageList({ messages }: MessageListProps) {
       }
     };
   }, [visibleMessages.length, filteredMessages.length]);
+
+  useEffect(() => {
+    console.log('openFilter changed:', openFilter);
+  }, [openFilter]);
+
+  // Remove patch effect for openFilter/selectedTags
 
   const handleMessageClick = (messageId: string) => {
     router.push(`/message/${messageId}`);
@@ -296,13 +314,7 @@ export function MessageList({ messages }: MessageListProps) {
             </button>
             </div>
             <div className="w-full md:w-auto">
-            <TagsFilter
-              messages={messages}
-              selectedTags={selectedTags}
-              onFilterChange={setSelectedTags}
-              isOpen={openFilter === 'tags'}
-              setOpen={open => setOpenFilter(open ? 'tags' : null)}
-            />
+            <TagsFilter messages={messages} />
             </div>
           </div>
         </div>

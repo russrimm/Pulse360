@@ -94,6 +94,7 @@ const serviceIconMap: Record<string, string> = {
   'Microsoft Clipchamp': '/icons/clipchamp.svg',
   'Microsoft Copilot (Microsoft 365)': '/icons/copilot.svg',
   'Microsoft 365 Copilot App': '/icons/copilot.svg',
+  'Microsoft Loop': '/icons/loop.svg',
 };
 
 // Storage key for persisting filter settings

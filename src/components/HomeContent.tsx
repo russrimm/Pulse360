@@ -11,7 +11,6 @@ interface HomeContentProps {
 
 export function HomeContent({ messages }: HomeContentProps) {
   const [filteredMessages, setFilteredMessages] = useState<Message[]>(messages);
-
   return (
     <>
       <SearchBar messages={messages} onSearch={setFilteredMessages} placeholder="Search by Title, Product, or Message ID..." />

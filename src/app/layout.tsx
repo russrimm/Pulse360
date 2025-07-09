@@ -8,6 +8,7 @@ import Navbar from '@/components/Navbar'
 import { NavigationTabs } from '@/components/NavigationTabs'
 import { ErrorBoundary } from '@/components/ErrorBoundary'
 import { ReactQueryProvider } from '@/components/ReactQueryProvider'
+import { FilterProvider } from '@/components/FilterContext'
 
 if (process.env.NODE_ENV === 'production') {
   // eslint-disable-next-line no-console
@@ -56,7 +57,7 @@ export default function RootLayout({
         <link rel="icon" href="/favicon.ico" sizes="any" />
         <link rel="icon" href="/icons/m365.svg" type="image/svg+xml" />
       </head>
-      <body className={`${inter.className} min-h-screen bg-gray-900 dark:bg-black transition-colors duration-200`} suppressHydrationWarning>
+      <body className={`${inter.className} min-h-screen bg-white dark:bg-black transition-colors duration-200`} suppressHydrationWarning>
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
@@ -65,13 +66,15 @@ export default function RootLayout({
         >
           <ReactQueryProvider>
             <ErrorBoundary>
-              <div className="min-h-screen flex flex-col">
-                <Navbar />
-                <NavigationTabs />
-                <main className="flex-1">
-                  {children}
-                </main>
-              </div>
+              <FilterProvider>
+                <div className="min-h-screen flex flex-col">
+                  <Navbar />
+                  <NavigationTabs />
+                  <main className="flex-1">
+                    {children}
+                  </main>
+                </div>
+              </FilterProvider>
             </ErrorBoundary>
           </ReactQueryProvider>
         </ThemeProvider>

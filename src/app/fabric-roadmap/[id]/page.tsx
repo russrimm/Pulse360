@@ -33,7 +33,7 @@ export default async function FabricRoadmapDetailPage({ params }: PageProps) {
 
   // Map to ReleasePlanDetail shape if needed
   return (
-    <div className="min-h-screen bg-gray-900 dark:bg-black">
+    <div className="min-h-screen bg-white dark:bg-black">
       <ReleasePlanDetail plan={{
         id: plan.ReleaseItemID,
         title: plan.FeatureName,
