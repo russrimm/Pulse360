@@ -1,4 +1,5 @@
-import React from 'react';
+"use client";
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import CVECard from '../../components/CVECard';
 
@@ -46,39 +47,53 @@ async function fetchMonths(): Promise<UpdateMonth[]> {
   return (data.value || []).sort((a: UpdateMonth, b: UpdateMonth) => new Date(b.InitialReleaseDate).getTime() - new Date(a.InitialReleaseDate).getTime());
 }
 
-async function fetchCVEsForMonth(monthId: string): Promise<Vulnerability[]> {
+async function fetchCVEsForMonth(monthId: string): Promise<any> {
   const res = await fetch(CVRF_URL + monthId, { headers: { Accept: 'application/json' } });
   if (!res.ok) throw new Error('Failed to fetch CVEs for month');
   const data = await res.json();
-  return data.Vulnerability || [];
+  return data;
 }
 
-export default async function SecurityUpdatesPage({ searchParams }: { searchParams?: { month?: string } }) {
+export default function SecurityUpdatesPage({ searchParams }: { searchParams?: { month?: string } }) {
   const params = searchParams;
-  let months: UpdateMonth[] = [];
-  let vulnerabilities: Vulnerability[] = [];
-  let error: string | null = null;
-  let selectedMonth = params?.month;
-  let releaseDate = '';
-  let revisionHistory: any[] | undefined = undefined;
-  let productTree: any = undefined;
-  try {
-    months = await fetchMonths();
-    if (!selectedMonth) {
-      selectedMonth = months[0]?.ID;
+  const [months, setMonths] = useState<UpdateMonth[]>([]);
+  const [vulnerabilities, setVulnerabilities] = useState<Vulnerability[]>([]);
+  const [error, setError] = useState<string | null>(null);
+  const [selectedMonth, setSelectedMonth] = useState<string | undefined>(params?.month);
+  const [releaseDate, setReleaseDate] = useState<string>('');
+  const [revisionHistory, setRevisionHistory] = useState<any[] | undefined>(undefined);
+  const [productTree, setProductTree] = useState<any>(undefined);
+
+  useEffect(() => {
+    let isMounted = true;
+    async function load() {
+      try {
+        const monthsData = await fetchMonths();
+        if (!isMounted) return;
+        setMonths(monthsData);
+        let monthToFetch = selectedMonth || monthsData[0]?.ID;
+        setSelectedMonth(monthToFetch);
+        if (monthToFetch) {
+          const data = await fetchCVEsForMonth(monthToFetch);
+          if (!isMounted) return;
+          setVulnerabilities(data.Vulnerability || []);
+          setReleaseDate(data.ReleaseDate || '');
+          setRevisionHistory(data.RevisionHistory);
+          setProductTree(data.ProductTree);
+        }
+      } catch (e: any) {
+        if (!isMounted) return;
+        setError(e?.message || 'Failed to load security updates.');
+      }
     }
-    if (selectedMonth) {
-      const res = await fetch(CVRF_URL + selectedMonth, { headers: { Accept: 'application/json' } });
-      if (!res.ok) throw new Error('Failed to fetch CVEs for month');
-      const data = await res.json();
-      vulnerabilities = data.Vulnerability || [];
-      releaseDate = data.ReleaseDate || '';
-      revisionHistory = data.RevisionHistory;
-      productTree = data.ProductTree;
-    }
-  } catch (e: any) {
-    error = e?.message || 'Failed to load security updates.';
-  }
+    load();
+    return () => { isMounted = false; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedMonth]);
+
+  const handleMonthChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setSelectedMonth(e.target.value);
+  };
 
   return (
     <main className="max-w-4xl mx-auto py-8 px-4">
@@ -88,7 +103,8 @@ export default async function SecurityUpdatesPage({ searchParams }: { searchPara
         <select
           id="month"
           name="month"
-          defaultValue={selectedMonth}
+          value={selectedMonth}
+          onChange={handleMonthChange}
           className="w-full max-w-xs px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500 shadow-sm"
         >
           {months.map((m) => (
