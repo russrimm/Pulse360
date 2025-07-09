@@ -57,13 +57,13 @@ const serviceIcons: Record<string, string> = {
 };
 
 interface PageProps {
-  params: Promise<{ id: string }>;
+  params: { id: string };
+  searchParams?: { [key: string]: string | string[] | undefined };
 }
 
 export default async function M365UpdatePage({ params }: PageProps) {
-  const { id } = await params;
   const updates = await getM365Updates();
-  const update = updates.find(u => u.id === id);
+  const update = updates.find(u => u.id === params.id);
 
   if (!update) {
     notFound();

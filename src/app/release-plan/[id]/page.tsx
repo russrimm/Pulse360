@@ -3,8 +3,8 @@ import { ReleasePlanDetail } from '@/components/ReleasePlanDetail';
 import { notFound } from 'next/navigation';
 
 interface PageProps {
-  params: Promise<{ id: string }>;
-  searchParams: { [key: string]: string | string[] | undefined };
+  params: { id: string };
+  searchParams?: { [key: string]: string | string[] | undefined };
 }
 
 interface ReleasePlan {
@@ -26,9 +26,8 @@ interface ReleasePlan {
 }
 
 export default async function ReleasePlanPage({ params }: PageProps) {
-  const resolvedParams = await params;
   const releasePlans = await getReleasePlans();
-  const plan = releasePlans.find((p: ReleasePlan) => p.id === resolvedParams.id);
+  const plan = releasePlans.find((p: ReleasePlan) => p.id === params.id);
 
   if (!plan) {
     notFound();

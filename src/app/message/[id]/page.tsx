@@ -13,8 +13,8 @@ type PageProps = {
 */
 
 type PageProps = {
-  params: Promise<{ id: string }>;
-  searchParams: { [key: string]: string | string[] | undefined };
+  params: { id: string };
+  searchParams?: { [key: string]: string | string[] | undefined };
 };
 
 /* This should stay like this
@@ -24,8 +24,7 @@ export default async function MessagePage({ params }: PageProps) {
 */
 
 export default async function MessagePage({ params }: PageProps) {
-  const resolvedParams = await params;
-  const message = await getMessage(resolvedParams.id);  
+  const message = await getMessage(params.id);  
 
   if (!message) {
     return notFound();
