@@ -14,7 +14,7 @@ export const metadata = {
 
 interface PageProps {
   params: Promise<{ id: string }>;
-  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+  searchParams: { [key: string]: string | string[] | undefined };
 }
 
 export default async function AzureUpdatePage({ params }: PageProps) {

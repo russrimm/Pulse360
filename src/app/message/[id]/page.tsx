@@ -14,8 +14,8 @@ type PageProps = {
 
 type PageProps = {
   params: Promise<{ id: string }>;
-  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
-  };
+  searchParams: { [key: string]: string | string[] | undefined };
+};
 
 /* This should stay like this
 export default async function MessagePage({ params }: PageProps) {

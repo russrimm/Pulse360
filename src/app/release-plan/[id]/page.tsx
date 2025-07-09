@@ -4,7 +4,7 @@ import { notFound } from 'next/navigation';
 
 interface PageProps {
   params: Promise<{ id: string }>;
-  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+  searchParams: { [key: string]: string | string[] | undefined };
 }
 
 interface ReleasePlan {
