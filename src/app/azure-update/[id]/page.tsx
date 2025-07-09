@@ -18,9 +18,8 @@ interface PageProps {
 }
 
 export default async function AzureUpdatePage({ params }: PageProps) {
-  const resolvedParams = await params;
   const updates = await getAzureUpdates();
-  const update = updates.find(u => u.id === resolvedParams.id);
+  const update = updates.find(u => u.id === params.id);
 
   if (!update) {
     notFound();
