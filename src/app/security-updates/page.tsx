@@ -54,7 +54,7 @@ async function fetchCVEsForMonth(monthId: string): Promise<Vulnerability[]> {
 }
 
 export default async function SecurityUpdatesPage({ searchParams }: { searchParams?: { month?: string } }) {
-  const params = await searchParams;
+  const params = searchParams;
   let months: UpdateMonth[] = [];
   let vulnerabilities: Vulnerability[] = [];
   let error: string | null = null;
