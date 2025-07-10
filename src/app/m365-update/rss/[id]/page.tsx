@@ -9,8 +9,9 @@ interface PageProps {
   searchParams?: { [key: string]: string | string[] | undefined };
 }
 
-export default async function M365UpdatePage({ params }: PageProps) {
-  const update = await getM365Update(params.id);
+export default async function M365UpdatePage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  const update = await getM365Update(id);
 
   if (!update) {
     notFound();

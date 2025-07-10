@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect, useMemo, useCallback } from 'react';
 import Image from 'next/image';
+import { getProductIcon } from '@/lib/getProductIcon';
 
 interface ProductFilterProps {
   services: string[];
@@ -95,6 +96,8 @@ const serviceIconMap: Record<string, string> = {
   'Microsoft Copilot (Microsoft 365)': '/icons/copilot.svg',
   'Microsoft 365 Copilot App': '/icons/copilot.svg',
   'Microsoft Loop': '/icons/loop.svg',
+  'Microsoft Graph': '/icons/graph.svg',
+  'Office 365': '/icons/m365.svg',
 };
 
 // Storage key for persisting filter settings
@@ -102,8 +105,8 @@ const STORAGE_KEY = 'message-center-filters';
 
 // Get icon for a service, using m365.svg for any 'Microsoft 365' prefix
 function getServiceIcon(service: string): string | undefined {
-  if (service.startsWith('Microsoft 365')) return '/icons/m365.svg'
-  return serviceIconMap[service]
+  if (service.startsWith('Microsoft 365')) return '/icons/m365.svg';
+  return serviceIconMap[service] || getProductIcon(service) || undefined;
 }
 
 export function ProductFilter({ services, selectedServices, onFilterChange, isOpen, setOpen }: ProductFilterProps) {

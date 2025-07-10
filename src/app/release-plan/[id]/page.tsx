@@ -25,9 +25,10 @@ interface ReleasePlan {
   service: string[];
 }
 
-export default async function ReleasePlanPage({ params }: PageProps) {
+export default async function ReleasePlanPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
   const releasePlans = await getReleasePlans();
-  const plan = releasePlans.find((p: ReleasePlan) => p.id === params.id);
+  const plan = releasePlans.find((p: ReleasePlan) => p.id === id);
 
   if (!plan) {
     notFound();

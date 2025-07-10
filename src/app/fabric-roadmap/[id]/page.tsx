@@ -7,7 +7,8 @@ interface PageProps {
   searchParams?: { [key: string]: string | string[] | undefined };
 }
 
-export default async function FabricRoadmapDetailPage({ params }: PageProps) {
+export default async function FabricRoadmapDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
   // Fetch all productIds used in fabric-roadmap
   const productIds = [
     '796a0af7-2dc7-ee11-9079-000d3a3419a8', // Fabric
@@ -27,7 +28,7 @@ export default async function FabricRoadmapDetailPage({ params }: PageProps) {
     await Promise.all(productIds.map(getFabricRoadmap))
   ).flat()
 
-  const plan = allPlans.find(p => p.ReleaseItemID === params.id)
+  const plan = allPlans.find(p => p.ReleaseItemID === id)
   if (!plan) return notFound()
 
   // Map to ReleasePlanDetail shape if needed

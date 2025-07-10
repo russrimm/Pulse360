@@ -10,8 +10,9 @@ type PageProps = {
   searchParams?: { [key: string]: string | string[] | undefined };
 };
 
-export default async function MessagePage({ params }: PageProps) {
-  const message = await getMessage(params.id);  
+export default async function MessagePage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  const message = await getMessage(id);  
 
   if (!message) {
     return notFound();

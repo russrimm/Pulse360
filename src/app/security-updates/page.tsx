@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import CVECard from '../../components/CVECard';
+import { useSearchParams } from 'next/navigation';
 
 const API_URL = 'https://api.msrc.microsoft.com/cvrf/v3.0/updates';
 const CVRF_URL = 'https://api.msrc.microsoft.com/cvrf/v3.0/cvrf/';
@@ -41,25 +42,26 @@ function formatDate(date: string | undefined) {
 }
 
 async function fetchMonths(): Promise<UpdateMonth[]> {
-  const res = await fetch(API_URL, { headers: { Accept: 'application/json' } });
+  const res = await fetch('/api/security-updates');
   if (!res.ok) throw new Error('Failed to fetch months');
   const data = await res.json();
   return (data.value || []).sort((a: UpdateMonth, b: UpdateMonth) => new Date(b.InitialReleaseDate).getTime() - new Date(a.InitialReleaseDate).getTime());
 }
 
 async function fetchCVEsForMonth(monthId: string): Promise<any> {
-  const res = await fetch(CVRF_URL + monthId, { headers: { Accept: 'application/json' } });
+  const res = await fetch(`/api/security-updates?monthId=${encodeURIComponent(monthId)}`);
   if (!res.ok) throw new Error('Failed to fetch CVEs for month');
   const data = await res.json();
   return data;
 }
 
-export default function SecurityUpdatesPage({ searchParams }: { searchParams?: { month?: string } }) {
-  const params = searchParams;
+export default function SecurityUpdatesPage() {
+  const searchParams = useSearchParams();
+  const monthParam = searchParams.get('month');
   const [months, setMonths] = useState<UpdateMonth[]>([]);
   const [vulnerabilities, setVulnerabilities] = useState<Vulnerability[]>([]);
   const [error, setError] = useState<string | null>(null);
-  const [selectedMonth, setSelectedMonth] = useState<string | undefined>(params?.month);
+  const [selectedMonth, setSelectedMonth] = useState<string | undefined>(monthParam || undefined);
   const [releaseDate, setReleaseDate] = useState<string>('');
   const [revisionHistory, setRevisionHistory] = useState<any[] | undefined>(undefined);
   const [productTree, setProductTree] = useState<any>(undefined);
