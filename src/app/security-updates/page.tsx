@@ -125,12 +125,11 @@ export default function SecurityUpdatesPage() {
         </div>
       ) : (
         <div className="space-y-8">
-          {vulnerabilities.map((vuln, idx) => (
-            <CVECard key={`${vuln.ID || (vuln.CVE && vuln.CVE[0]) || ''}-${idx}`} vuln={vuln} month={selectedMonth!} releaseDate={releaseDate} revisionHistory={revisionHistory} productTree={productTree} />
-          ))}
-          {vulnerabilities.length === 0 && (
-            <div className="text-center text-gray-500 dark:text-gray-400 py-12 text-lg">No CVEs found for this month.</div>
-          )}
+          {vulnerabilities
+            .filter(vuln => !!vuln.Title && getFieldValue(vuln.Title).trim() !== '')
+            .map((vuln, idx) => (
+              <CVECard key={`${vuln.ID || (vuln.CVE && vuln.CVE[0]) || ''}-${idx}`} vuln={vuln} month={selectedMonth!} releaseDate={releaseDate} revisionHistory={revisionHistory} productTree={productTree} />
+            ))}
         </div>
       )}
     </main>
