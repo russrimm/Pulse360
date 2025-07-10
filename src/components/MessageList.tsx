@@ -190,6 +190,9 @@ export function MessageList({ messages }: MessageListProps) {
               setOpen={open => setOpenFilter(open ? 'product' : null)}
             />
             </div>
+            <div className="w-full md:w-auto">
+              <TagsFilter messages={messages} />
+            </div>
             <div className="relative w-full md:w-auto">
               <button
                 onClick={() => setOpenFilter(openFilter === 'date' ? null : 'date')}
@@ -312,9 +315,6 @@ export function MessageList({ messages }: MessageListProps) {
                 0
               </span>
             </button>
-            </div>
-            <div className="w-full md:w-auto">
-            <TagsFilter messages={messages} />
             </div>
           </div>
         </div>

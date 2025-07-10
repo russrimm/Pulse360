@@ -12,13 +12,9 @@ interface TagsFilterProps {
 export function TagsFilter({ messages }: TagsFilterProps) {
   const selectedTags = useFilterStore(state => state.selectedTags);
   const setSelectedTags = useFilterStore(state => state.setSelectedTags);
-  const openFilter = useFilterStore(state => state.openFilter);
-  const setOpenFilter = useFilterStore(state => state.setOpenFilter);
-  const isOpen = openFilter === 'tags';
-  const setOpen = (open: boolean) => setOpenFilter(open ? 'tags' : null);
-
-  // Debug: Log openFilter value on every render
-  console.log('TagsFilter openFilter:', openFilter);
+  // Use local state for open/close
+  const [isOpen, setIsOpen] = useState(false);
+  const setOpen = setIsOpen;
 
   // Get unique tags from messages
   const uniqueTags = useMemo(() => {
@@ -27,23 +23,21 @@ export function TagsFilter({ messages }: TagsFilterProps) {
   }, [messages]);
 
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const internalClick = useRef(false);
 
   // Click outside handler (same as ProductFilter)
   const handleClickOutside = useCallback((event: MouseEvent) => {
+    if (internalClick.current) {
+      internalClick.current = false;
+      return;
+    }
     console.log('handleClickOutside fired', { eventTarget: event.target, dropdownRef: dropdownRef.current });
     if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
       setOpen(false);
     }
   }, [setOpen]);
 
-  useEffect(() => {
-    if (isOpen) {
-      document.addEventListener('mousedown', handleClickOutside);
-      return () => {
-        document.removeEventListener('mousedown', handleClickOutside);
-      };
-    }
-  }, [isOpen, handleClickOutside]);
+  // Remove useEffect for click outside
 
   return (
     <div className="relative w-full md:w-auto" ref={dropdownRef}>
@@ -73,7 +67,10 @@ export function TagsFilter({ messages }: TagsFilterProps) {
         )}
       </button>
       {isOpen && (
-        <div className="absolute z-10 w-72 mt-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow-lg">
+        <div
+          className="absolute z-10 w-72 mt-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow-lg"
+          onPointerDown={() => { internalClick.current = true; }}
+        >
           <div className="p-4 border-b border-gray-200 dark:border-gray-700">
             <h3 className="text-sm font-medium text-gray-900 dark:text-white">Filter Tags</h3>
             <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
@@ -85,6 +82,8 @@ export function TagsFilter({ messages }: TagsFilterProps) {
               <label
                 key={tag}
                 className="flex items-center px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md cursor-pointer"
+                onMouseDown={e => e.stopPropagation()}
+                onClick={e => e.stopPropagation()}
               >
                 <input
                   type="checkbox"
@@ -97,6 +96,7 @@ export function TagsFilter({ messages }: TagsFilterProps) {
                     }
                   }}
                   className="w-4 h-4 text-primary-600 border-gray-300 rounded focus:ring-primary-500"
+                  onClick={e => e.stopPropagation()}
                 />
                 <span className="ml-2 text-sm text-gray-700 dark:text-gray-200">{tag}</span>
               </label>
