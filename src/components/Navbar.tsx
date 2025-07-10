@@ -59,20 +59,6 @@ const Navbar = () => {
                   priority
                 />
               </Link>
-              <Link
-                href="/security-updates"
-                className="group relative flex items-center justify-center w-9 h-9 rounded-full bg-white/70 dark:bg-gray-800/70 border border-gray-200 dark:border-gray-700 hover:bg-primary-50 dark:hover:bg-primary-900/40 hover:border-primary-300 dark:hover:border-primary-700 transition-colors shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
-                title="Security Updates"
-              >
-                <Image
-                  src="/icons/defender.svg"
-                  alt="Security Updates"
-                  width={20}
-                  height={20}
-                  className="w-5 h-5"
-                  priority
-                />
-              </Link>
               <ThemeToggle />
             </div>
           </div>
