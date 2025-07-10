@@ -113,7 +113,6 @@ export default function SecurityUpdatesPage() {
             <option key={m.ID} value={m.ID}>{m.DocumentTitle}</option>
           ))}
         </select>
-        <button type="submit" className="ml-2 px-4 py-2 rounded-lg bg-primary-600 text-white font-semibold hover:bg-primary-700 transition">Go</button>
       </form>
       {releaseDate && (
         <div className="mb-6 text-center text-xs text-gray-500 dark:text-gray-400">Release Date: {formatDate(releaseDate)}</div>
@@ -125,11 +124,25 @@ export default function SecurityUpdatesPage() {
         </div>
       ) : (
         <div className="space-y-8">
-          {vulnerabilities
-            .filter(vuln => !!vuln.Title && getFieldValue(vuln.Title).trim() !== '')
-            .map((vuln, idx) => (
-              <CVECard key={`${vuln.ID || (vuln.CVE && vuln.CVE[0]) || ''}-${idx}`} vuln={vuln} month={selectedMonth!} releaseDate={releaseDate} revisionHistory={revisionHistory} productTree={productTree} />
-            ))}
+          {vulnerabilities.length === 0 && !error
+            ? [1,2,3].map(i => (
+                <div key={i} className="w-full">
+                  <div className="bg-white/80 dark:bg-gray-800/50 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700/50 p-6 animate-pulse flex flex-col h-full">
+                    <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-3/4 mb-4 mx-auto" />
+                    <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/2 mb-2 mx-auto" />
+                    <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-2/3 mb-2 mx-auto" />
+                    <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-5/6 mb-2 mx-auto" />
+                    <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-1/2 mb-6 mx-auto" />
+                    <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-24 mx-auto mt-auto" />
+                  </div>
+                </div>
+              ))
+            : vulnerabilities
+                .filter(vuln => !!vuln.Title && getFieldValue(vuln.Title).trim() !== '')
+                .map((vuln, idx) => (
+                  <CVECard key={`${vuln.ID || (vuln.CVE && vuln.CVE[0]) || ''}-${idx}`} vuln={vuln} month={selectedMonth!} releaseDate={releaseDate} revisionHistory={revisionHistory} productTree={productTree} />
+                ))
+          }
         </div>
       )}
     </main>
