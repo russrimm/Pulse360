@@ -3,12 +3,12 @@ import { ReleasePlanDetail } from '@/components/ReleasePlanDetail'
 import { getFabricRoadmap } from '@/lib/fabricApi' // You may need to create this helper if not present
 
 interface PageProps {
-  params: Promise<{ id: string }>
-  searchParams?: Promise<{ [key: string]: string | string[] | undefined }>
+  params: { id: string };
+  searchParams?: { [key: string]: string | string[] | undefined };
 }
 
-export default async function FabricRoadmapDetailPage({ params }: PageProps) {
-  const resolvedParams = await params
+export default async function FabricRoadmapDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
   // Fetch all productIds used in fabric-roadmap
   const productIds = [
     '796a0af7-2dc7-ee11-9079-000d3a3419a8', // Fabric
@@ -28,12 +28,12 @@ export default async function FabricRoadmapDetailPage({ params }: PageProps) {
     await Promise.all(productIds.map(getFabricRoadmap))
   ).flat()
 
-  const plan = allPlans.find(p => p.ReleaseItemID === resolvedParams.id)
+  const plan = allPlans.find(p => p.ReleaseItemID === id)
   if (!plan) return notFound()
 
   // Map to ReleasePlanDetail shape if needed
   return (
-    <div className="min-h-screen bg-gray-900 dark:bg-black">
+    <div className="min-h-screen bg-white dark:bg-black">
       <ReleasePlanDetail plan={{
         id: plan.ReleaseItemID,
         title: plan.FeatureName,

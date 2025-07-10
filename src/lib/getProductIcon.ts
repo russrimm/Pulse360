@@ -18,6 +18,7 @@ export function getProductIcon(product: string): string | null {
     'visual studio': '/icons/Visual Studio.svg',
     'visual studio code': '/icons/azure/devops/VisualStudioCode.svg',
     'vs code': '/icons/azure/devops/VisualStudioCode.svg',
+    'microsoft graph': '/icons/graph.svg',
   }
 
   for (const [key, path] of Object.entries(specialMappings)) {

@@ -5,12 +5,11 @@ import { format } from 'date-fns';
 import { ProductBadge } from '@/components/ProductBadge';
 
 interface PageProps {
-  params: Promise<{
-    id: string;
-  }>;
+  params: { id: string };
+  searchParams?: { [key: string]: string | string[] | undefined };
 }
 
-export default async function M365UpdatePage({ params }: PageProps) {
+export default async function M365UpdatePage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const update = await getM365Update(id);
 

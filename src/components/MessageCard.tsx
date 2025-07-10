@@ -49,6 +49,7 @@ const serviceIcons: Record<string, string> = {
   'Microsoft Clipchamp': '/icons/clipchamp.svg',
   'Microsoft Copilot (Microsoft 365)': '/icons/copilot.svg',
   'Azure Databricks': '/icons/databricks.svg',
+  'Microsoft Loop': '/icons/loop.svg',
 };
 
 // Normalize service names

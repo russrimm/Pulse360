@@ -97,7 +97,7 @@ export function MessageDetail({ message }: MessageDetailProps) {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-black flex flex-col items-center py-8 px-2">
+    <div className="min-h-screen bg-white dark:bg-black flex flex-col items-center py-8 px-2">
       <div className="w-full max-w-3xl mb-4">
         <Link
           href="/message-center"

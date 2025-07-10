@@ -3,8 +3,8 @@ import { ReleasePlanDetail } from '@/components/ReleasePlanDetail';
 import { notFound } from 'next/navigation';
 
 interface PageProps {
-  params: Promise<{ id: string }>;
-  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+  params: { id: string };
+  searchParams?: { [key: string]: string | string[] | undefined };
 }
 
 interface ReleasePlan {
@@ -25,10 +25,10 @@ interface ReleasePlan {
   service: string[];
 }
 
-export default async function ReleasePlanPage({ params }: PageProps) {
-  const resolvedParams = await params;
+export default async function ReleasePlanPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
   const releasePlans = await getReleasePlans();
-  const plan = releasePlans.find((p: ReleasePlan) => p.id === resolvedParams.id);
+  const plan = releasePlans.find((p: ReleasePlan) => p.id === id);
 
   if (!plan) {
     notFound();

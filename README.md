@@ -1,12 +1,12 @@
-# Microsoft Pulse 360°
+# Pulse 360°
 
-A modern, filterable, multi-product roadmap and message center for Microsoft Fabric, Power Platform, and Microsoft 365. Built with Next.js App Router, TypeScript, Tailwind CSS, Shadcn UI, and Radix UI.
+A modern, filterable, multi-product roadmap and message center for Microsoft Fabric, Power Platform, Microsoft 365, and Security Updates. Built with Next.js App Router, TypeScript, Tailwind CSS, Shadcn UI, and Radix UI.
 
 ## Features
 
 ### Core Functionality
-- Real-time updates and release plans for Microsoft 365, Fabric, Power Platform, Azure, and more
-- Unified, filterable roadmap and message center UI
+- Real-time updates and release plans for Microsoft 365, Fabric, Power Platform, Azure, and Security Updates
+- Unified, filterable roadmap, message center, and security update UI
 - Responsive, mobile-first design
 - Dark/Light mode with system preference
 - Accessible, modern design system (Shadcn UI, Radix, Tailwind)
@@ -19,6 +19,7 @@ A modern, filterable, multi-product roadmap and message center for Microsoft Fab
 - **/product-news**: Aggregated product news, with subpages for Power Platform, Power BI, Power Automate, Microsoft News, Tech Community, Learn Blog, Copilot, and Copilot Studio
 - **/m365-updates**: Microsoft 365 update feed
 - **/azure-updates**: Azure update feed
+- **/security-updates**: Security Updates from the official MSRC CVRF API, with monthly filtering and detailed CVE cards
 - **/map** and **/test-map**: (Experimental) Map-based visualizations
 - **/message/[id]**: Message Center detail page with product tab, message ID badge, impact pills, and meta info
 - **/fabric-roadmap/[id]**, **/release-plan/[id]**, **/m365-update/[id]**, **/azure-update/[id]**: Drillthrough detail pages for roadmap, release, and update items
@@ -29,6 +30,18 @@ A modern, filterable, multi-product roadmap and message center for Microsoft Fab
 - Case- and whitespace-insensitive filtering
 - Filter buttons styled for mobile/desktop, equal widths on mobile
 - "Showing X" label after Filters heading
+
+### Security Updates (MSRC CVRF API)
+- Fetches official Microsoft Security Response Center (MSRC) CVRF data for each month
+- Dropdown to select and filter by month
+- Card layout for each CVE, mimicking the MSRC Update Guide
+- Expandable details for each CVE
+- Table layout for CVE details: Product, Impact, Max Severity, Article, Download
+- Robust extraction of product names, impact, severity, KB articles, and download links
+- Prominent CVE.org link for each CVE
+- Weakness (CWE) row with ID and description
+- Revision history and last updated info
+- Fallbacks for missing data, always shows something useful
 
 ### Message Center & Card UI
 - Message cards: compact, modern, with product badges, message ID badge, impact pills (User/Admin), and "New"/"Updated" pills
@@ -79,7 +92,7 @@ A modern, filterable, multi-product roadmap and message center for Microsoft Fab
 4. Open [http://localhost:3000](http://localhost:3000) in your browser
 
 ## API Integration
-- Data fetched from Microsoft Fabric, Power Platform, and M365 public APIs
+- Data fetched from Microsoft Fabric, Power Platform, M365, and MSRC public APIs
 - Server-side proxy for bot-protected endpoints
 - ProductId GUIDs mapped to ProductName
 - Handles large API responses (Next.js cache disabled if >2MB)

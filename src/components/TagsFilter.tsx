@@ -1,23 +1,52 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useRef, useEffect, useCallback } from 'react';
 import type { Message } from '@/lib/types';
+import { useFilterStore } from './filterStore';
+
+// Debug: Log when TagsFilter renders and the current openFilter value
+console.log('TagsFilter rendered');
 
 interface TagsFilterProps {
   messages: Message[];
-  selectedTags: string[];
-  onFilterChange: (tags: string[]) => void;
-  isOpen: boolean;
-  setOpen: (open: boolean) => void;
 }
 
-export function TagsFilter({ messages, selectedTags, onFilterChange, isOpen, setOpen }: TagsFilterProps) {
+export function TagsFilter({ messages }: TagsFilterProps) {
+  const selectedTags = useFilterStore(state => state.selectedTags);
+  const setSelectedTags = useFilterStore(state => state.setSelectedTags);
+  const openFilter = useFilterStore(state => state.openFilter);
+  const setOpenFilter = useFilterStore(state => state.setOpenFilter);
+  const isOpen = openFilter === 'tags';
+  const setOpen = (open: boolean) => setOpenFilter(open ? 'tags' : null);
+
+  // Debug: Log openFilter value on every render
+  console.log('TagsFilter openFilter:', openFilter);
+
   // Get unique tags from messages
   const uniqueTags = useMemo(() => {
     const allTags = messages.flatMap(message => message.tags);
     return Array.from(new Set(allTags)).sort();
   }, [messages]);
 
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // Click outside handler (same as ProductFilter)
+  const handleClickOutside = useCallback((event: MouseEvent) => {
+    console.log('handleClickOutside fired', { eventTarget: event.target, dropdownRef: dropdownRef.current });
+    if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+      setOpen(false);
+    }
+  }, [setOpen]);
+
+  useEffect(() => {
+    if (isOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+      return () => {
+        document.removeEventListener('mousedown', handleClickOutside);
+      };
+    }
+  }, [isOpen, handleClickOutside]);
+
   return (
-    <div className="relative w-full md:w-auto">
+    <div className="relative w-full md:w-auto" ref={dropdownRef}>
       <button
         onClick={() => setOpen(!isOpen)}
         className="flex items-center justify-center gap-2 px-4 h-8 text-gray-700 dark:text-gray-200 bg-white/80 dark:bg-gray-800/50 backdrop-blur-sm border border-gray-200 dark:border-gray-700/50 rounded-lg shadow-[inset_0_2px_4px_rgba(0,0,0,0.05)] dark:shadow-[inset_0_2px_4px_rgba(0,0,0,0.2)] hover:shadow-[inset_0_2px_4px_rgba(0,0,0,0.1)] dark:hover:shadow-[inset_0_2px_4px_rgba(0,0,0,0.3)] hover:border-primary-200 dark:hover:border-primary-800 hover:shadow-[0_0_0_1px_rgba(59,130,246,0.5)] dark:hover:shadow-[0_0_0_1px_rgba(59,130,246,0.5)] transition-all duration-300 relative w-full md:w-auto min-h-[32px]"
@@ -62,9 +91,9 @@ export function TagsFilter({ messages, selectedTags, onFilterChange, isOpen, set
                   checked={selectedTags.includes(tag)}
                   onChange={(e) => {
                     if (e.target.checked) {
-                      onFilterChange([...selectedTags, tag]);
+                      setSelectedTags([...selectedTags, tag]);
                     } else {
-                      onFilterChange(selectedTags.filter(t => t !== tag));
+                      setSelectedTags(selectedTags.filter(t => t !== tag));
                     }
                   }}
                   className="w-4 h-4 text-primary-600 border-gray-300 rounded focus:ring-primary-500"
@@ -76,7 +105,7 @@ export function TagsFilter({ messages, selectedTags, onFilterChange, isOpen, set
           <div className="p-3 border-t border-gray-200 dark:border-gray-700">
             <button
               onClick={() => {
-                onFilterChange([]);
+                setSelectedTags([]);
                 setOpen(false);
               }}
               className="w-full px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"

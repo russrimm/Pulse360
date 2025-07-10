@@ -60,6 +60,13 @@ export function NavigationTabs() {
         </svg>
       ),
     },
+    {
+      name: 'Security Updates',
+      href: '/security-updates',
+      icon: (
+        <Image src="/icons/defender.svg" alt="Security Updates" width={20} height={20} className="w-5 h-5" />
+      ),
+    },
   ];
 
   return (

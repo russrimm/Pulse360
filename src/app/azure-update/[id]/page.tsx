@@ -13,14 +13,14 @@ export const metadata = {
 };
 
 interface PageProps {
-  params: Promise<{ id: string }>;
-  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+  params: { id: string };
+  searchParams: { [key: string]: string | string[] | undefined };
 }
 
-export default async function AzureUpdatePage({ params }: PageProps) {
-  const resolvedParams = await params;
+export default async function AzureUpdatePage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
   const updates = await getAzureUpdates();
-  const update = updates.find(u => u.id === resolvedParams.id);
+  const update = updates.find(u => u.id === id);
 
   if (!update) {
     notFound();

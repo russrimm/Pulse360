@@ -11,7 +11,7 @@ const Navbar = () => {
   return (
     <nav className="md:sticky md:top-0 z-50 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm border-b border-gray-200 dark:border-gray-700">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-12 sm:h-16">
+        <div className="flex justify-between items-center">
           <div className="flex items-center space-x-8">
             <Link href="/" className="flex items-center">
               <span className="text-2xl sm:text-4xl font-bold bg-gradient-to-r from-primary-600 to-primary-400 dark:from-primary-400 dark:to-primary-300 bg-clip-text text-transparent">
@@ -53,6 +53,20 @@ const Navbar = () => {
                 <Image
                   src="/icons/azure/general/10005-icon-service-Information.svg"
                   alt="About"
+                  width={20}
+                  height={20}
+                  className="w-5 h-5"
+                  priority
+                />
+              </Link>
+              <Link
+                href="/security-updates"
+                className="group relative flex items-center justify-center w-9 h-9 rounded-full bg-white/70 dark:bg-gray-800/70 border border-gray-200 dark:border-gray-700 hover:bg-primary-50 dark:hover:bg-primary-900/40 hover:border-primary-300 dark:hover:border-primary-700 transition-colors shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
+                title="Security Updates"
+              >
+                <Image
+                  src="/icons/defender.svg"
+                  alt="Security Updates"
                   width={20}
                   height={20}
                   className="w-5 h-5"
