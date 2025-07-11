@@ -19,7 +19,7 @@ A modern, filterable, multi-product roadmap and message center for Microsoft Fab
 - **/product-news**: Aggregated product news, with subpages for Power Platform, Power BI, Power Automate, Microsoft News, Tech Community, Learn Blog, Copilot, and Copilot Studio
 - **/m365-updates**: Microsoft 365 update feed
 - **/azure-updates**: Azure update feed
-- **/security-updates**: Security Updates from the official MSRC CVRF API, with monthly filtering and detailed CVE cards
+- **/msrc**: Security Updates from the official MSRC CVRF API, with monthly filtering and detailed CVE cards
 - **/map** and **/test-map**: (Experimental) Map-based visualizations
 - **/message/[id]**: Message Center detail page with product tab, message ID badge, impact pills, and meta info
 - **/fabric-roadmap/[id]**, **/release-plan/[id]**, **/m365-update/[id]**, **/azure-update/[id]**: Drillthrough detail pages for roadmap, release, and update items

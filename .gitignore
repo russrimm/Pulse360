@@ -33,3 +33,10 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts 
 /src/generated/prisma
+
+# Playwright
+node_modules/
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/

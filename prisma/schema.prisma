@@ -31,3 +31,20 @@ model Preference {
   key    String
   value  String
 }
+
+model PublishedListing {
+  id               String   @id @default(uuid())
+  product          String
+  edition          String
+  release          String?
+  supportPolicy    String?
+  startDate        Int?
+  mainstreamDate   Int?
+  extendedEndDate  Int?
+  retirementDate   Int?
+  releaseStartDate Int?
+  releaseEndDate   Int?
+  docsUrl          String?
+
+  @@unique([product, edition, release])
+}
