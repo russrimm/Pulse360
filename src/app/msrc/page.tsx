@@ -42,14 +42,14 @@ function formatDate(date: string | undefined) {
 }
 
 async function fetchMonths(): Promise<UpdateMonth[]> {
-  const res = await fetch('/api/security-updates');
+  const res = await fetch('/api/msrc');
   if (!res.ok) throw new Error('Failed to fetch months');
   const data = await res.json();
   return (data.value || []).sort((a: UpdateMonth, b: UpdateMonth) => new Date(b.InitialReleaseDate).getTime() - new Date(a.InitialReleaseDate).getTime());
 }
 
 async function fetchCVEsForMonth(monthId: string): Promise<any> {
-  const res = await fetch(`/api/security-updates?monthId=${encodeURIComponent(monthId)}`);
+  const res = await fetch(`/api/msrc?monthId=${encodeURIComponent(monthId)}`);
   if (!res.ok) throw new Error('Failed to fetch CVEs for month');
   const data = await res.json();
   return data;
@@ -99,8 +99,8 @@ export default function SecurityUpdatesPage() {
 
   return (
     <main className="max-w-4xl mx-auto py-8 px-4">
-      <h1 className="text-2xl font-bold mb-6 text-gray-900 dark:text-white text-center">MSRC Security Updates ({selectedMonth})</h1>
-      <form className="flex justify-center mb-8" action="/security-updates" method="get">
+      <h1 className="text-2xl font-bold mb-6 text-gray-900 dark:text-white text-center">Microsoft Security Response Center Security Updates ({selectedMonth})</h1>
+      <form className="flex justify-center mb-8" action="/msrc" method="get">
         <label htmlFor="month" className="sr-only">Select Month</label>
         <select
           id="month"

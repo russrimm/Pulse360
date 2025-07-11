@@ -6,7 +6,7 @@ import { AzureUpdateCard } from './AzureUpdateCard';
 import { SearchBar } from './SearchBar';
 import { LoadingSpinner } from './LoadingSpinner';
 import { useRouter } from 'next/navigation';
-import { format, parseISO, isWithinInterval, startOfDay, endOfDay } from 'date-fns';
+import { format, parseISO, isWithinInterval, startOfDay, endOfDay, isAfter, subDays } from 'date-fns';
 import { getProductIcon } from '@/lib/getProductIcon';
 import Image from 'next/image';
 import { createPortal } from 'react-dom';
@@ -46,6 +46,8 @@ export function AzureUpdatesContent({ updates, searchQuery = '' }: AzureUpdatesC
   const statusBtnRef = useRef<HTMLButtonElement>(null);
   const dateBtnRef = useRef<HTMLButtonElement>(null);
   const [dropdownPos, setDropdownPos] = useState<{left: number, top: number}>({left: 0, top: 0});
+  // Add state for date filter type
+  const [dateFilterType, setDateFilterType] = useState<'all' | 'last30' | 'last60' | 'custom'>('all');
 
   // Sort updates by last modified date
   const sortedUpdates = useMemo(() => {
@@ -147,20 +149,20 @@ export function AzureUpdatesContent({ updates, searchQuery = '' }: AzureUpdatesC
       
       // Date range filtering
       let matchesDateRange = true;
-      if (dateRange.start || dateRange.end) {
+      if (dateFilterType === 'last30') {
+        matchesDateRange = isAfter(parseISO(update.modified), subDays(new Date(), 30));
+      } else if (dateFilterType === 'last60') {
+        matchesDateRange = isAfter(parseISO(update.modified), subDays(new Date(), 60));
+      } else if (dateFilterType === 'custom' && (dateRange.start || dateRange.end)) {
         const updateDate = parseISO(update.modified);
-        
         if (dateRange.start && dateRange.end) {
-          // Both start and end dates are selected
           const startDate = startOfDay(parseISO(dateRange.start));
           const endDate = endOfDay(parseISO(dateRange.end));
           matchesDateRange = isWithinInterval(updateDate, { start: startDate, end: endDate });
         } else if (dateRange.start) {
-          // Only start date is selected
           const startDate = startOfDay(parseISO(dateRange.start));
           matchesDateRange = updateDate >= startDate;
         } else if (dateRange.end) {
-          // Only end date is selected
           const endDate = endOfDay(parseISO(dateRange.end));
           matchesDateRange = updateDate <= endDate;
         }
@@ -168,7 +170,7 @@ export function AzureUpdatesContent({ updates, searchQuery = '' }: AzureUpdatesC
 
       return matchesCategories && matchesProducts && matchesTags && matchesStatus && matchesDateRange;
     });
-  }, [sortedUpdates, selectedCategories, selectedProducts, selectedTags, selectedStatuses, dateRange]);
+  }, [sortedUpdates, selectedCategories, selectedProducts, selectedTags, selectedStatuses, dateRange, dateFilterType]);
 
   // Update selected categories when products change
   useEffect(() => {
@@ -606,7 +608,7 @@ export function AzureUpdatesContent({ updates, searchQuery = '' }: AzureUpdatesC
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                 </svg>
-                <span className="text-sm font-medium">Date Range</span>
+                <span className="text-sm font-medium">Date</span>
                 {(dateRange.start || dateRange.end) && (
                   <span className="absolute -top-1 -right-1 flex items-center justify-center w-5 h-5 text-xs font-medium text-white bg-primary-600 rounded-full">
                     1
@@ -616,46 +618,80 @@ export function AzureUpdatesContent({ updates, searchQuery = '' }: AzureUpdatesC
               {isDateDropdownOpen && createPortal(
                 <div className="fixed z-[9999] w-72 mt-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow-lg" style={{ left: dropdownPos.left, top: dropdownPos.top }}>
                   <div className="p-4 border-b border-gray-200 dark:border-gray-700">
-                    <h3 className="text-sm font-medium text-gray-900 dark:text-white">Filter by Date Range</h3>
-                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                      Select a date range to filter updates
-                    </p>
+                    <h3 className="text-sm font-medium text-gray-900 dark:text-white">Filter by Date</h3>
                   </div>
-                  <div className="p-4 space-y-4">
-                    <div>
-                      <label htmlFor="start-date" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                        Start Date
-                      </label>
+                  <div className="p-4 flex flex-col gap-2">
+                    <label className="flex items-center gap-2 cursor-pointer">
                       <input
-                        type="date"
-                        id="start-date"
-                        value={dateRange.start}
-                        onChange={(e) => setDateRange(prev => ({ ...prev, start: e.target.value }))}
-                        className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-primary-500"
+                        type="radio"
+                        checked={dateFilterType === 'all'}
+                        onChange={() => setDateFilterType('all')}
+                        className="text-primary-600"
                       />
-                    </div>
-                    <div>
-                      <label htmlFor="end-date" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                        End Date
-                      </label>
+                      <span className="text-sm text-gray-700 dark:text-gray-200">All Dates</span>
+                    </label>
+                    <label className="flex items-center gap-2 cursor-pointer">
                       <input
-                        type="date"
-                        id="end-date"
-                        value={dateRange.end}
-                        onChange={(e) => setDateRange(prev => ({ ...prev, end: e.target.value }))}
-                        className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-primary-500"
+                        type="radio"
+                        checked={dateFilterType === 'last30'}
+                        onChange={() => setDateFilterType('last30')}
+                        className="text-primary-600"
                       />
-                    </div>
+                      <span className="text-sm text-gray-700 dark:text-gray-200">Last 30 days</span>
+                    </label>
+                    <label className="flex items-center gap-2 cursor-pointer">
+                      <input
+                        type="radio"
+                        checked={dateFilterType === 'last60'}
+                        onChange={() => setDateFilterType('last60')}
+                        className="text-primary-600"
+                      />
+                      <span className="text-sm text-gray-700 dark:text-gray-200">Last 60 days</span>
+                    </label>
+                    <label className="flex items-center gap-2 cursor-pointer">
+                      <input
+                        type="radio"
+                        checked={dateFilterType === 'custom'}
+                        onChange={() => setDateFilterType('custom')}
+                        className="text-primary-600"
+                      />
+                      <span className="text-sm text-gray-700 dark:text-gray-200">Custom Range</span>
+                    </label>
+                    {dateFilterType === 'custom' && (
+                      <div className="flex flex-col gap-2 mt-2">
+                        <div className="flex flex-col gap-1">
+                          <label htmlFor="date-from" className="text-sm text-gray-700 dark:text-gray-200">From</label>
+                          <input
+                            id="date-from"
+                            type="date"
+                            value={dateRange.start}
+                            onChange={e => setDateRange(prev => ({ ...prev, start: e.target.value }))}
+                            className="border rounded px-2 py-1 text-sm text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600"
+                          />
+                        </div>
+                        <div className="flex flex-col gap-1">
+                          <label htmlFor="date-to" className="text-sm text-gray-700 dark:text-gray-200">To</label>
+                          <input
+                            id="date-to"
+                            type="date"
+                            value={dateRange.end}
+                            onChange={e => setDateRange(prev => ({ ...prev, end: e.target.value }))}
+                            className="border rounded px-2 py-1 text-sm text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600"
+                          />
+                        </div>
+                      </div>
+                    )}
                   </div>
                   <div className="p-3 border-t border-gray-200 dark:border-gray-700">
                     <button
                       onClick={() => {
+                        setDateFilterType('all');
                         setDateRange({ start: '', end: '' });
                         setIsDateDropdownOpen(false);
                       }}
                       className="w-full px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
                     >
-                      Clear dates
+                      Clear all
                     </button>
                   </div>
                 </div>,
