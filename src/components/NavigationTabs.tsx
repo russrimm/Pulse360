@@ -6,6 +6,7 @@ import * as Popover from '@radix-ui/react-popover';
 import { ChevronDownIcon } from '@radix-ui/react-icons';
 import { useState, useCallback } from 'react';
 import Image from 'next/image';
+import React from 'react';
 
 const PRODUCTS = [
   {
@@ -22,35 +23,56 @@ const PRODUCTS = [
 
 export function NavigationTabs() {
   const pathname = usePathname();
-  const [open, setOpen] = useState(false)
+  const [open365, setOpen365] = useState(false);
+  const [openMSRC, setOpenMSRC] = useState(false);
 
-  const handleOpenChange = useCallback((nextOpen: boolean) => setOpen(nextOpen), [])
-  const handleMenuItemClick = useCallback(() => setOpen(false), [])
+  const handleOpenChange365 = useCallback((nextOpen: boolean) => setOpen365(nextOpen), [])
+  const handleMenuItemClick365 = useCallback(() => setOpen365(false), [])
+  const handleOpenChangeMSRC = useCallback((nextOpen: boolean) => setOpenMSRC(nextOpen), [])
+  const handleMenuItemClickMSRC = useCallback(() => setOpenMSRC(false), [])
 
-  const tabs = [
+  const MICROSOFT_365_LINKS = [
     {
-      name: 'Microsoft 365 Message Center',
+      name: 'M365 Message Center',
       href: '/message-center',
       icon: (
         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
         </svg>
-      )
+      ),
     },
     {
-      name: 'Microsoft 365 Updates',
+      name: 'M365 Product Updates',
       href: '/m365-updates',
       icon: (
         <Image src="/icons/m365.svg" alt="Microsoft 365 Updates" width={20} height={20} className="w-5 h-5" />
       ),
     },
+  ];
+
+  const MSRC_LINKS = [
     {
-      name: 'Azure Updates',
+      name: 'Microsoft Security Response Center Blog',
+      href: '/msrc/blog',
+      icon: <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg>,
+    },
+    {
+      name: 'Microsoft Security Response Center Vulnerability Updates',
+      href: '/msrc',
+      icon: <Image src="/icons/defender.svg" alt="MSRC Updates" width={20} height={20} className="w-5 h-5" />,
+    },
+  ];
+
+  // Reorder the navigation so Microsoft 365 comes after Azure Updates
+  const tabs = [
+    {
+      name: 'Azure', // Renamed from 'Azure Updates'
       href: '/azure-updates',
       icon: (
         <Image src="/icons/Azure.svg" alt="Azure Updates" width={20} height={20} className="w-5 h-5" />
       ),
     },
+    // Microsoft 365 Popover will be rendered here
     {
       name: 'Product News',
       href: '/product-news',
@@ -61,11 +83,12 @@ export function NavigationTabs() {
       ),
     },
     {
-      name: 'Security Updates',
-      href: '/security-updates',
+      name: 'Microsoft Security',
+      href: '/msrc',
       icon: (
         <Image src="/icons/defender.svg" alt="Security Updates" width={20} height={20} className="w-5 h-5" />
       ),
+      dropdown: true,
     },
   ];
 
@@ -73,72 +96,98 @@ export function NavigationTabs() {
     <div className="md:sticky md:top-16 z-40 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm border-b border-gray-200 dark:border-gray-700">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col md:flex-row flex-wrap justify-center gap-1.5 py-2 sm:gap-2">
-          {tabs.map((tab) => {
-            const isActive = pathname === tab.href;
+          {tabs.map((tab, idx) => {
+            // Highlight Product News tab for any /product-news subpath
+            const isActive = tab.name === 'Product News'
+              ? pathname === tab.href || pathname.startsWith('/product-news/')
+              : pathname === tab.href;
             if (tab.name === 'Release Planner') return null;
+            if (tab.name === 'Microsoft Security') {
+              const isActive = MSRC_LINKS.some(link => pathname === link.href);
+              return (
+                <Popover.Root key={tab.href} open={openMSRC} onOpenChange={handleOpenChangeMSRC}>
+                  <Popover.Trigger asChild>
+                    <button
+                      className={`flex flex-col items-center justify-center md:flex-row md:items-center gap-1 md:gap-2 px-3 py-2 text-sm font-medium rounded-lg transition-colors relative w-full md:w-auto text-center
+                        ${isActive ? 'bg-primary-50 text-primary-700 dark:bg-primary-900/50 dark:text-primary-300' : 'text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200'}`}
+                      aria-label="Microsoft Security"
+                    >
+                      <span className={`transition-transform duration-200 ${isActive ? 'text-primary-600 dark:text-primary-400' : 'text-gray-500 dark:text-gray-400 group-hover:text-primary-600 dark:group-hover:text-primary-400'}`}>{tab.icon}</span>
+                      <span className="text-center w-full md:w-auto">{tab.name}</span>
+                      <ChevronDownIcon className="w-4 h-4" />
+                      <span className="absolute bottom-0 left-0 w-full h-0.5 bg-primary-600 dark:bg-primary-400 rounded-full" />
+                    </button>
+                  </Popover.Trigger>
+                  <Popover.Portal>
+                    <Popover.Content sideOffset={8} className="z-50 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl shadow-2xl p-2 min-w-[220px] flex flex-col gap-1 animate-fade-in">
+                      {MSRC_LINKS.map(link => (
+                        <Link
+                          key={link.href}
+                          href={link.href}
+                          className={`flex items-center gap-3 px-4 py-3 rounded-lg font-medium text-base transition-colors duration-150 hover:bg-primary-50 dark:hover:bg-primary-900/30 focus:outline-none focus:bg-primary-100 dark:focus:bg-primary-800/40 ${link.href === pathname ? 'bg-primary-600 text-white pointer-events-none' : 'text-gray-900 dark:text-gray-100'}`}
+                          aria-current={link.href === pathname ? 'page' : undefined}
+                          onClick={handleMenuItemClickMSRC}
+                        >
+                          {link.icon}
+                          {link.name}
+                        </Link>
+                      ))}
+                    </Popover.Content>
+                  </Popover.Portal>
+                </Popover.Root>
+              );
+            }
             return (
-              <Link
-                key={tab.href}
-                href={tab.href}
-                className={`flex flex-col items-center justify-center md:flex-row md:items-center gap-1 md:gap-2 px-3 py-2 text-sm font-medium rounded-lg transition-colors relative w-full md:w-auto text-center
-                  ${
-                    isActive
+              <React.Fragment key={tab.href}>
+                <Link
+                  href={tab.href}
+                  className={`flex flex-col items-center justify-center md:flex-row md:items-center gap-1 md:gap-2 px-3 py-2 text-sm font-medium rounded-lg transition-colors relative w-full md:w-auto text-center
+                    ${isActive
                       ? 'bg-primary-50 text-primary-700 dark:bg-primary-900/50 dark:text-primary-300'
                       : 'text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200'
-                  }`}
-              >
-                <span className={`transition-transform duration-200 ${isActive ? 'text-primary-600 dark:text-primary-400' : 'text-gray-500 dark:text-gray-400 group-hover:text-primary-600 dark:group-hover:text-primary-400'}`}
-                  >
-                  {tab.icon}
-                </span>
-                <span className="text-center w-full md:w-auto">{tab.name}</span>
-                <span className="absolute bottom-0 left-0 w-full h-0.5 bg-primary-600 dark:bg-primary-400 rounded-full" />
-              </Link>
+                    }`}
+                >
+                  <span className={`transition-transform duration-200 ${isActive ? 'text-primary-600 dark:text-primary-400' : 'text-gray-500 dark:text-gray-400 group-hover:text-primary-600 dark:group-hover:text-primary-400'}`}>{tab.icon}</span>
+                  <span className="text-center w-full md:w-auto">{tab.name}</span>
+                  <span className="absolute bottom-0 left-0 w-full h-0.5 bg-primary-600 dark:bg-primary-400 rounded-full" />
+                </Link>
+                {tab.name === 'Azure' && (
+                  <Popover.Root open={open365} onOpenChange={handleOpenChange365}>
+                    <Popover.Trigger asChild>
+                      <button
+                        className={`flex flex-col items-center justify-center md:flex-row md:items-center gap-1 md:gap-2 px-3 py-2 text-sm font-medium rounded-lg transition-colors relative w-full md:w-auto text-center
+                          ${MICROSOFT_365_LINKS.some(link => pathname === link.href) ? 'bg-primary-50 text-primary-700 dark:bg-primary-900/50 dark:text-primary-300' : 'text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200'}`}
+                        aria-label="Microsoft 365"
+                      >
+                        <span className={`transition-transform duration-200 ${MICROSOFT_365_LINKS.some(link => pathname === link.href) ? 'text-primary-600 dark:text-primary-400' : 'text-gray-500 dark:text-gray-400 group-hover:text-primary-600 dark:group-hover:text-primary-400'}`}>
+                          <Image src="/icons/m365.svg" alt="Microsoft 365" width={20} height={20} className="w-5 h-5" />
+                        </span>
+                        <span className="text-center w-full md:w-auto">Microsoft 365</span>
+                        <ChevronDownIcon className="w-4 h-4" />
+                        <span className="absolute bottom-0 left-0 w-full h-0.5 bg-primary-600 dark:bg-primary-400 rounded-full" />
+                      </button>
+                    </Popover.Trigger>
+                    <Popover.Portal>
+                      <Popover.Content sideOffset={8} className="z-50 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl shadow-2xl p-2 min-w-[220px] flex flex-col gap-1 animate-fade-in">
+                        {MICROSOFT_365_LINKS.map(link => (
+                          <Link
+                            key={link.href}
+                            href={link.href}
+                            className={`flex items-center gap-3 px-4 py-3 rounded-lg font-medium text-base transition-colors duration-150 hover:bg-primary-50 dark:hover:bg-primary-900/30 focus:outline-none focus:bg-primary-100 dark:focus:bg-primary-800/40 ${link.href === pathname ? 'bg-primary-600 text-white pointer-events-none' : 'text-gray-900 dark:text-gray-100'}`}
+                            aria-current={link.href === pathname ? 'page' : undefined}
+                            onClick={handleMenuItemClick365}
+                          >
+                            {link.icon}
+                            {link.name}
+                          </Link>
+                        ))}
+                      </Popover.Content>
+                    </Popover.Portal>
+                  </Popover.Root>
+                )}
+              </React.Fragment>
             );
           })}
-          {/* Release Planner Popover */}
-          <Popover.Root open={open} onOpenChange={handleOpenChange}>
-            <Popover.Trigger asChild>
-              <button
-                className={`flex flex-col items-center justify-center md:flex-row md:items-center gap-1 md:gap-2 px-3 py-2 text-sm font-medium rounded-lg transition-colors relative w-full md:w-auto text-center
-                  ${
-                    pathname.startsWith('/release-plans') || pathname.startsWith('/fabric-roadmap')
-                      ? 'bg-primary-50 text-primary-700 dark:bg-primary-900/50 dark:text-primary-300'
-                      : 'text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200'
-                  }`}
-                aria-label="Release Planner"
-              >
-                <span className={`transition-transform duration-200 ${
-                  pathname.startsWith('/release-plans') || pathname.startsWith('/fabric-roadmap')
-                    ? 'text-primary-600 dark:text-primary-400'
-                    : 'text-gray-500 dark:text-gray-400 group-hover:text-primary-600 dark:group-hover:text-primary-400'
-                }`}>
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                  </svg>
-                </span>
-                <span className="text-center w-full md:w-auto">Release Planner</span>
-                <ChevronDownIcon className="w-4 h-4" />
-                <span className="absolute bottom-0 left-0 w-full h-0.5 bg-primary-600 dark:bg-primary-400 rounded-full" />
-              </button>
-            </Popover.Trigger>
-            <Popover.Portal>
-              <Popover.Content sideOffset={8} className="z-50 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl shadow-2xl p-2 min-w-[220px] flex flex-col gap-1 animate-fade-in">
-                {PRODUCTS.map(product => (
-                  <Link
-                    key={product.href}
-                    href={product.href}
-                    className={`flex items-center gap-3 px-4 py-3 rounded-lg font-medium text-base transition-colors duration-150 hover:bg-primary-50 dark:hover:bg-primary-900/30 focus:outline-none focus:bg-primary-100 dark:focus:bg-primary-800/40 ${product.href === pathname ? 'bg-primary-600 text-white pointer-events-none' : 'text-gray-900 dark:text-gray-100'}`}
-                    aria-current={product.href === pathname ? 'page' : undefined}
-                    onClick={handleMenuItemClick}
-                  >
-                    <Image src={product.icon} alt="Product icon" width={24} height={24} className="w-6 h-6" loading="lazy" />
-                    {product.label}
-                  </Link>
-                ))}
-              </Popover.Content>
-            </Popover.Portal>
-          </Popover.Root>
         </div>
       </div>
     </div>

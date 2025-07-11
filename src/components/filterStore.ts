@@ -3,7 +3,7 @@ import { create, StateCreator } from 'zustand';
 console.log('Zustand filterStore created');
 
 export type FilterType = null | 'product' | 'tags' | 'severity' | 'area' | 'date';
-export type DateFilterType = 'all' | 'last30' | 'last7' | 'custom';
+export type DateFilterType = 'all' | 'last30' | 'last14' | 'last7' | 'custom';
 
 interface FilterState {
   openFilter: FilterType;
