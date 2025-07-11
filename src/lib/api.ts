@@ -296,7 +296,7 @@ export async function getAzureUpdates(): Promise<AzureUpdate[]> {
 export async function getM365Updates(): Promise<M365Update[]> {
   try {
     const response = await fetch('https://www.microsoft.com/releasecommunications/api/v2/m365', {
-      next: { revalidate: 60 }
+      cache: 'no-store'
     });
 
     if (!response.ok) {
@@ -329,7 +329,7 @@ export async function getM365Updates(): Promise<M365Update[]> {
 export async function getM365Update(id: string): Promise<M365Update> {
   try {
     const response = await fetch(`https://www.microsoft.com/releasecommunications/api/v2/m365/rss/${id}`, {
-      next: { revalidate: 3600 } // Revalidate every hour
+      cache: 'no-store'
     });
 
     if (!response.ok) {

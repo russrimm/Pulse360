@@ -45,6 +45,8 @@ export function M365UpdatesList({ updates, searchQuery }: M365UpdatesListProps) 
   const [isDateOpen, setIsDateOpen] = useState(false);
   const [selectedDateFilter, setSelectedDateFilter] = useState<'all' | 'last30' | 'last14' | 'last7' | 'custom'>('all');
   const [customDateRange, setCustomDateRange] = useState<{ from: string; to: string }>({ from: '', to: '' });
+  // Add local state for Products filter dropdown
+  const [isProductOpen, setIsProductOpen] = useState(false);
 
   // Get unique tags
   const uniqueTags = useMemo(() => {
@@ -158,13 +160,19 @@ export function M365UpdatesList({ updates, searchQuery }: M365UpdatesListProps) 
                   services={services}
                   selectedServices={selectedServices}
                   onFilterChange={setSelectedServices}
-                  isOpen={false} // Product filter is always open
-                  setOpen={() => {}}
+                  isOpen={isProductOpen}
+                  setOpen={open => {
+                    setIsProductOpen(open);
+                    if (open) setIsDateOpen(false);
+                  }}
                 />
               </div>
               <div className="relative w-full md:w-auto">
                 <button
-                  onClick={() => setIsDateOpen(!isDateOpen)}
+                  onClick={() => {
+                    setIsDateOpen(!isDateOpen);
+                    if (!isDateOpen) setIsProductOpen(false);
+                  }}
                   className="flex items-center justify-center gap-2 px-4 min-h-[32px] w-full md:w-auto text-gray-700 dark:text-gray-200 bg-white/80 dark:bg-gray-800/50 backdrop-blur-sm border border-gray-200 dark:border-gray-700/50 rounded-lg shadow-[inset_0_2px_4px_rgba(0,0,0,0.05)] dark:shadow-[inset_0_2px_4px_rgba(0,0,0,0.2)] hover:shadow-[inset_0_2px_4px_rgba(0,0,0,0.1)] dark:hover:shadow-[inset_0_2px_4px_rgba(0,0,0,0.3)] hover:border-primary-200 dark:hover:border-primary-800 hover:shadow-[0_0_0_1px_rgba(59,130,246,0.5)] dark:hover:shadow-[0_0_0_1px_rgba(59,130,246,0.5)] transition-all duration-300 relative"
                   aria-label="Filter by date"
                 >
