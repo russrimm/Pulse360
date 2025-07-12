@@ -1,5 +1,6 @@
 import { redirect } from 'next/navigation';
 
-export default function Home() {
-  redirect('/message-center');
+export default function Page() {
+  redirect('/home');
+  return null;
 } 

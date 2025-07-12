@@ -187,7 +187,7 @@ export function ProductNewsLayout({ children, title, description, icon }: Produc
 
         <div className="mt-8 mb-2 w-full overflow-x-hidden">
           {/* Mobile: show all buttons in a single grid */}
-          <div className={`grid grid-cols-2 gap-3 w-full min-w-0 lg:hidden justify-center${!['/product-news/power-platform','/product-news/power-automate','/product-news/copilot','/product-news/azure-ai-foundry','/product-news/all-things-azure','/product-news/semantic-kernel','/product-news/fabric-blog','/product-news/power-bi'].includes(pathname) ? ' mb-12' : ''}`}>
+          <div className={`grid grid-cols-2 gap-3 w-full min-w-0 lg:hidden justify-center${!['/product-news/power-platform','/product-news/power-automate','/product-news/copilot','/product-news/azure-ai-foundry','/product-news/all-things-azure','/product-news/semantic-kernel','/product-news/fabric-blog','/product-news/power-bi','/product-news/vscode','/product-news'].includes(pathname) ? ' mb-12' : ''}`}>
             {products.map((product) => (
               <Link
                 key={product.name}
@@ -227,7 +227,7 @@ export function ProductNewsLayout({ children, title, description, icon }: Produc
             ))}
           </div>
           {/* Desktop: force all buttons into a single horizontal row, shrink if needed */}
-          <div className={`hidden lg:flex flex-wrap gap-2 w-full pb-1 justify-center${!['/product-news/power-platform','/product-news/power-automate','/product-news/copilot','/product-news/azure-ai-foundry','/product-news/all-things-azure','/product-news/semantic-kernel','/product-news/fabric-blog','/product-news/power-bi'].includes(pathname) ? ' mb-12' : ''}`}>
+          <div className={`hidden lg:flex flex-wrap gap-2 w-full pb-1 justify-center${!['/product-news/power-platform','/product-news/power-automate','/product-news/copilot','/product-news/azure-ai-foundry','/product-news/all-things-azure','/product-news/semantic-kernel','/product-news/fabric-blog','/product-news/power-bi','/product-news/vscode','/product-news'].includes(pathname) ? ' mb-12' : ''}`}>
             {products.map((product) => (
               <Link
                 key={product.name}
@@ -299,12 +299,13 @@ export function ProductNewsLayout({ children, title, description, icon }: Produc
           )}
 
           {/* Azure AI Foundry sub-buttons, only show when Azure AI Foundry or its subpages are selected */}
-          {['/product-news/azure-ai-foundry','/product-news/all-things-azure','/product-news/semantic-kernel'].includes(pathname) && (
+          {['/product-news/azure-ai-foundry','/product-news/all-things-azure','/product-news/semantic-kernel','/product-news/vscode'].includes(pathname) && (
             <div className="flex flex-wrap gap-2 mt-2 mb-6 justify-center sm:flex-nowrap">
               {[
                  { name: 'Azure AI Foundry', icon: 'https://devblogs.microsoft.com/foundry/wp-content/uploads/sites/89/2025/03/cropped-ai-foundry-32x32.png', href: '/product-news/azure-ai-foundry' },
                  { name: 'All Things Azure', icon: '/icons/Azure.svg', href: '/product-news/all-things-azure' },
                  { name: 'Semantic Kernel', icon: '/icons/sklogo.svg', href: '/product-news/semantic-kernel' },
+                 { name: 'VS Code', icon: '/icons/azure/devops/VisualStudioCode.svg', href: '/product-news/vscode' },
               ].map((product) => (
                 <Link
                   key={product.name}

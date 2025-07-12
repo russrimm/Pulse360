@@ -37,7 +37,7 @@ export function AzureUpdatesClient({ initialUpdates }: AzureUpdatesClientProps) 
     <>
       <div className="text-center mb-8">
         <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-          Azure Updates
+          Azure Release Plans
         </h1>
         <p className="text-gray-600 dark:text-gray-400">
           Stay informed about the latest Azure updates and changes.
