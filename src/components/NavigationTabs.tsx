@@ -33,7 +33,7 @@ export function NavigationTabs() {
 
   const MICROSOFT_365_LINKS = [
     {
-      name: 'M365 Message Center',
+      name: 'Microsoft 365 Message Center',
       href: '/message-center',
       icon: (
         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -42,7 +42,7 @@ export function NavigationTabs() {
       ),
     },
     {
-      name: 'M365 Product Updates',
+      name: 'Microsoft 365 Release Plans',
       href: '/m365-updates',
       icon: (
         <Image src="/icons/m365.svg" alt="Microsoft 365 Updates" width={20} height={20} className="w-5 h-5" />
@@ -65,6 +65,15 @@ export function NavigationTabs() {
 
   // Reorder the navigation so Microsoft 365 comes after Azure Updates
   const tabs = [
+    {
+      name: 'Home',
+      href: '/home',
+      icon: (
+        <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+          <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7A1 1 0 003 11h1v6a1 1 0 001 1h4a1 1 0 001-1v-4h2v4a1 1 0 001 1h4a1 1 0 001-1v-6h1a1 1 0 00.707-1.707l-7-7z" />
+        </svg>
+      ),
+    },
     {
       name: 'Azure', // Renamed from 'Azure Updates'
       href: '/azure-updates',
