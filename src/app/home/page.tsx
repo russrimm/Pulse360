@@ -99,76 +99,155 @@ export default function HomePage() {
   return (
     <main className="w-full flex flex-col items-center justify-center bg-white dark:bg-black pt-8" style={{ minWidth: 0, width: '100%', minHeight: 0 }}>
       {pathname === '/home' && (
-        <div className="fixed top-32 right-8 z-30">
-          <button
-            ref={filterBtnRef}
-            className="flex items-center gap-2 px-4 py-2 rounded-lg bg-primary-600 text-white font-semibold shadow hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-400"
-            onClick={() => {
-              setPendingFeeds(selectedFeeds);
-              setIsFilterOpen(true);
-              if (filterBtnRef.current) {
-                const rect = filterBtnRef.current.getBoundingClientRect();
-                const dropdownWidth = 320; // approximate width of the dropdown
-                let left = rect.left + window.scrollX;
-                // Clamp left so dropdown doesn't overflow right edge
-                const maxLeft = window.innerWidth - dropdownWidth - 16; // 16px margin
-                if (left > maxLeft) left = maxLeft;
-                setDialogPos({ top: rect.bottom + window.scrollY + 4, left });
-              }
-            }}
-          >
-            <AdjustmentsHorizontalIcon className="w-5 h-5" />
-            Filter Feeds
-          </button>
-          {isFilterOpen && typeof window !== 'undefined' && createPortal(
-            <Dialog
-              open={isFilterOpen}
-              onClose={() => setIsFilterOpen(false)}
-              className="fixed z-50 w-80"
-              style={{ top: dialogPos.top, left: dialogPos.left }}
+        <>
+          {/* Desktop: fixed top-right */}
+          <div className="hidden lg:block fixed top-32 right-8 z-30">
+            <button
+              ref={filterBtnRef}
+              className="flex items-center gap-2 px-4 py-2 rounded-lg bg-primary-600 text-white font-semibold shadow hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-400"
+              onClick={() => {
+                setPendingFeeds(selectedFeeds);
+                setIsFilterOpen(true);
+                if (filterBtnRef.current) {
+                  const rect = filterBtnRef.current.getBoundingClientRect();
+                  const dropdownWidth = 320; // approximate width of the dropdown
+                  let left = rect.left + window.scrollX;
+                  // On desktop, always align right; on mobile/tablet, clamp left
+                  if (window.innerWidth >= 1024) { // lg breakpoint
+                    left = rect.right + window.scrollX - dropdownWidth;
+                    if (left < 16) left = 16;
+                  } else {
+                    const maxLeft = window.innerWidth - dropdownWidth - 16; // 16px margin
+                    if (left > maxLeft) left = maxLeft;
+                  }
+                  setDialogPos({ top: rect.bottom + window.scrollY + 4, left });
+                }
+              }}
             >
-              <Dialog.Panel className="relative bg-white dark:bg-gray-900 rounded-2xl shadow-2xl w-full p-8 border border-gray-200 dark:border-gray-700">
-                <button
-                  className="absolute top-4 right-4 text-gray-400 hover:text-gray-700 dark:hover:text-white"
-                  onClick={() => setIsFilterOpen(false)}
-                  aria-label="Close"
-                >
-                  <XMarkIcon className="w-6 h-6" />
-                </button>
-                <Dialog.Title className="text-xl font-bold mb-4 text-gray-900 dark:text-white">Select Feeds to Display</Dialog.Title>
-                <div className="flex flex-col gap-3 mb-6">
-                  {FEEDS.map(feed => (
-                    <label key={feed.name} className="flex items-center gap-3 cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={pendingFeeds.includes(feed.name)}
-                        onChange={e => {
-                          if (e.target.checked) {
-                            setPendingFeeds([...pendingFeeds, feed.name]);
-                          } else {
-                            setPendingFeeds(pendingFeeds.filter(f => f !== feed.name));
-                          }
-                        }}
-                        className="w-4 h-4 text-primary-600 border-gray-300 rounded focus:ring-primary-500"
-                      />
-                      <span className="text-gray-800 dark:text-gray-200 font-medium">{feed.name}</span>
-                    </label>
-                  ))}
-                </div>
-                <button
-                  className="w-full px-4 py-2 rounded-lg bg-primary-600 text-white font-semibold shadow hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-400"
-                  onClick={() => {
-                    setSelectedFeeds(pendingFeeds);
-                    setIsFilterOpen(false);
-                  }}
-                >
-                  Apply
-                </button>
-              </Dialog.Panel>
-            </Dialog>,
-            document.body
-          )}
-        </div>
+              <AdjustmentsHorizontalIcon className="w-5 h-5" />
+              Filter Feeds
+            </button>
+            {isFilterOpen && typeof window !== 'undefined' && createPortal(
+              <Dialog
+                open={isFilterOpen}
+                onClose={() => setIsFilterOpen(false)}
+                className="fixed z-50 w-80"
+                style={{ top: dialogPos.top, left: dialogPos.left }}
+              >
+                <Dialog.Panel className="relative bg-white dark:bg-gray-900 rounded-2xl shadow-2xl w-full p-8 border border-gray-200 dark:border-gray-700">
+                  <button
+                    className="absolute top-4 right-4 text-gray-400 hover:text-gray-700 dark:hover:text-white"
+                    onClick={() => setIsFilterOpen(false)}
+                    aria-label="Close"
+                  >
+                    <XMarkIcon className="w-6 h-6" />
+                  </button>
+                  <Dialog.Title className="text-xl font-bold mb-4 text-gray-900 dark:text-white">Select Feeds to Display</Dialog.Title>
+                  <div className="flex flex-col gap-3 mb-6">
+                    {FEEDS.map(feed => (
+                      <label key={feed.name} className="flex items-center gap-3 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={pendingFeeds.includes(feed.name)}
+                          onChange={e => {
+                            if (e.target.checked) {
+                              setPendingFeeds([...pendingFeeds, feed.name]);
+                            } else {
+                              setPendingFeeds(pendingFeeds.filter(f => f !== feed.name));
+                            }
+                          }}
+                          className="w-4 h-4 text-primary-600 border-gray-300 rounded focus:ring-primary-500"
+                        />
+                        <span className="text-gray-800 dark:text-gray-200 font-medium">{feed.name}</span>
+                      </label>
+                    ))}
+                  </div>
+                  <button
+                    className="w-full px-4 py-2 rounded-lg bg-primary-600 text-white font-semibold shadow hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-400"
+                    onClick={() => {
+                      setSelectedFeeds(pendingFeeds);
+                      setIsFilterOpen(false);
+                    }}
+                  >
+                    Apply
+                  </button>
+                </Dialog.Panel>
+              </Dialog>,
+              document.body
+            )}
+          </div>
+          {/* Mobile/Tablet: below nav links */}
+          <div className="block lg:hidden w-full px-4 mt-4 mb-2">
+            <button
+              ref={filterBtnRef}
+              className="flex items-center gap-2 w-full justify-center px-4 py-2 rounded-lg bg-primary-600 text-white font-semibold shadow hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-400"
+              onClick={() => {
+                setPendingFeeds(selectedFeeds);
+                setIsFilterOpen(true);
+                if (filterBtnRef.current) {
+                  const rect = filterBtnRef.current.getBoundingClientRect();
+                  const dropdownWidth = 320; // approximate width of the dropdown
+                  let left = rect.left + window.scrollX;
+                  // Clamp left so dropdown doesn't overflow right edge
+                  const maxLeft = window.innerWidth - dropdownWidth - 16; // 16px margin
+                  if (left > maxLeft) left = maxLeft;
+                  setDialogPos({ top: rect.bottom + window.scrollY + 4, left });
+                }
+              }}
+            >
+              <AdjustmentsHorizontalIcon className="w-5 h-5" />
+              Filter Feeds
+            </button>
+            {isFilterOpen && typeof window !== 'undefined' && createPortal(
+              <Dialog
+                open={isFilterOpen}
+                onClose={() => setIsFilterOpen(false)}
+                className="fixed z-50 w-80"
+                style={{ top: dialogPos.top, left: dialogPos.left }}
+              >
+                <Dialog.Panel className="relative bg-white dark:bg-gray-900 rounded-2xl shadow-2xl w-full p-8 border border-gray-200 dark:border-gray-700">
+                  <button
+                    className="absolute top-4 right-4 text-gray-400 hover:text-gray-700 dark:hover:text-white"
+                    onClick={() => setIsFilterOpen(false)}
+                    aria-label="Close"
+                  >
+                    <XMarkIcon className="w-6 h-6" />
+                  </button>
+                  <Dialog.Title className="text-xl font-bold mb-4 text-gray-900 dark:text-white">Select Feeds to Display</Dialog.Title>
+                  <div className="flex flex-col gap-3 mb-6">
+                    {FEEDS.map(feed => (
+                      <label key={feed.name} className="flex items-center gap-3 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={pendingFeeds.includes(feed.name)}
+                          onChange={e => {
+                            if (e.target.checked) {
+                              setPendingFeeds([...pendingFeeds, feed.name]);
+                            } else {
+                              setPendingFeeds(pendingFeeds.filter(f => f !== feed.name));
+                            }
+                          }}
+                          className="w-4 h-4 text-primary-600 border-gray-300 rounded focus:ring-primary-500"
+                        />
+                        <span className="text-gray-800 dark:text-gray-200 font-medium">{feed.name}</span>
+                      </label>
+                    ))}
+                  </div>
+                  <button
+                    className="w-full px-4 py-2 rounded-lg bg-primary-600 text-white font-semibold shadow hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-400"
+                    onClick={() => {
+                      setSelectedFeeds(pendingFeeds);
+                      setIsFilterOpen(false);
+                    }}
+                  >
+                    Apply
+                  </button>
+                </Dialog.Panel>
+              </Dialog>,
+              document.body
+            )}
+          </div>
+        </>
       )}
       {loading ? (
         null
@@ -200,7 +279,14 @@ export default function HomePage() {
                   <div className="mb-2 text-xs text-primary-600 font-semibold uppercase tracking-wide text-center">
                     {update.feed}
                   </div>
-                  <div className="font-bold text-3xl text-gray-900 dark:text-white mb-4 line-clamp-2 text-center">
+                  <div className="font-bold text-3xl text-gray-900 dark:text-white mb-4 text-center"
+                    style={{
+                      display: '-webkit-box',
+                      WebkitBoxOrient: 'vertical',
+                      overflow: 'hidden',
+                      WebkitLineClamp: typeof window !== 'undefined' && window.innerWidth < 640 ? 'unset' : 2
+                    }}
+                  >
                     {update.title}
                   </div>
                   <div className="text-xs text-gray-500 dark:text-gray-400 mb-6 text-center">
