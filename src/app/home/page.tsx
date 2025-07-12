@@ -26,6 +26,7 @@ const FEEDS = [
   { name: "Engineering@Microsoft", url: "https://devblogs.microsoft.com/engineering-at-microsoft/feed/" },
   { name: "VS Code", url: "https://devblogs.microsoft.com/vscode-blog/feed/", icon: "/icons/azure/devops/VisualStudioCode.svg" },
   { name: "Windows", url: "https://blogs.windows.com/feed/", icon: "https://winblogs.thesourcemediaassets.com/2022/09/cropped-Windows11IconTransparent512-32x32.png" },
+  { name: "Microsoft Copilot", url: "/api/copilot-news", icon: "/icons/Copilot_scalable.svg" },
 ];
 
 type Update = {
@@ -76,12 +77,21 @@ export default function HomePage() {
           // ignore
         }
       }
-      // Filter to last 30 days
+      // Filter to last 45 days
       const now = new Date();
       allUpdates = allUpdates.filter((u) => {
         const date = u.pubDate ? new Date(u.pubDate) : null;
-        return date && isAfter(date, subDays(now, 30));
+        return date && isAfter(date, subDays(now, 45));
       });
+      // For each feed, keep only the latest entry
+      const latestByFeed = new Map();
+      for (const update of allUpdates) {
+        const existing = latestByFeed.get(update.feed);
+        if (!existing || new Date(update.pubDate) > new Date(existing.pubDate)) {
+          latestByFeed.set(update.feed, update);
+        }
+      }
+      allUpdates = Array.from(latestByFeed.values());
       // Sort by date desc
       allUpdates.sort((a, b) => new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime());
       // Remove duplicate titles (keep first occurrence)
@@ -145,7 +155,7 @@ export default function HomePage() {
                   </button>
                   <Dialog.Title className="text-xl font-bold mb-4 text-gray-900 dark:text-white">Select Feeds to Display</Dialog.Title>
                   <div className="flex flex-col gap-3 mb-6">
-                    {FEEDS.map(feed => (
+                    {[...FEEDS].sort((a, b) => a.name.localeCompare(b.name)).map(feed => (
                       <label key={feed.name} className="flex items-center gap-3 cursor-pointer">
                         <input
                           type="checkbox"
@@ -216,7 +226,7 @@ export default function HomePage() {
                   </button>
                   <Dialog.Title className="text-xl font-bold mb-4 text-gray-900 dark:text-white">Select Feeds to Display</Dialog.Title>
                   <div className="flex flex-col gap-3 mb-6">
-                    {FEEDS.map(feed => (
+                    {[...FEEDS].sort((a, b) => a.name.localeCompare(b.name)).map(feed => (
                       <label key={feed.name} className="flex items-center gap-3 cursor-pointer">
                         <input
                           type="checkbox"
