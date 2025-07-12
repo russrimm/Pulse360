@@ -25,6 +25,7 @@ const FEEDS = [
   { name: "Azure AI Foundry", url: "/api/azure-ai-foundry-news" },
   { name: "Engineering@Microsoft", url: "https://devblogs.microsoft.com/engineering-at-microsoft/feed/" },
   { name: "VS Code", url: "https://devblogs.microsoft.com/vscode-blog/feed/", icon: "/icons/azure/devops/VisualStudioCode.svg" },
+  { name: "Windows", url: "https://blogs.windows.com/feed/", icon: "https://winblogs.thesourcemediaassets.com/2022/09/cropped-Windows11IconTransparent512-32x32.png" },
 ];
 
 type Update = {

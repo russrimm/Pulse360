@@ -51,6 +51,11 @@ let products = [
     icon: '/icons/azure/devops/10261-icon-service-Azure-DevOps.svg',
     href: '/product-news/azure-ai-foundry',
   },
+  {
+    name: 'Windows',
+    icon: 'https://winblogs.thesourcemediaassets.com/2022/09/cropped-Windows11IconTransparent512-32x32.png',
+    href: '/product-news/windows',
+  },
 ];
 
 // Move 'Finance and Operations cross-app capabilities' to the end if present
