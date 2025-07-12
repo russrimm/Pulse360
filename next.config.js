@@ -14,6 +14,11 @@ const nextConfig = {
         hostname: 'devblogs.microsoft.com',
         pathname: '**',
       },
+      {
+        protocol: 'https',
+        hostname: 'winblogs.thesourcemediaassets.com',
+        pathname: '**',
+      },
     ],
   },
 };
