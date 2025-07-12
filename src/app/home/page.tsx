@@ -54,11 +54,6 @@ export default function HomePage() {
   const pathname = usePathname();
   const [updates, setUpdates] = useState<Update[]>([]);
   const [loading, setLoading] = useState(true);
-  const [isFilterOpen, setIsFilterOpen] = useState(false);
-  const filterBtnRef = useRef<HTMLButtonElement>(null);
-  const [dialogPos, setDialogPos] = useState<{top: number, left: number}>({top: 0, left: 0});
-  const [selectedFeeds, setSelectedFeeds] = useState<string[]>(FEEDS.map(f => f.name));
-  const [pendingFeeds, setPendingFeeds] = useState<string[]>(selectedFeeds);
   const [thumbsSwiper, setThumbsSwiper] = useState<any>(null);
   const [activeIndex, setActiveIndex] = useState(0);
 
@@ -66,7 +61,6 @@ export default function HomePage() {
     async function fetchFeeds() {
       let allUpdates: Update[] = [];
       for (const feed of FEEDS) {
-        if (!selectedFeeds.includes(feed.name)) continue;
         try {
           const res = await fetch(feed.url);
           if (!res.ok) continue;
@@ -83,17 +77,6 @@ export default function HomePage() {
         const date = u.pubDate ? new Date(u.pubDate) : null;
         return date && isAfter(date, subDays(now, 45));
       });
-      // For each feed, keep only the latest entry
-      const latestByFeed = new Map();
-      for (const update of allUpdates) {
-        const existing = latestByFeed.get(update.feed);
-        if (!existing || new Date(update.pubDate) > new Date(existing.pubDate)) {
-          latestByFeed.set(update.feed, update);
-        }
-      }
-      allUpdates = Array.from(latestByFeed.values());
-      // Sort by date desc
-      allUpdates.sort((a, b) => new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime());
       // Remove duplicate titles (keep first occurrence)
       const seenTitles = new Set<string>();
       allUpdates = allUpdates.filter(u => {
@@ -101,11 +84,27 @@ export default function HomePage() {
         seenTitles.add(u.title);
         return true;
       });
-      setUpdates(allUpdates);
+      // Group updates by feed and sort each group by date desc
+      const updatesByFeed: Record<string, Update[]> = {};
+      for (const feed of FEEDS) {
+        updatesByFeed[feed.name] = allUpdates
+          .filter(u => u.feed === feed.name)
+          .sort((a, b) => new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime());
+      }
+      // Interleave updates round-robin: first latest from each feed, then next latest, etc.
+      const maxLen = Math.max(...Object.values(updatesByFeed).map(arr => arr.length));
+      const interleaved: Update[] = [];
+      for (let i = 0; i < maxLen; i++) {
+        for (const feed of FEEDS) {
+          const update = updatesByFeed[feed.name][i];
+          if (update) interleaved.push(update);
+        }
+      }
+      setUpdates(interleaved);
       setLoading(false);
     }
     fetchFeeds();
-  }, [selectedFeeds]);
+  }, []);
 
   return (
     <main className="w-full flex flex-col items-center justify-center bg-white dark:bg-black pt-8" style={{ minWidth: 0, width: '100%', minHeight: 0 }}>
@@ -113,150 +112,11 @@ export default function HomePage() {
         <>
           {/* Desktop: fixed top-right */}
           <div className="hidden lg:block fixed top-32 right-8 z-30">
-            <button
-              ref={filterBtnRef}
-              className="flex items-center gap-2 px-4 py-2 rounded-lg bg-primary-600 text-white font-semibold shadow hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-400"
-              onClick={() => {
-                setPendingFeeds(selectedFeeds);
-                setIsFilterOpen(true);
-                if (filterBtnRef.current) {
-                  const rect = filterBtnRef.current.getBoundingClientRect();
-                  const dropdownWidth = 320; // approximate width of the dropdown
-                  let left = rect.left + window.scrollX;
-                  // On desktop, always align right; on mobile/tablet, clamp left
-                  if (window.innerWidth >= 1024) { // lg breakpoint
-                    left = rect.right + window.scrollX - dropdownWidth;
-                    if (left < 16) left = 16;
-                  } else {
-                    const maxLeft = window.innerWidth - dropdownWidth - 16; // 16px margin
-                    if (left > maxLeft) left = maxLeft;
-                  }
-                  setDialogPos({ top: rect.bottom + window.scrollY + 4, left });
-                }
-              }}
-            >
-              <AdjustmentsHorizontalIcon className="w-5 h-5" />
-              Filter Feeds
-            </button>
-            {isFilterOpen && typeof window !== 'undefined' && createPortal(
-              <Dialog
-                open={isFilterOpen}
-                onClose={() => setIsFilterOpen(false)}
-                className="fixed z-50 w-80"
-                style={{ top: dialogPos.top, left: dialogPos.left }}
-              >
-                <Dialog.Panel className="relative bg-white dark:bg-gray-900 rounded-2xl shadow-2xl w-full p-8 border border-gray-200 dark:border-gray-700">
-                  <button
-                    className="absolute top-4 right-4 text-gray-400 hover:text-gray-700 dark:hover:text-white"
-                    onClick={() => setIsFilterOpen(false)}
-                    aria-label="Close"
-                  >
-                    <XMarkIcon className="w-6 h-6" />
-                  </button>
-                  <Dialog.Title className="text-xl font-bold mb-4 text-gray-900 dark:text-white">Select Feeds to Display</Dialog.Title>
-                  <div className="flex flex-col gap-3 mb-6">
-                    {[...FEEDS].sort((a, b) => a.name.localeCompare(b.name)).map(feed => (
-                      <label key={feed.name} className="flex items-center gap-3 cursor-pointer">
-                        <input
-                          type="checkbox"
-                          checked={pendingFeeds.includes(feed.name)}
-                          onChange={e => {
-                            if (e.target.checked) {
-                              setPendingFeeds([...pendingFeeds, feed.name]);
-                            } else {
-                              setPendingFeeds(pendingFeeds.filter(f => f !== feed.name));
-                            }
-                          }}
-                          className="w-4 h-4 text-primary-600 border-gray-300 rounded focus:ring-primary-500"
-                        />
-                        <span className="text-gray-800 dark:text-gray-200 font-medium">{feed.name}</span>
-                      </label>
-                    ))}
-                  </div>
-                  <button
-                    className="w-full px-4 py-2 rounded-lg bg-primary-600 text-white font-semibold shadow hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-400"
-                    onClick={() => {
-                      setSelectedFeeds(pendingFeeds);
-                      setIsFilterOpen(false);
-                    }}
-                  >
-                    Apply
-                  </button>
-                </Dialog.Panel>
-              </Dialog>,
-              document.body
-            )}
+            {/* Filter Feeds button removed */}
           </div>
           {/* Mobile/Tablet: below nav links */}
           <div className="block lg:hidden w-full px-4 mt-4 mb-2">
-            <button
-              ref={filterBtnRef}
-              className="flex items-center gap-2 w-full justify-center px-4 py-2 rounded-lg bg-primary-600 text-white font-semibold shadow hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-400"
-              onClick={() => {
-                setPendingFeeds(selectedFeeds);
-                setIsFilterOpen(true);
-                if (filterBtnRef.current) {
-                  const rect = filterBtnRef.current.getBoundingClientRect();
-                  const dropdownWidth = 320; // approximate width of the dropdown
-                  let left = rect.left + window.scrollX;
-                  // Clamp left so dropdown doesn't overflow right edge
-                  const maxLeft = window.innerWidth - dropdownWidth - 16; // 16px margin
-                  if (left > maxLeft) left = maxLeft;
-                  setDialogPos({ top: rect.bottom + window.scrollY + 4, left });
-                }
-              }}
-            >
-              <AdjustmentsHorizontalIcon className="w-5 h-5" />
-              Filter Feeds
-            </button>
-            {isFilterOpen && typeof window !== 'undefined' && createPortal(
-              <Dialog
-                open={isFilterOpen}
-                onClose={() => setIsFilterOpen(false)}
-                className="fixed z-50 w-80"
-                style={{ top: dialogPos.top, left: dialogPos.left }}
-              >
-                <Dialog.Panel className="relative bg-white dark:bg-gray-900 rounded-2xl shadow-2xl w-full p-8 border border-gray-200 dark:border-gray-700">
-                  <button
-                    className="absolute top-4 right-4 text-gray-400 hover:text-gray-700 dark:hover:text-white"
-                    onClick={() => setIsFilterOpen(false)}
-                    aria-label="Close"
-                  >
-                    <XMarkIcon className="w-6 h-6" />
-                  </button>
-                  <Dialog.Title className="text-xl font-bold mb-4 text-gray-900 dark:text-white">Select Feeds to Display</Dialog.Title>
-                  <div className="flex flex-col gap-3 mb-6">
-                    {[...FEEDS].sort((a, b) => a.name.localeCompare(b.name)).map(feed => (
-                      <label key={feed.name} className="flex items-center gap-3 cursor-pointer">
-                        <input
-                          type="checkbox"
-                          checked={pendingFeeds.includes(feed.name)}
-                          onChange={e => {
-                            if (e.target.checked) {
-                              setPendingFeeds([...pendingFeeds, feed.name]);
-                            } else {
-                              setPendingFeeds(pendingFeeds.filter(f => f !== feed.name));
-                            }
-                          }}
-                          className="w-4 h-4 text-primary-600 border-gray-300 rounded focus:ring-primary-500"
-                        />
-                        <span className="text-gray-800 dark:text-gray-200 font-medium">{feed.name}</span>
-                      </label>
-                    ))}
-                  </div>
-                  <button
-                    className="w-full px-4 py-2 rounded-lg bg-primary-600 text-white font-semibold shadow hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-400"
-                    onClick={() => {
-                      setSelectedFeeds(pendingFeeds);
-                      setIsFilterOpen(false);
-                    }}
-                  >
-                    Apply
-                  </button>
-                </Dialog.Panel>
-              </Dialog>,
-              document.body
-            )}
+            {/* Filter Feeds button removed */}
           </div>
         </>
       )}
