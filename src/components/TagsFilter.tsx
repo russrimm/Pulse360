@@ -1,6 +1,6 @@
 import { useState, useMemo, useRef, useEffect, useCallback } from 'react';
 import type { Message } from '@/lib/types';
-import { useFilterStore } from './filterStore';
+import { useFilterContext } from './FilterContext';
 
 // Debug: Log when TagsFilter renders and the current openFilter value
 console.log('TagsFilter rendered');
@@ -10,8 +10,7 @@ interface TagsFilterProps {
 }
 
 export function TagsFilter({ messages }: TagsFilterProps) {
-  const selectedTags = useFilterStore(state => state.selectedTags);
-  const setSelectedTags = useFilterStore(state => state.setSelectedTags);
+  const { selectedTags, setSelectedTags } = useFilterContext();
   // Use local state for open/close
   const [isOpen, setIsOpen] = useState(false);
   const setOpen = setIsOpen;
@@ -41,6 +40,7 @@ export function TagsFilter({ messages }: TagsFilterProps) {
 
   return (
     <div className="relative w-full md:w-auto" ref={dropdownRef}>
+      {/* Prevent event bubbling to avoid closing other filter dialogs */}
       <button
         onClick={() => setOpen(!isOpen)}
         className="flex items-center justify-center gap-2 px-4 h-8 text-gray-700 dark:text-gray-200 bg-white/80 dark:bg-gray-800/50 backdrop-blur-sm border border-gray-200 dark:border-gray-700/50 rounded-lg shadow-[inset_0_2px_4px_rgba(0,0,0,0.05)] dark:shadow-[inset_0_2px_4px_rgba(0,0,0,0.2)] hover:shadow-[inset_0_2px_4px_rgba(0,0,0,0.1)] dark:hover:shadow-[inset_0_2px_4px_rgba(0,0,0,0.3)] hover:border-primary-200 dark:hover:border-primary-800 hover:shadow-[0_0_0_1px_rgba(59,130,246,0.5)] dark:hover:shadow-[0_0_0_1px_rgba(59,130,246,0.5)] transition-all duration-300 relative w-full md:w-auto min-h-[32px]"
@@ -68,8 +68,9 @@ export function TagsFilter({ messages }: TagsFilterProps) {
       </button>
       {isOpen && (
         <div
+          onMouseDown={e => e.stopPropagation()}
+          onClick={e => e.stopPropagation()}
           className="absolute z-10 w-72 mt-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow-lg"
-          onPointerDown={() => { internalClick.current = true; }}
         >
           <div className="p-4 border-b border-gray-200 dark:border-gray-700">
             <h3 className="text-sm font-medium text-gray-900 dark:text-white">Filter Tags</h3>
