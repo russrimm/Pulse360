@@ -1,46 +1,10 @@
 'use client';
-import { useState, useRef, useEffect } from 'react';
-import { CopilotStudioClient, loadCopilotStudioConnectionSettingsFromEnv } from '@microsoft/agents-copilotstudio-client';
+import { useState } from 'react';
 
-const CONNECTION_STRING = process.env.NEXT_PUBLIC_COPILOT_CONNECTION_STRING;
+const COPILOT_AGENT_WEBCHAT_URL = "https://copilotstudio.preview.microsoft.com/environments/18571ae9-2db1-e2fc-97ef-2398a6944c06/bots/cr7d6_agent/webchat?__version__=2";
 
 export default function AgentChatWidget() {
   const [minimized, setMinimized] = useState(true);
-  const [messages, setMessages] = useState<{from: 'user'|'agent', text: string}[]>([]);
-  const [input, setInput] = useState('');
-  const [client, setClient] = useState<any>(null);
-  const [loading, setLoading] = useState(false);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (!client && CONNECTION_STRING) {
-      try {
-        // Use the helper to get ConnectionSettings from env
-        const settings = loadCopilotStudioConnectionSettingsFromEnv();
-        setClient(new CopilotStudioClient(settings, ""));
-      } catch {}
-    }
-  }, [client]);
-
-  useEffect(() => {
-    // Scroll to bottom on new message
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
-
-  const sendMessage = async () => {
-    if (!client || !input.trim()) return;
-    setLoading(true);
-    setMessages(msgs => [...msgs, { from: 'user', text: input }]);
-    try {
-      // SDK: sendActivity returns a response object
-      const response = await client.sendActivity({ type: 'message', text: input });
-      setMessages(msgs => [...msgs, { from: 'agent', text: response.text || '[No response]' }]);
-    } catch (e) {
-      setMessages(msgs => [...msgs, { from: 'agent', text: '[Error communicating with agent]' }]);
-    }
-    setInput('');
-    setLoading(false);
-  };
 
   if (minimized) {
     return (
@@ -111,34 +75,13 @@ export default function AgentChatWidget() {
           <rect x="3" y="11" width="18" height="2" rx="1"/>
         </svg>
       </button>
-      <div className="flex-1 flex flex-col p-3 overflow-y-auto" style={{ marginTop: 32, marginBottom: 48 }}>
-        {messages.length === 0 && (
-          <div className="text-gray-400 text-center mt-8">Start a conversation with Copilot Studio Agent…</div>
-        )}
-        {messages.map((msg, i) => (
-          <div key={i} className={`mb-2 text-sm ${msg.from === 'user' ? 'text-right' : 'text-left'}`}> 
-            <span className={`inline-block px-3 py-2 rounded-lg ${msg.from === 'user' ? 'bg-primary-100 text-primary-900 dark:bg-primary-900 dark:text-primary-100' : 'bg-gray-100 text-gray-900 dark:bg-gray-800 dark:text-gray-100'}`}>{msg.text}</span>
-          </div>
-        ))}
-        <div ref={messagesEndRef} />
-      </div>
-      <div className="absolute bottom-0 left-0 w-full flex items-center p-2 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700">
-        <input
-          className="flex-1 px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
-          value={input}
-          onChange={e => setInput(e.target.value)}
-          onKeyDown={e => e.key === 'Enter' && sendMessage()}
-          placeholder="Type your message…"
-          disabled={loading}
-        />
-        <button
-          className="ml-2 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:opacity-50"
-          onClick={sendMessage}
-          disabled={loading || !input.trim()}
-        >
-          Send
-        </button>
-      </div>
+      <iframe
+        src={COPILOT_AGENT_WEBCHAT_URL}
+        frameBorder="0"
+        style={{ width: '100%', height: '100%' }}
+        title="Copilot Studio Agent Chat"
+        allow="clipboard-write;"
+      />
     </div>
   );
 } 

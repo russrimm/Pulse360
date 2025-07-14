@@ -9,7 +9,7 @@ import { LoadingSpinner } from './LoadingSpinner';
 import { SearchBar } from '@/components/SearchBar';
 import { TagsFilter } from '@/components/TagsFilter';
 import { addDays, isAfter, isBefore, parseISO, startOfDay, endOfDay, subDays } from 'date-fns';
-import { useFilterStore } from './filterStore';
+import { useFilterContext } from './FilterContext';
 
 interface MessageListProps {
   messages: Message[];
@@ -28,18 +28,20 @@ export function MessageList({ messages }: MessageListProps) {
   const [searchQuery, setSearchQuery] = useState('');
 
   // Zustand filter state
-  const selectedTags = useFilterStore(state => state.selectedTags);
-  const setSelectedTags = useFilterStore(state => state.setSelectedTags);
-  const selectedServices = useFilterStore(state => state.selectedServices);
-  const setSelectedServices = useFilterStore(state => state.setSelectedServices);
-  const openFilter = useFilterStore(state => state.openFilter);
-  const setOpenFilter = useFilterStore(state => state.setOpenFilter);
-  const selectedDateFilter = useFilterStore(state => state.selectedDateFilter);
-  const setSelectedDateFilter = useFilterStore(state => state.setSelectedDateFilter);
-  const customDateRange = useFilterStore(state => state.customDateRange);
-  const setCustomDateRange = useFilterStore(state => state.setCustomDateRange);
-  const showMajorChangesOnly = useFilterStore(state => state.showMajorChangesOnly);
-  const setShowMajorChangesOnly = useFilterStore(state => state.setShowMajorChangesOnly);
+  const {
+    selectedTags,
+    setSelectedTags,
+    selectedServices,
+    setSelectedServices,
+    openFilter,
+    setOpenFilter,
+    selectedDateFilter,
+    setSelectedDateFilter,
+    customDateRange,
+    setCustomDateRange,
+    showMajorChangesOnly,
+    setShowMajorChangesOnly
+  } = useFilterContext();
 
   // Get unique tags
   const uniqueTags = useMemo(() => {
@@ -220,7 +222,11 @@ export function MessageList({ messages }: MessageListProps) {
                 )}
               </button>
               {openFilter === 'date' && (
-                <div className="absolute z-10 w-72 mt-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow-lg">
+                <div
+                  className="absolute z-10 w-72 mt-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow-lg"
+                  onMouseDown={e => e.stopPropagation()}
+                  onClick={e => e.stopPropagation()}
+                >
                   <div className="p-4 border-b border-gray-200 dark:border-gray-700">
                     <h3 className="text-sm font-medium text-gray-900 dark:text-white">Filter by Date</h3>
                   </div>

@@ -148,13 +148,6 @@ export function ProductFilter({ services, selectedServices, onFilterChange, isOp
     [services]
   );
 
-  // Memoize click outside handler
-  const handleClickOutside = useCallback((event: MouseEvent) => {
-    if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-      setOpen(false);
-    }
-  }, [setOpen]);
-
   // Handle keyboard navigation
   const handleKeyDown = useCallback((event: KeyboardEvent) => {
     if (!isOpen) return;
@@ -178,13 +171,11 @@ export function ProductFilter({ services, selectedServices, onFilterChange, isOp
   }, [isOpen, setOpen, toggleService]);
 
   useEffect(() => {
-    document.addEventListener('mousedown', handleClickOutside);
     document.addEventListener('keydown', handleKeyDown);
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
       document.removeEventListener('keydown', handleKeyDown);
     };
-  }, [handleClickOutside, handleKeyDown]);
+  }, [handleKeyDown]);
 
   // Load saved filters on mount
   useEffect(() => {
@@ -270,10 +261,12 @@ export function ProductFilter({ services, selectedServices, onFilterChange, isOp
       </button>
 
       {isOpen && (
-        <div 
+        <div
           className="absolute z-50 w-72 mt-1 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow-lg transition-opacity duration-150 opacity-100 animate-fadein"
           role="dialog"
           aria-label="Product filter options"
+          onMouseDown={e => e.stopPropagation()}
+          onClick={e => e.stopPropagation()}
         >
           <div className="p-4 border-b border-gray-200 dark:border-gray-700">
             <h3 className="text-sm font-medium text-gray-900 dark:text-white">Filter Products</h3>
