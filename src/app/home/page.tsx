@@ -134,9 +134,10 @@ export default function HomePage() {
             spaceBetween={48}
             slidesPerView={1}
             direction="horizontal"
-            style={{ width: '90vw', height: '60vh', maxWidth: 1800, maxHeight: 700 }}
+            style={{ width: '100vw', height: '60vh', maxWidth: 1800, maxHeight: 700 }}
             thumbs={{ swiper: thumbsSwiper && !thumbsSwiper.destroyed ? thumbsSwiper : null }}
             onSlideChange={swiper => setActiveIndex(swiper.activeIndex)}
+            className="relative"
           >
             {updates.map((update, idx) => (
               <SwiperSlide key={idx} className="flex items-center justify-center h-[70vh]">
@@ -144,31 +145,32 @@ export default function HomePage() {
                   href={update.link}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="block bg-white/95 dark:bg-gray-900/95 rounded-2xl shadow-xl hover:shadow-primary-400/40 transition-shadow border border-gray-200 dark:border-gray-700 p-14 max-w-3xl w-[70vw] max-h-[70vh] h-auto flex flex-col justify-center mx-auto"
-                  style={{ minHeight: '420px' }}
+                  className="block bg-white/95 dark:bg-gray-900/95 rounded-2xl shadow-xl hover:shadow-primary-400/40 transition-shadow border border-gray-200 dark:border-gray-700 p-2 sm:p-6 md:p-10 max-w-full w-full sm:w-[90vw] md:w-[70vw] max-h-[70vh] sm:max-h-[70vh] h-auto flex flex-col justify-center mx-auto"
+                  style={{ minHeight: '320px', maxHeight: '520px' }}
                 >
                   <div className="mb-2 text-xs text-primary-600 font-semibold uppercase tracking-wide text-center">
                     {update.feed}
                   </div>
-                  <div className="font-bold text-3xl text-gray-900 dark:text-white mb-4 text-center"
+                  <div
+                    className="font-bold text-lg sm:text-2xl md:text-3xl text-gray-900 dark:text-white mb-3 sm:mb-4 text-center leading-tight sm:leading-snug md:leading-snug"
                     style={{
                       display: '-webkit-box',
                       WebkitBoxOrient: 'vertical',
                       overflow: 'hidden',
-                      WebkitLineClamp: typeof window !== 'undefined' && window.innerWidth < 640 ? 'unset' : 2
+                      WebkitLineClamp: 3
                     }}
                   >
                     {update.title}
                   </div>
-                  <div className="text-xs text-gray-500 dark:text-gray-400 mb-6 text-center">
+                  <div className="text-xs text-gray-500 dark:text-gray-400 mb-4 sm:mb-6 text-center">
                     {update.pubDate ? format(new Date(update.pubDate), "MMM d, yyyy") : ""}
                   </div>
-                  <div className="text-lg text-gray-700 dark:text-gray-300 line-clamp-6 text-center" dangerouslySetInnerHTML={{ __html: update.description }} />
+                  <div className="text-sm sm:text-lg text-gray-700 dark:text-gray-300 line-clamp-6 text-center" dangerouslySetInnerHTML={{ __html: update.description }} />
                 </a>
               </SwiperSlide>
             ))}
           </Swiper>
-          <div className="w-full flex justify-center mt-2">
+          <div className="w-full flex justify-center mt-2 hidden sm:flex">
             <Swiper
               modules={[Thumbs]}
               onSwiper={setThumbsSwiper}
@@ -218,27 +220,71 @@ export default function HomePage() {
           background: #3b82f6 !important; /* bg-primary-500 */
         }
         .swiper-pagination {
-          margin-top: -180px !important;
+          margin-top: -100px !important;
+        }
+        @media (max-width: 640px) {
+          .swiper-pagination {
+            margin-top: 0 !important;
+            margin-bottom: 8px !important;
+          }
         }
         .thumbs-swiper {
           margin-top: 32px !important;
         }
         /* Swiper navigation buttons */
         .swiper-button-next, .swiper-button-prev {
-          border: 2px solid #60a5fa !important; /* primary-400 */
-          background: #fff !important;
-          color: #0284c7 !important; /* primary-600 */
+          background: linear-gradient(135deg, #f0f9ff 0%, #e0e7ef 100%) !important;
+          color: #2563eb !important; /* modern blue */
+          border: none !important;
           border-radius: 9999px !important;
-          box-shadow: 0 2px 8px 0 rgba(59,130,246,0.10);
-          transition: border-color 0.2s, box-shadow 0.2s;
+          box-shadow: 0 4px 16px 0 rgba(59,130,246,0.12), 0 1.5px 6px 0 rgba(0,0,0,0.04);
+          transition: box-shadow 0.18s, transform 0.18s, background 0.18s;
+          position: absolute !important;
+          top: 50% !important;
+          transform: translateY(-50%) !important;
+          z-index: 40 !important;
+          width: 44px !important;
+          height: 44px !important;
+          font-size: 1.5rem !important;
+          display: flex !important;
+          align-items: center !important;
+          justify-content: center !important;
+          padding: 0 !important;
+          opacity: 0.96 !important;
         }
         .swiper-button-next:hover, .swiper-button-prev:hover {
-          border-color: #38bdf8 !important; /* primary-400 */
-          box-shadow: 0 4px 16px 0 rgba(59,130,246,0.18);
+          box-shadow: 0 8px 32px 0 rgba(59,130,246,0.18), 0 2px 8px 0 rgba(0,0,0,0.08);
+          background: linear-gradient(135deg, #e0e7ef 0%, #f0f9ff 100%) !important;
+          transform: translateY(-50%) scale(1.08) !important;
+          opacity: 1 !important;
         }
         .swiper-button-disabled {
           opacity: 0.4 !important;
-          border-color: #d1d5db !important; /* gray-300 */
+          background: #f1f5f9 !important;
+          color: #94a3b8 !important;
+        }
+        .swiper-button-next {
+          right: 8px !important;
+          left: auto !important;
+        }
+        .swiper-button-prev {
+          left: 8px !important;
+          right: auto !important;
+        }
+        @media (max-width: 640px) {
+          .swiper-button-next, .swiper-button-prev {
+            width: 38px !important;
+            height: 38px !important;
+            font-size: 1.2rem !important;
+          }
+          .swiper-button-next {
+            right: 2vw !important;
+            left: auto !important;
+          }
+          .swiper-button-prev {
+            left: 2vw !important;
+            right: auto !important;
+          }
         }
         /* Swiper pagination bullets */
         .swiper-pagination-bullet {

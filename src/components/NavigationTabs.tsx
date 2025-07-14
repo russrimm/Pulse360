@@ -194,12 +194,12 @@ export function NavigationTabs() {
                         <Link
                           key={link.href}
                           href={link.href}
-                          className={`flex items-center gap-3 px-4 py-3 rounded-lg font-medium text-base transition-colors duration-150 hover:bg-primary-50 dark:hover:bg-primary-900/30 focus:outline-none focus:bg-primary-100 dark:focus:bg-primary-800/40 ${link.href === pathname ? 'bg-primary-600 text-white pointer-events-none' : 'text-gray-900 dark:text-gray-100'}`}
+                          className={`flex items-center gap-3 px-4 py-3 rounded-lg font-medium text-base transition-colors duration-150 hover:bg-primary-50 dark:hover:bg-primary-900/30 focus:outline-none focus:bg-primary-100 dark:focus:bg-primary-800/40 whitespace-normal break-words text-left ${link.href === pathname ? 'bg-primary-600 text-white pointer-events-none' : 'text-gray-900 dark:text-gray-100'}`}
                           aria-current={link.href === pathname ? 'page' : undefined}
                           onClick={handleMenuItemClickMSRC}
                         >
                           {link.icon}
-                          {link.name}
+                          <span className="whitespace-normal break-words text-left block w-full">{link.name}</span>
                         </Link>
                       ))}
                     </Popover.Content>
