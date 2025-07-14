@@ -191,6 +191,54 @@ export function ProductNewsLayout({ children, title, description, icon }: Produc
         </div>
 
         <div className="mt-8 mb-2 w-full overflow-x-hidden">
+          {/* Add improved button outlines for light mode */}
+          <style jsx global>{`
+            /* Product news buttons (mobile and desktop) */
+            .grid.grid-cols-2 a,
+            .lg\:flex.flex-wrap a {
+              border: 2px solid #94a3b8 !important; /* gray-400 */
+              background: #fff;
+              transition: border-color 0.2s, box-shadow 0.2s;
+            }
+            .dark .grid.grid-cols-2 a,
+            .dark .lg\:flex.flex-wrap a {
+              background: #18181b !important; /* gray-900 */
+              border-color: #374151 !important; /* gray-700 */
+            }
+            .grid.grid-cols-2 a:hover,
+            .lg\:flex.flex-wrap a:hover {
+              border-color: #38bdf8 !important; /* primary-400 */
+              box-shadow: 0 2px 8px 0 rgba(59,130,246,0.10);
+            }
+            .dark .grid.grid-cols-2 a:hover,
+            .dark .lg\:flex.flex-wrap a:hover {
+              border-color: #38bdf8 !important;
+            }
+            .grid.grid-cols-2 a[aria-current="page"],
+            .lg\:flex.flex-wrap a[aria-current="page"],
+            .grid.grid-cols-2 a.bg-primary-50,
+            .lg\:flex.flex-wrap a.bg-primary-50 {
+              border-color: #0ea5e9 !important; /* primary-500 */
+              box-shadow: 0 4px 24px 0 rgba(59,130,246,0.18);
+            }
+            .dark .grid.grid-cols-2 a[aria-current="page"],
+            .dark .lg\:flex.flex-wrap a[aria-current="page"],
+            .dark .grid.grid-cols-2 a.bg-primary-50,
+            .dark .lg\:flex.flex-wrap a.bg-primary-50 {
+              border-color: #38bdf8 !important;
+            }
+            .grid.grid-cols-2 a:focus,
+            .lg\:flex.flex-wrap a:focus {
+              border-color: #38bdf8 !important;
+              box-shadow: 0 0 0 3px #bae6fd;
+              outline: none;
+            }
+            .dark .grid.grid-cols-2 a:focus,
+            .dark .lg\:flex.flex-wrap a:focus {
+              border-color: #38bdf8 !important;
+              box-shadow: 0 0 0 3px #0ea5e9;
+            }
+          `}</style>
           {/* Mobile: show all buttons in a single grid */}
           <div className={`grid grid-cols-2 gap-3 w-full min-w-0 lg:hidden justify-center${!['/product-news/power-platform','/product-news/power-automate','/product-news/copilot','/product-news/azure-ai-foundry','/product-news/all-things-azure','/product-news/semantic-kernel','/product-news/fabric-blog','/product-news/power-bi','/product-news/vscode','/product-news'].includes(pathname) ? ' mb-12' : ''}`}>
             {products.map((product) => (

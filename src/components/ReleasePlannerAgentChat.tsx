@@ -7,6 +7,9 @@ interface ReleasePlannerAgentChatProps {
   endpoint: string
 }
 
+// Copilot Studio agent webchat endpoint for reuse
+export const COPILOT_AGENT_WEBCHAT_URL = "https://copilotstudio.preview.microsoft.com/environments/18571ae9-2db1-e2fc-97ef-2398a6944c06/bots/cr7d6_agent/webchat?__version__=2";
+
 export function ReleasePlannerAgentChat() {
   const [minimized, setMinimized] = useState(false)
 
