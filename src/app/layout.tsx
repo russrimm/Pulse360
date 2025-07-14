@@ -9,6 +9,7 @@ import { NavigationTabs } from '@/components/NavigationTabs'
 import { ErrorBoundary } from '@/components/ErrorBoundary'
 import { ReactQueryProvider } from '@/components/ReactQueryProvider'
 import { FilterProvider } from '@/components/FilterContext'
+import AgentChatWidget from '@/components/AgentChatWidget';
 
 if (process.env.NODE_ENV === 'production') {
   // eslint-disable-next-line no-console
@@ -73,6 +74,7 @@ export default function RootLayout({
                   <main className="flex-1">
                     {children}
                   </main>
+                  <AgentChatWidget />
                 </div>
               </FilterProvider>
             </ErrorBoundary>

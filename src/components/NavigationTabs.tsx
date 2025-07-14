@@ -63,7 +63,29 @@ export function NavigationTabs() {
     },
   ];
 
-  // Reorder the navigation so Microsoft 365 comes after Azure Updates
+  // Add Release Planners dropdown with Azure as a child
+  const RELEASE_PLANS_LINKS = [
+    {
+      name: 'Azure',
+      href: '/azure-updates',
+      icon: (
+        <Image src="/icons/Azure.svg" alt="Azure Updates" width={20} height={20} className="w-5 h-5" />
+      ),
+    },
+    {
+      name: 'Microsoft 365',
+      href: '/m365-updates',
+      icon: (
+        <Image src="/icons/m365.svg" alt="Microsoft 365" width={20} height={20} className="w-5 h-5" />
+      ),
+    },
+    ...PRODUCTS.map(p => ({
+      name: p.label,
+      href: p.href,
+      icon: <Image src={p.icon} alt={p.label} width={20} height={20} className="w-5 h-5" />,
+    })),
+  ];
+
   const tabs = [
     {
       name: 'Home',
@@ -75,11 +97,15 @@ export function NavigationTabs() {
       ),
     },
     {
-      name: 'Azure', // Renamed from 'Azure Updates'
-      href: '/azure-updates',
-      icon: (
-        <Image src="/icons/Azure.svg" alt="Azure Updates" width={20} height={20} className="w-5 h-5" />
-      ),
+      name: 'M365 Message Center',
+      href: '/message-center',
+      icon: <Image src="/icons/m365.svg" alt="M365 Message Center" width={20} height={20} className="w-5 h-5" />,
+    },
+    {
+      name: 'Release Plans',
+      href: '/release-plans',
+      icon: <Image src="/icons/planner.svg" alt="Release Plans" width={20} height={20} className="w-5 h-5" />, // Planner icon
+      dropdown: true,
     },
     // Microsoft 365 Popover will be rendered here
     {
@@ -111,6 +137,41 @@ export function NavigationTabs() {
               ? pathname === tab.href || pathname.startsWith('/product-news/')
               : pathname === tab.href;
             if (tab.name === 'Release Planner') return null;
+            if (tab.name === 'Release Plans') {
+              // Show dropdown for Release Plans
+              const isActive = RELEASE_PLANS_LINKS.some(link => pathname === link.href);
+              return (
+                <Popover.Root key={tab.href}>
+                  <Popover.Trigger asChild>
+                    <button
+                      className={`flex flex-col items-center justify-center md:flex-row md:items-center gap-1 md:gap-2 px-3 py-2 text-sm font-medium rounded-lg transition-colors relative w-full md:w-auto text-center
+                        ${isActive ? 'bg-primary-50 text-primary-700 dark:bg-primary-900/50 dark:text-primary-300' : 'text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200'}`}
+                      aria-label="Release Plans"
+                    >
+                      <span className={`transition-transform duration-200 ${isActive ? 'text-primary-600 dark:text-primary-400' : 'text-gray-500 dark:text-gray-400 group-hover:text-primary-600 dark:group-hover:text-primary-400'}`}>{tab.icon && tab.icon}</span>
+                      <span className="text-center w-full md:w-auto">{tab.name}</span>
+                      <ChevronDownIcon className="w-4 h-4" />
+                      <span className="absolute bottom-0 left-0 w-full h-0.5 bg-primary-600 dark:bg-primary-400 rounded-full" />
+                    </button>
+                  </Popover.Trigger>
+                  <Popover.Portal>
+                    <Popover.Content sideOffset={8} className="z-50 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl shadow-2xl p-2 min-w-[220px] flex flex-col gap-1 animate-fade-in">
+                      {RELEASE_PLANS_LINKS.map(link => (
+                        <Link
+                          key={link.href}
+                          href={link.href}
+                          className={`flex items-center gap-3 px-4 py-3 rounded-lg font-medium text-base transition-colors duration-150 hover:bg-primary-50 dark:hover:bg-primary-900/30 focus:outline-none focus:bg-primary-100 dark:focus:bg-primary-800/40 ${link.href === pathname ? 'bg-primary-600 text-white pointer-events-none' : 'text-gray-900 dark:text-gray-100'}`}
+                          aria-current={link.href === pathname ? 'page' : undefined}
+                        >
+                          {link.icon}
+                          {link.name}
+                        </Link>
+                      ))}
+                    </Popover.Content>
+                  </Popover.Portal>
+                </Popover.Root>
+              );
+            }
             if (tab.name === 'Microsoft Security') {
               const isActive = MSRC_LINKS.some(link => pathname === link.href);
               return (
@@ -156,43 +217,13 @@ export function NavigationTabs() {
                       : 'text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200'
                     }`}
                 >
-                  <span className={`transition-transform duration-200 ${isActive ? 'text-primary-600 dark:text-primary-400' : 'text-gray-500 dark:text-gray-400 group-hover:text-primary-600 dark:group-hover:text-primary-400'}`}>{tab.icon}</span>
+                  <span className={`transition-transform duration-200 ${isActive ? 'text-primary-600 dark:text-primary-400' : 'text-gray-500 dark:text-gray-400 group-hover:text-primary-600 dark:group-hover:text-primary-400'}`}>{tab.icon && tab.icon}</span>
                   <span className="text-center w-full md:w-auto">{tab.name}</span>
                   <span className="absolute bottom-0 left-0 w-full h-0.5 bg-primary-600 dark:bg-primary-400 rounded-full" />
                 </Link>
                 {tab.name === 'Azure' && (
-                  <Popover.Root open={open365} onOpenChange={handleOpenChange365}>
-                    <Popover.Trigger asChild>
-                      <button
-                        className={`flex flex-col items-center justify-center md:flex-row md:items-center gap-1 md:gap-2 px-3 py-2 text-sm font-medium rounded-lg transition-colors relative w-full md:w-auto text-center
-                          ${MICROSOFT_365_LINKS.some(link => pathname === link.href) ? 'bg-primary-50 text-primary-700 dark:bg-primary-900/50 dark:text-primary-300' : 'text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200'}`}
-                        aria-label="Microsoft 365"
-                      >
-                        <span className={`transition-transform duration-200 ${MICROSOFT_365_LINKS.some(link => pathname === link.href) ? 'text-primary-600 dark:text-primary-400' : 'text-gray-500 dark:text-gray-400 group-hover:text-primary-600 dark:group-hover:text-primary-400'}`}>
-                          <Image src="/icons/m365.svg" alt="Microsoft 365" width={20} height={20} className="w-5 h-5" />
-                        </span>
-                        <span className="text-center w-full md:w-auto">Microsoft 365</span>
-                        <ChevronDownIcon className="w-4 h-4" />
-                        <span className="absolute bottom-0 left-0 w-full h-0.5 bg-primary-600 dark:bg-primary-400 rounded-full" />
-                      </button>
-                    </Popover.Trigger>
-                    <Popover.Portal>
-                      <Popover.Content sideOffset={8} className="z-50 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl shadow-2xl p-2 min-w-[220px] flex flex-col gap-1 animate-fade-in">
-                        {MICROSOFT_365_LINKS.map(link => (
-                          <Link
-                            key={link.href}
-                            href={link.href}
-                            className={`flex items-center gap-3 px-4 py-3 rounded-lg font-medium text-base transition-colors duration-150 hover:bg-primary-50 dark:hover:bg-primary-900/30 focus:outline-none focus:bg-primary-100 dark:focus:bg-primary-800/40 ${link.href === pathname ? 'bg-primary-600 text-white pointer-events-none' : 'text-gray-900 dark:text-gray-100'}`}
-                            aria-current={link.href === pathname ? 'page' : undefined}
-                            onClick={handleMenuItemClick365}
-                          >
-                            {link.icon}
-                            {link.name}
-                          </Link>
-                        ))}
-                      </Popover.Content>
-                    </Popover.Portal>
-                  </Popover.Root>
+                  // Remove Azure as a top-level tab (now under Release Planners)
+                  null
                 )}
               </React.Fragment>
             );

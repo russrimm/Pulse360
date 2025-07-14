@@ -223,6 +223,51 @@ export default function HomePage() {
         .thumbs-swiper {
           margin-top: 32px !important;
         }
+        /* Swiper navigation buttons */
+        .swiper-button-next, .swiper-button-prev {
+          border: 2px solid #60a5fa !important; /* primary-400 */
+          background: #fff !important;
+          color: #0284c7 !important; /* primary-600 */
+          border-radius: 9999px !important;
+          box-shadow: 0 2px 8px 0 rgba(59,130,246,0.10);
+          transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .swiper-button-next:hover, .swiper-button-prev:hover {
+          border-color: #38bdf8 !important; /* primary-400 */
+          box-shadow: 0 4px 16px 0 rgba(59,130,246,0.18);
+        }
+        .swiper-button-disabled {
+          opacity: 0.4 !important;
+          border-color: #d1d5db !important; /* gray-300 */
+        }
+        /* Swiper pagination bullets */
+        .swiper-pagination-bullet {
+          border: 2px solid #94a3b8 !important; /* gray-400 */
+          background: #fff !important;
+          opacity: 1 !important;
+          box-shadow: 0 1px 4px 0 rgba(59,130,246,0.08);
+          transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .swiper-pagination-bullet-active {
+          border-color: #0ea5e9 !important; /* primary-500 */
+          background: #bae6fd !important; /* primary-200 */
+          box-shadow: 0 2px 8px 0 rgba(59,130,246,0.15);
+        }
+        /* Carousel card outline (main slide) */
+        .swiper-slide .block.bg-white\/95 {
+          border: 2px solid #94a3b8;
+          box-shadow: 0 2px 8px 0 rgba(59,130,246,0.10);
+          transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .swiper-slide-active .block.bg-white\/95 {
+          border-color: #0ea5e9;
+          box-shadow: 0 4px 24px 0 rgba(59,130,246,0.18);
+        }
+        .swiper-slide .block.bg-white\/95:active, .swiper-slide .block.bg-white\/95:focus {
+          border-color: #38bdf8;
+          box-shadow: 0 0 0 3px #bae6fd;
+          outline: none;
+        }
       `}</style>
     </main>
   );
