@@ -249,7 +249,7 @@ export function ProductNewsLayout({ children, title, description, icon }: Produc
                   ${
                     (product.href === '/product-news/microsoft-news' && (pathname === '/product-news/microsoft-news' || pathname.startsWith('/product-news/author/')))
                       ? 'bg-primary-50 border-primary-300 dark:bg-primary-900/50 dark:border-primary-700 shadow-sm ring-1 ring-primary-200 dark:ring-primary-800'
-                      : (product.href === '/product-news/azure-ai-foundry' && ['/product-news/azure-ai-foundry','/product-news/all-things-azure','/product-news/semantic-kernel'].includes(pathname))
+                      : (product.href === '/product-news/azure-ai-foundry' && ['/product-news/azure-ai-foundry','/product-news/all-things-azure','/product-news/semantic-kernel','/product-news/vscode'].includes(pathname))
                         ? 'bg-primary-50 border-primary-300 dark:bg-primary-900/50 dark:border-primary-700 shadow-sm ring-1 ring-primary-200 dark:ring-primary-800'
                         : (product.href === '/product-news/power-platform' && powerPlatformPaths.includes(pathname))
                           ? 'bg-primary-50 border-primary-300 dark:bg-primary-900/50 dark:border-primary-700 shadow-sm ring-1 ring-primary-200 dark:ring-primary-800'
@@ -289,7 +289,7 @@ export function ProductNewsLayout({ children, title, description, icon }: Produc
                   ${
                     (product.href === '/product-news/microsoft-news' && (pathname === '/product-news/microsoft-news' || pathname.startsWith('/product-news/author/')))
                       ? 'bg-primary-50 border-primary-300 dark:bg-primary-900/50 dark:border-primary-700 shadow-sm ring-1 ring-primary-200 dark:ring-primary-800'
-                      : (product.href === '/product-news/azure-ai-foundry' && ['/product-news/azure-ai-foundry','/product-news/all-things-azure','/product-news/semantic-kernel'].includes(pathname))
+                      : (product.href === '/product-news/azure-ai-foundry' && ['/product-news/azure-ai-foundry','/product-news/all-things-azure','/product-news/semantic-kernel','/product-news/vscode'].includes(pathname))
                         ? 'bg-primary-50 border-primary-300 dark:bg-primary-900/50 dark:border-primary-700 shadow-sm ring-1 ring-primary-200 dark:ring-primary-800'
                         : (product.href === '/product-news/power-platform' && powerPlatformPaths.includes(pathname))
                           ? 'bg-primary-50 border-primary-300 dark:bg-primary-900/50 dark:border-primary-700 shadow-sm ring-1 ring-primary-200 dark:ring-primary-800'
