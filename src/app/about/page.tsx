@@ -42,6 +42,15 @@ export default function AboutPage() {
             <li>Debugging is 80% of the job. The other 20% is asking, "Why is there a horizontal scrollbar?"</li>
             <li>Every bug is a learning opportunity. Or a reason to take a coffee break.</li>
           </ul>
+          <h2 className="text-xl font-semibold mt-8 mb-2">Vibe Coding Tips & Tricks</h2>
+          <ul>
+            <li><b>Be the AI's eyes:</b> Instead of telling the AI exactly how to fix something, describe what you see and what you don't like. For example, say "The button looks off-center on mobile" or "The card titles are getting cut off"—not "Change the margin to 8px." The AI often has a better (or weirder) way to fix it than you'd think.</li>
+            <li><b>Iterate fast:</b> Don't stress about getting the perfect prompt. Try something, see what happens, and adjust. The more you describe what you see, the better the results.</li>
+            <li><b>Stay curious:</b> If something looks odd, ask the AI why it did it that way. Sometimes you'll learn a new trick—or at least get a laugh.</li>
+            <li><b>Feedback is gold:</b> The more you point out what you like and don't like, the more the AI dials in your vibe. Treat it like a creative partner, not a vending machine.</li>
+          </ul>
+          <h2 className="text-xl font-semibold mt-8 mb-2">Want to Build Something Like This?</h2>
+          <p>If you're curious how this site was made, or want to build your own, I'm happy to share everything I learned (and all the mistakes I made). Just reach out to your Microsoft CSAM and ask to schedule a call with me. Let's vibe code together!</p>
           <p className="mt-8">Thanks for visiting! If you have feedback, ideas, or just want to say hi, hit the About icon in the navbar or <a href="mailto:russ.rimmerman@microsoft.com?subject=Pulse 360 Feedback" className="text-primary-600 dark:text-primary-400 underline">email me</a>. Happy Vibe Coding!</p>
         </div>
       </div>

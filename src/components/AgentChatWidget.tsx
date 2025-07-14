@@ -1,6 +1,6 @@
 'use client';
 import { useState, useRef, useEffect } from 'react';
-import { CopilotStudioClient } from '@microsoft/agents-copilotstudio-client';
+import { CopilotStudioClient, loadCopilotStudioConnectionSettingsFromEnv } from '@microsoft/agents-copilotstudio-client';
 
 const CONNECTION_STRING = process.env.NEXT_PUBLIC_COPILOT_CONNECTION_STRING;
 
@@ -15,7 +15,9 @@ export default function AgentChatWidget() {
   useEffect(() => {
     if (!client && CONNECTION_STRING) {
       try {
-        setClient(new CopilotStudioClient(CONNECTION_STRING, {}));
+        // Use the helper to get ConnectionSettings from env
+        const settings = loadCopilotStudioConnectionSettingsFromEnv();
+        setClient(new CopilotStudioClient(settings, ""));
       } catch {}
     }
   }, [client]);
