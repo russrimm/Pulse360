@@ -75,7 +75,7 @@ export function ReleasePlansContent({ releasePlans }: ReleasePlansContentProps) 
     });
   }, [releasePlans, searchTerm, selectedServices, selectedAreas, selectedDateFilter, customDateRange]);
 
-  // Group plans by product
+  // Group plans by product, and sort each group by published date descending
   const plansByProduct = useMemo(() => {
     return plansFiltered.reduce((acc, plan) => {
       if (!plan.product) return acc;
@@ -84,7 +84,15 @@ export function ReleasePlansContent({ releasePlans }: ReleasePlansContentProps) 
       return acc;
     }, {} as Record<string, ReleasePlan[]>);
   }, [plansFiltered]);
-  let productNames = Object.keys(plansByProduct);
+  // Sort each product's plans by published date descending (newest first)
+  const sortedPlansByProduct = useMemo(() => {
+    const sorted: Record<string, ReleasePlan[]> = {};
+    for (const product in plansByProduct) {
+      sorted[product] = [...plansByProduct[product]].sort((a, b) => new Date(b.published).getTime() - new Date(a.published).getTime());
+    }
+    return sorted;
+  }, [plansByProduct]);
+  let productNames = Object.keys(sortedPlansByProduct);
   if (selectedServices.length > 0) productNames = productNames.filter(p => selectedServices.includes(p));
   // Move any product with 'Dynamics' in the name to the end
   productNames = [
@@ -244,7 +252,7 @@ export function ReleasePlansContent({ releasePlans }: ReleasePlansContentProps) 
                   })()}
                     <span className="text-left w-full">{product}</span>
                   </span>
-                  <span className="text-lg font-semibold text-gray-500 dark:text-gray-400 ml-0 sm:ml-2 w-full text-left">{plansByProduct[product]?.length ?? 0} Updates</span>
+                  <span className="text-lg font-semibold text-gray-500 dark:text-gray-400 ml-0 sm:ml-2 w-full text-left">{sortedPlansByProduct[product]?.length ?? 0} Updates</span>
                 </span>
                 <span className="ml-2 transition-transform group-data-[state=open]:rotate-180">
                   <svg width="20" height="20" fill="none" viewBox="0 0 20 20"><path d="M6 8l4 4 4-4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
@@ -252,7 +260,7 @@ export function ReleasePlansContent({ releasePlans }: ReleasePlansContentProps) 
               </Accordion.Trigger>
             </Accordion.Header>
             <Accordion.Content className="px-2 pb-4">
-              <ReleasePlansList releasePlans={plansByProduct[product]} hideFilters={true} />
+              <ReleasePlansList releasePlans={sortedPlansByProduct[product]} hideFilters={true} />
             </Accordion.Content>
           </Accordion.Item>
         ))}
