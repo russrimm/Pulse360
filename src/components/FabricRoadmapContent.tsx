@@ -86,7 +86,9 @@ export function FabricRoadmapContent({ allPlans }: { allPlans: ReleasePlan[] }) 
   const visibleSections = Array.from(plansByProduct.entries())
     .map(([product, plans]) => {
       const filtered = filterPlans(plans)
-      return { product, plans: filtered }
+      // Sort filtered plans by published date descending (newest first)
+      const sorted = [...filtered].sort((a, b) => new Date(b.published).getTime() - new Date(a.published).getTime())
+      return { product, plans: sorted }
     })
     .filter(section => section.plans.length > 0)
 
