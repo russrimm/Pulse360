@@ -52,7 +52,7 @@ let products = [
     href: '/product-news/fabric-blog',
   },
   {
-    name: 'Developer Tools',
+    name: 'Dev Blogs',
     icon: '/icons/azure/devops/10261-icon-service-Azure-DevOps.svg',
     href: '/product-news/azure-ai-foundry',
   },
