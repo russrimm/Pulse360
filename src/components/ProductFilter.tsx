@@ -261,7 +261,7 @@ export function ProductFilter({ services, selectedServices, onFilterChange, isOp
       </button>
 
       {isOpen && (
-        <div
+        <div 
           className="absolute z-50 w-72 mt-1 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow-lg transition-opacity duration-150 opacity-100 animate-fadein"
           role="dialog"
           aria-label="Product filter options"

@@ -99,7 +99,7 @@ export function ProductNewsCard({ news, productIcon }: ProductNewsCardProps) {
               {decodedTitle}
             </h3>
             <p className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-0 text-center">
-              {new Date(news.publishDate).toLocaleDateString('en-US', {
+              {new Date(news.publishDate || new Date()).toLocaleDateString('en-US', {
                 year: 'numeric',
                 month: 'long',
                 day: 'numeric'

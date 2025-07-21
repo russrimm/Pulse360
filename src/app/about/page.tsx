@@ -16,23 +16,23 @@ export default function AboutPage() {
             For years, I've had ideas for apps and websites—some brilliant, some questionable, all of them just out of reach. Why? Because I never had the attention span (or, let's be honest, the patience) to sit down and actually learn to code. I'd dabble in PowerShell, tinker with batch files, and then get distracted by something shiny (or a snack).
           </p>
           <p>
-            Then along came Vibe Coding. Suddenly, building something real didn't mean memorizing syntax or debugging for hours. It meant describing what I wanted, letting an AI do the heavy lifting, and poking it until it worked. The rest, as they say, is history—and this site is the proof.
+            Then along came Vibe Coding. Suddenly, building something real didn't mean memorizing syntax or debugging for hours. It meant describing what I wanted, letting an AI do the heavy lifting, and poking it until it worked. The rest, as they say, is history—and this site is the proof. What's next for Vibe Coding? Bing Context Engineering.
           </p>
           <h2 className="text-xl font-semibold mt-8 mb-2">How This Site Was Made (No Magic, Just Prompts)</h2>
           <ul>
-            <li><b>Stack:</b> Next.js 15 App Router, React, TypeScript, Tailwind, Shadcn UI, Radix UI, Viem, Wagmi, and a parade of SVGs.</li>
+            <li><b>Stack:</b> Next.js 15 App Router, React, TypeScript, Tailwind, Shadcn UI, Radix UI, Viem, Wagmi, and a parade of SVGs. Do I know what all actually means? Yes to SVGs!</li>
             <li><b>Design:</b> Modern, mobile-first, and accessibility-friendly. If it looks weird on your phone, blame the AI (or me).</li>
             <li><b>Development:</b> 100% prompt-driven. I described what I wanted, the AI wrote the code, and I poked it until it worked. No Stack Overflow rabbit holes required.</li>
           </ul>
           <h2 className="text-xl font-semibold mt-8 mb-2">If You Want to Build Something Like This…</h2>
           <p>Here are the kinds of prompts that worked best for each part of the site:</p>
           <ul>
-            <li><b>Landing Page & Navbar:</b> <code>"Create a modern Next.js landing page with a sticky navbar, logo, and responsive design. Use Tailwind and Shadcn UI."</code></li>
+            <li><b>Landing Page & Navbar:</b> <code>"Create a modern Next.js landing page with a sticky navbar, logo, and responsive design. Support dark and light mode."</code></li>
             <li><b>Product Filters & Cards:</b> <code>"Show a grid of product cards with SVG icons, filterable by product. Make it mobile-friendly and accessible."</code></li>
-            <li><b>Azure Updates & News:</b> <code>"Fetch and display Azure updates from an API. Use infinite scroll, search, and filter by product. Style with Tailwind."</code></li>
+            <li><b>Azure Updates & News:</b> <code>"Fetch and display Azure updates from an API. Use infinite scroll, search, and filter by product. Make it look modern."</code></li>
             <li><b>Detail Views:</b> <code>"Add a detail page for each update with a back arrow, date, and all the tags. Keep the layout clean."</code></li>
             <li><b>SVG Icon Consistency:</b> <code>"Map product names to SVG icons. Use the right icon everywhere, even in filters and cards."</code></li>
-            <li><b>Accessibility & Polish:</b> <code>"Make sure all buttons are accessible, keyboard-friendly, and have focus states. Add tooltips and ARIA labels."</code></li>
+            <li><b>Accessibility & Polish:</b> <code>"Make sure all buttons are accessible, keyboard-friendly, and have focus states. Make it look modern."</code></li>
             <li><b>About Page (this one!):</b> <code>"Write a fun, modern about page styled like a welcome email. Explain the project, the stack, and how prompts drove the build. Make it entertaining but concise."</code></li>
           </ul>
           <h2 className="text-xl font-semibold mt-8 mb-2">Lessons Learned</h2>
