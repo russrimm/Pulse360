@@ -6,9 +6,43 @@ import { SearchBar } from '@/components/SearchBar';
 import * as Accordion from '@radix-ui/react-accordion';
 import { ProductFilter } from '@/components/ProductFilter';
 import { AreaFilter } from '@/components/AreaFilter';
-import { addDays, isAfter, isBefore, parseISO, startOfDay, endOfDay, subDays } from 'date-fns';
+import { addDays, isAfter, isBefore, parseISO, startOfDay, endOfDay, subDays, parse } from 'date-fns';
 import Image from 'next/image'
 import { getProductIcon } from '@/lib/getProductIcon'
+
+// Helper function to parse dates that could be in different formats
+const parseDate = (dateString: string): Date => {
+  if (!dateString) return new Date(0); // Return epoch if no date
+  
+  // Try to parse as ISO format first (YYYY-MM-DD)
+  try {
+    const isoDate = parseISO(dateString);
+    if (!isNaN(isoDate.getTime())) {
+      return isoDate;
+    }
+  } catch (e) {
+    // Continue to next format if ISO parsing fails
+  }
+  
+  // Try to parse as MM/DD/YYYY format (common in the API response)
+  try {
+    const parsedDate = parse(dateString, 'MM/dd/yyyy', new Date());
+    if (!isNaN(parsedDate.getTime())) {
+      return parsedDate;
+    }
+  } catch (e) {
+    // Continue to next format if MM/DD/YYYY parsing fails
+  }
+  
+  // Fallback to regular Date constructor
+  const date = new Date(dateString);
+  if (!isNaN(date.getTime())) {
+    return date;
+  }
+  
+  // If all parsing fails, return epoch
+  return new Date(0);
+};
 
 interface ReleasePlan {
   id: string;
@@ -62,16 +96,16 @@ export function ReleasePlansContent({ releasePlans }: ReleasePlansContentProps) 
       const matchesArea = selectedAreas.length === 0 || selectedAreas.includes(plan.investmentArea);
       let matchesDate = true;
       if (selectedDateFilter === 'last30') {
-        matchesDate = isAfter(parseISO(plan.published), subDays(new Date(), 30));
+        matchesDate = isAfter(parseDate(plan.published), subDays(new Date(), 30));
       } else if (selectedDateFilter === 'last14') {
-        matchesDate = isAfter(parseISO(plan.published), subDays(new Date(), 14));
+        matchesDate = isAfter(parseDate(plan.published), subDays(new Date(), 14));
       } else if (selectedDateFilter === 'last7') {
-        matchesDate = isAfter(parseISO(plan.published), subDays(new Date(), 7));
+        matchesDate = isAfter(parseDate(plan.published), subDays(new Date(), 7));
       } else if (selectedDateFilter === 'custom' && customDateRange.from && customDateRange.to) {
-        const published = parseISO(plan.published);
+        const published = parseDate(plan.published);
         matchesDate =
-          isAfter(published, startOfDay(parseISO(customDateRange.from))) &&
-          isBefore(published, endOfDay(parseISO(customDateRange.to)));
+          isAfter(published, startOfDay(parseDate(customDateRange.from))) &&
+          isBefore(published, endOfDay(parseDate(customDateRange.to)));
       }
       return matchesSearch && matchesService && matchesArea && matchesDate;
     });
