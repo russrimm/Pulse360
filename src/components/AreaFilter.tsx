@@ -13,16 +13,8 @@ interface AreaFilterProps {
 export function AreaFilter({ areas, selectedAreas, onFilterChange, isOpen, setOpen }: AreaFilterProps) {
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setOpen(false);
-      }
-    }
-
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
+  // Remove the document-level click handler
+  // We're now handling event propagation directly in the dropdown
 
   const handleAreaToggle = (area: string) => {
     if (selectedAreas.includes(area)) {
@@ -50,7 +42,11 @@ export function AreaFilter({ areas, selectedAreas, onFilterChange, isOpen, setOp
         )}
       </button>
       {isOpen && (
-        <div className="absolute z-10 w-72 mt-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow-lg">
+        <div 
+          className="absolute z-10 w-72 mt-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow-lg"
+          onMouseDown={e => e.stopPropagation()}
+          onClick={e => e.stopPropagation()}
+        >
           <div className="p-4 border-b border-gray-200 dark:border-gray-700">
             <h3 className="text-sm font-medium text-gray-900 dark:text-white">Filter by Area</h3>
           </div>

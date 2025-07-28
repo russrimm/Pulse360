@@ -36,7 +36,7 @@ export function ReleasePlansContent({ releasePlans }: ReleasePlansContentProps) 
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedServices, setSelectedServices] = useState<string[]>([]);
   const [selectedAreas, setSelectedAreas] = useState<string[]>([]);
-  const [selectedDateFilter, setSelectedDateFilter] = useState<'all' | 'last30' | 'last7' | 'custom'>('all');
+  const [selectedDateFilter, setSelectedDateFilter] = useState<'all' | 'last30' | 'last14' | 'last7' | 'custom'>('all');
   const [customDateRange, setCustomDateRange] = useState<{ from: string; to: string }>({ from: '', to: '' });
   const [openFilter, setOpenFilter] = useState<null | 'product' | 'area' | 'date'>(null)
 
@@ -63,6 +63,8 @@ export function ReleasePlansContent({ releasePlans }: ReleasePlansContentProps) 
       let matchesDate = true;
       if (selectedDateFilter === 'last30') {
         matchesDate = isAfter(parseISO(plan.published), subDays(new Date(), 30));
+      } else if (selectedDateFilter === 'last14') {
+        matchesDate = isAfter(parseISO(plan.published), subDays(new Date(), 14));
       } else if (selectedDateFilter === 'last7') {
         matchesDate = isAfter(parseISO(plan.published), subDays(new Date(), 7));
       } else if (selectedDateFilter === 'custom' && customDateRange.from && customDateRange.to) {
@@ -145,6 +147,7 @@ export function ReleasePlansContent({ releasePlans }: ReleasePlansContentProps) 
             <span className="text-sm font-medium">
               {selectedDateFilter === 'all' && 'All Dates'}
               {selectedDateFilter === 'last30' && 'Last 30 Days'}
+              {selectedDateFilter === 'last14' && 'Last 14 Days'}
               {selectedDateFilter === 'last7' && 'Last 7 Days'}
               {selectedDateFilter === 'custom' && 'Custom'}
             </span>
@@ -155,7 +158,9 @@ export function ReleasePlansContent({ releasePlans }: ReleasePlansContentProps) 
             )}
           </button>
           {openFilter === 'date' && (
-            <div className="absolute z-10 w-72 mt-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow-lg">
+            <div className="absolute z-10 w-72 mt-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow-lg"
+                 onMouseDown={e => e.stopPropagation()}
+                 onClick={e => e.stopPropagation()}>
               <div className="p-4 border-b border-gray-200 dark:border-gray-700">
                 <h3 className="text-sm font-medium text-gray-900 dark:text-white">Filter by Date</h3>
               </div>
@@ -177,6 +182,15 @@ export function ReleasePlansContent({ releasePlans }: ReleasePlansContentProps) 
                     className="text-primary-600"
                   />
                   <span className="text-sm text-gray-700 dark:text-gray-200">Last 30 days</span>
+                </label>
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="radio"
+                    checked={selectedDateFilter === 'last14'}
+                    onChange={() => { setSelectedDateFilter('last14'); setOpenFilter(null); }}
+                    className="text-primary-600"
+                  />
+                  <span className="text-sm text-gray-700 dark:text-gray-200">Last 14 days</span>
                 </label>
                 <label className="flex items-center gap-2 cursor-pointer">
                   <input
