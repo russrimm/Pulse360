@@ -10,6 +10,8 @@ import { ErrorBoundary } from '@/components/ErrorBoundary'
 import { ReactQueryProvider } from '@/components/ReactQueryProvider'
 import { FilterProvider } from '@/components/FilterContext'
 
+import { Analytics } from "@vercel/analytics/next"
+
 if (process.env.NODE_ENV === 'production') {
   // eslint-disable-next-line no-console
   // console.log = function () {}
@@ -73,6 +75,7 @@ export default function RootLayout({
                   <main className="flex-1">
                     {children}
                   </main>
+                  <Analytics />
                 </div>
               </FilterProvider>
             </ErrorBoundary>
