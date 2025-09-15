@@ -56,9 +56,11 @@ export function MessageList({ messages }: MessageListProps) {
 
   // Filter and sort messages
   const filteredMessages = useMemo(() => {
+    const MAINTENANCE_PHRASE = 'We have scheduled your Power Platform environment for planned service maintenance.';
     return messages
       .filter(message => message.id !== 'MC1085084')
       .filter(message => message.title !== "Power Platform - Planned maintenance")
+      .filter(message => !message.content.includes(MAINTENANCE_PHRASE) && !message.title.includes(MAINTENANCE_PHRASE))
       .filter(message => {
         const matchesSearch = searchQuery === '' || 
           message.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
