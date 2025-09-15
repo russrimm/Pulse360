@@ -11,6 +11,7 @@ import { ReactQueryProvider } from '@/components/ReactQueryProvider'
 import { FilterProvider } from '@/components/FilterContext'
 
 import { Analytics } from "@vercel/analytics/next"
+import { SpeedInsights } from "@vercel/speed-insights/next"
 
 if (process.env.NODE_ENV === 'production') {
   // eslint-disable-next-line no-console
@@ -76,6 +77,7 @@ export default function RootLayout({
                     {children}
                   </main>
                   <Analytics />
+                  <SpeedInsights />
                 </div>
               </FilterProvider>
             </ErrorBoundary>
