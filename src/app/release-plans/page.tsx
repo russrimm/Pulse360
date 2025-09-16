@@ -49,12 +49,12 @@ export default function ReleasePlansHubPage() {
 
   return (
     <main className="relative w-full min-h-[calc(100vh-4rem)] flex flex-col items-center overflow-hidden bg-white dark:bg-black pt-20 md:pt-24 pb-20">
-      <div className="relative w-full max-w-6xl px-4 md:px-8 flex flex-col z-0">
-        <header className="mb-10 md:mb-14">
+      <div className="relative w-full max-w-6xl px-4 md:px-8 flex flex-col z-0 items-center text-center">
+        <header className="mb-10 md:mb-14 max-w-2xl">
           <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-gray-900 dark:text-gray-50">Release Plans</h1>
-          <p className="mt-3 max-w-2xl text-sm md:text-base text-gray-600 dark:text-gray-400">Central hub for roadmap browsing and future feature insights.</p>
+          <p className="mt-3 text-sm md:text-base text-gray-600 dark:text-gray-400">Central hub for roadmap browsing and future feature insights.</p>
         </header>
-        <section aria-labelledby="release-plans-hub-heading" className="flex-1">
+        <section aria-labelledby="release-plans-hub-heading" className="flex-1 w-full flex flex-col items-center">
           <h2 id="release-plans-hub-heading" className="sr-only">Release Plans navigation cards</h2>
           <div className="grid grid-cols-2 gap-5 md:gap-6 w-full max-w-4xl h-full place-items-stretch auto-rows-[13rem] md:auto-rows-[15rem]">
             {cards.map((card, idx) => (
@@ -89,7 +89,7 @@ export default function ReleasePlansHubPage() {
             ))}
           </div>
         </section>
-        <div className="mt-14">
+        <div className="mt-14 text-center">
           <Link href="/home" className="text-xs md:text-sm font-medium text-primary-600 dark:text-primary-400 hover:underline">← Back to Hub</Link>
         </div>
       </div>

@@ -138,8 +138,8 @@ export function NavigationTabs() {
               : pathname === tab.href;
             if (tab.name === 'Release Planner') return null;
             if (tab.name === 'Release Plans') {
-              // Show dropdown for Release Plans
-              const isActive = RELEASE_PLANS_LINKS.some(link => pathname === link.href);
+              // Active if on the hub or any nested release-plans path
+              const isActive = pathname === '/release-plans' || pathname.startsWith('/release-plans/');
               return (
                 <Popover.Root key={tab.href}>
                   <Popover.Trigger asChild>
@@ -173,7 +173,7 @@ export function NavigationTabs() {
               );
             }
             if (tab.name === 'Microsoft Security') {
-              const isActive = MSRC_LINKS.some(link => pathname === link.href);
+              const isActive = MSRC_LINKS.some(link => pathname === link.href) || pathname === '/security' || pathname.startsWith('/security/');
               return (
                 <Popover.Root key={tab.href} open={openMSRC} onOpenChange={handleOpenChangeMSRC}>
                   <Popover.Trigger asChild>
