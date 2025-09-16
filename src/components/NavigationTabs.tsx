@@ -11,7 +11,7 @@ import React from 'react';
 const PRODUCTS = [
   {
     label: 'Dynamics/Power Platform',
-    href: '/release-plans',
+    href: '/release-plans/dynamics-power',
     icon: '/icons/PowerPlatform_scalable.svg',
   },
   {
@@ -43,7 +43,7 @@ export function NavigationTabs() {
     },
     {
       name: 'Microsoft 365 Release Plans',
-      href: '/m365-updates',
+      href: '/release-plans/m365',
       icon: (
         <Image src="/icons/m365.svg" alt="Microsoft 365 Updates" width={20} height={20} className="w-5 h-5" />
       ),
@@ -67,14 +67,14 @@ export function NavigationTabs() {
   const RELEASE_PLANS_LINKS = [
     {
       name: 'Azure',
-      href: '/azure-updates',
+      href: '/release-plans/azure',
       icon: (
         <Image src="/icons/Azure.svg" alt="Azure Updates" width={20} height={20} className="w-5 h-5" />
       ),
     },
     {
       name: 'Microsoft 365',
-      href: '/m365-updates',
+      href: '/release-plans/m365',
       icon: (
         <Image src="/icons/m365.svg" alt="Microsoft 365" width={20} height={20} className="w-5 h-5" />
       ),

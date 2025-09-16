@@ -5,27 +5,24 @@ import Image from "next/image";
 // Home hub page: static card grid linking to key sections
 export default function HomePage() {
   const cards = [
-    {
-      href: "/message-center",
-      title: "Message Center",
-      description: "Curated Microsoft 365 and Power Platform change notifications"
-    },
-    {
-      href: "/release-plans",
-      title: "Release Plans",
-      description: "Track upcoming features & roadmap items"
-    },
-    {
-      href: "/product-news",
-      title: "Product News",
-      description: "Latest product & platform announcements"
-    },
-    {
-      href: "/security",
-      title: "Security & Advisories",
-      description: "Security, service health & incident posture"
-    }
+    { href: "/message-center", title: "Message Center", description: "Curated Microsoft 365 and Power Platform change notifications" },
+    { href: "/release-plans", title: "Release Plans", description: "Track upcoming features & roadmap items" },
+    { href: "/product-news", title: "Product News", description: "Latest product & platform announcements" },
+    { href: "/security", title: "Security & Advisories", description: "Security, service health & incident posture" }
   ];
+
+  // Central set of hero cards that use an image instead of a visible heading
+  const HERO_CARD_PATHS = new Set(["/message-center","/release-plans","/product-news","/security"]);
+
+  // Map for card images to eliminate repeated conditional blocks
+  const heroImages: Record<string, { src: string; alt: string; priority?: boolean }> = {
+    "/message-center": { src: "/images/m365messagecenter.png", alt: "Microsoft 365 Message Center", priority: true },
+    "/release-plans": { src: "/images/releaseplans.png", alt: "Release Plans" },
+    "/product-news": { src: "/images/productnews.png", alt: "Product News" },
+    "/security": { src: "/images/securityadvisories.png", alt: "Security & Advisories" }
+  };
+
+  const cardBaseClasses = "flex flex-col rounded-3xl border border-gray-200/60 dark:border-gray-800/70 bg-white/80 dark:bg-gray-900/65 backdrop-blur-lg shadow-[0_4px_18px_-6px_rgba(0,0,0,0.20)] dark:shadow-[0_6px_30px_-10px_rgba(0,0,0,0.70)] p-5 overflow-hidden focus:outline-none focus-visible:ring-4 focus-visible:ring-primary-300/60 dark:focus-visible:ring-primary-800/60 transition-all duration-500 hover:shadow-2xl hover:-translate-y-1.5 hover:border-primary-300/50 dark:hover:border-primary-600/50 hover:bg-white/90 dark:hover:bg-gray-900/75 h-full";
 
   return (
     <main className="relative w-full min-h-[calc(100vh-4rem)] flex flex-col items-center overflow-hidden bg-white dark:bg-black pt-24 md:pt-28">
@@ -39,56 +36,30 @@ export default function HomePage() {
               <div key={card.href} className="relative group stagger-animate animate-fade-up will-change-transform">
                 <Link
                   href={card.href}
-                  className="flex flex-col rounded-3xl border border-gray-200/60 dark:border-gray-800/70 bg-white/80 dark:bg-gray-900/65 backdrop-blur-lg shadow-[0_4px_18px_-6px_rgba(0,0,0,0.20)] dark:shadow-[0_6px_30px_-10px_rgba(0,0,0,0.70)] p-5 overflow-hidden focus:outline-none focus-visible:ring-4 focus-visible:ring-primary-300/60 dark:focus-visible:ring-primary-800/60 transition-all duration-500 hover:shadow-2xl hover:-translate-y-1.5 hover:border-primary-300/50 dark:hover:border-primary-600/50 hover:bg-white/90 dark:hover:bg-gray-900/75 h-full"
-                  aria-labelledby={['/message-center','/release-plans','/product-news','/security'].includes(card.href) ? undefined : `card-${idx}-title`}
+                  className={cardBaseClasses}
+                  aria-labelledby={HERO_CARD_PATHS.has(card.href) ? undefined : `card-${idx}-title`}
                 >
                   <div className="flex-1 flex flex-col items-center justify-center text-center">
-                  {card.href === "/message-center" && (
-                    <Image
-                      src="/images/m365messagecenter.png"
-                      alt="Microsoft 365 Message Center"
-                      width={160}
-                      height={90}
-                      priority
-                      className="w-32 h-auto mb-4 rounded-md shadow-sm dark:shadow-none object-contain"
-                    />
+                  {heroImages[card.href] && (
+                    <>
+                      <Image
+                        src={heroImages[card.href].src}
+                        alt={heroImages[card.href].alt}
+                        width={160}
+                        height={90}
+                        priority={heroImages[card.href].priority}
+                        className="w-32 h-auto mb-4 rounded-md shadow-sm dark:shadow-none object-contain"
+                      />
+                      {/* Provide an off-screen heading for screen readers to ensure a clear accessible name */}
+                      <h3 id={`card-${idx}-title`} className="sr-only">{card.title}</h3>
+                    </>
                   )}
-                  {card.href === "/release-plans" && (
-                    <Image
-                      src="/images/releaseplans.png"
-                      alt="Release Plans"
-                      width={160}
-                      height={90}
-                      priority={false}
-                      className="w-32 h-auto mb-4 rounded-md shadow-sm dark:shadow-none object-contain"
-                    />
+                  {!HERO_CARD_PATHS.has(card.href) && (
+                    <h3 id={`card-${idx}-title`} className="text-[1.05rem] md:text-lg font-semibold text-gray-900 dark:text-gray-100 tracking-tight">
+                      {card.title}
+                    </h3>
                   )}
-                  {card.href === "/product-news" && (
-                    <Image
-                      src="/images/productnews.png"
-                      alt="Product News"
-                      width={160}
-                      height={90}
-                      priority={false}
-                      className="w-32 h-auto mb-4 rounded-md shadow-sm dark:shadow-none object-contain"
-                    />
-                  )}
-                  {card.href === "/security" && (
-                    <Image
-                      src="/images/securityadvisories.png"
-                      alt="Security & Advisories"
-                      width={160}
-                      height={90}
-                      priority={false}
-                      className="w-32 h-auto mb-4 rounded-md shadow-sm dark:shadow-none object-contain"
-                    />
-                  )}
-                   {!['/message-center','/release-plans','/product-news','/security'].includes(card.href) && (
-                     <h3 id={`card-${idx}-title`} className="text-[1.05rem] md:text-lg font-semibold text-gray-900 dark:text-gray-100 tracking-tight">
-                       {card.title}
-                     </h3>
-                   )}
-                  <p className={`mt-1.5 text-xs md:text-[0.8rem] text-gray-700 dark:text-gray-300 leading-relaxed line-clamp-4 ${['/message-center','/release-plans','/product-news','/security'].includes(card.href) ? 'mt-0' : ''}`}> 
+                  <p className={`mt-1.5 text-xs md:text-[0.8rem] text-gray-700 dark:text-gray-300 leading-relaxed line-clamp-4 ${HERO_CARD_PATHS.has(card.href) ? 'mt-0' : ''}`}> 
                      {card.description}
                    </p>
                    </div>
