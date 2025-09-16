@@ -57,7 +57,7 @@ export default function AboutPage() {
           </ul>
           <h2 className="text-xl font-semibold mt-8 mb-2">Want to Build Something Like This?</h2>
           <p>If you're curious how this site was made, or want to build your own, I'm happy to share everything I learned (and all the mistakes I made). Just reach out to your Microsoft CSAM and ask to schedule a call with me. Let's vibe code together!</p>
-          <p className="mt-8">Thanks for visiting! If you have feedback, ideas, or just want to say hi, hit the About icon in the navbar or <a href="mailto:russ.rimmerman@microsoft.com?subject=Pulse 360 Feedback" className="text-primary-600 dark:text-primary-400 underline">email me</a>. Happy Vibe Coding!</p>
+          <p className="mt-8">Thanks for visiting! If you have feedback, ideas, or just want to say hi, <a href="mailto:russ.rimmerman@microsoft.com?subject=Pulse 360 Feedback" className="text-primary-600 dark:text-primary-400 underline">email me</a>. Happy Vibe Coding!</p>
         </div>
       </div>
     </main>
