@@ -2,6 +2,7 @@ import React from 'react';
 import Link from 'next/link';
 import { getReleasePlans } from '@/lib/api';
 import { releasePlanServiceIcons } from '@/lib/releasePlanIcons';
+import { FuturePastReleasePlanList } from '@/components/FuturePastReleasePlanList';
 import Image from 'next/image';
 
 export const metadata = {
@@ -105,30 +106,25 @@ export default async function DynamicsPowerReleasePlansPage() {
           </svg>
         </summary>
         <div className="px-5 pb-5 sm:pb-6 pt-0">
-          <ul className="divide-y divide-gray-200 dark:divide-gray-700 border-t border-gray-200 dark:border-gray-700">
-            {productPlans
-              .sort((a,b) => a.title.localeCompare(b.title))
-              .map(plan => (
-                <li key={plan.id} className="py-3 sm:py-3.5 flex flex-col sm:flex-row sm:items-center sm:gap-4">
-                  <div className="flex-1 min-w-0">
-                    <Link href={`/release-plan/${plan.id}`} prefetch={false} className="group/feat inline-flex items-start font-medium text-sm sm:text-[15px] text-primary-700 dark:text-primary-300 hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 rounded">
-                      <span className="line-clamp-2 group-hover/feat:text-primary-600 dark:group-hover/feat:text-primary-200">{plan.title}</span>
-                    </Link>
-                    <div className="mt-1 flex flex-wrap items-center gap-2 text-[11px] sm:text-xs text-gray-500 dark:text-gray-400">
-                      {plan.investmentArea && (
-                        <span className="inline-flex items-center px-1.5 py-0.5 rounded-md bg-primary-50 text-primary-700 dark:bg-primary-900/40 dark:text-primary-300 border border-primary-100 dark:border-primary-800">{plan.investmentArea}</span>
-                      )}
-                      {plan.publicPreviewDate && (
-                        <span className="inline-flex items-center px-1.5 py-0.5 rounded-md bg-blue-50 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300 border border-blue-100 dark:border-blue-800">PP: {formatDate(plan.publicPreviewDate)}</span>
-                      )}
-                      {plan.gaDate && (
-                        <span className="inline-flex items-center px-1.5 py-0.5 rounded-md bg-green-50 text-green-700 dark:bg-green-900/40 dark:text-green-300 border border-green-100 dark:border-green-800">GA: {formatDate(plan.gaDate)}</span>
-                      )}
-                    </div>
-                  </div>
-                </li>
-              ))}
-          </ul>
+          {(() => {
+            const sorted = productPlans.slice().sort((a,b) => {
+              const aTime = a.gaDate ? new Date(a.gaDate).getTime() : Number.POSITIVE_INFINITY;
+              const bTime = b.gaDate ? new Date(b.gaDate).getTime() : Number.POSITIVE_INFINITY;
+              if (aTime !== bTime) return aTime - bTime;
+              const aPP = a.publicPreviewDate ? new Date(a.publicPreviewDate).getTime() : Number.POSITIVE_INFINITY;
+              const bPP = b.publicPreviewDate ? new Date(b.publicPreviewDate).getTime() : Number.POSITIVE_INFINITY;
+              if (aPP !== bPP) return aPP - bPP;
+              return a.title.localeCompare(b.title);
+            });
+            const now = Date.now();
+            const future = sorted.filter(p => {
+              if (!p.gaDate) return true;
+              const t = new Date(p.gaDate).getTime();
+              return !isNaN(t) && t >= now;
+            });
+            const past = sorted.filter(p => p.gaDate && new Date(p.gaDate).getTime() < now);
+            return <FuturePastReleasePlanList future={future} past={past} />;
+          })()}
         </div>
       </details>
     );
