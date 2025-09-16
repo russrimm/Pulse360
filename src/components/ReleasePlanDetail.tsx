@@ -5,6 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useState, useEffect } from 'react';
 import { LoadingSpinner } from './LoadingSpinner';
+import { releasePlanServiceIcons } from '@/lib/releasePlanIcons';
 
 interface ReleasePlan {
   id: string;
@@ -28,30 +29,8 @@ interface ReleasePlanDetailProps {
   plan: ReleasePlan;
 }
 
-// Map of service names to their icon paths
-const serviceIcons: Record<string, string> = {
-  'Power Apps': '/icons/PowerApps_scalable.svg',
-  'Power Automate': '/icons/PowerAutomate_scalable.svg',
-  'Power Platform': '/icons/PowerPlatform_scalable.svg',
-  'Microsoft Dataverse': '/icons/Dataverse_scalable.svg',
-  'Power BI': '/icons/PowerBI_scalable.svg',
-  'Microsoft Teams': '/icons/teams.svg',
-  'SharePoint Online': '/icons/sharepoint.svg',
-  'Microsoft 365': '/icons/m365.svg',
-  'OneDrive for Business': '/icons/onedrive.svg',
-  'Microsoft Stream': '/icons/stream.svg',
-  'Exchange Online': '/icons/exchange.svg',
-  'Microsoft Forms': '/icons/forms.svg',
-  'Microsoft Intune': '/icons/intune.svg',
-  'Microsoft Planner': '/icons/planner.svg',
-  'Microsoft Entra': '/icons/entra.svg',
-  'Dynamics 365 Apps': '/icons/Dynamics365_scalable.svg',
-  'Microsoft Viva': '/icons/viva.svg',
-  'Microsoft Purview': '/icons/purview.svg',
-  'Microsoft Defender XDR': '/icons/defender.svg',
-  'Windows': '/icons/Windows.svg',
-  'Azure Databricks': '/icons/databricks.svg'
-};
+// Importing shared icon mapping; fallback remains handled below
+const serviceIcons = releasePlanServiceIcons;
 
 export function ReleasePlanDetail({ plan }: ReleasePlanDetailProps) {
   const [isLoading, setIsLoading] = useState(true);
@@ -224,7 +203,7 @@ export function ReleasePlanDetail({ plan }: ReleasePlanDetailProps) {
                 {/* Feature Details */}
                 <div className="bg-white/70 dark:bg-gray-700/70 backdrop-blur-sm rounded-xl p-4 sm:p-6 border border-gray-200 dark:border-gray-600">
                   <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-4">Feature Details</h2>
-                  <div className="mt-4 prose dark:prose-invert prose-sm max-w-none" style={{ color: 'inherit' }} dangerouslySetInnerHTML={{ __html: plan.content }} />
+                  <div className="mt-4 prose dark:prose-invert prose-sm max-w-none text-current" dangerouslySetInnerHTML={{ __html: plan.content }} />
                 </div>
               </div>
             </div>

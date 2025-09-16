@@ -1,5 +1,9 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // Disable Next.js invoking eslint during build since we run it explicitly via npm scripts.
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
   images: {
     dangerouslyAllowSVG: true,
     contentDispositionType: 'attachment',
