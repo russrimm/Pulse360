@@ -26,6 +26,12 @@ function formatDate(value?: string) {
   return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
 }
 
+// Map specific product names to preferred display labels
+function getDisplayProductName(product: string) {
+  if (product === 'Microsoft Copilot Studio') return 'Copilot Studio';
+  return product;
+}
+
 export default async function ReleasePlansPage() {
   const plans = await getReleasePlans();
 
@@ -76,6 +82,7 @@ export default async function ReleasePlansPage() {
 
   const renderProductAccordion = (product: string) => {
     const productPlans = groups[product];
+    const displayName = getDisplayProductName(product);
     return (
       <details key={product} className="group bg-white/70 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-2xl shadow-sm backdrop-blur-sm overflow-hidden open:shadow-md transition-all">
         <summary className="cursor-pointer list-none flex items-center gap-4 px-5 py-4 sm:py-5 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500">
@@ -84,7 +91,7 @@ export default async function ReleasePlansPage() {
               <Image src={releasePlanServiceIcons[product]} alt="" width={32} height={32} className="w-8 h-8" />
             )}
             <div className="min-w-0">
-              <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-gray-100 truncate">{product}</h3>
+              <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-gray-100 truncate">{displayName}</h3>
               <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mt-0.5">{productPlans.length} update{productPlans.length !== 1 && 's'}</p>
             </div>
           </div>

@@ -21,5 +21,7 @@ export const releasePlanServiceIcons: Record<string, string> = {
   'Microsoft Purview': '/icons/purview.svg',
   'Microsoft Defender XDR': '/icons/defender.svg',
   'Windows': '/icons/Windows.svg',
-  'Azure Databricks': '/icons/databricks.svg'
+  'Azure Databricks': '/icons/databricks.svg',
+  'Microsoft Copilot Studio': '/icons/CopilotStudio_scalable.svg',
+  'Power Pages': '/icons/PowerPages_scalable.svg'
 };
