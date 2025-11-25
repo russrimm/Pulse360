@@ -1,13 +1,12 @@
-import React from 'react';
-import Link from 'next/link';
+import { FuturePastReleasePlanList } from '@/components/FuturePastReleasePlanList';
 import { getReleasePlans } from '@/lib/api';
 import { releasePlanServiceIcons } from '@/lib/releasePlanIcons';
-import { FuturePastReleasePlanList } from '@/components/FuturePastReleasePlanList';
 import Image from 'next/image';
+import Link from 'next/link';
 
 export const metadata = {
   title: 'Dynamics & Power Platform Release Plans | Pulse 360',
-  description: 'Dynamics 365 & Power Platform public release wave features grouped by product.'
+  description: 'Dynamics 365 & Power Platform public release wave features grouped by product.',
 };
 
 interface ReleasePlanIndexItem {
@@ -41,14 +40,25 @@ export default async function DynamicsPowerReleasePlansPage() {
       <main className="w-full flex flex-col items-center bg-white dark:bg-black pt-10 pb-24">
         <div className="w-full max-w-5xl px-4 md:px-8">
           <header className="mb-8">
-            <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-gray-900 dark:text-gray-50">Dynamics & Power Platform Release Plans</h1>
-            <p className="mt-3 max-w-2xl text-sm md:text-base text-gray-600 dark:text-gray-400">Unable to load release plan data at this time. Please try again later.</p>
+            <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-gray-900 dark:text-gray-50">
+              Dynamics & Power Platform Release Plans
+            </h1>
+            <p className="mt-3 max-w-2xl text-sm md:text-base text-gray-600 dark:text-gray-400">
+              Unable to load release plan data at this time. Please try again later.
+            </p>
           </header>
           <div className="rounded-xl border border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-900/30 p-6 text-sm text-red-700 dark:text-red-300">
-            The upstream Microsoft release plans feed returned no data. This can happen temporarily if their API changes or rate limits. We automatically fall back once data is available again.
+            The upstream Microsoft release plans feed returned no data. This can happen temporarily
+            if their API changes or rate limits. We automatically fall back once data is available
+            again.
           </div>
           <div className="mt-10">
-            <Link href="/release-plans" className="text-sm font-medium text-primary-600 dark:text-primary-400 hover:underline">← Back to Release Plans Hub</Link>
+            <Link
+              href="/release-plans"
+              className="text-sm font-medium text-primary-600 dark:text-primary-400 hover:underline"
+            >
+              ← Back to Release Plans Hub
+            </Link>
           </div>
         </div>
       </main>
@@ -65,7 +75,7 @@ export default async function DynamicsPowerReleasePlansPage() {
       tags: p.tags || [],
       investmentArea: p.investmentArea || p.tags?.[0] || '',
       publicPreviewDate: p.publicPreviewDate,
-      gaDate: p.gaDate
+      gaDate: p.gaDate,
     };
     groups[p.product] = groups[p.product] || [];
     groups[p.product].push(item);
@@ -79,9 +89,7 @@ export default async function DynamicsPowerReleasePlansPage() {
 
   // Split into two macro groups (Dynamics vs Power Platform)
   // Override: certain products belong with Dynamics although name lacks the word 'Dynamics'
-  const dynamicsOverride = new Set<string>([
-    'Finance and Operations cross-app capabilities'
-  ]);
+  const dynamicsOverride = new Set<string>(['Finance and Operations cross-app capabilities']);
   const isDynamics = (p: string) => /dynamics/i.test(p) || dynamicsOverride.has(p);
   const dynamicsProducts = orderedProducts.filter(p => isDynamics(p));
   const powerProducts = orderedProducts.filter(p => !isDynamics(p));
@@ -90,29 +98,51 @@ export default async function DynamicsPowerReleasePlansPage() {
     const productPlans = groups[product];
     const displayName = getDisplayProductName(product);
     return (
-      <details key={product} className="group bg-white/70 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-2xl shadow-sm backdrop-blur-sm overflow-hidden open:shadow-md transition-all">
+      <details
+        key={product}
+        className="group bg-white/70 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-2xl shadow-sm backdrop-blur-sm overflow-hidden open:shadow-md transition-all"
+      >
         <summary className="cursor-pointer list-none flex items-center gap-4 px-5 py-4 sm:py-5 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500">
           <div className="flex items-center gap-3 flex-1 min-w-0">
             {releasePlanServiceIcons[product] && (
-              <Image src={releasePlanServiceIcons[product]} alt="" width={32} height={32} className="w-8 h-8" />
+              <Image
+                src={releasePlanServiceIcons[product]}
+                alt=""
+                width={32}
+                height={32}
+                className="w-8 h-8"
+              />
             )}
             <div className="min-w-0">
-              <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-gray-100 truncate">{displayName}</h3>
-              <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mt-0.5">{productPlans.length} update{productPlans.length !== 1 && 's'}</p>
+              <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-gray-100 truncate">
+                {displayName}
+              </h3>
+              <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mt-0.5">
+                {productPlans.length} update{productPlans.length !== 1 && 's'}
+              </p>
             </div>
           </div>
-          <svg className="w-5 h-5 text-gray-500 dark:text-gray-400 transition-transform group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg
+            className="w-5 h-5 text-gray-500 dark:text-gray-400 transition-transform group-open:rotate-180"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
           </svg>
         </summary>
         <div className="px-5 pb-5 sm:pb-6 pt-0">
           {(() => {
-            const sorted = productPlans.slice().sort((a,b) => {
+            const sorted = productPlans.slice().sort((a, b) => {
               const aTime = a.gaDate ? new Date(a.gaDate).getTime() : Number.POSITIVE_INFINITY;
               const bTime = b.gaDate ? new Date(b.gaDate).getTime() : Number.POSITIVE_INFINITY;
               if (aTime !== bTime) return aTime - bTime;
-              const aPP = a.publicPreviewDate ? new Date(a.publicPreviewDate).getTime() : Number.POSITIVE_INFINITY;
-              const bPP = b.publicPreviewDate ? new Date(b.publicPreviewDate).getTime() : Number.POSITIVE_INFINITY;
+              const aPP = a.publicPreviewDate
+                ? new Date(a.publicPreviewDate).getTime()
+                : Number.POSITIVE_INFINITY;
+              const bPP = b.publicPreviewDate
+                ? new Date(b.publicPreviewDate).getTime()
+                : Number.POSITIVE_INFINITY;
               if (aPP !== bPP) return aPP - bPP;
               return a.title.localeCompare(b.title);
             });
@@ -148,7 +178,9 @@ export default async function DynamicsPowerReleasePlansPage() {
     <main className="w-full flex flex-col items-center bg-gradient-to-b from-white via-gray-50 to-white dark:from-black dark:via-gray-900 dark:to-black pt-10 pb-24">
       <div className="w-full max-w-7xl px-4 md:px-8">
         <header className="mb-10">
-          <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-gray-900 dark:text-gray-50">Dynamics & Power Platform Roadmap</h1>
+          <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-gray-900 dark:text-gray-50">
+            Dynamics & Power Platform Roadmap
+          </h1>
         </header>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-10">
@@ -158,14 +190,17 @@ export default async function DynamicsPowerReleasePlansPage() {
               className="flex flex-col rounded-3xl border border-gray-200/60 dark:border-gray-800/70 bg-white/80 dark:bg-gray-900/60 backdrop-blur-lg shadow-[0_4px_18px_-6px_rgba(0,0,0,0.20)] dark:shadow-[0_6px_30px_-10px_rgba(0,0,0,0.70)] p-5 md:p-6 transition-all"
             >
               <div className="flex items-center justify-between mb-2">
-                <h2 id="power-platform-group" className="text-base md:text-lg font-semibold tracking-tight text-gray-900 dark:text-gray-100">
+                <h2
+                  id="power-platform-group"
+                  className="text-base md:text-lg font-semibold tracking-tight text-gray-900 dark:text-gray-100"
+                >
                   Power Platform
-                  <span className="ml-2 text-xs md:text-sm font-medium text-gray-500 dark:text-gray-400">{powerCount} update{powerCount !== 1 && 's'}</span>
+                  <span className="ml-2 text-xs md:text-sm font-medium text-gray-500 dark:text-gray-400">
+                    {powerCount} update{powerCount !== 1 && 's'}
+                  </span>
                 </h2>
               </div>
-              <div className="mt-3 space-y-5">
-                {powerProducts.map(renderProductAccordion)}
-              </div>
+              <div className="mt-3 space-y-5">{powerProducts.map(renderProductAccordion)}</div>
             </section>
           )}
 
@@ -175,24 +210,38 @@ export default async function DynamicsPowerReleasePlansPage() {
               className="flex flex-col rounded-3xl border border-gray-200/60 dark:border-gray-800/70 bg-white/80 dark:bg-gray-900/60 backdrop-blur-lg shadow-[0_4px_18px_-6px_rgba(0,0,0,0.20)] dark:shadow-[0_6px_30px_-10px_rgba(0,0,0,0.70)] p-5 md:p-6 transition-all"
             >
               <div className="flex items-center justify-between mb-2">
-                <h2 id="dynamics-group" className="text-base md:text-lg font-semibold tracking-tight text-gray-900 dark:text-gray-100">
+                <h2
+                  id="dynamics-group"
+                  className="text-base md:text-lg font-semibold tracking-tight text-gray-900 dark:text-gray-100"
+                >
                   Dynamics 365
-                  <span className="ml-2 text-xs md:text-sm font-medium text-gray-500 dark:text-gray-400">{dynamicsCount} update{dynamicsCount !== 1 && 's'}</span>
+                  <span className="ml-2 text-xs md:text-sm font-medium text-gray-500 dark:text-gray-400">
+                    {dynamicsCount} update{dynamicsCount !== 1 && 's'}
+                  </span>
                 </h2>
               </div>
-              <div className="mt-3 space-y-5">
-                {dynamicsProducts.map(renderProductAccordion)}
-              </div>
+              <div className="mt-3 space-y-5">{dynamicsProducts.map(renderProductAccordion)}</div>
             </section>
           )}
         </div>
 
         <div className="mt-14 flex items-center gap-6 text-xs sm:text-sm text-gray-500 dark:text-gray-400">
-          <Link href="/release-plans" className="font-medium text-primary-600 dark:text-primary-400 hover:underline">← Back to Release Plans Hub</Link>
-          <a href="https://learn.microsoft.com/dynamics365/release-plans/" target="_blank" rel="noopener noreferrer" className="hover:underline">Official Release Plans</a>
+          <Link
+            href="/release-plans"
+            className="font-medium text-primary-600 dark:text-primary-400 hover:underline"
+          >
+            ← Back to Release Plans Hub
+          </Link>
+          <a
+            href="https://learn.microsoft.com/dynamics365/release-plans/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover:underline"
+          >
+            Official Release Plans
+          </a>
         </div>
       </div>
     </main>
   );
 }
-
