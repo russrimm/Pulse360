@@ -116,13 +116,24 @@ export default async function DynamicsPowerReleasePlansPage() {
               if (aPP !== bPP) return aPP - bPP;
               return a.title.localeCompare(b.title);
             });
-            const now = Date.now();
+            // Normalize to start of today for day-level comparison
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const todayTime = today.getTime();
             const future = sorted.filter(p => {
               if (!p.gaDate) return true;
-              const t = new Date(p.gaDate).getTime();
-              return !isNaN(t) && t >= now;
+              const gaDate = new Date(p.gaDate);
+              gaDate.setHours(0, 0, 0, 0);
+              const t = gaDate.getTime();
+              return !isNaN(t) && t >= todayTime;
             });
-            const past = sorted.filter(p => p.gaDate && new Date(p.gaDate).getTime() < now);
+            const past = sorted.filter(p => {
+              if (!p.gaDate) return false;
+              const gaDate = new Date(p.gaDate);
+              gaDate.setHours(0, 0, 0, 0);
+              const t = gaDate.getTime();
+              return !isNaN(t) && t < todayTime;
+            });
             return <FuturePastReleasePlanList future={future} past={past} />;
           })()}
         </div>
