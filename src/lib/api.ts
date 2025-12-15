@@ -35,7 +35,11 @@ const hasRequiredEnvVars = API_KEY && TENANT_ID && CLIENT_ID;
 
 async function getToken(): Promise<string> {
   if (!hasRequiredEnvVars) {
-    throw new Error('Missing required environment variables');
+    const missing = [];
+    if (!API_KEY) missing.push('NEXT_PUBLIC_API_KEY');
+    if (!TENANT_ID) missing.push('NEXT_PUBLIC_TENANT_ID');
+    if (!CLIENT_ID) missing.push('NEXT_PUBLIC_CLIENT_ID');
+    throw new Error(`Missing required environment variables: ${missing.join(', ')}`);
   }
 
   try {
@@ -72,7 +76,19 @@ async function getToken(): Promise<string> {
       //   endpoint: tokenEndpoint,
       //   params: Object.fromEntries(params.entries())
       // });
-      throw new Error(`Failed to get token: ${response.status} ${response.statusText} - ${errorText}`);
+      
+      // Parse error for more details
+      let errorDetails = errorText;
+      try {
+        const errorJson = JSON.parse(errorText);
+        if (errorJson.error_description) {
+          errorDetails = errorJson.error_description;
+        }
+      } catch {
+        // Keep original error text if not JSON
+      }
+      
+      throw new Error(`Failed to get Azure AD token (${response.status}): ${errorDetails}. Please verify TENANT_ID, CLIENT_ID, and API_KEY in environment variables.`);
     }
 
     const data = await response.json();
