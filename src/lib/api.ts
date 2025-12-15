@@ -1,12 +1,12 @@
-import { Message, M365Update, ProductNews } from './types';
 import { XMLParser } from 'fast-xml-parser';
+import { M365Update, Message, ProductNews } from './types';
 
 if (process.env.NODE_ENV === 'production') {
-  console.log = function () {}
-  console.warn = function () {}
-  console.error = function () {}
-  console.info = function () {}
-  console.debug = function () {}
+  console.log = function() {};
+  console.warn = function() {};
+  console.error = function() {};
+  console.info = function() {};
+  console.debug = function() {};
 }
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://graphapirim.azure-api.net/v1.0';
@@ -45,7 +45,7 @@ async function getToken(): Promise<string> {
   try {
     const tokenEndpoint = `https://login.microsoftonline.com/${TENANT_ID}/oauth2/v2.0/token`;
     // console.log('Getting token from:', tokenEndpoint);
-    
+
     const params = new URLSearchParams();
     if (CLIENT_ID) params.append('client_id', CLIENT_ID);
     params.append('scope', 'https://graph.microsoft.com/.default');
@@ -58,13 +58,13 @@ async function getToken(): Promise<string> {
     //   grant_type: 'client_credentials',
     //   has_client_secret: !!API_KEY
     // });
-    
+
     const response = await fetch(tokenEndpoint, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
       },
-      body: params
+      body: params,
     });
 
     if (!response.ok) {
@@ -76,7 +76,7 @@ async function getToken(): Promise<string> {
       //   endpoint: tokenEndpoint,
       //   params: Object.fromEntries(params.entries())
       // });
-      
+
       // Parse error for more details
       let errorDetails = errorText;
       try {
@@ -87,8 +87,10 @@ async function getToken(): Promise<string> {
       } catch {
         // Keep original error text if not JSON
       }
-      
-      throw new Error(`Failed to get Azure AD token (${response.status}): ${errorDetails}. Please verify TENANT_ID, CLIENT_ID, and API_KEY in environment variables.`);
+
+      throw new Error(
+        `Failed to get Azure AD token (${response.status}): ${errorDetails}. Please verify TENANT_ID, CLIENT_ID, and API_KEY in environment variables.`
+      );
     }
 
     const data = await response.json();
@@ -139,8 +141,8 @@ export async function getMessages(): Promise<Message[]> {
 
     const headers = {
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`,
-      'Ocp-Apim-Subscription-Key': API_KEY || ''
+      Authorization: `Bearer ${token}`,
+      'Ocp-Apim-Subscription-Key': API_KEY || '',
     };
 
     // console.log('Making API call to:', nextLink);
@@ -154,8 +156,8 @@ export async function getMessages(): Promise<Message[]> {
       const response = await fetch(nextLink, {
         headers: {
           ...headers,
-          'Cache-Control': 'public, max-age=604800' // 7 days in seconds
-        }
+          'Cache-Control': 'public, max-age=604800', // 7 days in seconds
+        },
       });
 
       // console.log('Response status:', response.status);
@@ -169,7 +171,9 @@ export async function getMessages(): Promise<Message[]> {
         //   url: nextLink,
         //   errorBody: errorText
         // });
-        throw new Error(`Failed to fetch messages: ${response.status} ${response.statusText} - ${errorText}`);
+        throw new Error(
+          `Failed to fetch messages: ${response.status} ${response.statusText} - ${errorText}`
+        );
       }
 
       const data: GraphApiResponse = await response.json();
@@ -189,7 +193,7 @@ export async function getMessages(): Promise<Message[]> {
       details: message.details || [],
       isMajorChange: message.isMajorChange || false,
       actionRequiredByDateTime: message.actionRequiredByDateTime,
-      severity: message.severity
+      severity: message.severity,
     }));
   } catch (error) {
     // console.error('Error fetching messages:', error);
@@ -206,15 +210,18 @@ export async function getMessage(id: string): Promise<Message> {
     const token = await getToken();
     const headers = {
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`,
+      Authorization: `Bearer ${token}`,
       'Ocp-Apim-Subscription-Key': API_KEY || '',
-      'Cache-Control': 'public, max-age=86400' // Cache for 24 hours
+      'Cache-Control': 'public, max-age=86400', // Cache for 24 hours
     };
 
-    const response = await fetch(`${API_BASE_URL}/admin/serviceAnnouncement/messages?$filter=id eq '${id}'`, {
-      headers,
-      next: { revalidate: 86400 } // Enable Next.js cache for 24 hours
-    });
+    const response = await fetch(
+      `${API_BASE_URL}/admin/serviceAnnouncement/messages?$filter=id eq '${id}'`,
+      {
+        headers,
+        next: { revalidate: 86400 }, // Enable Next.js cache for 24 hours
+      }
+    );
 
     if (!response.ok) {
       throw new Error(`Failed to fetch message: ${response.status} ${response.statusText}`);
@@ -235,10 +242,13 @@ export async function getMessage(id: string): Promise<Message> {
       tags: message.tags,
       content: message.body.content,
       summary: message.details?.find(v => v.name === 'Summary')?.value || '',
-      details: message.details?.filter(detail => !['RoadmapIds', 'FeatureStatusJson'].includes(detail.name)) || [],
+      details:
+        message.details?.filter(
+          detail => !['RoadmapIds', 'FeatureStatusJson'].includes(detail.name)
+        ) || [],
       isMajorChange: message.isMajorChange || false,
       actionRequiredByDateTime: message.actionRequiredByDateTime,
-      severity: message.severity
+      severity: message.severity,
     };
   } catch (error) {
     // console.error('Error fetching message:', error);
@@ -268,7 +278,7 @@ export async function getReleasePlans() {
       published: plan['Last Gitcommit date'],
       lastUpdated: plan['Last Gitcommit date'],
       tags: [plan['Investment area']],
-      service: [plan['Product name']]
+      service: [plan['Product name']],
     }));
   } catch (error) {
     // console.error('Error fetching release plans:', error);
@@ -294,7 +304,7 @@ export interface AzureUpdate {
 export async function getAzureUpdates(): Promise<AzureUpdate[]> {
   try {
     const response = await fetch('https://www.microsoft.com/releasecommunications/api/v2/azure', {
-      next: { revalidate: 3600 } // Revalidate every hour
+      next: { revalidate: 3600 }, // Revalidate every hour
     });
 
     if (!response.ok) {
@@ -312,7 +322,7 @@ export async function getAzureUpdates(): Promise<AzureUpdate[]> {
 export async function getM365Updates(): Promise<M365Update[]> {
   try {
     const response = await fetch('https://www.microsoft.com/releasecommunications/api/v2/m365', {
-      cache: 'no-store'
+      cache: 'no-store',
     });
 
     if (!response.ok) {
@@ -344,9 +354,12 @@ export async function getM365Updates(): Promise<M365Update[]> {
 
 export async function getM365Update(id: string): Promise<M365Update> {
   try {
-    const response = await fetch(`https://www.microsoft.com/releasecommunications/api/v2/m365/rss/${id}`, {
-      cache: 'no-store'
-    });
+    const response = await fetch(
+      `https://www.microsoft.com/releasecommunications/api/v2/m365/rss/${id}`,
+      {
+        cache: 'no-store',
+      }
+    );
 
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
@@ -355,20 +368,23 @@ export async function getM365Update(id: string): Promise<M365Update> {
     const xmlText = await response.text();
     const parser = new XMLParser({
       ignoreAttributes: false,
-      attributeNamePrefix: "@_",
-      textNodeName: "#text"
+      attributeNamePrefix: '@_',
+      textNodeName: '#text',
     });
     const result = parser.parse(xmlText);
     const item = result.rss.channel.item;
 
     // Extract the content from the description
     const content = item.description || '';
-    
+
     // Extract services from the content
     const servicesMatch = content.match(/<strong>Services<\/strong>: (.*?)(?:<br>|<\/p>)/);
-    const services = servicesMatch ? 
-      servicesMatch[1].replace(/<[^>]*>/g, '').split(',').map((s: string) => s.trim()) : 
-      [];
+    const services = servicesMatch
+      ? servicesMatch[1]
+          .replace(/<[^>]*>/g, '')
+          .split(',')
+          .map((s: string) => s.trim())
+      : [];
 
     // Extract status from the content
     const statusMatch = content.match(/<strong>Status<\/strong>: (.*?)(?:<br>|<\/p>)/);
@@ -382,27 +398,41 @@ export async function getM365Update(id: string): Promise<M365Update> {
 
     // Extract tags from the content
     const tagsMatch = content.match(/<strong>Tags<\/strong>: (.*?)(?:<br>|<\/p>)/);
-    const tags = tagsMatch ? 
-      tagsMatch[1].replace(/<[^>]*>/g, '').split(',').map((tag: string) => tag.trim()) : 
-      [];
+    const tags = tagsMatch
+      ? tagsMatch[1]
+          .replace(/<[^>]*>/g, '')
+          .split(',')
+          .map((tag: string) => tag.trim())
+      : [];
 
     // Extract platforms from the content
     const platformsMatch = content.match(/<strong>Platforms<\/strong>: (.*?)(?:<br>|<\/p>)/);
-    const platforms = platformsMatch ? 
-      platformsMatch[1].replace(/<[^>]*>/g, '').split(',').map((p: string) => p.trim()) : 
-      [];
+    const platforms = platformsMatch
+      ? platformsMatch[1]
+          .replace(/<[^>]*>/g, '')
+          .split(',')
+          .map((p: string) => p.trim())
+      : [];
 
     // Extract cloud instances from the content
-    const cloudInstancesMatch = content.match(/<strong>Cloud Instances<\/strong>: (.*?)(?:<br>|<\/p>)/);
-    const cloudInstances = cloudInstancesMatch ? 
-      cloudInstancesMatch[1].replace(/<[^>]*>/g, '').split(',').map((c: string) => c.trim()) : 
-      [];
+    const cloudInstancesMatch = content.match(
+      /<strong>Cloud Instances<\/strong>: (.*?)(?:<br>|<\/p>)/
+    );
+    const cloudInstances = cloudInstancesMatch
+      ? cloudInstancesMatch[1]
+          .replace(/<[^>]*>/g, '')
+          .split(',')
+          .map((c: string) => c.trim())
+      : [];
 
     // Extract release rings from the content
     const releaseRingsMatch = content.match(/<strong>Release Rings<\/strong>: (.*?)(?:<br>|<\/p>)/);
-    const releaseRings = releaseRingsMatch ? 
-      releaseRingsMatch[1].replace(/<[^>]*>/g, '').split(',').map((r: string) => r.trim()) : 
-      [];
+    const releaseRings = releaseRingsMatch
+      ? releaseRingsMatch[1]
+          .replace(/<[^>]*>/g, '')
+          .split(',')
+          .map((r: string) => r.trim())
+      : [];
 
     // Extract the actual content by removing all metadata sections
     const metadataSections = [
@@ -413,7 +443,7 @@ export async function getM365Update(id: string): Promise<M365Update> {
       /<strong>Tags<\/strong>:.*?(?:<br>|<\/p>)/,
       /<strong>Platforms<\/strong>:.*?(?:<br>|<\/p>)/,
       /<strong>Cloud Instances<\/strong>:.*?(?:<br>|<\/p>)/,
-      /<strong>Release Rings<\/strong>:.*?(?:<br>|<\/p>)/
+      /<strong>Release Rings<\/strong>:.*?(?:<br>|<\/p>)/,
     ];
 
     let finalContent = content;
@@ -447,7 +477,7 @@ export async function getM365Update(id: string): Promise<M365Update> {
 export async function getPowerAppsNews(): Promise<ProductNews[]> {
   try {
     const response = await fetch('/api/power-apps-news', {
-      next: { revalidate: 3600 } // Cache for 1 hour
+      next: { revalidate: 3600 }, // Cache for 1 hour
     });
 
     if (!response.ok) {
@@ -462,7 +492,7 @@ export async function getPowerAppsNews(): Promise<ProductNews[]> {
     const xmlText = await response.text();
     const parser = new XMLParser({
       ignoreAttributes: false,
-      attributeNamePrefix: '@_'
+      attributeNamePrefix: '@_',
     });
     const result = parser.parse(xmlText);
     const items = result.rss.channel.item;
@@ -474,12 +504,12 @@ export async function getPowerAppsNews(): Promise<ProductNews[]> {
       description: item.description,
       publishDate: item.pubDate,
       author: item['dc:creator'] || '',
-      categories: Array.isArray(item.category) ? item.category : [item.category].filter(Boolean)
+      categories: Array.isArray(item.category) ? item.category : [item.category].filter(Boolean),
     }));
 
     // Sort by publish date, newest first
-    return news.sort((a, b) => 
-      new Date(b.publishDate).getTime() - new Date(a.publishDate).getTime()
+    return news.sort(
+      (a, b) => new Date(b.publishDate).getTime() - new Date(a.publishDate).getTime()
     );
   } catch (error) {
     // console.error('Error fetching Power Apps news:', error);
@@ -490,7 +520,7 @@ export async function getPowerAppsNews(): Promise<ProductNews[]> {
 export async function getPowerPlatformNews(): Promise<ProductNews[]> {
   try {
     const response = await fetch('/api/power-platform-news', {
-      next: { revalidate: 3600 } // Cache for 1 hour
+      next: { revalidate: 3600 }, // Cache for 1 hour
     });
 
     if (!response.ok) {
@@ -505,7 +535,7 @@ export async function getPowerPlatformNews(): Promise<ProductNews[]> {
     const xmlText = await response.text();
     const parser = new XMLParser({
       ignoreAttributes: false,
-      attributeNamePrefix: '@_'
+      attributeNamePrefix: '@_',
     });
     const result = parser.parse(xmlText);
     const items = result.rss.channel.item;
@@ -517,12 +547,12 @@ export async function getPowerPlatformNews(): Promise<ProductNews[]> {
       description: item.description,
       publishDate: item.pubDate,
       author: item['dc:creator'] || '',
-      categories: Array.isArray(item.category) ? item.category : [item.category].filter(Boolean)
+      categories: Array.isArray(item.category) ? item.category : [item.category].filter(Boolean),
     }));
 
     // Sort by publish date, newest first
-    return news.sort((a, b) => 
-      new Date(b.publishDate).getTime() - new Date(a.publishDate).getTime()
+    return news.sort(
+      (a, b) => new Date(b.publishDate).getTime() - new Date(a.publishDate).getTime()
     );
   } catch (error) {
     // console.error('Error fetching Power Platform news:', error);
@@ -533,7 +563,7 @@ export async function getPowerPlatformNews(): Promise<ProductNews[]> {
 export async function getPowerAutomateNews(): Promise<ProductNews[]> {
   try {
     const response = await fetch('/api/power-automate-news', {
-      next: { revalidate: 3600 } // Cache for 1 hour
+      next: { revalidate: 3600 }, // Cache for 1 hour
     });
 
     if (!response.ok) {
@@ -548,7 +578,7 @@ export async function getPowerAutomateNews(): Promise<ProductNews[]> {
     const xml = await response.text();
     const parser = new XMLParser({
       ignoreAttributes: false,
-      attributeNamePrefix: '@_'
+      attributeNamePrefix: '@_',
     });
     const result = parser.parse(xml);
 
@@ -557,17 +587,20 @@ export async function getPowerAutomateNews(): Promise<ProductNews[]> {
       return [];
     }
 
-    return result.rss.channel.item.map((item: any) => ({
-      id: item.guid?.['#text'] || item.link,
-      title: item.title,
-      description: item.description,
-      link: item.link,
-      publishDate: item.pubDate,
-      author: item['dc:creator'] || 'Microsoft Power Automate',
-      categories: Array.isArray(item.category) ? item.category : [item.category].filter(Boolean)
-    })).sort((a: ProductNews, b: ProductNews) => 
-      new Date(b.publishDate).getTime() - new Date(a.publishDate).getTime()
-    );
+    return result.rss.channel.item
+      .map((item: any) => ({
+        id: item.guid?.['#text'] || item.link,
+        title: item.title,
+        description: item.description,
+        link: item.link,
+        publishDate: item.pubDate,
+        author: item['dc:creator'] || 'Microsoft Power Automate',
+        categories: Array.isArray(item.category) ? item.category : [item.category].filter(Boolean),
+      }))
+      .sort(
+        (a: ProductNews, b: ProductNews) =>
+          new Date(b.publishDate).getTime() - new Date(a.publishDate).getTime()
+      );
   } catch (error) {
     // console.error('Error fetching Power Automate news:', error);
     return [];
@@ -577,7 +610,7 @@ export async function getPowerAutomateNews(): Promise<ProductNews[]> {
 export async function getPowerBINews(): Promise<ProductNews[]> {
   try {
     const response = await fetch('/api/power-bi-news', {
-      next: { revalidate: 3600 } // Cache for 1 hour
+      next: { revalidate: 3600 }, // Cache for 1 hour
     });
 
     if (!response.ok) {
@@ -592,7 +625,7 @@ export async function getPowerBINews(): Promise<ProductNews[]> {
     const xml = await response.text();
     const parser = new XMLParser({
       ignoreAttributes: false,
-      attributeNamePrefix: '@_'
+      attributeNamePrefix: '@_',
     });
     const result = parser.parse(xml);
 
@@ -601,17 +634,20 @@ export async function getPowerBINews(): Promise<ProductNews[]> {
       return [];
     }
 
-    return result.rss.channel.item.map((item: any) => ({
-      id: item.guid?.['#text'] || item.link,
-      title: item.title,
-      description: item.description,
-      link: item.link,
-      publishDate: item.pubDate,
-      author: item['dc:creator'] || 'Microsoft Power BI',
-      categories: Array.isArray(item.category) ? item.category : [item.category].filter(Boolean)
-    })).sort((a: ProductNews, b: ProductNews) => 
-      new Date(b.publishDate).getTime() - new Date(a.publishDate).getTime()
-    );
+    return result.rss.channel.item
+      .map((item: any) => ({
+        id: item.guid?.['#text'] || item.link,
+        title: item.title,
+        description: item.description,
+        link: item.link,
+        publishDate: item.pubDate,
+        author: item['dc:creator'] || 'Microsoft Power BI',
+        categories: Array.isArray(item.category) ? item.category : [item.category].filter(Boolean),
+      }))
+      .sort(
+        (a: ProductNews, b: ProductNews) =>
+          new Date(b.publishDate).getTime() - new Date(a.publishDate).getTime()
+      );
   } catch (error) {
     // console.error('Error fetching Power BI news:', error);
     return [];
@@ -621,7 +657,7 @@ export async function getPowerBINews(): Promise<ProductNews[]> {
 export async function getCopilotStudioNews(): Promise<ProductNews[]> {
   try {
     const response = await fetch('/api/copilot-studio-news', {
-      next: { revalidate: 3600 } // Cache for 1 hour
+      next: { revalidate: 3600 }, // Cache for 1 hour
     });
 
     if (!response.ok) {
@@ -634,18 +670,18 @@ export async function getCopilotStudioNews(): Promise<ProductNews[]> {
     }
 
     const html = await response.text();
-    
+
     // Extract the table data using regex
     const tableRegex = /<table[^>]*>([\s\S]*?)<\/table>/g;
     const rowRegex = /<tr[^>]*>([\s\S]*?)<\/tr>/g;
     const cellRegex = /<td[^>]*>([\s\S]*?)<\/td>/g;
-    
+
     const tables = html.match(tableRegex) || [];
     const features: ProductNews[] = [];
 
     for (const table of tables) {
       const rows = table.match(rowRegex) || [];
-      
+
       // Skip header row
       for (let i = 1; i < rows.length; i++) {
         const cells = rows[i].match(cellRegex);
@@ -657,8 +693,9 @@ export async function getCopilotStudioNews(): Promise<ProductNews[]> {
 
           // Extract feature name and link
           let feature = featureCell.replace(/<[^>]*>/g, '').trim();
-          let link = 'https://learn.microsoft.com/en-us/power-platform/release-plan/2024wave2/microsoft-copilot-studio/planned-features';
-          
+          let link =
+            'https://learn.microsoft.com/en-us/power-platform/release-plan/2024wave2/microsoft-copilot-studio/planned-features';
+
           // Try to find a link in the feature cell
           const linkMatch = featureCell.match(/<a[^>]*href="([^"]*)"[^>]*>([^<]*)<\/a>/);
           if (linkMatch && linkMatch[1]) {
@@ -679,7 +716,7 @@ export async function getCopilotStudioNews(): Promise<ProductNews[]> {
             link: link,
             publishDate: new Date().toISOString(), // Use current date since these are planned features
             author: '', // Remove author information
-            categories: ['Release Plan', '2024 Wave 2']
+            categories: ['Release Plan', '2024 Wave 2'],
           });
         }
       }
@@ -695,7 +732,7 @@ export async function getCopilotStudioNews(): Promise<ProductNews[]> {
 export async function getLearnBlogNews(): Promise<ProductNews[]> {
   try {
     const response = await fetch('/api/learn-blog-news', {
-      next: { revalidate: 3600 } // Cache for 1 hour
+      next: { revalidate: 3600 }, // Cache for 1 hour
     });
 
     if (!response.ok) {
@@ -710,7 +747,7 @@ export async function getLearnBlogNews(): Promise<ProductNews[]> {
     const xmlText = await response.text();
     const parser = new XMLParser({
       ignoreAttributes: false,
-      attributeNamePrefix: '@_'
+      attributeNamePrefix: '@_',
     });
     const result = parser.parse(xmlText);
     const items = result.rss.channel.item;
@@ -722,12 +759,12 @@ export async function getLearnBlogNews(): Promise<ProductNews[]> {
       description: item.description,
       publishDate: item.pubDate,
       author: item['dc:creator'] || '',
-      categories: Array.isArray(item.category) ? item.category : [item.category].filter(Boolean)
+      categories: Array.isArray(item.category) ? item.category : [item.category].filter(Boolean),
     }));
 
     // Sort by publish date, newest first
-    return news.sort((a, b) => 
-      new Date(b.publishDate).getTime() - new Date(a.publishDate).getTime()
+    return news.sort(
+      (a, b) => new Date(b.publishDate).getTime() - new Date(a.publishDate).getTime()
     );
   } catch (error) {
     // console.error('Error fetching Learn Blog news:', error);
@@ -747,13 +784,15 @@ export async function getMicrosoftNews(): Promise<ProductNews[]> {
     const doc = parser.parseFromString(xml, 'text/xml');
     const items = doc.querySelectorAll('item');
 
-    const news: ProductNews[] = Array.from(items).map((item) => {
+    const news: ProductNews[] = Array.from(items).map(item => {
       const title = item.querySelector('title')?.textContent || '';
       const link = item.querySelector('link')?.textContent || '';
       const description = item.querySelector('description')?.textContent || '';
       const pubDate = item.querySelector('pubDate')?.textContent || '';
       const author = item.getElementsByTagName('dc:creator')[0]?.textContent?.trim() || '';
-      const categories = Array.from(item.querySelectorAll('category')).map(cat => cat.textContent || '');
+      const categories = Array.from(item.querySelectorAll('category')).map(
+        cat => cat.textContent || ''
+      );
       const publishDate = new Date(pubDate).toISOString();
 
       return {
@@ -763,7 +802,7 @@ export async function getMicrosoftNews(): Promise<ProductNews[]> {
         description,
         publishDate,
         author,
-        categories
+        categories,
       };
     });
 
@@ -771,13 +810,15 @@ export async function getMicrosoftNews(): Promise<ProductNews[]> {
     const twelveMonthsAgo = new Date();
     twelveMonthsAgo.setMonth(twelveMonthsAgo.getMonth() - 12);
     const filteredNews = news.filter(n => {
-      const date = new Date(n.publishDate)
+      const date = new Date(n.publishDate);
       // Debug log
       // if (date < twelveMonthsAgo) console.log('Filtered out (too old):', n.title, n.publishDate)
-      return date >= twelveMonthsAgo
+      return date >= twelveMonthsAgo;
     });
 
-    return filteredNews.sort((a, b) => new Date(b.publishDate).getTime() - new Date(a.publishDate).getTime());
+    return filteredNews.sort(
+      (a, b) => new Date(b.publishDate).getTime() - new Date(a.publishDate).getTime()
+    );
   } catch (error) {
     // console.error('Error fetching Microsoft Blog news:', error);
     throw error;
@@ -794,15 +835,17 @@ export async function getTechCommunityNews(): Promise<ProductNews[]> {
     const parser = new DOMParser();
     const xmlDoc = parser.parseFromString(xmlText, 'text/xml');
     const items = xmlDoc.getElementsByTagName('item');
-    
-    const news: ProductNews[] = Array.from(items).map((item) => {
+
+    const news: ProductNews[] = Array.from(items).map(item => {
       const title = item.getElementsByTagName('title')[0]?.textContent || '';
       const link = item.getElementsByTagName('link')[0]?.textContent || '';
       const description = item.getElementsByTagName('description')[0]?.textContent || '';
       const pubDate = item.getElementsByTagName('pubDate')[0]?.textContent || '';
       const author = item.getElementsByTagName('dc:creator')[0]?.textContent || '';
-      const categories = Array.from(item.getElementsByTagName('category')).map(cat => cat.textContent || '');
-      
+      const categories = Array.from(item.getElementsByTagName('category')).map(
+        cat => cat.textContent || ''
+      );
+
       return {
         id: `${link}-${pubDate}`,
         title,
@@ -810,11 +853,13 @@ export async function getTechCommunityNews(): Promise<ProductNews[]> {
         description,
         publishDate: new Date(pubDate).toISOString(),
         author,
-        categories
+        categories,
       };
     });
 
-    return news.sort((a, b) => new Date(b.publishDate).getTime() - new Date(a.publishDate).getTime());
+    return news.sort(
+      (a, b) => new Date(b.publishDate).getTime() - new Date(a.publishDate).getTime()
+    );
   } catch (error) {
     // console.error('Error fetching Tech Community news:', error);
     throw error;
@@ -824,7 +869,7 @@ export async function getTechCommunityNews(): Promise<ProductNews[]> {
 export async function getCopilotNews(): Promise<ProductNews[]> {
   try {
     const response = await fetch('/api/copilot-news', {
-      next: { revalidate: 3600 } // Cache for 1 hour
+      next: { revalidate: 3600 }, // Cache for 1 hour
     });
 
     if (!response.ok) {
@@ -839,7 +884,7 @@ export async function getCopilotNews(): Promise<ProductNews[]> {
     const xmlText = await response.text();
     const parser = new XMLParser({
       ignoreAttributes: false,
-      attributeNamePrefix: '@_'
+      attributeNamePrefix: '@_',
     });
     const result = parser.parse(xmlText);
     const items = result.rss.channel.item;
@@ -851,11 +896,11 @@ export async function getCopilotNews(): Promise<ProductNews[]> {
       description: item.description,
       publishDate: item.pubDate,
       author: item['dc:creator'] || 'Microsoft',
-      categories: Array.isArray(item.category) ? item.category : [item.category].filter(Boolean)
+      categories: Array.isArray(item.category) ? item.category : [item.category].filter(Boolean),
     }));
 
-    return news.sort((a, b) => 
-      new Date(b.publishDate).getTime() - new Date(a.publishDate).getTime()
+    return news.sort(
+      (a, b) => new Date(b.publishDate).getTime() - new Date(a.publishDate).getTime()
     );
   } catch (error) {
     // console.error('Error fetching Copilot news:', error);
@@ -864,31 +909,31 @@ export async function getCopilotNews(): Promise<ProductNews[]> {
 }
 
 export async function getFabricBlogNews(): Promise<ProductNews[]> {
-  const res = await fetch('/api/fabric-blog-news')
-  if (!res.ok) throw new Error('Failed to fetch Fabric Blog news')
-  return res.json()
+  const res = await fetch('/api/fabric-blog-news');
+  if (!res.ok) throw new Error('Failed to fetch Fabric Blog news');
+  return res.json();
 }
 
 export async function getSemanticKernelNews(): Promise<ProductNews[]> {
   try {
     const response = await fetch('/api/semantic-kernel-news', {
-      next: { revalidate: 3600 }
-    })
+      next: { revalidate: 3600 },
+    });
     if (!response.ok) {
       // console.error('Failed to fetch Semantic Kernel news:', {
       //   status: response.status,
       //   statusText: response.statusText,
       //   url: response.url
       // })
-      return []
+      return [];
     }
-    const xmlText = await response.text()
+    const xmlText = await response.text();
     const parser = new XMLParser({
       ignoreAttributes: false,
-      attributeNamePrefix: '@_'
-    })
-    const result = parser.parse(xmlText)
-    const items = result.rss.channel.item
+      attributeNamePrefix: '@_',
+    });
+    const result = parser.parse(xmlText);
+    const items = result.rss.channel.item;
     const news: ProductNews[] = items.map((item: any) => ({
       id: item.guid?.['#text'] || item.link,
       title: item.title,
@@ -896,35 +941,37 @@ export async function getSemanticKernelNews(): Promise<ProductNews[]> {
       description: item.description,
       publishDate: item.pubDate,
       author: item['dc:creator'] || '',
-      categories: Array.isArray(item.category) ? item.category : [item.category].filter(Boolean)
-    }))
-    return news.sort((a, b) => new Date(b.publishDate).getTime() - new Date(a.publishDate).getTime())
+      categories: Array.isArray(item.category) ? item.category : [item.category].filter(Boolean),
+    }));
+    return news.sort(
+      (a, b) => new Date(b.publishDate).getTime() - new Date(a.publishDate).getTime()
+    );
   } catch (error) {
     // console.error('Error fetching Semantic Kernel news:', error)
-    return []
+    return [];
   }
 }
 
 export async function getAzureAIFoundryNews(): Promise<ProductNews[]> {
   try {
     const response = await fetch('/api/azure-ai-foundry-news', {
-      next: { revalidate: 3600 }
-    })
+      next: { revalidate: 3600 },
+    });
     if (!response.ok) {
       // console.error('Failed to fetch Azure AI Foundry news:', {
       //   status: response.status,
       //   statusText: response.statusText,
       //   url: response.url
       // })
-      return []
+      return [];
     }
-    const xmlText = await response.text()
+    const xmlText = await response.text();
     const parser = new XMLParser({
       ignoreAttributes: false,
-      attributeNamePrefix: '@_'
-    })
-    const result = parser.parse(xmlText)
-    const items = result.rss.channel.item
+      attributeNamePrefix: '@_',
+    });
+    const result = parser.parse(xmlText);
+    const items = result.rss.channel.item;
     const news: ProductNews[] = items.map((item: any) => ({
       id: item.guid?.['#text'] || item.link,
       title: item.title,
@@ -932,11 +979,13 @@ export async function getAzureAIFoundryNews(): Promise<ProductNews[]> {
       description: item.description,
       publishDate: item.pubDate,
       author: item['dc:creator'] || '',
-      categories: Array.isArray(item.category) ? item.category : [item.category].filter(Boolean)
-    }))
-    return news.sort((a, b) => new Date(b.publishDate).getTime() - new Date(a.publishDate).getTime())
+      categories: Array.isArray(item.category) ? item.category : [item.category].filter(Boolean),
+    }));
+    return news.sort(
+      (a, b) => new Date(b.publishDate).getTime() - new Date(a.publishDate).getTime()
+    );
   } catch (error) {
     // console.error('Error fetching Azure AI Foundry news:', error)
-    return []
+    return [];
   }
-} 
+}
