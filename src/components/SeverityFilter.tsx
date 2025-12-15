@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useMemo, useCallback } from 'react';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
 
 interface SeverityFilterProps {
   severities: string[];
@@ -10,21 +10,33 @@ interface SeverityFilterProps {
 
 const STORAGE_KEY = 'message-center-severity-filters';
 
-export function SeverityFilter({ severities, selectedSeverities, onFilterChange, isOpen, setOpen }: SeverityFilterProps) {
+export function SeverityFilter({
+  severities,
+  selectedSeverities,
+  onFilterChange,
+  isOpen,
+  setOpen,
+}: SeverityFilterProps) {
   const dropdownRef = useRef<HTMLDivElement>(null);
   const saveTimeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
 
-  const isSeveritySelected = useCallback((severity: string): boolean => {
-    return selectedSeverities.includes(severity);
-  }, [selectedSeverities]);
+  const isSeveritySelected = useCallback(
+    (severity: string): boolean => {
+      return selectedSeverities.includes(severity);
+    },
+    [selectedSeverities]
+  );
 
-  const toggleSeverity = useCallback((severity: string) => {
-    if (isSeveritySelected(severity)) {
-      onFilterChange(selectedSeverities.filter(s => s !== severity));
-    } else {
-      onFilterChange([...selectedSeverities, severity]);
-    }
-  }, [selectedSeverities, onFilterChange, isSeveritySelected]);
+  const toggleSeverity = useCallback(
+    (severity: string) => {
+      if (isSeveritySelected(severity)) {
+        onFilterChange(selectedSeverities.filter(s => s !== severity));
+      } else {
+        onFilterChange([...selectedSeverities, severity]);
+      }
+    },
+    [selectedSeverities, onFilterChange, isSeveritySelected]
+  );
 
   const handleClearAll = useCallback(() => {
     onFilterChange([]);
@@ -33,11 +45,14 @@ export function SeverityFilter({ severities, selectedSeverities, onFilterChange,
 
   const sortedSeverities = useMemo(() => [...severities].sort(), [severities]);
 
-  const handleClickOutside = useCallback((event: MouseEvent) => {
-    if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-      setOpen(false);
-    }
-  }, [setOpen]);
+  const handleClickOutside = useCallback(
+    (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setOpen(false);
+      }
+    },
+    [setOpen]
+  );
 
   useEffect(() => {
     document.addEventListener('mousedown', handleClickOutside);
@@ -88,12 +103,7 @@ export function SeverityFilter({ severities, selectedSeverities, onFilterChange,
         className="flex items-center justify-center gap-2 px-4 h-10 text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-primary-500 relative"
         aria-label="Filter severity"
       >
-        <svg
-          className="w-5 h-5"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
+        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path
             strokeLinecap="round"
             strokeLinejoin="round"
@@ -117,7 +127,7 @@ export function SeverityFilter({ severities, selectedSeverities, onFilterChange,
             </p>
           </div>
           <div className="max-h-60 overflow-y-auto p-2">
-            {sortedSeverities.map((severity) => (
+            {sortedSeverities.map(severity => (
               <label
                 key={severity}
                 className="flex items-center px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md cursor-pointer"
@@ -128,7 +138,9 @@ export function SeverityFilter({ severities, selectedSeverities, onFilterChange,
                   onChange={() => toggleSeverity(severity)}
                   className="w-4 h-4 text-primary-600 border-gray-300 rounded focus:ring-primary-500"
                 />
-                <span className="ml-2 text-sm text-gray-700 dark:text-gray-200 capitalize">{severity}</span>
+                <span className="ml-2 text-sm text-gray-700 dark:text-gray-200 capitalize">
+                  {severity}
+                </span>
               </label>
             ))}
           </div>
@@ -144,4 +156,4 @@ export function SeverityFilter({ severities, selectedSeverities, onFilterChange,
       )}
     </div>
   );
-} 
+}
