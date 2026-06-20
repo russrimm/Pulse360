@@ -5,6 +5,7 @@ import { format } from 'date-fns';
 import Link from 'next/link';
 import Image from 'next/image';
 import { getProductIcon } from '@/lib/getProductIcon';
+import { SafeHtml } from '@/components/SafeHtml';
 
 interface AzureUpdateCardProps {
   update: AzureUpdate;
@@ -56,7 +57,7 @@ export function AzureUpdateCard({ update, onClick }: AzureUpdateCardProps) {
             )}
           </div>
           <div className="mt-2 text-[10px] prose prose-tight dark:prose-invert max-w-none [&_*]:!text-gray-600 [&_*]:dark:!text-gray-300 [&_a]:!text-primary-600 [&_a]:dark:!text-primary-400 [&_a]:!no-underline [&_a:hover]:!text-primary-700 [&_a:hover]:dark:!text-primary-300 [&_strong]:!text-gray-900 [&_strong]:dark:!text-white [&_h1]:!text-gray-900 [&_h1]:dark:!text-white [&_h2]:!text-gray-900 [&_h2]:dark:!text-white [&_h3]:!text-gray-900 [&_h3]:dark:!text-white [&_h4]:!text-gray-900 [&_h4]:dark:!text-white [&_h5]:!text-gray-900 [&_h5]:dark:!text-white [&_h6]:!text-gray-900 [&_h6]:dark:!text-white [&_code]:!text-gray-900 [&_code]:dark:!text-gray-100 [&_code]:!bg-gray-100 [&_code]:dark:!bg-gray-800 [&_pre]:!text-gray-900 [&_pre]:dark:!text-gray-100 [&_pre]:!bg-gray-100 [&_pre]:dark:!bg-gray-800 [&_p]:!text-gray-600 [&_p]:dark:!text-gray-300 [&_ul]:!text-gray-600 [&_ul]:dark:!text-gray-300 [&_ol]:!text-gray-600 [&_ol]:dark:!text-gray-300 [&_li]:!text-gray-600 [&_li]:dark:!text-gray-300 [&_blockquote]:!text-gray-600 [&_blockquote]:dark:!text-gray-300 [&_blockquote]:!border-gray-200 [&_blockquote]:dark:!border-gray-700 [&_*]:!bg-transparent [&_*]:dark:!bg-transparent [&_p]:mb-1 [&_li]:mb-1">
-            <div className="line-clamp-3" dangerouslySetInnerHTML={{ __html: update.description }} />
+            <SafeHtml html={update.description} className="line-clamp-3" />
           </div>
         </div>
       </div>

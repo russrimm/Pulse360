@@ -1,4 +1,5 @@
 import { getM365Updates } from '@/lib/api.server';
+import { sanitizeFeedHtml } from '@/lib/feed/sanitize';
 import { notFound } from 'next/navigation';
 import { format } from 'date-fns';
 import Image from 'next/image';
@@ -71,6 +72,7 @@ export default async function M365UpdatePage({ params }: { params: Promise<{ id:
   }
 
   const uniqueServices = Array.from(new Set(update.service));
+  const safeContent = sanitizeFeedHtml(update.content);
 
   return (
     <div className="min-h-screen bg-gray-900 dark:bg-black">
@@ -140,7 +142,7 @@ export default async function M365UpdatePage({ params }: { params: Promise<{ id:
                   <h1 className="text-base font-medium text-gray-900 dark:text-white tracking-tight text-center">{update.title}</h1>
                 </div>
                 <div className="mt-2 text-sm text-gray-600 dark:text-gray-400 flex-grow">
-                  <div className="prose dark:prose-invert prose-sm max-w-none" dangerouslySetInnerHTML={{ __html: update.content }} />
+                  <div className="prose dark:prose-invert prose-sm max-w-none" dangerouslySetInnerHTML={{ __html: safeContent }} />
                 </div>
               </div>
             </div>

@@ -6,6 +6,7 @@ import Image from 'next/image';
 import { useState, useEffect } from 'react';
 import { LoadingSpinner } from './LoadingSpinner';
 import { releasePlanServiceIcons } from '@/lib/releasePlanIcons';
+import { SafeHtml } from '@/components/SafeHtml';
 
 interface ReleasePlan {
   id: string;
@@ -197,13 +198,13 @@ export function ReleasePlanDetail({ plan }: ReleasePlanDetailProps) {
                 {/* Business Value */}
                 <div className="bg-white/70 dark:bg-gray-700/70 backdrop-blur-sm rounded-xl p-4 sm:p-6 border border-gray-200 dark:border-gray-600">
                   <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-4">Business Value</h2>
-                  <div className="prose dark:prose-invert max-w-none" dangerouslySetInnerHTML={{ __html: plan.businessValue }} />
+                  <SafeHtml html={plan.businessValue} className="prose dark:prose-invert max-w-none" />
                 </div>
 
                 {/* Feature Details */}
                 <div className="bg-white/70 dark:bg-gray-700/70 backdrop-blur-sm rounded-xl p-4 sm:p-6 border border-gray-200 dark:border-gray-600">
                   <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-4">Feature Details</h2>
-                  <div className="mt-4 prose dark:prose-invert prose-sm max-w-none text-current" dangerouslySetInnerHTML={{ __html: plan.content }} />
+                  <SafeHtml html={plan.content} className="mt-4 prose dark:prose-invert prose-sm max-w-none text-current" />
                 </div>
               </div>
             </div>
