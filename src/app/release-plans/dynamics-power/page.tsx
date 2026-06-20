@@ -1,5 +1,5 @@
 import { FuturePastReleasePlanList } from '@/components/FuturePastReleasePlanList';
-import { getReleasePlans } from '@/lib/api';
+import { getReleasePlans } from '@/lib/api.server';
 import { releasePlanServiceIcons } from '@/lib/releasePlanIcons';
 import Image from 'next/image';
 import Link from 'next/link';

@@ -1,4 +1,3 @@
-import { getFabricBlogNews } from '@/lib/api'
 import { ProductNewsLayout } from '@/components/ProductNewsLayout'
 import { ProductNewsCard } from '@/components/ProductNewsCard'
 import { FabricBlogNewsClient } from './FabricBlogNewsClient'

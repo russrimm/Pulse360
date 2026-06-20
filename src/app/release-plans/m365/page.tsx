@@ -1,5 +1,5 @@
 import { M365UpdatesContent } from '@/components/M365UpdatesContent';
-import { getM365Updates } from '@/lib/api';
+import { getM365Updates } from '@/lib/api.server';
 
 export const revalidate = 3600;
 

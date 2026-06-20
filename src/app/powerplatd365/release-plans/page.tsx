@@ -1,6 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
-import { getReleasePlans } from '@/lib/api';
+import { getReleasePlans } from '@/lib/api.server';
 import { releasePlanServiceIcons } from '@/lib/releasePlanIcons';
 import Image from 'next/image';
 

@@ -1,6 +1,6 @@
 "use client"
 import { useQuery } from '@tanstack/react-query';
-import { getAzureAIFoundryNews } from "@/lib/api"
+import { getAzureAIFoundryNews } from "@/lib/api.client"
 import { ProductNewsCard } from "@/components/ProductNewsCard"
 import { ProductNewsLayout } from "@/components/ProductNewsLayout"
 import type { ProductNews } from "@/lib/types"

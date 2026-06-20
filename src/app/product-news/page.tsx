@@ -1,6 +1,6 @@
 'use client';
 
-import { getPowerAppsNews } from '@/lib/api';
+import { getPowerAppsNews } from '@/lib/api.client';
 import { ProductNewsCard } from '@/components/ProductNewsCard';
 import { ProductNewsLayout } from '@/components/ProductNewsLayout';
 import { useEffect, useState } from 'react';

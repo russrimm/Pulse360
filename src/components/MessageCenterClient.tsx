@@ -2,7 +2,6 @@
 import { useEffect, useState } from 'react';
 import { FilterProvider } from './FilterContext';
 import { HomeContent } from './HomeContent';
-import { getMessages } from '@/lib/api';
 import type { Message } from '@/lib/types';
 
 export default function MessageCenterClient() {

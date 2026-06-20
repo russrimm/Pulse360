@@ -1,4 +1,4 @@
-import { getAzureUpdates } from '@/lib/api';
+import { getAzureUpdates } from '@/lib/api.server';
 import { notFound } from 'next/navigation';
 import { format } from 'date-fns';
 import Link from 'next/link';

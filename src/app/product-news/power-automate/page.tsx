@@ -1,6 +1,6 @@
 'use client';
 
-import { getPowerAutomateNews } from '@/lib/api';
+import { getPowerAutomateNews } from '@/lib/api.client';
 import { ProductNewsCard } from '@/components/ProductNewsCard';
 import { ProductNewsLayout } from '@/components/ProductNewsLayout';
 import { useQuery } from '@tanstack/react-query';

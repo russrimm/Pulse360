@@ -1,4 +1,4 @@
-import { getM365Update } from '@/lib/api';
+import { getM365Update } from '@/lib/api.server';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { format } from 'date-fns';

@@ -1,4 +1,4 @@
-import { getAzureUpdates } from '@/lib/api';
+import { getAzureUpdates } from '@/lib/api.server';
 import { AzureUpdatesClient } from '@/components/AzureUpdatesClient';
 
 export const revalidate = 3600;
