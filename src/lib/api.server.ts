@@ -11,6 +11,8 @@ const CLIENT_ID = process.env.AZURE_CLIENT_ID;
 // When AZURE_API_URL is set, APIM handles auth — no local credentials needed
 const isApimMode = !!process.env.AZURE_API_URL;
 
+const isDev = process.env.NODE_ENV === 'development';
+
 if (!isApimMode && process.env.NODE_ENV === 'development' && (!API_KEY || !TENANT_ID || !CLIENT_ID)) {
   const missing: string[] = [];
   if (!API_KEY) missing.push('AZURE_CLIENT_SECRET');
@@ -171,13 +173,15 @@ export async function getMessages(): Promise<Message[]> {
       severity: message.severity,
     }));
   } catch (error) {
-    throw error;
+    if (isDev) throw error;
+    return [];
   }
 }
 
-export async function getMessage(id: string): Promise<Message> {
+export async function getMessage(id: string): Promise<Message | null> {
   if (!hasRequiredEnvVars) {
-    throw new Error('Message not found');
+    if (isDev) throw new Error('Message not found');
+    return null;
   }
 
   try {
@@ -228,7 +232,8 @@ export async function getMessage(id: string): Promise<Message> {
       severity: message.severity,
     };
   } catch (error) {
-    throw error;
+    if (isDev) throw error;
+    return null;
   }
 }
 
@@ -289,7 +294,8 @@ export async function getAzureUpdates(): Promise<AzureUpdate[]> {
     const data = await response.json();
     return data.value;
   } catch (error) {
-    throw error;
+    if (isDev) throw error;
+    return [];
   }
 }
 
@@ -321,11 +327,12 @@ export async function getM365Updates(): Promise<M365Update[]> {
       releaseRings: update.releaseRings || [],
     }));
   } catch (error) {
-    throw error;
+    if (isDev) throw error;
+    return [];
   }
 }
 
-export async function getM365Update(id: string): Promise<M365Update> {
+export async function getM365Update(id: string): Promise<M365Update | null> {
   try {
     const response = await fetch(
       `https://www.microsoft.com/releasecommunications/api/v2/m365/rss/${id}`,
@@ -442,6 +449,7 @@ export async function getM365Update(id: string): Promise<M365Update> {
       releaseRings: releaseRings,
     };
   } catch (error) {
-    throw error;
+    if (isDev) throw error;
+    return null;
   }
 }

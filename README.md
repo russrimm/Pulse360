@@ -168,7 +168,6 @@ If an upstream is down, list endpoints return `200` with an empty array so the U
 │   │   ├── powerplatd365/       # Power Platform / D365 release plans landing
 │   │   └── api/                 # 20+ route handlers (see below)
 │   ├── components/              # Cards, filters, lists, nav, theme toggle
-│   ├── hooks/useData.ts         # React Query wrappers
 │   ├── lib/
 │   │   ├── api.server.ts        # `server-only` Graph client (Message Center)
 │   │   ├── api.client.ts        # Client-side RSS/news fetchers
