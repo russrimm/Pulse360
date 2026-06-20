@@ -13,11 +13,7 @@ import { FilterProvider } from '@/components/FilterContext'
 import { Analytics } from "@vercel/analytics/next"
 import { SpeedInsights } from "@vercel/speed-insights/next"
 
-if (process.env.NODE_ENV === 'production') {
-  console.debug = function () {}
-}
-
-const inter = Inter({ 
+const inter = Inter({
   subsets: ['latin'],
   display: 'swap',
   preload: true,

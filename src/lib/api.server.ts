@@ -2,11 +2,6 @@ import 'server-only';
 import { M365Update, Message } from './types';
 import { XMLParser } from 'fast-xml-parser';
 
-if (process.env.NODE_ENV === 'production') {
-  console.log = function () {};
-  console.debug = function () {};
-}
-
 // Base URL without version path — supports both /v1.0 and /beta
 const GRAPH_BASE_URL = process.env.AZURE_API_URL || 'https://graph.microsoft.com';
 const API_KEY = process.env.AZURE_CLIENT_SECRET;

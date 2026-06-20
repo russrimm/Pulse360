@@ -145,12 +145,6 @@ export function MessageList({ messages: messagesProp }: MessageListProps) {
     };
   }, [visibleMessages.length, filteredMessages.length]);
 
-  useEffect(() => {
-    console.log('openFilter changed:', openFilter);
-  }, [openFilter]);
-
-  // Remove patch effect for openFilter/selectedTags
-
   const handleMessageClick = (messageId: string) => {
     router.push(`/message/${messageId}`);
   };

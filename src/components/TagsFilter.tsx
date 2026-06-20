@@ -2,9 +2,6 @@ import { useState, useMemo, useRef, useEffect, useCallback } from 'react';
 import type { Message } from '@/lib/types';
 import { useFilterContext } from './FilterContext';
 
-// Debug: Log when TagsFilter renders and the current openFilter value
-console.log('TagsFilter rendered');
-
 interface TagsFilterProps {
   messages: Message[];
 }
@@ -30,7 +27,6 @@ export function TagsFilter({ messages }: TagsFilterProps) {
       internalClick.current = false;
       return;
     }
-    console.log('handleClickOutside fired', { eventTarget: event.target, dropdownRef: dropdownRef.current });
     if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
       setOpen(false);
     }
