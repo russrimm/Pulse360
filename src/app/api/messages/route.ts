@@ -6,9 +6,10 @@ export async function GET() {
     const messages = await getMessages();
     return NextResponse.json(messages);
   } catch (error) {
-    console.error('Error in /api/messages:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    console.error('Error in /api/messages:', errorMessage);
     return NextResponse.json(
-      { error: 'Upstream service unavailable' },
+      { error: 'Upstream service unavailable', detail: errorMessage },
       { status: 500 }
     );
   }

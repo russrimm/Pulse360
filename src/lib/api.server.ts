@@ -4,18 +4,19 @@ import { XMLParser } from 'fast-xml-parser';
 
 if (process.env.NODE_ENV === 'production') {
   console.log = function () {};
-  console.warn = function () {};
-  console.error = function () {};
-  console.info = function () {};
   console.debug = function () {};
 }
 
-const API_BASE_URL = process.env.AZURE_API_URL || 'https://graph.microsoft.com/v1.0';
+// Base URL without version path — supports both /v1.0 and /beta
+const GRAPH_BASE_URL = process.env.AZURE_API_URL || 'https://graph.microsoft.com';
 const API_KEY = process.env.AZURE_CLIENT_SECRET;
 const TENANT_ID = process.env.AZURE_TENANT_ID;
 const CLIENT_ID = process.env.AZURE_CLIENT_ID;
 
-if (process.env.NODE_ENV === 'development' && (!API_KEY || !TENANT_ID || !CLIENT_ID)) {
+// When AZURE_API_URL is set, APIM handles auth — no local credentials needed
+const isApimMode = !!process.env.AZURE_API_URL;
+
+if (!isApimMode && process.env.NODE_ENV === 'development' && (!API_KEY || !TENANT_ID || !CLIENT_ID)) {
   const missing: string[] = [];
   if (!API_KEY) missing.push('AZURE_CLIENT_SECRET');
   if (!TENANT_ID) missing.push('AZURE_TENANT_ID');
@@ -25,8 +26,13 @@ if (process.env.NODE_ENV === 'development' && (!API_KEY || !TENANT_ID || !CLIENT
   );
 }
 
-// In production, return empty data instead of throwing
-const hasRequiredEnvVars = API_KEY && TENANT_ID && CLIENT_ID;
+// In APIM mode, no local credentials required; otherwise check env vars
+const hasRequiredEnvVars = isApimMode || (API_KEY && TENANT_ID && CLIENT_ID);
+
+/** Build a Graph API URL with version. Defaults to v1.0. */
+function graphUrl(path: string, version: 'v1.0' | 'beta' = 'v1.0'): string {
+  return `${GRAPH_BASE_URL}/${version}${path}`;
+}
 
 async function getToken(): Promise<string> {
   if (!hasRequiredEnvVars) {
@@ -72,6 +78,13 @@ async function getToken(): Promise<string> {
     }
 
     const data = await response.json();
+
+    if (!data.access_token) {
+      throw new Error(
+        `Azure AD returned no access_token. Response: ${JSON.stringify({ error: data.error, error_description: data.error_description })}`
+      );
+    }
+
     return data.access_token;
   } catch (error) {
     throw error;
@@ -111,22 +124,29 @@ export async function getMessages(): Promise<Message[]> {
   }
 
   try {
-    const token = await getToken();
-    let allMessages: GraphApiMessage[] = [];
-    let nextLink: string | undefined = `${API_BASE_URL}/admin/serviceAnnouncement/messages`;
-
-    const headers = {
+    // In APIM mode, no token needed — APIM policy handles auth
+    const headers: Record<string, string> = {
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`,
-      'Ocp-Apim-Subscription-Key': API_KEY || '',
     };
 
-    while (nextLink) {
+    if (isApimMode) {
+      // APIM handles Authorization; no Bearer token needed from the app
+    } else {
+      const token = await getToken();
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+
+    let allMessages: GraphApiMessage[] = [];
+    const MAX_PAGES = 10;
+    let nextLink: string | undefined =
+      graphUrl(`/admin/serviceAnnouncement/messages?$top=500&$orderby=lastModifiedDateTime desc`);
+
+    let pageCount = 0;
+    while (nextLink && pageCount < MAX_PAGES) {
+      pageCount++;
       const response = await fetch(nextLink, {
-        headers: {
-          ...headers,
-          'Cache-Control': 'public, max-age=604800', // 7 days in seconds
-        },
+        headers,
+        next: { revalidate: 3600 },
       });
 
       if (!response.ok) {
@@ -166,19 +186,22 @@ export async function getMessage(id: string): Promise<Message> {
   }
 
   try {
-    const token = await getToken();
-    const headers = {
+    const headers: Record<string, string> = {
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`,
-      'Ocp-Apim-Subscription-Key': API_KEY || '',
-      'Cache-Control': 'public, max-age=86400', // Cache for 24 hours
     };
 
+    if (isApimMode) {
+      // APIM handles Authorization
+    } else {
+      const token = await getToken();
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+
     const response = await fetch(
-      `${API_BASE_URL}/admin/serviceAnnouncement/messages?$filter=id eq '${id}'`,
+      graphUrl(`/admin/serviceAnnouncement/messages?$filter=id eq '${id}'`),
       {
         headers,
-        next: { revalidate: 86400 }, // Enable Next.js cache for 24 hours
+        next: { revalidate: 86400 },
       }
     );
 

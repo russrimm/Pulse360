@@ -14,15 +14,6 @@ import { Analytics } from "@vercel/analytics/next"
 import { SpeedInsights } from "@vercel/speed-insights/next"
 
 if (process.env.NODE_ENV === 'production') {
-  // eslint-disable-next-line no-console
-  // console.log = function () {}
-  // eslint-disable-next-line no-console
-  console.warn = function () {}
-  // eslint-disable-next-line no-console
-  console.error = function () {}
-  // eslint-disable-next-line no-console
-  console.info = function () {}
-  // eslint-disable-next-line no-console
   console.debug = function () {}
 }
 
