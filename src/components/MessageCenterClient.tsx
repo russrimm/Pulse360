@@ -6,15 +6,25 @@ import { getMessages } from '@/lib/api';
 import type { Message } from '@/lib/types';
 
 export default function MessageCenterClient() {
-  console.log('MessageCenterClient mounted');
   const [messages, setMessages] = useState<Message[]>([]);
   const [loading, setLoading] = useState(true);
+  const [hasError, setHasError] = useState(false);
 
   useEffect(() => {
     fetch('/api/messages')
       .then(res => res.json())
       .then((msgs) => {
-        setMessages(msgs);
+        if (Array.isArray(msgs)) {
+          setMessages(msgs);
+        } else {
+          setMessages([]);
+          setHasError(true);
+        }
+        setLoading(false);
+      })
+      .catch(() => {
+        setMessages([]);
+        setHasError(true);
         setLoading(false);
       });
   }, []);
@@ -34,6 +44,11 @@ export default function MessageCenterClient() {
             Stay informed about Microsoft 365 service updates and changes
           </p>
         </div>
+        {hasError && (
+          <div className="mb-6 rounded border border-yellow-300 bg-yellow-50 px-4 py-3 text-sm text-yellow-800 dark:border-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-200">
+            Messages are temporarily unavailable. Please try again shortly.
+          </div>
+        )}
         <HomeContent messages={messages} />
       </div>
     </div>
