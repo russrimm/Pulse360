@@ -17,7 +17,8 @@ interface MessageListProps {
 
 const ITEMS_PER_PAGE = 12;
 
-export function MessageList({ messages }: MessageListProps) {
+export function MessageList({ messages: messagesProp }: MessageListProps) {
+  const messages = Array.isArray(messagesProp) ? messagesProp : [];
   const router = useRouter();
   const [services, setServices] = useState<string[]>([]);
   const [visibleMessages, setVisibleMessages] = useState<Message[]>([]);

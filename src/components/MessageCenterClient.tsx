@@ -14,7 +14,11 @@ export default function MessageCenterClient() {
     fetch('/api/messages')
       .then(res => res.json())
       .then((msgs) => {
-        setMessages(msgs);
+        setMessages(Array.isArray(msgs) ? msgs : []);
+        setLoading(false);
+      })
+      .catch(() => {
+        setMessages([]);
         setLoading(false);
       });
   }, []);
