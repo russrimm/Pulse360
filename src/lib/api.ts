@@ -9,10 +9,10 @@ if (process.env.NODE_ENV === 'production') {
   console.debug = function() {};
 }
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://graphapirim.azure-api.net/v1.0';
-const API_KEY = process.env.NEXT_PUBLIC_API_KEY;
-const TENANT_ID = process.env.NEXT_PUBLIC_TENANT_ID;
-const CLIENT_ID = process.env.NEXT_PUBLIC_CLIENT_ID;
+const API_BASE_URL = process.env.AZURE_API_URL || 'https://graph.microsoft.com/v1.0';
+const API_KEY = process.env.AZURE_CLIENT_SECRET;
+const TENANT_ID = process.env.AZURE_TENANT_ID;
+const CLIENT_ID = process.env.AZURE_CLIENT_ID;
 
 // Debug environment variables
 // console.log('Environment variables:', {
@@ -25,10 +25,13 @@ const CLIENT_ID = process.env.NEXT_PUBLIC_CLIENT_ID;
 //   environment: process.env.NODE_ENV
 // });
 
-// Only throw in development
-if (process.env.NODE_ENV === 'development' && (!API_KEY || !TENANT_ID || !CLIENT_ID)) {
-  throw new Error('Missing required environment variables. Please check your .env.local file.');
-}
+  if (process.env.NODE_ENV === 'development' && (!API_KEY || !TENANT_ID || !CLIENT_ID)) {
+    const missing: string[] = [];
+    if (!API_KEY) missing.push('AZURE_CLIENT_SECRET');
+    if (!TENANT_ID) missing.push('AZURE_TENANT_ID');
+    if (!CLIENT_ID) missing.push('AZURE_CLIENT_ID');
+    throw new Error(`Missing required environment variables: ${missing.join(', ')}. Please check your .env.local file.`);
+  }
 
 // In production, return empty data instead of throwing
 const hasRequiredEnvVars = API_KEY && TENANT_ID && CLIENT_ID;
@@ -36,9 +39,9 @@ const hasRequiredEnvVars = API_KEY && TENANT_ID && CLIENT_ID;
 async function getToken(): Promise<string> {
   if (!hasRequiredEnvVars) {
     const missing = [];
-    if (!API_KEY) missing.push('NEXT_PUBLIC_API_KEY');
-    if (!TENANT_ID) missing.push('NEXT_PUBLIC_TENANT_ID');
-    if (!CLIENT_ID) missing.push('NEXT_PUBLIC_CLIENT_ID');
+    if (!API_KEY) missing.push('AZURE_CLIENT_SECRET');
+    if (!TENANT_ID) missing.push('AZURE_TENANT_ID');
+    if (!CLIENT_ID) missing.push('AZURE_CLIENT_ID');
     throw new Error(`Missing required environment variables: ${missing.join(', ')}`);
   }
 

@@ -8,8 +8,12 @@ export async function GET(req: NextRequest) {
   const monthId = searchParams.get('monthId');
   try {
     if (monthId) {
+      // MSRC month IDs are shape '2026-Jun'. Validate strictly to prevent path injection.
+      if (!/^\d{4}-[A-Za-z]{3}$/.test(monthId)) {
+        return NextResponse.json({ error: 'Invalid monthId format' }, { status: 400 });
+      }
       // Proxy CVRF details for a specific month
-      const res = await fetch(CVRF_URL + monthId, {
+      const res = await fetch(CVRF_URL + encodeURIComponent(monthId), {
         headers: { Accept: 'application/json' },
       });
       if (!res.ok) {

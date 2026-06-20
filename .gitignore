@@ -22,9 +22,14 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-# local env files
+# local env files (catches all variants including typos like ..env)
 .env*.local
 .env
+*.env*
+!.env.example
+
+# security review (contains rendered findings, may include sensitive context)
+/security-review/*.pdf
 
 # vercel
 .vercel
