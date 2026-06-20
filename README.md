@@ -85,47 +85,40 @@ The repo currently ships without screenshots in `public/`. If you take any while
 
 ## Architecture overview
 
-```mermaid
-flowchart TD
-    subgraph Browser
-        A[React Server Components + Client Islands]
-    end
-
-    subgraph Azure Static Web Apps
-        B[Next.js 16 App Router]
-        B1["/api/messages — Graph proxy"]
-        B2["/api/proxy-rss — RSS proxy"]
-        B3["/api/msrc — MSRC proxy"]
-    end
-
-    subgraph Azure API Management
-        C[APIM Policy:<br/>Token acquisition via<br/>client credentials flow]
-    end
-
-    subgraph Microsoft APIs
-        D[Microsoft Graph API<br/>/v1.0 and /beta]
-        E[MSRC CVRF API]
-        F[*.microsoft.com RSS feeds]
-    end
-
-    A -->|fetch /api/*| B
-    B --> B1 & B2 & B3
-    B1 -->|No auth header — APIM handles it| C
-    C -->|Bearer token injected by policy| D
-    B3 -->|Public, validated monthId| E
-    B2 -->|Allowlisted hosts only| F
+```
+                       ┌────────────────────────────────────┐
+                       │            Browser (RSC)           │
+                       │  React Server Components hydrate   │
+                       │   client islands (filters, modals) │
+                       └────────────┬───────────────────────┘
+                                    │
+                                    ▼
+                       ┌────────────────────────────────────┐
+                       │     Next.js 16 (App Router)        │
+                       │  - Server Components fetch data    │
+                       │  - Route handlers act as a server- │
+                       │    side proxy for cross-origin /   │
+                       │    bot-protected upstreams         │
+                       └────┬───────────────┬───────────────┘
+                            │               │
+              client creds  │               │ public REST / RSS
+                            ▼               ▼
+            ┌──────────────────────┐  ┌──────────────────────┐
+            │   Microsoft Graph    │  │  MSRC CVRF API +     │
+            │  (Message Center)    │  │  *.microsoft.com     │
+            └──────────────────────┘  │  RSS feeds (allow-   │
+                                      │  listed)             │
+                                      └──────────────────────┘
 ```
 
-**Key design choices:**
+Key design choices:
 
-- **APIM as auth gateway.** In production, `AZURE_API_URL` points to an Azure API Management instance. APIM's inbound policy acquires an OAuth token via client credentials and injects `Authorization: Bearer <token>` before forwarding to Graph. The app never handles Graph secrets in production.
-- **Version-agnostic base URL.** The app uses a `graphUrl(path, version)` helper that constructs `{APIM_HOST}/{version}{path}`. Both `/v1.0` and `/beta` are supported without config changes.
 - **Server-first data fetching.** `src/lib/api.server.ts` is marked `server-only`. Secrets never reach the browser.
-- **No client-side Microsoft Graph tokens.** The browser talks to `/api/messages`; the server proxies Graph via APIM.
+- **No client-side Microsoft Graph tokens.** The browser talks to `/api/messages`; the server holds the Entra app credentials and proxies Graph.
 - **Allowlist-secured RSS proxy.** `/api/proxy-rss` only fetches from a fixed list of `*.microsoft.com` hosts to prevent SSRF.
 - **Strict MSRC input validation.** `/api/msrc?monthId=...` validates `monthId` against `^\d{4}-[A-Za-z]{3}$` before forwarding.
-- **Caching.** Server fetches use Next.js `revalidate` hints (1 hour for news, 24 hours for individual messages). Pagination is capped at 10 pages × 500 items to avoid serverless timeouts.
-- **Graceful degradation.** If an upstream fails, the UI shows an error banner with actionable detail rather than a blank page.
+- **Caching.** Server fetches use Next.js `revalidate` hints (typically 1 hour for news, 24 hours for Graph). The Graph proxy disables caching for paginated responses that may exceed Next.js's 2 MB cache cap.
+- **Per-request console silencing in production** (`src/lib/api.server.ts`, `src/app/layout.tsx`) to avoid leaking diagnostic payloads to hosting logs.
 
 ---
 
@@ -220,40 +213,23 @@ Open <http://localhost:3000>. The root path redirects to `/home`.
 
 Pulse 360° reads its configuration from a `.env.local` file at the repo root (Next.js convention — automatically gitignored).
 
-#### Production (APIM mode — recommended)
-
-In production, the app delegates authentication to Azure API Management. Only one env var is needed:
-
 | Variable | Required? | Purpose |
 |---|---|---|
-| `AZURE_API_URL` | **Yes** | APIM endpoint (e.g. `https://graphapirim.azure-api.net`). The app sends requests here; APIM handles token acquisition via its inbound policy. |
-
-No secrets are stored in the web app. APIM uses Named Values (`graph-client-id`, `graph-client-secret`) to acquire tokens.
-
-#### Local development (direct mode)
-
-For local dev without APIM, the app acquires Graph tokens itself using client credentials:
-
-| Variable | Required? | Purpose |
-|---|---|---|
-| `AZURE_CLIENT_ID` | Yes | Application (client) ID of the Entra app registration |
-| `AZURE_TENANT_ID` | Yes | Directory (tenant) ID |
-| `AZURE_CLIENT_SECRET` | Yes | Client secret value (treat as a password — rotate regularly) |
-| `AZURE_API_URL` | No | Set to `https://graph.microsoft.com` for direct access. If omitted, defaults to `https://graph.microsoft.com`. |
+| `AZURE_CLIENT_ID` | Yes, for Message Center | Application (client) ID of the Entra app registration |
+| `AZURE_TENANT_ID` | Yes, for Message Center | Directory (tenant) ID |
+| `AZURE_CLIENT_SECRET` | Yes, for Message Center | Client secret value (treat as a password — rotate regularly) |
+| `AZURE_API_URL` | No | Overrides the Graph base URL. Defaults to `https://graph.microsoft.com/v1.0`. Useful only for Graph national clouds (e.g. Gov, China). |
 
 Create `.env.local` (use placeholders — never commit real secrets):
 
 ```ini
-# Microsoft Graph — app-only credentials (local dev only)
+# Microsoft Graph — app-only credentials
 AZURE_CLIENT_ID=00000000-0000-0000-0000-000000000000
 AZURE_TENANT_ID=00000000-0000-0000-0000-000000000000
 AZURE_CLIENT_SECRET=replace_with_real_secret_value
-
-# Base URL — no version path suffix (supports both /v1.0 and /beta)
-AZURE_API_URL=https://graph.microsoft.com
+# Optional override:
+# AZURE_API_URL=https://graph.microsoft.com/v1.0
 ```
-
-> **APIM mode detection:** When `AZURE_API_URL` points to a non-`graph.microsoft.com` host, the app assumes APIM handles authentication and skips local token acquisition. When it points to `graph.microsoft.com` (or is unset), the app acquires tokens itself using `AZURE_CLIENT_ID`, `AZURE_TENANT_ID`, and `AZURE_CLIENT_SECRET`.
 
 ### Optional environment variables
 
@@ -428,33 +404,14 @@ The ESLint config covers TypeScript, React, Next.js, JSON, CSS, and Markdown fil
 
 ## Deployment
 
-Pulse 360° runs on **Azure Static Web Apps** with an **Azure API Management** gateway for Graph API authentication.
+Pulse 360° is built for Vercel but runs anywhere Node 20.17+ can host Next.js 16.
 
-```mermaid
-flowchart LR
-    subgraph Azure
-        SWA[Static Web App<br/>Next.js 16 SSR]
-        APIM[API Management<br/>Token injection policy]
-        Graph[Microsoft Graph]
-    end
+**Vercel (recommended):**
 
-    SWA -->|AZURE_API_URL| APIM
-    APIM -->|Bearer token| Graph
-```
-
-**Azure Static Web Apps (current production):**
-
-1. CI/CD via GitHub Actions (`.github/workflows/`).
-2. Add `AZURE_API_URL=https://<your-apim>.azure-api.net` in **Configuration → Application settings**.
-3. No other secrets are needed — APIM handles Graph authentication.
-4. The production domain is <https://www.mspulse360.app>.
-
-**APIM setup:**
-
-1. Create an API in APIM with backend `https://graph.microsoft.com`.
-2. Add Named Values: `graph-client-id` and `graph-client-secret` (use Key Vault references for the secret).
-3. Apply the inbound policy that acquires a client_credentials token and sets the `Authorization` header. See the [APIM policy reference](docs/apim-policy.md) or the Architecture diagram above.
-4. The policy supports both `/v1.0` and `/beta` paths — they're forwarded as-is.
+1. Import the repo in Vercel → **New Project**.
+2. Framework preset: **Next.js** (auto-detected).
+3. Add the env vars under **Settings → Environment Variables** (`AZURE_CLIENT_ID`, `AZURE_TENANT_ID`, `AZURE_CLIENT_SECRET`, plus `DATABASE_URL` only if you use Prisma).
+4. Deploy. The production domain in use is <https://www.mspulse360.app>.
 
 **Self-host:**
 
@@ -464,26 +421,25 @@ npm run build
 npm start   # serves on port 3000
 ```
 
-Put it behind a reverse proxy (Caddy / nginx / CloudFront) with HTTPS terminated upstream. Set `NODE_ENV=production` and `AZURE_API_URL`.
+Put it behind a reverse proxy (Caddy / nginx / CloudFront) with HTTPS terminated upstream. Set `NODE_ENV=production`.
 
 **Notes:**
 
-- The site never stores Graph tokens — APIM acquires a fresh access token per request via the client credentials flow.
-- Pagination is capped at 10 pages × 500 items to avoid serverless function timeouts.
+- The site never persists Graph tokens — each request acquires a fresh access token via the client credentials flow.
+- Vercel's default 4.5 MB serverless response cap can clip the largest Graph pages; if you see truncated Message Center results, deploy to a Node runtime with a higher cap or move that route to an Edge Function with streaming.
 - `next.config.js` whitelists images from `devblogs.microsoft.com` and `winblogs.thesourcemediaassets.com`. Add hosts here if you embed images from new sources.
 
 ---
 
 ## Security notes
 
-- **Secrets stay server-side.** All Graph requests route through Azure API Management in production. The web app contains **no Graph credentials** — APIM Named Values (backed by Key Vault) hold the client secret.
-- **APIM as a security boundary.** The app's server-side code calls APIM without an Authorization header. APIM's inbound policy acquires tokens internally and injects them before forwarding to Graph. Even if the web app is compromised, no Graph secret is exposed.
+- **Secrets stay server-side.** All Graph credentials are read in `src/lib/api.server.ts` (marked `server-only`) and never bundled into client code.
 - **`.env*` is gitignored** by a broad rule that catches typos like `..env`. Always use a placeholder template (never real values) and never commit secrets. If you suspect a secret was committed, rotate the Entra client secret immediately.
 - **RSS proxy is allowlisted.** `/api/proxy-rss` only fetches HTTPS URLs whose hostname is in a fixed `*.microsoft.com` set. Redirects are read manually (`redirect: 'manual'`) to prevent the proxy from being used to reach arbitrary hosts.
 - **MSRC input is validated.** `/api/msrc?monthId=...` rejects anything not matching `^\d{4}-[A-Za-z]{3}$` before forwarding to MSRC, preventing path injection.
 - **HTML from feeds is sanitized** with `isomorphic-dompurify` before render to mitigate stored XSS from upstream feeds.
 - **CSP for SVG images.** `next.config.js` enables inline SVG (`dangerouslyAllowSVG: true`) but pairs it with a strict CSP (`script-src 'none'; sandbox;`) and `Content-Disposition: attachment` to neutralize active content.
-- **Never use `NEXT_PUBLIC_` prefix for secrets.** Variables prefixed with `NEXT_PUBLIC_` are bundled into client JavaScript. Graph credentials must remain server-only.
+- **Console silencing in production** prevents accidental disclosure of upstream payloads via host log aggregation.
 
 If you find a security issue, please email the maintainer (see [Contact](#contact)) rather than opening a public issue.
 
@@ -492,20 +448,14 @@ If you find a security issue, please email the maintainer (see [Contact](#contac
 ## Troubleshooting
 
 **"Missing required environment variables: AZURE_CLIENT_ID, ..." at dev start.**
-You're in local dev mode (direct Graph access) without credentials. Either set them in `.env.local` and restart, or point `AZURE_API_URL` to your APIM instance instead.
-
-**`/message-center` shows "Something went wrong" (500) in production.**
-Check the API response at `/api/messages` for the upstream error. Common causes:
-
-- APIM Named Value `graph-client-secret` is expired or empty — update it in APIM portal.
-- Admin consent for `ServiceMessage.Read.All` was never granted on the app registration.
-- The APIM inbound policy is returning a null token (check `tokenResponse` variable in APIM tracing).
-
-**`InvalidAuthenticationToken: ArgumentNull` from Graph.**
-The token sent to Graph is `null` or empty. If using APIM, this means the token acquisition in the APIM policy failed. Verify APIM Named Values and that the app registration's client secret hasn't expired.
+You're in dev mode without Graph creds. Either set them in `.env.local` and restart, or set `NODE_ENV=production` if you intentionally want the app to boot with the Message Center disabled.
 
 **`/message-center` is empty in production.**
-The Graph request succeeded but returned no messages. Verify the app registration has `ServiceMessage.Read.All` (Application) permission with admin consent on the correct tenant.
+The Graph token request failed silently. Check Vercel function logs. Common causes:
+
+- `AZURE_CLIENT_SECRET` expired — generate a new one in Entra and update the env var.
+- Admin consent for `ServiceMessage.Read.All` was never granted.
+- Wrong tenant ID.
 
 **MSRC page shows "Failed to fetch CVEs for month".**
 The MSRC API occasionally rate-limits or 502s. Refresh; the route surfaces the upstream status.
