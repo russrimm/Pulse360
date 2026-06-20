@@ -36,9 +36,11 @@ npx playwright test --project=chromium     # Single browser
 
 The app aggregates Microsoft data from multiple sources:
 
-- **Server-side** (`src/lib/api.server.ts`): Authenticated calls to Microsoft Graph API using client credentials (AZURE_CLIENT_ID, AZURE_CLIENT_SECRET, AZURE_TENANT_ID). Imports `'server-only'` to enforce server boundary.
+- **Server-side** (`src/lib/api.server.ts`): Calls Microsoft Graph API through Azure API Management (APIM). In production (APIM mode), the app sends unauthenticated requests to APIM which handles token acquisition via Named Values. In local dev, the app can acquire tokens directly using `AZURE_CLIENT_ID`, `AZURE_CLIENT_SECRET`, `AZURE_TENANT_ID`. Imports `'server-only'` to enforce server boundary.
 - **Client-side** (`src/lib/api.client.ts`): Fetches from internal Next.js API routes (`/api/*`) that proxy and parse RSS/XML feeds.
-- **API routes** (`src/app/api/`): ~20 route handlers for proxying Microsoft RSS feeds (product news, blog feeds), MSRC security data, auth tokens, and message center data.
+- **API routes** (`src/app/api/`): ~20 route handlers for proxying Microsoft RSS feeds (product news, blog feeds), MSRC security data, and message center data.
+- **APIM mode detection**: When `AZURE_API_URL` points to a non-`graph.microsoft.com` host, the app skips local token acquisition (APIM handles auth). A `graphUrl(path, version)` helper builds URLs supporting both `/v1.0` and `/beta`.
+- **Pagination**: Graph API pagination is capped at 10 pages × 500 items to avoid serverless timeouts.
 
 ### Path Alias
 
@@ -65,12 +67,19 @@ The app aggregates Microsoft data from multiple sources:
 
 ## Environment Variables
 
-Required in `.env.local` for local development:
+### Production (APIM mode)
 
-- `AZURE_CLIENT_ID`
-- `AZURE_CLIENT_SECRET`
-- `AZURE_TENANT_ID`
-- `DATABASE_URL` (PostgreSQL connection string for Prisma)
+Only one env var is needed — APIM handles Graph auth:
+
+- `AZURE_API_URL` — APIM endpoint (e.g. `https://graphapirim.azure-api.net`)
+
+### Local development (direct mode)
+
+- `AZURE_CLIENT_ID` — Entra app registration client ID
+- `AZURE_TENANT_ID` — Directory (tenant) ID
+- `AZURE_CLIENT_SECRET` — Client secret value
+- `AZURE_API_URL` — Set to `https://graph.microsoft.com` (no version path)
+- `DATABASE_URL` — PostgreSQL connection string for Prisma (optional)
 
 ## Strict TypeScript
 
