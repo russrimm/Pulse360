@@ -3,13 +3,39 @@ import { M365Update, Message } from './types';
 import { XMLParser } from 'fast-xml-parser';
 
 // Base URL without version path — supports both /v1.0 and /beta
-const GRAPH_BASE_URL = process.env.AZURE_API_URL || 'https://graph.microsoft.com';
+const RAW_AZURE_API_URL = process.env.AZURE_API_URL?.trim();
+const DIRECT_GRAPH_BASE_URL = 'https://graph.microsoft.com';
+
+function normalizeApiBaseUrl(url?: string): string {
+  if (!url) {
+    return DIRECT_GRAPH_BASE_URL;
+  }
+
+  if (url.startsWith('http://') || url.startsWith('https://')) {
+    return url;
+  }
+
+  // Allow bare host values in env vars (common in local/codespaces setup)
+  return `https://${url}`;
+}
+
+function isGraphMicrosoftHost(url: string): boolean {
+  try {
+    const parsed = new URL(url);
+    return parsed.hostname.toLowerCase() === 'graph.microsoft.com';
+  } catch {
+    return false;
+  }
+}
+
+const GRAPH_BASE_URL = normalizeApiBaseUrl(RAW_AZURE_API_URL);
 const API_KEY = process.env.AZURE_CLIENT_SECRET;
 const TENANT_ID = process.env.AZURE_TENANT_ID;
 const CLIENT_ID = process.env.AZURE_CLIENT_ID;
+const hasLocalCredentials = Boolean(API_KEY && TENANT_ID && CLIENT_ID);
 
-// When AZURE_API_URL is set, APIM handles auth — no local credentials needed
-const isApimMode = !!process.env.AZURE_API_URL;
+// APIM mode applies only when AZURE_API_URL points to a non-Graph host.
+const isApimMode = Boolean(RAW_AZURE_API_URL) && !isGraphMicrosoftHost(GRAPH_BASE_URL);
 
 const isDev = process.env.NODE_ENV === 'development';
 
@@ -24,11 +50,28 @@ if (!isApimMode && process.env.NODE_ENV === 'development' && (!API_KEY || !TENAN
 }
 
 // In APIM mode, no local credentials required; otherwise check env vars
-const hasRequiredEnvVars = isApimMode || (API_KEY && TENANT_ID && CLIENT_ID);
+const hasRequiredEnvVars = isApimMode || hasLocalCredentials;
 
 /** Build a Graph API URL with version. Defaults to v1.0. */
-function graphUrl(path: string, version: 'v1.0' | 'beta' = 'v1.0'): string {
-  return `${GRAPH_BASE_URL}/${version}${path}`;
+function graphUrl(
+  path: string,
+  version: 'v1.0' | 'beta' = 'v1.0',
+  baseUrl = GRAPH_BASE_URL
+): string {
+  return `${baseUrl}/${version}${path}`;
+}
+
+function isEmptyAccessTokenGraphError(errorText: string): boolean {
+  try {
+    const parsed = JSON.parse(errorText) as {
+      error?: { code?: string; message?: string };
+    };
+    const code = parsed.error?.code ?? '';
+    const message = parsed.error?.message ?? '';
+    return code === 'InvalidAuthenticationToken' && /access token is empty/i.test(message);
+  } catch {
+    return /InvalidAuthenticationToken/i.test(errorText) && /access token is empty/i.test(errorText);
+  }
 }
 
 async function getToken(): Promise<string> {
@@ -82,7 +125,12 @@ async function getToken(): Promise<string> {
       );
     }
 
-    return data.access_token;
+    const accessToken = typeof data.access_token === 'string' ? data.access_token.trim() : '';
+    if (!accessToken) {
+      throw new Error('Azure AD returned an empty access_token.');
+    }
+
+    return accessToken;
   } catch (error) {
     throw error;
   }
@@ -121,7 +169,8 @@ export async function getMessages(): Promise<Message[]> {
   }
 
   try {
-    // In APIM mode, no token needed — APIM policy handles auth
+    // In APIM mode, no token needed initially — APIM policy should handle auth.
+    // If APIM returns an empty-token error, fallback to direct Graph with local creds.
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
     };
@@ -134,9 +183,11 @@ export async function getMessages(): Promise<Message[]> {
     }
 
     let allMessages: GraphApiMessage[] = [];
+    let requestBaseUrl = GRAPH_BASE_URL;
+    const firstPagePath = `/admin/serviceAnnouncement/messages?$top=500&$orderby=lastModifiedDateTime desc`;
+    let didFallbackToDirectGraph = false;
     const MAX_PAGES = 10;
-    let nextLink: string | undefined =
-      graphUrl(`/admin/serviceAnnouncement/messages?$top=500&$orderby=lastModifiedDateTime desc`);
+    let nextLink: string | undefined = graphUrl(firstPagePath, 'v1.0', requestBaseUrl);
 
     let pageCount = 0;
     while (nextLink && pageCount < MAX_PAGES) {
@@ -148,6 +199,25 @@ export async function getMessages(): Promise<Message[]> {
 
       if (!response.ok) {
         const errorText = await response.text();
+
+        const canFallbackToDirectGraph =
+          isApimMode &&
+          hasLocalCredentials &&
+          !didFallbackToDirectGraph &&
+          response.status === 401 &&
+          isEmptyAccessTokenGraphError(errorText);
+
+        if (canFallbackToDirectGraph) {
+          const token = await getToken();
+          headers['Authorization'] = `Bearer ${token}`;
+          requestBaseUrl = DIRECT_GRAPH_BASE_URL;
+          didFallbackToDirectGraph = true;
+          allMessages = [];
+          pageCount = 0;
+          nextLink = graphUrl(firstPagePath, 'v1.0', requestBaseUrl);
+          continue;
+        }
+
         throw new Error(
           `Failed to fetch messages: ${response.status} ${response.statusText} - ${errorText}`
         );
@@ -196,13 +266,27 @@ export async function getMessage(id: string): Promise<Message | null> {
       headers['Authorization'] = `Bearer ${token}`;
     }
 
-    const response = await fetch(
-      graphUrl(`/admin/serviceAnnouncement/messages?$filter=id eq '${id}'`),
-      {
-        headers,
-        next: { revalidate: 86400 },
+    const requestPath = `/admin/serviceAnnouncement/messages?$filter=id eq '${id}'`;
+    let requestBaseUrl = GRAPH_BASE_URL;
+    let response = await fetch(graphUrl(requestPath, 'v1.0', requestBaseUrl), {
+      headers,
+      next: { revalidate: 86400 },
+    });
+
+    if (isApimMode && hasLocalCredentials && response.status === 401) {
+      const errorText = await response.text();
+      if (isEmptyAccessTokenGraphError(errorText)) {
+        const token = await getToken();
+        headers['Authorization'] = `Bearer ${token}`;
+        requestBaseUrl = DIRECT_GRAPH_BASE_URL;
+        response = await fetch(graphUrl(requestPath, 'v1.0', requestBaseUrl), {
+          headers,
+          next: { revalidate: 86400 },
+        });
+      } else {
+        throw new Error(`Failed to fetch message: ${response.status} ${response.statusText}`);
       }
-    );
+    }
 
     if (!response.ok) {
       throw new Error(`Failed to fetch message: ${response.status} ${response.statusText}`);
