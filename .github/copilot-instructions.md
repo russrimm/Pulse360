@@ -25,7 +25,7 @@ npx playwright test --project=chromium     # Single browser
 
 ### Stack
 
-- **Next.js 15 App Router** with React 19, TypeScript, Tailwind CSS v4
+- **Next.js 16 App Router** with React 19, TypeScript, Tailwind CSS v4
 - **UI**: Shadcn UI + Radix UI primitives
 - **State**: Zustand (`src/components/filterStore.ts`) for client-side filter state; React Server Components for data fetching
 - **Database**: PostgreSQL via Prisma (schema at `prisma/schema.prisma`, generated client output to `src/generated/prisma`)

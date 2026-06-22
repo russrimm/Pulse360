@@ -1,11 +1,5 @@
 import { NextResponse } from 'next/server';
-import Parser from 'rss-parser';
-
-const parser = new Parser({
-  customFields: {
-    item: ['description', 'content:encoded', 'author', 'category']
-  }
-});
+import { XMLParser } from 'fast-xml-parser';
 
 // Helper to create a guaranteed unique ID
 function createUniqueId(item: any, index: number): string {
@@ -18,16 +12,28 @@ function createUniqueId(item: any, index: number): string {
 
 export async function GET() {
   try {
-    const feed = await parser.parseURL('https://azure.microsoft.com/en-us/blog/category/ai-machine-learning/feed/');
+    const response = await fetch('https://azure.microsoft.com/en-us/blog/category/ai-machine-learning/feed/', { cache: 'no-store' });
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
     
-    const news = feed.items.map((item: any, index: number) => ({
+    const xml = await response.text();
+    const parser = new XMLParser({
+      ignoreAttributes: false,
+      attributeNamePrefix: '@_',
+      parseTagValue: false,
+    });
+    
+    const result = parser.parse(xml) as any;
+    const items = result.rss?.channel?.item || [];
+    const itemArray = Array.isArray(items) ? items : [items];
+    
+    const news = itemArray.map((item: any, index: number) => ({
       id: item.guid || item.link || createUniqueId(item, index),
       title: item.title || '',
-      description: item.description || item.contentSnippet || '',
-      content: item['content:encoded'] || item.content || item.description || '',
+      description: item.description || '',
+      content: item['content:encoded'] || item.description || '',
       link: item.link || '',
       publishDate: item.pubDate ? new Date(item.pubDate).toISOString() : new Date().toISOString(),
-      author: item.author || item.creator || 'Azure Team',
+      author: item.author || item['dc:creator'] || 'Azure Team',
       categories: Array.isArray(item.category) ? item.category : (item.category ? [item.category] : ['AI + Machine Learning']),
       image: null
     }));
