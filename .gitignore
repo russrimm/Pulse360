@@ -50,3 +50,6 @@ node_modules/
 .claude/repowise-gate.cjs
 .claude/settings.json
 # repowise:end
+
+# Local dotfiles cache (not part of the repo)
+.dotfiles/.cache/
