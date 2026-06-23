@@ -204,6 +204,149 @@ Open <http://localhost:3000>. The root path redirects to `/home`.
 
 > **No env vars?** The app still boots in production mode and the Message Center endpoint returns an empty array. RSS-driven pages (Product News, AI Foundry News, etc.) work without any credentials. In development mode, missing Graph credentials throw at startup — set them or comment out the Message Center calls.
 
+## Reusable dotfiles
+
+This repo now includes a reusable dotfiles template set under `.dotfiles/templates/` and a sync script at `scripts/sync-dotfiles.mjs`.
+
+Supported files:
+
+- `.gitignore`
+- `.gitattributes`
+- `.nvmrc`
+- `.npmrc`
+- `.prettierrc`
+- `.cursorignore`
+- `.eslintrc.json`
+
+Sync to current repo (preview only):
+
+```bash
+npm run dotfiles:check
+```
+
+Sync to current repo (write missing files, keep differing files):
+
+```bash
+npm run dotfiles:sync
+```
+
+Sync to another repo and overwrite differences:
+
+```bash
+npm run dotfiles:sync -- --target ../another-repo --force
+```
+
+Auto-populate all repos under a parent folder (safe mode: no overwrites):
+
+```bash
+npm run dotfiles:sync:all
+```
+
+Auto-populate all repos and overwrite differing files:
+
+```bash
+npm run dotfiles:sync:all -- --force
+```
+
+Control scan depth when auto-populating:
+
+```bash
+npm run dotfiles:sync:all -- --max-depth 2
+```
+
+Sync only a subset:
+
+```bash
+npm run dotfiles:sync -- --target ../another-repo --files .gitignore,.nvmrc
+```
+
+List available files:
+
+```bash
+npm run dotfiles:sync -- --list
+```
+
+### Optional: bootstrap from a global dotfiles repo
+
+If you keep canonical templates in a separate repo, use the bootstrap script. It will:
+
+1. Clone (or update) your central dotfiles repo.
+2. Copy templates from that repo into `.dotfiles/templates/` in this project.
+3. Run the local sync script automatically.
+
+Set your repo URL once per shell:
+
+```bash
+export DOTFILES_REPO_URL=git@github.com:you/dotfiles.git
+```
+
+Bootstrap and sync this repo (dry run):
+
+```bash
+npm run dotfiles:bootstrap -- --dry-run
+```
+
+Bootstrap and sync this repo (apply changes):
+
+```bash
+npm run dotfiles:bootstrap -- --force
+```
+
+Bootstrap and auto-populate all repos under parent folder:
+
+```bash
+npm run dotfiles:bootstrap:all -- --force
+```
+
+Use a custom templates folder from the central repo:
+
+```bash
+npm run dotfiles:bootstrap -- --repo git@github.com:you/dotfiles.git --templates-path dotfiles/templates --force
+```
+
+### Bootstrap tools, extensions, skills, and agents
+
+Use the manifest-driven bootstrap script to enforce your full developer baseline:
+
+- CLI tools (apt packages)
+- npm global packages
+- VS Code extensions
+- Copilot user assets (skills, agents, prompts)
+- repo dotfile templates
+
+Manifest file:
+
+- `.dotfiles/bootstrap-manifest.json`
+
+Copilot user asset source folder:
+
+- `.dotfiles/copilot-user/`
+
+Run bootstrap in dry-run mode:
+
+```bash
+npm run dotfiles:bootstrap -- --repo git@github.com:you/dotfiles.git --all-repos --scan-root .. --dry-run
+```
+
+Apply bootstrap for all repos:
+
+```bash
+npm run dotfiles:bootstrap -- --repo git@github.com:you/dotfiles.git --all-repos --scan-root .. --force
+```
+
+Skip selected setup phases:
+
+```bash
+npm run dotfiles:bootstrap -- --repo git@github.com:you/dotfiles.git --all-repos --skip-tools --skip-extensions
+```
+
+Set your repo URL once:
+
+```bash
+export DOTFILES_REPO_URL=git@github.com:you/dotfiles.git
+npm run dotfiles:bootstrap -- --all-repos --scan-root .. --force
+```
+
 ---
 
 ## Configuration

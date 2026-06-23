@@ -1,0 +1,27 @@
+{
+  "aptPackages": [
+    "curl",
+    "git",
+    "gh"
+  ],
+  "npmGlobalPackages": [
+    {
+      "name": "pnpm",
+      "version": ">=9.0.0"
+    },
+    {
+      "name": "tsx",
+      "version": "latest"
+    }
+  ],
+  "vscodeExtensions": [
+    "github.copilot",
+    "github.copilot-chat",
+    "esbenp.prettier-vscode",
+    "dbaeumer.vscode-eslint"
+  ],
+  "copilotAssets": {
+    "copilot-instructions": ".instructions.md",
+    "agent-customizations": "agents/"
+  }
+}

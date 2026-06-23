@@ -101,7 +101,7 @@ export const MessageCard: React.FC<MessageCardProps> = ({ message, onClick }) =>
   const uniqueServices = Array.from(new Set(message.service.map(normalizeService)));
 
   return (
-    <Link href={`/message/${message.id}`} className="block min-w-0">
+    <Link href={`/message/${message.id}`} className="block min-w-0 h-full">
       <div onClick={handleClick} className="group bg-white/80 dark:bg-gray-800/50 backdrop-blur-sm rounded-xl shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-200 dark:border-gray-700/50 hover:border-primary-200 dark:hover:border-primary-800 hover:-translate-y-1 h-full cursor-pointer flex flex-col min-w-0 overflow-hidden">
         {/* Major Change banner at the very top */}
   <div className="min-h-[38px]">
@@ -252,7 +252,7 @@ export const MessageCard: React.FC<MessageCardProps> = ({ message, onClick }) =>
               })
               if (!hasImpact) return null
               return (
-                <div className="flex flex-col items-center gap-1 px-0 pt-2 pb-0">
+                <div className="mt-auto flex flex-col items-center gap-1 px-0 pt-2 pb-0 min-h-[40px] justify-end">
                   <span className="text-[10px] font-medium text-primary-600 dark:text-primary-400 mb-0.5 text-center">Impact</span>
                   <div className="flex flex-row gap-px">
                     {['user impact', 'admin impact'].map((impactType, idx, arr) => {

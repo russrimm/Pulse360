@@ -1,0 +1,14 @@
+{
+  "aptPackages": ["ripgrep", "jq"],
+  "npmGlobalPackages": [],
+  "vscodeExtensions": [
+    "github.copilot",
+    "github.copilot-chat",
+    "ms-playwright.playwright"
+  ],
+  "copilotAssets": {
+    "sourceDir": "copilot-user",
+    "targetEnvVar": "VSCODE_USER_PROMPTS_FOLDER",
+    "targetFallback": "~/.vscode-remote/data/User/prompts"
+  }
+}

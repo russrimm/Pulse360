@@ -10,7 +10,12 @@
     "lint:fix": "eslint . --fix",
     "type-check": "tsc --noEmit",
     "clean": "rimraf .next",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "dotfiles:sync": "node scripts/sync-dotfiles.mjs",
+    "dotfiles:check": "node scripts/sync-dotfiles.mjs --dry-run",
+    "dotfiles:sync:all": "node scripts/sync-dotfiles.mjs --all-repos --scan-root ..",
+    "dotfiles:bootstrap": "node scripts/bootstrap-dotfiles.mjs",
+    "dotfiles:bootstrap:all": "node scripts/bootstrap-dotfiles.mjs --all-repos --scan-root .."
   },
   "dependencies": {
     "@azure/msal-browser": "^4.27.0",
