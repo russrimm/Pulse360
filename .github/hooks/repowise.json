@@ -1,0 +1,13 @@
+{
+  "version": 1,
+  "hooks": {
+    "sessionStart": [
+      {
+        "type": "command",
+        "bash": "echo '{\"additionalContext\":\"RepoWise-first: before any codebase task, gather context from RepoWise first. Tier 1: RepoWise MCP graph tools (the \\\"RepoWise MCP for Pulse360\\\" MCP server; tools: find_symbol, get_symbol, get_impact, find_callers, find_references, batch_query) and LSP tools (lsp_definition, lsp_references, lsp_hover) for symbol resolution and blast radius. Tier 2: repowise-context/ files, starting with repowise-context/project-overview.md. Tier 3: native file search only when tiers 1-2 do not cover the question. If these tools are deferred in your environment, load them via tool search before calling.\"}' # repowise-managed",
+        "powershell": "echo '{\"additionalContext\":\"RepoWise-first: before any codebase task, gather context from RepoWise first. Tier 1: RepoWise MCP graph tools (the \\\"RepoWise MCP for Pulse360\\\" MCP server; tools: find_symbol, get_symbol, get_impact, find_callers, find_references, batch_query) and LSP tools (lsp_definition, lsp_references, lsp_hover) for symbol resolution and blast radius. Tier 2: repowise-context/ files, starting with repowise-context/project-overview.md. Tier 3: native file search only when tiers 1-2 do not cover the question. If these tools are deferred in your environment, load them via tool search before calling.\"}' # repowise-managed",
+        "timeoutSec": 10
+      }
+    ]
+  }
+}

@@ -45,3 +45,8 @@ node_modules/
 /playwright-report/
 /blob-report/
 /playwright/.cache/
+
+# repowise:start (managed by RepoWise, do not edit between markers)
+.claude/repowise-gate.cjs
+.claude/settings.json
+# repowise:end
