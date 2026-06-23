@@ -10,6 +10,7 @@ const ALLOWED_HOSTS = new Set([
   'powerplatform.microsoft.com',
   'www.microsoft.com',
   'microsoft.com',
+  'code.visualstudio.com',
 ]);
 
 export async function GET(req: NextRequest) {

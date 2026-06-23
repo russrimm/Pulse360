@@ -1,4 +1,3 @@
-'use client';
 import MessageCenterClient from '@/components/MessageCenterClient';
 
 export default function MessageCenterPage() {

@@ -45,12 +45,6 @@ const products = [
     current: false
   },
   {
-    name: 'Learn Blog',
-    icon: '/icons/m365.svg',
-    href: '/product-news/learn-blog',
-    current: false
-  },
-  {
     name: 'Microsoft News',
     icon: '/icons/Windows.svg',
     href: '/product-news/microsoft-news',

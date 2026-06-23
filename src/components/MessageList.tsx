@@ -5,8 +5,6 @@ import { MessageCard } from '@/components/MessageCard';
 import { ProductFilter } from '@/components/ProductFilter';
 import { Message } from '@/lib/types';
 import { useRouter } from 'next/navigation';
-import { LoadingSpinner } from './LoadingSpinner';
-import { SearchBar } from '@/components/SearchBar';
 import { TagsFilter } from '@/components/TagsFilter';
 import { addDays, isAfter, isBefore, parseISO, startOfDay, endOfDay, subDays } from 'date-fns';
 import { useFilterContext } from './FilterContext';
@@ -20,11 +18,10 @@ const ITEMS_PER_PAGE = 12;
 export function MessageList({ messages: messagesProp }: MessageListProps) {
   const messages = Array.isArray(messagesProp) ? messagesProp : [];
   const router = useRouter();
-  const [services, setServices] = useState<string[]>([]);
-  const [visibleMessages, setVisibleMessages] = useState<Message[]>([]);
   const [page, setPage] = useState(1);
   const observerRef = useRef<IntersectionObserver | null>(null);
   const loadMoreRef = useRef<HTMLDivElement>(null);
+  const isInitialMount = useRef(true);
   const [isLoading, setIsLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -91,20 +88,24 @@ export function MessageList({ messages: messagesProp }: MessageListProps) {
       .sort((a, b) => new Date(b.lastUpdated).getTime() - new Date(a.lastUpdated).getTime());
   }, [messages, searchQuery, selectedServices, selectedTags, showMajorChangesOnly, selectedDateFilter, customDateRange]);
 
-  // Handle loading state
+  // Derive services synchronously — no useEffect flash
+  const services = useMemo(
+    () => Array.from(new Set(messages.flatMap(m => m.service))).sort((a, b) => a.localeCompare(b)),
+    [messages]
+  );
+
+  // Handle loading state — skip skeleton on initial mount
   useEffect(() => {
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+      return;
+    }
     setIsLoading(true);
     const timer = requestAnimationFrame(() => {
       setIsLoading(false);
     });
     return () => cancelAnimationFrame(timer);
   }, [searchQuery, selectedServices, selectedTags]);
-
-  // Update available services
-  useEffect(() => {
-    const uniqueServices = Array.from(new Set(messages.flatMap(m => m.service))).sort((a, b) => a.localeCompare(b));
-    setServices(uniqueServices);
-  }, [messages]);
 
   // Update available tags only if necessary
   useEffect(() => {
@@ -116,18 +117,23 @@ export function MessageList({ messages: messagesProp }: MessageListProps) {
     // Do NOT reset selectedTags on every messages change
   }, [messages]);
 
-  // Update visible messages when page changes
+  // Derive visible messages synchronously — no useEffect flash
+  const visibleMessages = filteredMessages.slice(0, page * ITEMS_PER_PAGE);
+
+  // Reset to first page when filters/search changes
+  const prevFilteredLengthRef = useRef(filteredMessages.length);
   useEffect(() => {
-    const start = 0;
-    const end = page * ITEMS_PER_PAGE;
-    setVisibleMessages(filteredMessages.slice(start, end));
-  }, [filteredMessages, page]);
+    if (prevFilteredLengthRef.current !== filteredMessages.length) {
+      prevFilteredLengthRef.current = filteredMessages.length;
+      setPage(1);
+    }
+  }, [filteredMessages.length]);
 
   // Setup intersection observer for infinite scroll
   useEffect(() => {
     observerRef.current = new IntersectionObserver(
       (entries) => {
-        if (entries[0].isIntersecting && visibleMessages.length < filteredMessages.length) {
+        if (entries[0].isIntersecting && page * ITEMS_PER_PAGE < filteredMessages.length) {
           setPage(prev => prev + 1);
         }
       },
@@ -143,7 +149,7 @@ export function MessageList({ messages: messagesProp }: MessageListProps) {
         observerRef.current.disconnect();
       }
     };
-  }, [visibleMessages.length, filteredMessages.length]);
+  }, [page, filteredMessages.length]);
 
   const handleMessageClick = (messageId: string) => {
     router.push(`/message/${messageId}`);

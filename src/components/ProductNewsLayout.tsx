@@ -20,11 +20,6 @@ let products = [
     href: '/product-news/power-platform',
   },
   {
-    name: 'Microsoft Learn',
-    icon: '/icons/m365.svg',
-    href: '/product-news/learn-blog',
-  },
-  {
     name: 'Microsoft News',
     icon: (
       <svg aria-hidden="true" viewBox="0 0 25 25" fill="none" xmlns="http://www.w3.org/2000/svg" width={16} height={16} style={{display:'inline-block'}}>
