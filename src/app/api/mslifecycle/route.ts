@@ -95,11 +95,14 @@ async function fetchAndParseLifecycle(): Promise<{ rows: LifecycleRow[]; sourceU
     raw.push((row.values as CellVal[]).slice(1));
   });
 
-  // Find the header row (first row containing 'Product' or 'product')
+  // Find the header row (first row containing 'Product', 'ListingName', or similar)
   let headerIdx = 0;
   for (let i = 0; i < Math.min(10, raw.length); i++) {
     const row = raw[i];
-    if (row.some(c => cellToString(c).toLowerCase().includes('product'))) {
+    if (row.some(c => {
+      const v = cellToString(c).toLowerCase();
+      return v.includes('product') || v.includes('listingname') || v.includes('listing name');
+    })) {
       headerIdx = i;
       break;
     }
@@ -115,11 +118,11 @@ async function fetchAndParseLifecycle(): Promise<{ rows: LifecycleRow[]; sourceU
     return -1;
   };
 
-  const iProduct = colIdx(['product name', 'product']);
+  const iProduct = colIdx(['product name', 'listingname', 'listing name', 'product']);
   const iVersion = colIdx(['version', 'edition', 'release']);
-  const iCategory = colIdx(['category', 'type', 'family']);
+  const iCategory = colIdx(['category', 'type', 'family', 'azurefeature', 'azure feature']);
   const iStart = colIdx(['start date', 'general availability', 'launch date']);
-  const iEOS = colIdx(['end of support', 'mainstream end', 'support end']);
+  const iEOS = colIdx(['end of support', 'mainstream end', 'support end', 'enddate', 'end date']);
   const iExtended = colIdx(['extended', 'extended end']);
   const iRetirement = colIdx(['retirement', 'retired']);
 

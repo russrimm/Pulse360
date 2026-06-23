@@ -41,17 +41,6 @@ export function MessageList({ messages: messagesProp }: MessageListProps) {
     setShowMajorChangesOnly
   } = useFilterContext();
 
-  // Get unique tags
-  const uniqueTags = useMemo(() => {
-    const tags = new Set<string>();
-    messages.forEach(message => {
-      message.tags.forEach(tag => {
-        tags.add(tag);
-      });
-    });
-    return Array.from(tags).sort();
-  }, [messages]);
-
   // Filter and sort messages
   const filteredMessages = useMemo(() => {
     const MAINTENANCE_PHRASE = 'We have scheduled your Power Platform environment for planned service maintenance.';

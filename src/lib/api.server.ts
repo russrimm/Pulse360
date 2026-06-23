@@ -226,18 +226,18 @@ export async function getMessages(): Promise<Message[]> {
       }
 
       const data: GraphApiResponse = await response.json();
-      allMessages = [...allMessages, ...data.value];
+      allMessages = [...allMessages, ...(data.value ?? [])];
       nextLink = data['@odata.nextLink'];
     }
 
     return allMessages.map(message => ({
       id: message.id,
       title: message.title,
-      service: message.services,
+      service: message.services ?? [],
       lastUpdated: message.lastModifiedDateTime,
       published: message.startDateTime,
-      tags: message.tags,
-      content: message.body.content,
+      tags: message.tags ?? [],
+      content: message.body?.content ?? '',
       summary: message.details?.find(v => v.name === 'Summary')?.value || '',
       details: message.details || [],
       isMajorChange: message.isMajorChange || false,
@@ -303,11 +303,11 @@ export async function getMessage(id: string): Promise<Message | null> {
     return {
       id: message.id,
       title: message.title,
-      service: message.services,
+      service: message.services ?? [],
       lastUpdated: message.lastModifiedDateTime,
       published: message.startDateTime,
-      tags: message.tags,
-      content: message.body.content,
+      tags: message.tags ?? [],
+      content: message.body?.content ?? '',
       summary: message.details?.find(v => v.name === 'Summary')?.value || '',
       details:
         message.details?.filter(
