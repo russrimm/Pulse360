@@ -47,13 +47,25 @@ export default function MessageCenterClient() {
           </p>
         </div>
         {error && (
-          <div className="mb-6 rounded-lg border border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-900/20 p-4 text-center">
-            <p className="text-sm text-red-700 dark:text-red-300">
-              Unable to load messages: {error}
+          <div className="mb-6 rounded-lg border border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-900/20 p-4">
+            <p className="text-sm font-semibold text-red-700 dark:text-red-300 mb-1">
+              Unable to load messages
             </p>
+            <p className="text-xs text-red-600 dark:text-red-400 font-mono break-all mb-3">
+              {error}
+            </p>
+            {error.toLowerCase().includes('not configured') && (
+              <p className="text-xs text-red-600 dark:text-red-400 mb-3">
+                Set <code className="bg-red-100 dark:bg-red-900/40 px-1 rounded">AZURE_API_URL</code> (APIM) or{' '}
+                <code className="bg-red-100 dark:bg-red-900/40 px-1 rounded">AZURE_CLIENT_ID</code>{' '}+{' '}
+                <code className="bg-red-100 dark:bg-red-900/40 px-1 rounded">AZURE_TENANT_ID</code>{' '}+{' '}
+                <code className="bg-red-100 dark:bg-red-900/40 px-1 rounded">AZURE_CLIENT_SECRET</code>{' '}
+                in your Azure Static Web App application settings.
+              </p>
+            )}
             <button
               onClick={() => window.location.reload()}
-              className="mt-2 text-sm font-medium text-red-600 dark:text-red-400 hover:underline"
+              className="text-sm font-medium text-red-600 dark:text-red-400 hover:underline"
             >
               Try again
             </button>

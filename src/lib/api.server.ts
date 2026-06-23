@@ -167,7 +167,9 @@ interface GraphApiResponse {
 
 export async function getMessages(): Promise<Message[]> {
   if (!hasRequiredEnvVars) {
-    return [];
+    throw new Error(
+      'API not configured. Set AZURE_API_URL (APIM endpoint) or AZURE_CLIENT_ID + AZURE_TENANT_ID + AZURE_CLIENT_SECRET (direct Graph).'
+    );
   }
 
   try {
@@ -245,8 +247,7 @@ export async function getMessages(): Promise<Message[]> {
       severity: message.severity,
     }));
   } catch (error) {
-    if (isDev) throw error;
-    return [];
+    throw error;
   }
 }
 
