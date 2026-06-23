@@ -1,6 +1,6 @@
 'use client';
 
-import DOMPurify from 'isomorphic-dompurify';
+import sanitizeHtml from 'sanitize-html';
 import { SANITIZE_CONFIG } from '@/lib/feed/sanitize';
 
 interface SafeHtmlProps {
@@ -9,6 +9,6 @@ interface SafeHtmlProps {
 }
 
 export function SafeHtml({ html, className }: SafeHtmlProps) {
-  const sanitized = String(DOMPurify.sanitize(html, SANITIZE_CONFIG));
+  const sanitized = sanitizeHtml(html, SANITIZE_CONFIG);
   return <div className={className} dangerouslySetInnerHTML={{ __html: sanitized }} />;
 }

@@ -7,7 +7,7 @@ import { Card } from './Card';
 import { FiRefreshCw } from 'react-icons/fi'
 import { MdFiberNew } from 'react-icons/md'
 import { BsStars } from 'react-icons/bs'
-import DOMPurify from 'isomorphic-dompurify'
+import sanitizeHtml from 'sanitize-html'
 
 interface MessageCardProps {
   message: Message;
@@ -64,7 +64,7 @@ function getPreviewFromMessage(message: any, maxLength = 120): { preview: string
   else if (message?.bodyPreview) html = message.bodyPreview
   else if (typeof message.details === 'string') html = message.details
   else html = ''
-  const text = DOMPurify.sanitize(html, { ALLOWED_TAGS: [] }).replace(/\s+/g, ' ').trim()
+  const text = sanitizeHtml(html, { allowedTags: [] }).replace(/\s+/g, ' ').trim()
   if (text.length <= maxLength) return { preview: text, isTruncated: false }
   return { preview: text.slice(0, maxLength).trim(), isTruncated: true }
 }
@@ -76,14 +76,14 @@ function getHtmlPreviewFromMessage(message: any, maxLength = 120): { preview: st
   else if (typeof message.details === 'string') html = message.details
   else html = ''
   // Allow more tags for richer preview
-  const cleanHtml = DOMPurify.sanitize(html, {
-    ALLOWED_TAGS: [
+  const cleanHtml = sanitizeHtml(html, {
+    allowedTags: [
       'b', 'i', 'em', 'strong', 'a', 'br', 'p', 'ul', 'ol', 'li', 'span',
       'u', 'blockquote', 'code'
     ]
   })
   // Strip tags for length calculation
-  const text = DOMPurify.sanitize(cleanHtml, { ALLOWED_TAGS: [] }).replace(/\s+/g, ' ').trim()
+  const text = sanitizeHtml(cleanHtml, { allowedTags: [] }).replace(/\s+/g, ' ').trim()
   if (text.length <= maxLength) return { preview: cleanHtml, isTruncated: false }
   // Truncate text, then find where to cut the HTML
   const truncatedText = text.slice(0, maxLength).trim()
