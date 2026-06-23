@@ -13,29 +13,10 @@ module.exports = {
           css: {
             maxWidth: 'none',
             color: 'inherit',
-            a: {
-              color: 'inherit',
-              textDecoration: 'none',
-              fontWeight: '500',
-            },
-            strong: {
-              color: 'inherit',
-            },
-            code: {
-              color: 'inherit',
-            },
-            h1: {
-              color: 'inherit',
-            },
-            h2: {
-              color: 'inherit',
-            },
-            h3: {
-              color: 'inherit',
-            },
-            h4: {
-              color: 'inherit',
-            },
+            a: { color: 'inherit', textDecoration: 'none', fontWeight: '500' },
+            ...Object.fromEntries(
+              ['strong', 'code', 'h1', 'h2', 'h3', 'h4'].map((tag) => [tag, { color: 'inherit' }])
+            ),
           },
         },
       },

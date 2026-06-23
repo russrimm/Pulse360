@@ -1,0 +1,11 @@
+{
+  "universe_allowlist": [
+    "The Expanse"
+  ],
+  "active_universe": "The Expanse",
+  "capacity": 20,
+  "one_universe_per_assignment": true,
+  "scribe_exempt": true,
+  "ralph_exempt": true,
+  "rai_exempt": true
+}

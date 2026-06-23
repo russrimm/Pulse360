@@ -11,21 +11,9 @@ import { ReactQueryProvider } from '@/components/ReactQueryProvider'
 import { FilterProvider } from '@/components/FilterContext'
 
 import { Analytics } from "@vercel/analytics/next"
+import { SpeedInsights } from "@vercel/speed-insights/next"
 
-if (process.env.NODE_ENV === 'production') {
-  // eslint-disable-next-line no-console
-  // console.log = function () {}
-  // eslint-disable-next-line no-console
-  console.warn = function () {}
-  // eslint-disable-next-line no-console
-  console.error = function () {}
-  // eslint-disable-next-line no-console
-  console.info = function () {}
-  // eslint-disable-next-line no-console
-  console.debug = function () {}
-}
-
-const inter = Inter({ 
+const inter = Inter({
   subsets: ['latin'],
   display: 'swap',
   preload: true,
@@ -76,6 +64,7 @@ export default function RootLayout({
                     {children}
                   </main>
                   <Analytics />
+                  <SpeedInsights />
                 </div>
               </FilterProvider>
             </ErrorBoundary>

@@ -1,8 +1,6 @@
 'use client';
 import { useEffect, useState } from 'react';
-import { FilterProvider } from './FilterContext';
 import { HomeContent } from './HomeContent';
-import { getMessages } from '@/lib/api';
 import type { Message } from '@/lib/types';
 
 export default function MessageCenterClient() {
@@ -12,7 +10,14 @@ export default function MessageCenterClient() {
 
   useEffect(() => {
     fetch('/api/messages')
-      .then(res => res.json())
+      .then(res => {
+        if (!res.ok) {
+          return res.json().then(body => {
+            throw new Error(body.detail || body.error || `HTTP ${res.status}`);
+          });
+        }
+        return res.json();
+      })
       .then((msgs) => {
         if (Array.isArray(msgs)) {
           setMessages(msgs);
@@ -53,4 +58,4 @@ export default function MessageCenterClient() {
       </div>
     </div>
   );
-} 
+}

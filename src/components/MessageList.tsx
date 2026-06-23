@@ -57,9 +57,11 @@ export function MessageList({ messages: messagesProp }: MessageListProps) {
 
   // Filter and sort messages
   const filteredMessages = useMemo(() => {
+    const MAINTENANCE_PHRASE = 'We have scheduled your Power Platform environment for planned service maintenance.';
     return messages
       .filter(message => message.id !== 'MC1085084')
       .filter(message => message.title !== "Power Platform - Planned maintenance")
+      .filter(message => !message.content.includes(MAINTENANCE_PHRASE) && !message.title.includes(MAINTENANCE_PHRASE))
       .filter(message => {
         const matchesSearch = searchQuery === '' || 
           message.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -143,12 +145,6 @@ export function MessageList({ messages: messagesProp }: MessageListProps) {
     };
   }, [visibleMessages.length, filteredMessages.length]);
 
-  useEffect(() => {
-    console.log('openFilter changed:', openFilter);
-  }, [openFilter]);
-
-  // Remove patch effect for openFilter/selectedTags
-
   const handleMessageClick = (messageId: string) => {
     router.push(`/message/${messageId}`);
   };
@@ -200,7 +196,7 @@ export function MessageList({ messages: messagesProp }: MessageListProps) {
             <div className="relative w-full md:w-auto">
               <button
                 onClick={() => setOpenFilter(openFilter === 'date' ? null : 'date')}
-                className="flex items-center justify-center gap-2 px-4 min-h-[32px] w-full md:w-auto text-gray-700 dark:text-gray-200 bg-white/80 dark:bg-gray-800/50 backdrop-blur-sm border border-gray-200 dark:border-gray-700/50 rounded-lg shadow-[inset_0_2px_4px_rgba(0,0,0,0.05)] dark:shadow-[inset_0_2px_4px_rgba(0,0,0,0.2)] hover:shadow-[inset_0_2px_4px_rgba(0,0,0,0.1)] dark:hover:shadow-[inset_0_2px_4px_rgba(0,0,0,0.3)] hover:border-primary-200 dark:hover:border-primary-800 hover:shadow-[0_0_0_1px_rgba(59,130,246,0.5)] dark:hover:shadow-[0_0_0_1px_rgba(59,130,246,0.5)] transition-all duration-300 relative"
+                className="flex items-center justify-center gap-2 px-4 min-h-[32px] w-full md:w-auto text-gray-700 dark:text-gray-200 bg-white/80 dark:bg-gray-800/50 backdrop-blur-sm border border-gray-200 dark:border-gray-700/50 rounded-lg shadow-[inset_0_2px_4px_rgba(0,0,0,0.05)] dark:shadow-[inset_0_2px_4px_rgba(0,0,0,0.2)] hover:shadow-[0_0_0_1px_rgba(59,130,246,0.5)] dark:hover:shadow-[0_0_0_1px_rgba(59,130,246,0.5)] hover:border-primary-200 dark:hover:border-primary-800 transition-all duration-300 relative"
                 aria-label="Filter by date"
               >
                 <svg
@@ -312,7 +308,7 @@ export function MessageList({ messages: messagesProp }: MessageListProps) {
             <div className="w-full md:w-auto">
             <button
               onClick={() => setShowMajorChangesOnly(!showMajorChangesOnly)}
-                className={`flex items-center justify-center gap-2 px-4 min-h-[32px] w-full md:w-auto text-gray-700 dark:text-gray-200 bg-white/80 dark:bg-gray-800/50 backdrop-blur-sm border border-gray-200 dark:border-gray-700/50 rounded-lg shadow-[inset_0_2px_4px_rgba(0,0,0,0.05)] dark:shadow-[inset_0_2px_4px_rgba(0,0,0,0.2)] hover:shadow-[inset_0_2px_4px_rgba(0,0,0,0.1)] dark:hover:shadow-[inset_0_2px_4px_rgba(0,0,0,0.3)] hover:border-primary-200 dark:hover:border-primary-800 hover:shadow-[0_0_0_1px_rgba(59,130,246,0.5)] dark:hover:shadow-[0_0_0_1px_rgba(59,130,246,0.5)] transition-all duration-300 relative ${showMajorChangesOnly ? 'bg-red-50 dark:bg-red-900/30 border-red-200 dark:border-red-800 text-red-700 dark:text-red-300 animate-pulse-slow' : ''}`}
+                className={`flex items-center justify-center gap-2 px-4 min-h-[32px] w-full md:w-auto text-gray-700 dark:text-gray-200 bg-white/80 dark:bg-gray-800/50 backdrop-blur-sm border border-gray-200 dark:border-gray-700/50 rounded-lg shadow-[inset_0_2px_4px_rgba(0,0,0,0.05)] dark:shadow-[inset_0_2px_4px_rgba(0,0,0,0.2)] hover:shadow-[0_0_0_1px_rgba(59,130,246,0.5)] dark:hover:shadow-[0_0_0_1px_rgba(59,130,246,0.5)] hover:border-primary-200 dark:hover:border-primary-800 transition-all duration-300 relative ${showMajorChangesOnly ? 'bg-red-50 dark:bg-red-900/30 border-red-200 dark:border-red-800 text-red-700 dark:text-red-300 animate-pulse-slow' : ''}`}
               aria-label="Filter major changes"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

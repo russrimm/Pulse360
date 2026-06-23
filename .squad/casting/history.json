@@ -1,0 +1,15 @@
+{
+  "universe_usage": [
+    { "universe": "The Expanse", "used_at": "2026-06-20T11:38:29-05:00" }
+  ],
+  "assignments": [
+    {
+      "assignment_id": "pulse360-init-2026-06-20",
+      "universe": "The Expanse",
+      "created_at": "2026-06-20T11:38:29-05:00",
+      "names": ["Miller", "Naomi", "Amos", "Alex", "Bobbie"],
+      "shape": "lead + frontend + backend + data/integrations + tester",
+      "note": "Initial cast for Pulse 360° (Next.js Microsoft news portal)."
+    }
+  ]
+}

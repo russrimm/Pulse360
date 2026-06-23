@@ -1,6 +1,6 @@
 'use client';
 
-import { getCopilotStudioNews } from '@/lib/api';
+import { getCopilotStudioNews } from '@/lib/api.client';
 import { ProductNewsCard } from '@/components/ProductNewsCard';
 import Image from 'next/image';
 import Link from 'next/link';

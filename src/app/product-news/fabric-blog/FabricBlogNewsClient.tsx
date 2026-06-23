@@ -1,7 +1,7 @@
 'use client'
 
 import { useQuery } from '@tanstack/react-query'
-import { getFabricBlogNews } from '@/lib/api'
+import { getFabricBlogNews } from '@/lib/api.client'
 import { ProductNewsCard } from '@/components/ProductNewsCard'
 import type { ProductNews } from '@/lib/types'
 

@@ -1,12 +1,34 @@
 import React from 'react';
-import Parser from 'rss-parser';
+import { XMLParser } from 'fast-xml-parser';
 
 export const dynamic = 'force-dynamic';
 
-async function getFeed() {
-  const parser = new Parser();
-  const feed = await parser.parseURL('https://msrc.microsoft.com/blog/feed');
-  return feed.items;
+interface RssItem {
+  title: string;
+  link: string;
+  pubDate: string;
+  description?: string;
+}
+
+async function getFeed(): Promise<RssItem[]> {
+  try {
+    const response = await fetch('https://msrc.microsoft.com/blog/feed', { cache: 'no-store' });
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    
+    const xml = await response.text();
+    const parser = new XMLParser({
+      ignoreAttributes: false,
+      attributeNamePrefix: '@_',
+    });
+    
+    const result = parser.parse(xml) as any;
+    const items = result.rss?.channel?.item || [];
+    
+    // Normalize to array
+    return Array.isArray(items) ? items : [items];
+  } catch (error) {
+    return [];
+  }
 }
 
 export default async function MSRCBlogPage() {
@@ -20,11 +42,11 @@ export default async function MSRCBlogPage() {
     <div className="max-w-2xl mx-auto py-8 px-4">
       <h1 className="text-2xl font-bold mb-6 text-gray-900 dark:text-white dark:drop-shadow-md">Microsoft Security Response Center Blog</h1>
       <ul className="space-y-6">
-        {items.map(item => (
-          <li key={item.guid || item.link} className="border-b pb-4">
+        {items.map((item, index) => (
+          <li key={item.guid || item.link || index} className="border-b pb-4">
             <a href={item.link} target="_blank" rel="noopener noreferrer" className="text-lg font-semibold text-primary-700 dark:text-primary-200 hover:underline">{item.title}</a>
             <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">{item.pubDate && new Date(item.pubDate).toLocaleDateString()}</div>
-            {item.contentSnippet && <p className="mt-2 text-gray-700 dark:text-gray-300 text-sm">{item.contentSnippet}</p>}
+            {item.description && <p className="mt-2 text-gray-700 dark:text-gray-300 text-sm">{item.description}</p>}
           </li>
         ))}
       </ul>

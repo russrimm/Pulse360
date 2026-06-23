@@ -101,10 +101,10 @@ export const MessageCard: React.FC<MessageCardProps> = ({ message, onClick }) =>
   const uniqueServices = Array.from(new Set(message.service.map(normalizeService)));
 
   return (
-    <Link href={`/message/${message.id}`}>
-      <div onClick={handleClick} className="group bg-white/80 dark:bg-gray-800/50 backdrop-blur-sm rounded-xl shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-200 dark:border-gray-700/50 hover:border-primary-200 dark:hover:border-primary-800 hover:-translate-y-1 h-full cursor-pointer flex flex-col">
+    <Link href={`/message/${message.id}`} className="block min-w-0 h-full">
+      <div onClick={handleClick} className="group bg-white/80 dark:bg-gray-800/50 backdrop-blur-sm rounded-xl shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-200 dark:border-gray-700/50 hover:border-primary-200 dark:hover:border-primary-800 hover:-translate-y-1 h-full cursor-pointer flex flex-col min-w-0 overflow-hidden">
         {/* Major Change banner at the very top */}
-        <div style={{ minHeight: 38 }}>
+  <div className="min-h-[38px]">
           {message.isMajorChange ? (
             <div className="w-full bg-red-50 dark:bg-red-900/30 border-b border-red-200 dark:border-red-800 animate-pulse-subtle">
               <div className="flex items-center justify-center py-1.5">
@@ -117,13 +117,13 @@ export const MessageCard: React.FC<MessageCardProps> = ({ message, onClick }) =>
               </div>
             </div>
           ) : (
-            <div style={{ height: 38 }} />
+            <div className="h-[38px]" />
           )}
         </div>
         {/* Message ID and service badges row (now just below banner) */}
-        <div className="w-full flex items-start justify-between relative px-4 pt-2">
-          <div className="flex items-center gap-2">
-            <span className="text-xs font-semibold text-blue-700 dark:text-blue-300">{message.id}</span>
+        <div className="w-full flex items-start justify-between relative px-4 pt-2 gap-2 min-w-0">
+          <div className="flex items-center gap-2 min-w-0 flex-wrap">
+            <span className="text-xs font-semibold text-blue-700 dark:text-blue-300 break-all max-w-[120px]">{message.id}</span>
             {(() => {
               const isNew = message.tags.some(tag => tag.toLowerCase().includes('new feature'))
               const isUpdated = message.tags.some(tag => tag.toLowerCase().includes('update'))
@@ -133,27 +133,24 @@ export const MessageCard: React.FC<MessageCardProps> = ({ message, onClick }) =>
                 <>
                   {isNew && (
                     <span
-                      className="inline-flex items-center justify-center px-3 py-0.5 rounded-full text-xs font-semibold tracking-wide whitespace-nowrap shadow-sm border bg-emerald-50 text-emerald-700 dark:bg-emerald-900/20 dark:text-emerald-200 border-emerald-200/70 dark:border-emerald-700/70"
+                      className="inline-flex items-center justify-center px-3 py-0.5 rounded-full text-xs font-semibold tracking-wide whitespace-nowrap shadow-sm border bg-emerald-50 text-emerald-700 dark:bg-emerald-900/20 dark:text-emerald-200 border-emerald-200/70 dark:border-emerald-700/70 overflow-hidden text-ellipsis"
                       title="New"
-                      style={{textOverflow:'ellipsis',overflow:'hidden'}}
                     >
                       New
                     </span>
                   )}
                   {isUpdated && (
                     <span
-                      className="inline-flex items-center justify-center px-3 py-0.5 rounded-full text-xs font-semibold tracking-wide whitespace-nowrap shadow-sm border bg-teal-50 text-teal-700 dark:bg-teal-900/20 dark:text-teal-200 border-teal-200/70 dark:border-teal-700/70 ml-1"
+                      className="inline-flex items-center justify-center px-3 py-0.5 rounded-full text-xs font-semibold tracking-wide whitespace-nowrap shadow-sm border bg-teal-50 text-teal-700 dark:bg-teal-900/20 dark:text-teal-200 border-teal-200/70 dark:border-teal-700/70 ml-1 overflow-hidden text-ellipsis"
                       title="Updated"
-                      style={{textOverflow:'ellipsis',overflow:'hidden'}}
                     >
                       Updated
                     </span>
                   )}
                   {isRetirement && (
                     <span
-                      className="inline-flex items-center justify-center px-3 py-0.5 rounded-full text-xs font-semibold tracking-wide whitespace-nowrap shadow-sm border bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-200 border-red-400 ml-1"
+                      className="inline-flex items-center justify-center px-3 py-0.5 rounded-full text-xs font-semibold tracking-wide whitespace-nowrap shadow-sm border bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-200 border-red-400 ml-1 overflow-hidden text-ellipsis"
                       title="Deprecation"
-                      style={{textOverflow:'ellipsis',overflow:'hidden'}}
                     >
                       <svg className="w-3.5 h-3.5 mr-1 text-red-500 dark:text-red-300" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
                       Deprecation
@@ -163,11 +160,11 @@ export const MessageCard: React.FC<MessageCardProps> = ({ message, onClick }) =>
               )
             })()}
           </div>
-          <div className="flex flex-col items-end gap-y-0.5">
+          <div className="flex flex-col items-end gap-y-0.5 min-w-0">
             {uniqueServices.length > 0 && uniqueServices.map((service) => (
               <span
                 key={service}
-                className="text-blue-700 dark:text-blue-200 px-1 py-0.5 text-xs font-medium flex items-center gap-1 z-10 w-32 justify-center"
+                className="text-blue-700 dark:text-blue-200 px-1 py-0.5 text-xs font-medium flex items-center gap-1 z-10 w-32 justify-center truncate"
               >
                 {(() => {
                   const iconPath = service.startsWith('Microsoft 365') ? '/icons/m365.svg' : serviceIcons[service]
@@ -212,8 +209,7 @@ export const MessageCard: React.FC<MessageCardProps> = ({ message, onClick }) =>
                       return (
                         <span
                           key={tag}
-                          className={`inline-flex items-center min-w-0 max-w-[120px] justify-center px-2.5 py-0.5 rounded-full text-[11px] font-medium tracking-wide whitespace-nowrap shrink shadow-sm hover:shadow transition-all duration-200 ${pillClass}`}
-                          style={{textOverflow:'ellipsis',overflow:'hidden'}}>
+                          className={`inline-flex items-center min-w-0 max-w-[120px] justify-center px-2.5 py-0.5 rounded-full text-[11px] font-medium tracking-wide whitespace-nowrap shrink shadow-sm hover:shadow transition-all duration-200 overflow-hidden text-ellipsis ${pillClass}`}>
                           {pillText}
                         </span>
                       )
@@ -234,7 +230,9 @@ export const MessageCard: React.FC<MessageCardProps> = ({ message, onClick }) =>
               </div>
               <div>
                 <div className="flex items-center gap-2">
-                  <h3 className="text-sm font-medium text-gray-900 dark:text-white group-hover:text-primary-700 dark:group-hover:text-primary-400 transition-colors tracking-tight text-center">{message.title}</h3>
+                  <h3 className="text-sm font-medium text-gray-900 dark:text-white group-hover:text-primary-700 dark:group-hover:text-primary-400 transition-colors tracking-tight text-center break-words overflow-hidden">
+                    {message.title}
+                  </h3>
                   {message.severity && message.severity.toLowerCase() !== 'normal' && (
                     <span
                       className="inline-block px-2 py-0.5 rounded-full text-xs font-semibold border ml-1 bg-red-100 text-red-800 border-red-300 dark:bg-red-900/30 dark:text-red-200 dark:border-red-700"
@@ -254,7 +252,7 @@ export const MessageCard: React.FC<MessageCardProps> = ({ message, onClick }) =>
               })
               if (!hasImpact) return null
               return (
-                <div className="flex flex-col items-center gap-1 px-0 pt-2 pb-0">
+                <div className="mt-auto flex flex-col items-center gap-1 px-0 pt-2 pb-0 min-h-[40px] justify-end">
                   <span className="text-[10px] font-medium text-primary-600 dark:text-primary-400 mb-0.5 text-center">Impact</span>
                   <div className="flex flex-row gap-px">
                     {['user impact', 'admin impact'].map((impactType, idx, arr) => {
@@ -275,8 +273,7 @@ export const MessageCard: React.FC<MessageCardProps> = ({ message, onClick }) =>
                       return (
                         <React.Fragment key={impactType}>
                           <span
-                            className={`inline-flex items-center justify-center w-8 h-4 px-1 py-0 rounded-md text-[9px] tracking-wide whitespace-nowrap shadow-lg transition-all duration-200 ${pillClass} ${borderClass}`}
-                            style={{textOverflow:'ellipsis',overflow:'hidden'}}>
+                            className={`inline-flex items-center justify-center w-8 h-4 px-1 py-0 rounded-md text-[9px] tracking-wide whitespace-nowrap shadow-lg transition-all duration-200 overflow-hidden text-ellipsis ${pillClass} ${borderClass}`}>
                             {pillText}
                           </span>
                           {idx === 0 && arr.length > 1 && message.tags.find(t => t.toLowerCase().includes('admin impact')) && (

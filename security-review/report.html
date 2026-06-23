@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Pulse 360° — End-to-End Security Review</title>
+<style>
+  @page { size: A4; margin: 18mm 16mm 20mm 16mm; }
+  * { box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    color: #1f2937;
+    font-size: 10.5pt;
+    line-height: 1.45;
+    margin: 0;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  h1 { font-size: 26pt; margin: 0 0 6pt; color: #0f172a; letter-spacing: -0.5px; }
+  h2 { font-size: 16pt; margin: 24pt 0 10pt; padding-bottom: 4pt; border-bottom: 2px solid #e5e7eb; color: #0f172a; page-break-after: avoid; }
+  h3 { font-size: 12pt; margin: 14pt 0 6pt; color: #111827; page-break-after: avoid; }
+  h4 { font-size: 10.5pt; margin: 10pt 0 4pt; color: #1f2937; }
+  p { margin: 6pt 0; }
+  code { background: #f3f4f6; padding: 1pt 4pt; border-radius: 3px; font-family: "Consolas", "Monaco", monospace; font-size: 9pt; color: #0f172a; }
+  pre { background: #0f172a; color: #e2e8f0; padding: 10pt; border-radius: 6px; overflow-x: auto; font-size: 8.5pt; line-height: 1.5; white-space: pre-wrap; word-wrap: break-word; }
+  pre code { background: transparent; color: inherit; padding: 0; }
+  ul, ol { margin: 6pt 0; padding-left: 20pt; }
+  li { margin: 2pt 0; }
+
+  .cover {
+    page-break-after: always;
+    text-align: center;
+    padding-top: 80mm;
+  }
+  .cover .title { font-size: 36pt; font-weight: 800; color: #0f172a; letter-spacing: -1px; }
+  .cover .subtitle { font-size: 16pt; color: #4b5563; margin-top: 8pt; font-weight: 300; }
+  .cover .meta { margin-top: 60pt; color: #6b7280; font-size: 10pt; }
+  .cover .badge { display: inline-block; margin-top: 30pt; padding: 8pt 16pt; background: #dc2626; color: white; border-radius: 999px; font-weight: 600; font-size: 10pt; }
+
+  .summary-box {
+    background: #f8fafc;
+    border-left: 4px solid #6366f1;
+    padding: 10pt 14pt;
+    border-radius: 4px;
+    margin: 10pt 0;
+  }
+
+  table { width: 100%; border-collapse: collapse; margin: 8pt 0; font-size: 9.5pt; }
+  th { background: #1e293b; color: white; padding: 6pt 8pt; text-align: left; font-weight: 600; }
+  td { padding: 5pt 8pt; border-bottom: 1px solid #e5e7eb; vertical-align: top; }
+  tr:nth-child(even) td { background: #f9fafb; }
+
+  .sev-badge {
+    display: inline-block;
+    padding: 2pt 8pt;
+    border-radius: 4px;
+    font-weight: 700;
+    font-size: 8.5pt;
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
+    color: white;
+    white-space: nowrap;
+  }
+  .sev-critical { background: #991b1b; }
+  .sev-high     { background: #dc2626; }
+  .sev-medium   { background: #d97706; }
+  .sev-low      { background: #2563eb; }
+
+  .finding {
+    border: 1px solid #e5e7eb;
+    border-left-width: 5px;
+    border-radius: 6px;
+    padding: 12pt 14pt;
+    margin: 12pt 0;
+    page-break-inside: avoid;
+    background: #ffffff;
+  }
+  .finding.critical { border-left-color: #991b1b; background: #fef2f2; }
+  .finding.high     { border-left-color: #dc2626; background: #fff5f5; }
+  .finding.medium   { border-left-color: #d97706; background: #fffbeb; }
+  .finding.low      { border-left-color: #2563eb; background: #eff6ff; }
+
+  .finding h3 { margin-top: 0; display: flex; align-items: center; gap: 8pt; }
+  .finding .meta-grid { display: grid; grid-template-columns: max-content 1fr; gap: 2pt 12pt; font-size: 9pt; color: #4b5563; margin: 6pt 0; }
+  .finding .meta-grid .label { font-weight: 600; color: #374151; }
+
+  .stat-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10pt;
+    margin: 12pt 0;
+  }
+  .stat-card {
+    padding: 12pt;
+    border-radius: 6px;
+    text-align: center;
+    color: white;
+  }
+  .stat-card .count { font-size: 24pt; font-weight: 800; line-height: 1; }
+  .stat-card .label { font-size: 9pt; margin-top: 4pt; text-transform: uppercase; letter-spacing: 0.5px; opacity: 0.95; }
+
+  .phase {
+    background: #f1f5f9;
+    border-radius: 6px;
+    padding: 10pt 14pt;
+    margin: 10pt 0;
+    page-break-inside: avoid;
+  }
+  .phase h3 { margin-top: 0; color: #0369a1; }
+  .phase ul { margin: 4pt 0; }
+
+  .toc { columns: 1; }
+  .toc ol { padding-left: 16pt; }
+  .toc li { padding: 1pt 0; }
+
+  .footer-note {
+    font-size: 8pt;
+    color: #6b7280;
+    font-style: italic;
+    margin-top: 8pt;
+  }
+</style>
+</head>
+<body>
+
+<!-- COVER PAGE -->
+<div class="cover">
+  <div class="title">Pulse 360°</div>
+  <div class="subtitle">End-to-End Security Review</div>
+  <div class="badge">42 NPM CVEs · 4 CRITICAL APP ISSUES</div>
+  <div class="meta">
+    Russ Rimmerman · Repository: russrimm/Pulse360 · Branch: russ<br>
+    Generated: June 19, 2026<br>
+    Scope: Source code, dependencies, configuration, deployment surface
+  </div>
+</div>
+
+<!-- EXECUTIVE SUMMARY -->
+<h2>Executive Summary</h2>
+<p>Pulse 360° is a publicly-accessible Next.js 16 application that surfaces Microsoft 365 Message Center data, release plans, security advisories, and product news via Microsoft Graph and assorted RSS feeds. This review examined the source on the <code>russ</code> branch (matches the live <code>mspulse360.app</code> deployment) and produced 20 findings across application code, dependencies, deployment configuration, and operational hygiene.</p>
+
+<div class="stat-grid">
+  <div class="stat-card" style="background:#991b1b;"><div class="count">4</div><div class="label">Critical</div></div>
+  <div class="stat-card" style="background:#dc2626;"><div class="count">5</div><div class="label">High</div></div>
+  <div class="stat-card" style="background:#d97706;"><div class="count">7</div><div class="label">Medium</div></div>
+  <div class="stat-card" style="background:#2563eb;"><div class="count">4</div><div class="label">Low</div></div>
+</div>
+
+<div class="summary-box">
+<strong>Single most urgent finding:</strong> The Azure AD client secret, tenant ID, and client ID are all stored as <code>NEXT_PUBLIC_*</code> environment variables. Next.js bundles every <code>NEXT_PUBLIC_*</code> value into the client-side JavaScript that ships to the browser. <em>Anyone who visits mspulse360.app can extract these credentials from view-source and use them to authenticate to Microsoft Graph as the application service principal indefinitely</em>, until the secret is rotated. This is the #1 priority remediation item and must be fixed before any other work.
+</div>
+
+<h3>Top 3 things to fix this week</h3>
+<ol>
+  <li><strong>Move all secrets off the client.</strong> Rename <code>NEXT_PUBLIC_API_KEY</code>, <code>NEXT_PUBLIC_TENANT_ID</code>, <code>NEXT_PUBLIC_CLIENT_ID</code> to non-public names. Rotate the secret in Azure immediately because it is currently shipping to every visitor.</li>
+  <li><strong>Lock down or remove <code>/api/proxy-rss</code>.</strong> It is a textbook open SSRF — any user can have the server fetch any URL including cloud metadata endpoints.</li>
+  <li><strong>Apply security headers and run <code>npm audit fix</code>.</strong> 4 critical and 19 high CVEs are sitting in <code>node_modules</code>, including Next.js cache poisoning and XSS bypasses.</li>
+</ol>
+
+<h2>Findings — Prioritized</h2>
+
+<table>
+  <thead>
+    <tr><th style="width:24pt">#</th><th style="width:60pt">Severity</th><th>Issue</th><th style="width:80pt">Category</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>1</td><td><span class="sev-badge sev-critical">Critical</span></td><td>Azure AD client secret exposed to browser via <code>NEXT_PUBLIC_*</code> prefix</td><td>Secrets</td></tr>
+    <tr><td>2</td><td><span class="sev-badge sev-critical">Critical</span></td><td>Open SSRF in <code>/api/proxy-rss</code> — unrestricted server-side URL fetch</td><td>API</td></tr>
+    <tr><td>3</td><td><span class="sev-badge sev-critical">Critical</span></td><td>OAuth client-credentials flow runs in shared module — auth logic reachable from client bundle</td><td>Auth</td></tr>
+    <tr><td>4</td><td><span class="sev-badge sev-critical">Critical</span></td><td>5 critical &amp; 19 high CVEs in npm dependencies (Next.js, ws, lodash, minimatch, xlsx)</td><td>Deps</td></tr>
+    <tr><td>5</td><td><span class="sev-badge sev-high">High</span></td><td>No global security headers (HSTS, CSP, X-Frame-Options, Referrer-Policy, Permissions-Policy)</td><td>Headers</td></tr>
+    <tr><td>6</td><td><span class="sev-badge sev-high">High</span></td><td><code>dangerouslyAllowSVG: true</code> in next/image config — SVG XSS surface</td><td>XSS</td></tr>
+    <tr><td>7</td><td><span class="sev-badge sev-high">High</span></td><td>8 components use <code>dangerouslySetInnerHTML</code> with no DOMPurify sanitization (installed but unused)</td><td>XSS</td></tr>
+    <tr><td>8</td><td><span class="sev-badge sev-high">High</span></td><td>No rate limiting on any of 18 API routes</td><td>DoS</td></tr>
+    <tr><td>9</td><td><span class="sev-badge sev-high">High</span></td><td>No authentication on any API route — Graph data, RSS proxies all publicly callable</td><td>AuthZ</td></tr>
+    <tr><td>10</td><td><span class="sev-badge sev-medium">Medium</span></td><td>Misnamed <code>..env</code> file holding a real secret is NOT gitignored</td><td>Secrets</td></tr>
+    <tr><td>11</td><td><span class="sev-badge sev-medium">Medium</span></td><td>Error responses disclose env var names and hint about Azure AD</td><td>Info Disc</td></tr>
+    <tr><td>12</td><td><span class="sev-badge sev-medium">Medium</span></td><td>No CSRF protection on state-changing routes (currently none, but a footgun for future)</td><td>CSRF</td></tr>
+    <tr><td>13</td><td><span class="sev-badge sev-medium">Medium</span></td><td>Path-injection vector in <code>/api/msrc?monthId=</code> — value concatenated into URL</td><td>API</td></tr>
+    <tr><td>14</td><td><span class="sev-badge sev-medium">Medium</span></td><td>No CORS policy declared — relies entirely on Next.js defaults</td><td>CORS</td></tr>
+    <tr><td>15</td><td><span class="sev-badge sev-medium">Medium</span></td><td>Static client secret with no documented rotation policy</td><td>Secrets</td></tr>
+    <tr><td>16</td><td><span class="sev-badge sev-medium">Medium</span></td><td>Production blanket-overrides all <code>console.*</code> methods — silences security-relevant errors</td><td>Logging</td></tr>
+    <tr><td>17</td><td><span class="sev-badge sev-low">Low</span></td><td><code>xlsx</code> package with known unfixed prototype pollution shipped in bundle</td><td>Deps</td></tr>
+    <tr><td>18</td><td><span class="sev-badge sev-low">Low</span></td><td>No Subresource Integrity (SRI) on remote image / asset references</td><td>Integrity</td></tr>
+    <tr><td>19</td><td><span class="sev-badge sev-low">Low</span></td><td>Image <code>remotePatterns</code> uses overly broad <code>pathname: '**'</code> on Microsoft hosts</td><td>SSRF</td></tr>
+    <tr><td>20</td><td><span class="sev-badge sev-low">Low</span></td><td>Generic try/catch in API routes swallows root cause — hampers post-incident forensics</td><td>Logging</td></tr>
+  </tbody>
+</table>
+
+<!-- DETAILED FINDINGS -->
+<h2>Detailed Findings</h2>
+
+<div class="finding critical">
+  <h3><span class="sev-badge sev-critical">Critical</span> #1 — Azure AD client secret exposed to browser via NEXT_PUBLIC_ prefix</h3>
+  <div class="meta-grid">
+    <span class="label">Files</span><span><code>src/lib/api.ts</code> · <code>.env.local</code> · <code>..env</code></span>
+    <span class="label">CWE</span><span>CWE-798 (Hard-coded Credentials), CWE-200 (Information Exposure)</span>
+    <span class="label">Effort</span><span>~30 minutes + secret rotation</span>
+  </div>
+  <h4>Issue</h4>
+  <p>In Next.js, any environment variable prefixed with <code>NEXT_PUBLIC_</code> is statically inlined into the client-side JavaScript bundle. The current <code>.env.local</code> stores the Azure AD client secret, tenant ID, and client ID under <code>NEXT_PUBLIC_API_KEY</code>, <code>NEXT_PUBLIC_TENANT_ID</code>, and <code>NEXT_PUBLIC_CLIENT_ID</code>. <code>src/lib/api.ts</code> reads these values, so they end up in any bundle that imports it.</p>
+  <p>Anyone who visits the deployed site can open browser DevTools → Sources, search for the client ID, and read the secret in plain text. With those three values they can independently mint Graph API tokens as the app's service principal.</p>
+  <h4>Fix</h4>
+  <pre><code># .env.local (rename ALL three; remove NEXT_PUBLIC_ prefix)
+AZURE_CLIENT_ID=32c72b33-...
+AZURE_TENANT_ID=f33d7d7f-...
+AZURE_CLIENT_SECRET=&lt;new rotated value&gt;</code></pre>
+  <p>Then in <code>src/lib/api.ts</code>:</p>
+  <pre><code>const CLIENT_ID = process.env.AZURE_CLIENT_ID;
+const TENANT_ID = process.env.AZURE_TENANT_ID;
+const API_KEY   = process.env.AZURE_CLIENT_SECRET;</code></pre>
+  <p>This file is only imported by server-side route handlers (<code>app/api/*/route.ts</code>), so server-only env vars work fine. Verify after the change by running <code>npm run build</code> then grep the <code>.next/static</code> output — the secret must not appear.</p>
+  <p><strong>Critically:</strong> rotate the existing secret in Azure Portal NOW, regardless of whether you ship the rename today. The current secret is in production bundles.</p>
+</div>
+
+<div class="finding critical">
+  <h3><span class="sev-badge sev-critical">Critical</span> #2 — Open SSRF in /api/proxy-rss</h3>
+  <div class="meta-grid">
+    <span class="label">File</span><span><code>src/app/api/proxy-rss/route.ts</code></span>
+    <span class="label">CWE</span><span>CWE-918 (Server-Side Request Forgery)</span>
+    <span class="label">Effort</span><span>~1 hour</span>
+  </div>
+  <h4>Issue</h4>
+  <p>The route accepts a <code>url</code> query parameter and fetches it server-side with no validation:</p>
+  <pre><code>const url = searchParams.get('url');
+const res = await fetch(url);</code></pre>
+  <p>This lets any unauthenticated visitor:</p>
+  <ul>
+    <li>Probe internal network ranges (10.x, 192.168.x, 172.16-31.x)</li>
+    <li>Hit cloud metadata endpoints (Azure IMDS at <code>http://169.254.169.254/metadata/instance</code>)</li>
+    <li>Read local files via <code>file://</code> (depending on fetch runtime)</li>
+    <li>Use the server as a relay to mask the attacker's IP when attacking third parties</li>
+    <li>Cause egress traffic that pivots into Vercel/Microsoft infrastructure</li>
+  </ul>
+  <h4>Fix</h4>
+  <pre><code>const ALLOWED_HOSTS = new Set([
+  'devblogs.microsoft.com',
+  'blogs.windows.com',
+  'blogs.microsoft.com',
+  // ... explicit allowlist
+]);
+
+const url = searchParams.get('url');
+if (!url) return new NextResponse('Missing url', { status: 400 });
+
+let parsed: URL;
+try { parsed = new URL(url); } catch { return new NextResponse('Invalid url', { status: 400 }); }
+if (parsed.protocol !== 'https:') return new NextResponse('Only https allowed', { status: 400 });
+if (!ALLOWED_HOSTS.has(parsed.hostname)) return new NextResponse('Host not allowed', { status: 403 });
+
+const res = await fetch(parsed.toString(), { redirect: 'manual' });</code></pre>
+  <p>Even better: replace this route with per-feed routes (you already have most of them). The proxy route appears to exist for arbitrary client-supplied feeds — if no current page actually needs that, delete the route entirely.</p>
+</div>
+
+<div class="finding critical">
+  <h3><span class="sev-badge sev-critical">Critical</span> #3 — OAuth client-credentials logic in module shared between server and client</h3>
+  <div class="meta-grid">
+    <span class="label">File</span><span><code>src/lib/api.ts</code></span>
+    <span class="label">CWE</span><span>CWE-522 (Insufficiently Protected Credentials)</span>
+    <span class="label">Effort</span><span>~2 hours</span>
+  </div>
+  <h4>Issue</h4>
+  <p><code>src/lib/api.ts</code> contains the <code>getToken()</code> function that POSTs the client secret to Azure AD. The file is not marked <code>'use server'</code> and is imported from places that could theoretically be reached client-side. Combined with the <code>NEXT_PUBLIC_*</code> exposure (Finding #1), the entire OAuth client-credentials flow could execute in a browser, leaking the access token to the user.</p>
+  <h4>Fix</h4>
+  <ul>
+    <li>Add the top-level directive <code>import 'server-only';</code> at the top of <code>src/lib/api.ts</code>. This causes Next.js to throw a build-time error if the module is ever imported from a Client Component.</li>
+    <li>Once Finding #1 is fixed (env vars no longer <code>NEXT_PUBLIC_*</code>), the runtime cost of accidental client import is also mitigated — the secret won't be available.</li>
+    <li>Move the Graph fetch into a single server-side API route and let client components <em>only</em> call <code>/api/*</code> endpoints, never <code>src/lib/api.ts</code> directly.</li>
+  </ul>
+</div>
+
+<div class="finding critical">
+  <h3><span class="sev-badge sev-critical">Critical</span> #4 — 42 npm vulnerabilities (4 critical, 19 high)</h3>
+  <div class="meta-grid">
+    <span class="label">Source</span><span><code>npm audit</code> (June 2026)</span>
+    <span class="label">Notable</span><span>Next.js, ws, lodash, minimatch, xlsx, undici, hono, next-auth</span>
+    <span class="label">Effort</span><span>~3 hours including testing</span>
+  </div>
+  <h4>Issue</h4>
+  <p>Headline CVEs include:</p>
+  <ul>
+    <li><strong>Next.js</strong> — cache poisoning via Middleware/Proxy redirects, XSS in App Router with CSP nonces, DoS via Image Optimizer, CSRF bypass via null origin, HTTP request smuggling in rewrites. Multiple CVEs at the installed version.</li>
+    <li><strong>ws (high)</strong> — Uninitialized memory disclosure (GHSA-58qx-3vcg-4xpx), DoS via tiny fragments.</li>
+    <li><strong>lodash (high)</strong> — Prototype pollution in <code>_.unset</code>/<code>_.omit</code>, code injection via <code>_.template</code>.</li>
+    <li><strong>minimatch (high)</strong> — Multiple ReDoS variants via combinatorial backtracking.</li>
+    <li><strong>xlsx (high)</strong> — Prototype pollution &amp; ReDoS, <em>no upstream fix available</em>.</li>
+    <li><strong>next-auth (depends on vulnerable uuid)</strong> — Buffer bounds check missing.</li>
+  </ul>
+  <h4>Fix</h4>
+  <ol>
+    <li>Run <code>npm audit fix</code> first — picks up safe non-breaking updates.</li>
+    <li>Run <code>npm outdated</code> and update Next.js to the latest patch within the same major (currently 16.0.10 → newer 16.x patches).</li>
+    <li>For <code>xlsx</code> with no fix: either remove the dependency (search for actual usage; it may be unused) or replace with the actively maintained fork <code>@e965/xlsx</code> or <code>exceljs</code>.</li>
+    <li>For <code>npm audit fix --force</code> changes (will bump next-auth to v3) — review the changelog before accepting; v3 is older not newer. Better to upgrade to <code>next-auth@5</code> intentionally.</li>
+    <li>Add <code>npm audit --omit=dev --audit-level=high</code> to CI to block future high/critical CVEs from merging.</li>
+  </ol>
+</div>
+
+<div class="finding high">
+  <h3><span class="sev-badge sev-high">High</span> #5 — No global security headers</h3>
+  <div class="meta-grid">
+    <span class="label">File</span><span><code>next.config.js</code></span>
+    <span class="label">CWE</span><span>CWE-693 (Protection Mechanism Failure)</span>
+    <span class="label">Effort</span><span>~30 minutes</span>
+  </div>
+  <h4>Issue</h4>
+  <p><code>next.config.js</code> only configures <code>images.contentSecurityPolicy</code> (which applies <em>only</em> to next/image-served SVGs). The actual application HTML ships with no HSTS, no CSP, no X-Frame-Options, no Referrer-Policy, and no Permissions-Policy. This leaves Pulse 360° open to clickjacking, MIME-sniffing, mixed-content downgrade, and excessive referrer leakage.</p>
+  <h4>Fix — add to next.config.js</h4>
+  <pre><code>async headers() {
+  return [{
+    source: '/(.*)',
+    headers: [
+      { key: 'Strict-Transport-Security', value: 'max-age=63072000; includeSubDomains; preload' },
+      { key: 'X-Content-Type-Options', value: 'nosniff' },
+      { key: 'X-Frame-Options', value: 'DENY' },
+      { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
+      { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=()' },
+      { key: 'Content-Security-Policy', value:
+        "default-src 'self'; " +
+        "script-src 'self' 'unsafe-inline' va.vercel-scripts.com vitals.vercel-insights.com; " +
+        "style-src 'self' 'unsafe-inline'; " +
+        "img-src 'self' data: https:; " +
+        "font-src 'self' data:; " +
+        "connect-src 'self' https://graph.microsoft.com https://login.microsoftonline.com va.vercel-scripts.com vitals.vercel-insights.com; " +
+        "frame-ancestors 'none'; " +
+        "base-uri 'self'; " +
+        "form-action 'self';" },
+    ],
+  }];
+},</code></pre>
+  <p>Tune <code>connect-src</code> to match all upstream RSS hosts the client side actually hits. Test on a deployment preview before merging.</p>
+</div>
+
+<div class="finding high">
+  <h3><span class="sev-badge sev-high">High</span> #6 — dangerouslyAllowSVG: true</h3>
+  <div class="meta-grid">
+    <span class="label">File</span><span><code>next.config.js</code> (line 6)</span>
+    <span class="label">CWE</span><span>CWE-79 (XSS), CWE-434 (Unrestricted Upload)</span>
+    <span class="label">Effort</span><span>~1 hour (audit current SVG usage)</span>
+  </div>
+  <h4>Issue</h4>
+  <p>SVG files can contain <code>&lt;script&gt;</code> tags and event handlers. <code>dangerouslyAllowSVG</code> opens the door even with the per-image CSP. The repo bundles ~500 Microsoft Azure icon SVGs locally and references remote SVGs (e.g. AI Foundry favicon from <code>devblogs.microsoft.com</code>) — if any remote SVG is ever attacker-controlled, this becomes XSS.</p>
+  <h4>Fix</h4>
+  <p>Either (a) remove <code>dangerouslyAllowSVG: true</code> and switch to inline SVG components (the repo already vendors them locally so this is feasible), or (b) keep it but tighten the per-image CSP <em>and</em> document an SVG-vetting policy. Option (a) is recommended for new images.</p>
+</div>
+
+<div class="finding high">
+  <h3><span class="sev-badge sev-high">High</span> #7 — Unsanitized HTML rendering in 8 components</h3>
+  <div class="meta-grid">
+    <span class="label">Files</span><span><code>MessageDetail.tsx</code>, <code>ReleasePlanDetail.tsx</code>, <code>AzureUpdateCard.tsx</code>, <code>M365UpdateCard.tsx</code>, <code>ReleasePlanCard.tsx</code>, plus 3 page.tsx files</span>
+    <span class="label">CWE</span><span>CWE-79 (XSS)</span>
+    <span class="label">Effort</span><span>~2 hours</span>
+  </div>
+  <h4>Issue</h4>
+  <p>9 occurrences of <code>dangerouslySetInnerHTML</code> across 8 files render HTML returned from Graph API, RSS feeds, and external blog content with no sanitization. <code>isomorphic-dompurify</code> is already a project dependency — but is never imported anywhere in <code>src/</code>.</p>
+  <p>Graph API content is high-trust today, but RSS feeds are not — anything <code>devblogs.microsoft.com/foundry</code> publishes ends up here unfiltered. A compromised author or a publishing bug upstream becomes site-wide XSS.</p>
+  <h4>Fix</h4>
+  <p>Create <code>src/lib/sanitize.ts</code>:</p>
+  <pre><code>import DOMPurify from 'isomorphic-dompurify';
+export const cleanHtml = (html: string) =>
+  DOMPurify.sanitize(html, {
+    ALLOWED_TAGS: ['p','b','i','em','strong','a','ul','ol','li','br','h1','h2','h3','h4','code','pre','blockquote','img','table','thead','tbody','tr','th','td'],
+    ALLOWED_ATTR: ['href','target','rel','src','alt','title','class'],
+    ALLOW_DATA_ATTR: false,
+  });</code></pre>
+  <p>Then replace every <code>dangerouslySetInnerHTML={{ __html: x }}</code> with <code>dangerouslySetInnerHTML={{ __html: cleanHtml(x) }}</code>.</p>
+</div>
+
+<div class="finding high">
+  <h3><span class="sev-badge sev-high">High</span> #8 — No rate limiting on any API route</h3>
+  <div class="meta-grid">
+    <span class="label">Files</span><span>18 routes under <code>src/app/api/</code></span>
+    <span class="label">CWE</span><span>CWE-770 (Allocation of Resources Without Limits)</span>
+    <span class="label">Effort</span><span>~2 hours</span>
+  </div>
+  <h4>Issue</h4>
+  <p>Anyone can hammer <code>/api/messages</code> to exhaust the Graph API quota (incurring real Azure cost / tenant-wide throttle) or <code>/api/proxy-rss</code> to relay traffic. There is no per-IP or per-route rate limit, and no middleware.</p>
+  <h4>Fix</h4>
+  <p>Add Vercel's <code>@upstash/ratelimit</code> + Upstash Redis (free tier) and create <code>middleware.ts</code> at the project root applying limits to <code>/api/*</code>:</p>
+  <pre><code>// middleware.ts
+import { Ratelimit } from '@upstash/ratelimit';
+import { Redis } from '@upstash/redis';
+import { NextRequest, NextResponse } from 'next/server';
+
+const limiter = new Ratelimit({
+  redis: Redis.fromEnv(),
+  limiter: Ratelimit.slidingWindow(30, '1 m'),
+});
+
+export async function middleware(req: NextRequest) {
+  const ip = req.headers.get('x-forwarded-for') ?? 'anon';
+  const { success } = await limiter.limit(ip);
+  if (!success) return new NextResponse('Too Many Requests', { status: 429 });
+  return NextResponse.next();
+}
+export const config = { matcher: '/api/:path*' };</code></pre>
+</div>
+
+<div class="finding high">
+  <h3><span class="sev-badge sev-high">High</span> #9 — All 18 API routes are unauthenticated</h3>
+  <div class="meta-grid">
+    <span class="label">Files</span><span>Every <code>route.ts</code></span>
+    <span class="label">CWE</span><span>CWE-862 (Missing Authorization)</span>
+    <span class="label">Effort</span><span>~4 hours (depends on auth model decision)</span>
+  </div>
+  <h4>Issue</h4>
+  <p>None of the API routes check who the caller is. The data is mostly publicly-published Microsoft content, so this is acceptable for read-only feeds, but it also means the routes are CDN-bypass attack vectors and there's no future-proofing for any user-specific feature.</p>
+  <h4>Fix</h4>
+  <ul>
+    <li>For routes that are <em>intentionally</em> public (RSS proxies of public feeds): rate-limit aggressively (Finding #8) and add caching headers.</li>
+    <li>For <code>/api/messages</code> (real Graph API call costing tenant quota): require a session cookie or a referer/origin check at minimum. Long term, add Entra ID sign-in via NextAuth and gate the route to authenticated users.</li>
+  </ul>
+</div>
+
+<div class="finding medium">
+  <h3><span class="sev-badge sev-medium">Medium</span> #10 — Misnamed ..env file with real secret not gitignored</h3>
+  <div class="meta-grid">
+    <span class="label">File</span><span><code>..env</code> (note: leading double dot)</span>
+    <span class="label">Effort</span><span>~5 minutes</span>
+  </div>
+  <h4>Issue</h4>
+  <p>A file literally named <code>..env</code> (double dot) sits in the repo root containing the old client secret. <code>.gitignore</code> covers only <code>.env</code> and <code>.env*.local</code>, so <code>..env</code> would be tracked if anyone ever runs <code>git add .</code>.</p>
+  <h4>Fix</h4>
+  <ol>
+    <li>Delete <code>..env</code> (the secret in it is rotated anyway after Finding #1).</li>
+    <li>Tighten <code>.gitignore</code> to <code>*.env*</code> (catches all variants) and explicitly allow <code>.env.example</code>.</li>
+    <li>Add a pre-commit hook with <code>git-secrets</code> or <code>gitleaks</code> to block credential commits.</li>
+  </ol>
+</div>
+
+<div class="finding medium">
+  <h3><span class="sev-badge sev-medium">Medium</span> #11 — Error responses disclose env var names</h3>
+  <div class="meta-grid">
+    <span class="label">File</span><span><code>src/app/api/messages/route.ts</code></span>
+    <span class="label">CWE</span><span>CWE-209 (Information Exposure Through Error Message)</span>
+  </div>
+  <h4>Issue</h4>
+  <p>On 500, the route returns a JSON payload including a <code>hint</code> that names <code>NEXT_PUBLIC_TENANT_ID</code>, <code>NEXT_PUBLIC_CLIENT_ID</code>, and <code>NEXT_PUBLIC_API_KEY</code>. The actual upstream error text is also forwarded verbatim (currently leaking Azure AAD trace IDs, correlation IDs, and AADSTS error codes). This helps attackers reconnaissance the auth setup.</p>
+  <h4>Fix</h4>
+  <p>Return a generic <code>{ error: 'Upstream service unavailable' }</code> to the client. Log the detailed error server-side only (via <code>console.error</code> or your observability tool). Keep the rich diagnostics out of the HTTP body.</p>
+</div>
+
+<div class="finding medium">
+  <h3><span class="sev-badge sev-medium">Medium</span> #12 — No CSRF protection (footgun for future state-changing endpoints)</h3>
+  <h4>Issue</h4>
+  <p>All current API routes are GETs returning data, so CSRF is not exploitable today. The risk is forward-looking: the first POST/DELETE route added (e.g., subscription endpoint, comment, bookmark) will be CSRF-vulnerable by default in Next.js App Router.</p>
+  <h4>Fix</h4>
+  <p>Adopt a CSRF strategy now: either use NextAuth's built-in CSRF token, or add a <code>SameSite=Strict</code> session cookie + <code>Origin</code> header check in <code>middleware.ts</code>.</p>
+</div>
+
+<div class="finding medium">
+  <h3><span class="sev-badge sev-medium">Medium</span> #13 — Path-injection in /api/msrc?monthId=</h3>
+  <div class="meta-grid"><span class="label">File</span><span><code>src/app/api/msrc/route.ts</code></span></div>
+  <h4>Issue</h4>
+  <p><code>const res = await fetch(CVRF_URL + monthId)</code> directly concatenates user input. <code>monthId=../../v1.0/foo</code> rewrites the path. The blast radius is limited to <code>api.msrc.microsoft.com</code>, but still allows hitting non-CVRF endpoints on that host.</p>
+  <h4>Fix</h4>
+  <p>Validate against a strict regex: <code>if (!/^\d{4}-[A-Za-z]{3}$/.test(monthId)) return 400;</code> (MSRC month IDs are <code>2026-Jun</code> shape). Use <code>encodeURIComponent(monthId)</code> when building the URL.</p>
+</div>
+
+<div class="finding medium">
+  <h3><span class="sev-badge sev-medium">Medium</span> #14 — No CORS policy declared</h3>
+  <h4>Issue</h4>
+  <p>API routes return no <code>Access-Control-Allow-Origin</code> header. Browsers fall back to same-origin, so it appears safe — but if anyone later adds <code>Access-Control-Allow-Origin: *</code> reflexively, the now-public routes (Finding #9) become available to any third-party site, including expensive Graph-backed ones.</p>
+  <h4>Fix</h4>
+  <p>Decide explicitly: either reject cross-origin (default; document it) or allowlist specific origins. Add a unit-test that fails if <code>Access-Control-Allow-Origin: *</code> appears on any <code>/api/*</code> response.</p>
+</div>
+
+<div class="finding medium">
+  <h3><span class="sev-badge sev-medium">Medium</span> #15 — No documented secret rotation policy</h3>
+  <h4>Issue</h4>
+  <p>The Azure AD client secret is created with multi-year expiry in Azure and stored statically. There is no calendar reminder, no rotation runbook, and no detection if it leaks. The secret rotated during this review is good for ~2 years and then will silently expire.</p>
+  <h4>Fix</h4>
+  <ul>
+    <li>Store secrets in Vercel project env settings (or Azure Key Vault for non-Vercel environments) with notes on expiry.</li>
+    <li>Set a calendar reminder 30 days before expiry.</li>
+    <li>Better: migrate from client-secret to Federated Identity Credentials (Workload Identity Federation) — no secret to rotate. Azure supports FIC for GitHub Actions and Vercel today.</li>
+  </ul>
+</div>
+
+<div class="finding medium">
+  <h3><span class="sev-badge sev-medium">Medium</span> #16 — Production silences all console.* methods</h3>
+  <div class="meta-grid"><span class="label">File</span><span><code>src/lib/api.ts</code> lines 4–10</span></div>
+  <h4>Issue</h4>
+  <pre><code>if (process.env.NODE_ENV === 'production') {
+  console.log = function() {};
+  console.warn = function() {};
+  console.error = function() {};
+  ...
+}</code></pre>
+  <p>This pattern blanket-mutes every log on the production server, including security-relevant errors. When something goes wrong in production you have no breadcrumbs.</p>
+  <h4>Fix</h4>
+  <p>Remove the override entirely. Use Vercel's built-in log aggregation or wire up Sentry / Application Insights. Keep <code>console.error</code> active at minimum.</p>
+</div>
+
+<div class="finding low">
+  <h3><span class="sev-badge sev-low">Low</span> #17 — xlsx package with no upstream fix</h3>
+  <p>The <code>xlsx</code> dependency has known prototype pollution and ReDoS with no patch available. If it's actually used (search the codebase — appears to be unused at first glance), replace with <code>exceljs</code> or <code>@e965/xlsx</code> (the maintained fork). If unused, remove from <code>package.json</code>.</p>
+</div>
+
+<div class="finding low">
+  <h3><span class="sev-badge sev-low">Low</span> #18 — No Subresource Integrity on remote assets</h3>
+  <p>External images loaded via <code>next/image</code> from <code>devblogs.microsoft.com</code> have no SRI. If Microsoft's CDN is ever compromised, you serve compromised content. Not exploitable today; document as accepted risk or vendor the few external images locally.</p>
+</div>
+
+<div class="finding low">
+  <h3><span class="sev-badge sev-low">Low</span> #19 — Image remotePatterns uses pathname: '**'</h3>
+  <p>Allowing <code>**</code> on <code>devblogs.microsoft.com</code> means any path on that host can be requested through <code>/_next/image</code>. Combined with <code>dangerouslyAllowSVG</code> this widens the attack surface. Narrow to specific path prefixes you actually use.</p>
+</div>
+
+<div class="finding low">
+  <h3><span class="sev-badge sev-low">Low</span> #20 — Generic try/catch swallows root cause</h3>
+  <p>Several API routes catch any error and return <code>'Error fetching feed'</code> or similar. The actual error is lost. Replace with <code>console.error('proxy-rss failed', { url, err })</code> at minimum, or wire to Sentry.</p>
+</div>
+
+<!-- REMEDIATION PLAN -->
+<h2>Remediation Plan</h2>
+<p>Work the plan top to bottom. Each phase is sized so it can ship as a single PR without breaking the live site. Test each phase against the live <code>mspulse360.app</code> behavior before moving on.</p>
+
+<div class="phase">
+  <h3>Phase 0 — Emergency (do today, before any other work)</h3>
+  <ul>
+    <li>Rotate the Azure AD client secret in Azure Portal (Certificates &amp; secrets → New client secret).</li>
+    <li>Update <code>.env.local</code> and Vercel project env settings with the new secret.</li>
+    <li>Confirm the old secret is revoked in Azure.</li>
+  </ul>
+  <p class="footer-note">Why this is Phase 0: the current secret has been shipping to every browser visitor. Until rotated, anyone who saved the bundle still has working credentials.</p>
+</div>
+
+<div class="phase">
+  <h3>Phase 1 — Secrets &amp; SSRF (1–2 days, single PR)</h3>
+  <ul>
+    <li><strong>Finding #1:</strong> Rename all <code>NEXT_PUBLIC_*</code> credentials → server-only names. Update <code>src/lib/api.ts</code>, <code>src/app/api/messages/route.ts</code>, and Vercel env settings. Add <code>import 'server-only';</code> to <code>src/lib/api.ts</code>.</li>
+    <li><strong>Finding #2:</strong> Add host allowlist to <code>/api/proxy-rss</code> OR delete the route if unused.</li>
+    <li><strong>Finding #10:</strong> Delete <code>..env</code>; update <code>.gitignore</code> to <code>*.env*</code>; add gitleaks pre-commit hook.</li>
+    <li><strong>Finding #11:</strong> Strip env var names from error responses.</li>
+    <li><strong>Verification:</strong> Build the app and grep <code>.next/static</code> for the secret value. Should not appear anywhere.</li>
+  </ul>
+</div>
+
+<div class="phase">
+  <h3>Phase 2 — Dependencies (half day, single PR)</h3>
+  <ul>
+    <li><strong>Finding #4:</strong> Run <code>npm audit fix</code>; commit the lockfile.</li>
+    <li>Run <code>npm outdated</code> and update Next.js to the latest 16.x patch.</li>
+    <li>Replace or remove <code>xlsx</code> (Finding #17).</li>
+    <li>Add CI step: <code>npm audit --omit=dev --audit-level=high</code> as a required check on PRs.</li>
+    <li><strong>Verification:</strong> Re-run <code>npm audit</code>; critical/high counts should be 0.</li>
+  </ul>
+</div>
+
+<div class="phase">
+  <h3>Phase 3 — Headers, CSP, XSS (1 day, single PR)</h3>
+  <ul>
+    <li><strong>Finding #5:</strong> Add global security headers via <code>next.config.js</code> <code>async headers()</code>.</li>
+    <li><strong>Finding #7:</strong> Create <code>src/lib/sanitize.ts</code> using <code>isomorphic-dompurify</code>; wrap all 9 <code>dangerouslySetInnerHTML</code> sites.</li>
+    <li><strong>Finding #6:</strong> Remove <code>dangerouslyAllowSVG: true</code>; convert any remaining required SVGs to inline React components.</li>
+    <li><strong>Finding #19:</strong> Narrow <code>remotePatterns</code> from <code>**</code> to specific paths.</li>
+    <li><strong>Verification:</strong> Deploy preview, run <a href="https://securityheaders.com">securityheaders.com</a> against it — target grade A.</li>
+  </ul>
+</div>
+
+<div class="phase">
+  <h3>Phase 4 — Rate Limit + Logging (1 day, single PR)</h3>
+  <ul>
+    <li><strong>Finding #8:</strong> Add <code>middleware.ts</code> with Upstash rate limiting for <code>/api/*</code>.</li>
+    <li><strong>Finding #16:</strong> Remove the production <code>console.*</code> override.</li>
+    <li><strong>Finding #20:</strong> Add structured error logging to all API routes.</li>
+    <li><strong>Finding #13:</strong> Add regex validation to <code>/api/msrc</code> <code>monthId</code>.</li>
+    <li><strong>Verification:</strong> Hammer <code>/api/messages</code> with curl 100 times; verify 429 returned and Graph quota not consumed.</li>
+  </ul>
+</div>
+
+<div class="phase">
+  <h3>Phase 5 — Hardening (ongoing, multiple PRs)</h3>
+  <ul>
+    <li><strong>Finding #15:</strong> Migrate from client secret to Federated Identity Credentials for Vercel (eliminates rotation).</li>
+    <li><strong>Finding #9:</strong> Add NextAuth + Entra ID sign-in for routes that should be gated.</li>
+    <li><strong>Finding #12:</strong> Document CSRF strategy before adding any POST/DELETE route.</li>
+    <li><strong>Finding #14:</strong> Add a CORS unit test that fails on accidental <code>*</code>.</li>
+    <li><strong>Finding #18:</strong> Decide on SRI vs. vendoring for remote images.</li>
+  </ul>
+</div>
+
+<h2>Appendix — Verification Checklist</h2>
+<ul>
+  <li>☐ Azure AD secret rotated; old secret revoked</li>
+  <li>☐ <code>grep -r "NEXT_PUBLIC_API_KEY\|NEXT_PUBLIC_CLIENT_ID\|NEXT_PUBLIC_TENANT_ID" src/</code> returns no matches</li>
+  <li>☐ <code>npm run build &amp;&amp; grep -r "&lt;secret value&gt;" .next/static</code> returns no matches</li>
+  <li>☐ <code>npm audit --audit-level=high</code> returns 0 vulnerabilities</li>
+  <li>☐ <code>/api/proxy-rss?url=http://169.254.169.254/metadata/instance</code> returns 403</li>
+  <li>☐ securityheaders.com grades production deployment ≥ A</li>
+  <li>☐ <code>/api/messages</code> with 100 rapid requests returns 429 after limit</li>
+  <li>☐ All <code>dangerouslySetInnerHTML</code> sites wrapped with <code>cleanHtml()</code></li>
+  <li>☐ <code>..env</code> deleted; <code>.gitignore</code> updated to <code>*.env*</code></li>
+  <li>☐ Gitleaks pre-commit hook installed and tested</li>
+</ul>
+
+<p class="footer-note" style="text-align:center; margin-top:24pt; border-top:1px solid #e5e7eb; padding-top:8pt;">
+  End of report · Pulse 360° Security Review · June 19, 2026 · 20 findings across 5 phases
+</p>
+
+</body>
+</html>

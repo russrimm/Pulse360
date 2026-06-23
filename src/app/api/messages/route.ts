@@ -1,7 +1,16 @@
+import { getMessages } from '@/lib/api.server';
 import { NextResponse } from 'next/server';
-import { getMessages } from '@/lib/api';
 
 export async function GET() {
-  const messages = await getMessages();
-  return NextResponse.json(messages);
-} 
+  try {
+    const messages = await getMessages();
+    return NextResponse.json(messages);
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    console.error('Error in /api/messages:', errorMessage);
+    return NextResponse.json(
+      { error: 'Upstream service unavailable', detail: errorMessage },
+      { status: 500 }
+    );
+  }
+}

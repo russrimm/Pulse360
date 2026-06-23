@@ -7,6 +7,7 @@ import { useState, useMemo, useEffect } from 'react';
 import { ImageModal } from './ImageModal';
 import Image from 'next/image';
 import { LoadingSpinner } from './LoadingSpinner';
+import { SafeHtml } from '@/components/SafeHtml';
 
 // Map of service names to their icon paths
 const serviceIcons: Record<string, string> = {
@@ -187,7 +188,7 @@ export function MessageDetail({ message }: MessageDetailProps) {
             const target = e.target as HTMLElement;
             if (target.tagName === 'IMG') handleImageClick(e as React.MouseEvent<HTMLImageElement>);
           }}>
-            <div className="break-words whitespace-normal [&_*]:break-words [&_*]:whitespace-normal [&_p]:whitespace-normal" style={{ overflowWrap: 'break-word', wordBreak: 'normal' }} dangerouslySetInnerHTML={{ __html: processedContent }} />
+            <div className="break-words whitespace-normal [&_*]:break-words [&_*]:whitespace-normal [&_p]:whitespace-normal"><SafeHtml html={processedContent} /></div>
           </div>
         </div>
       </div>

@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "RepoWise MCP for Pulse360": {
+      "command": "repowise",
+      "args": [
+        "mcp-shim",
+        "--repo-id",
+        "fea29a2c-080c-4b78-a4bb-a595d3953c48"
+      ]
+    }
+  }
+}

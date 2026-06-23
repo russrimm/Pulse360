@@ -1,6 +1,6 @@
 'use client';
 
-import { getLearnBlogNews } from '@/lib/api';
+import { getLearnBlogNews } from '@/lib/api.client';
 import { ProductNewsCard } from '@/components/ProductNewsCard';
 import { ProductNewsLayout } from '@/components/ProductNewsLayout';
 import { useQuery } from '@tanstack/react-query';

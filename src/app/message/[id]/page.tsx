@@ -1,4 +1,4 @@
-import { getMessage } from '@/lib/api';
+import { getMessage } from '@/lib/api.server';
 import { MessageDetail } from '@/components/MessageDetail';
 import { notFound } from 'next/navigation';
 

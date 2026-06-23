@@ -61,9 +61,7 @@ export default function VSCodeNewsPage() {
       const res = await fetch(`/api/proxy-rss?url=${encodeURIComponent(FEED_URL)}`);
       if (!res.ok) throw new Error('Failed to fetch VS Code blog feed');
       const xml = await res.text();
-      console.log('Fetched XML:', xml); // DEBUG
       const items = parseFeed(xml);
-      console.log('Parsed items:', items); // DEBUG
       setNews(items);
       if (items.length === 0) setError('No items found in feed.');
     } catch (e: any) {

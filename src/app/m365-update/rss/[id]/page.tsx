@@ -1,4 +1,5 @@
-import { getM365Update } from '@/lib/api';
+import { getM365Update } from '@/lib/api.server';
+import { sanitizeFeedHtml } from '@/lib/feed/sanitize';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { format } from 'date-fns';
@@ -17,12 +18,14 @@ export default async function M365UpdatePage({ params }: { params: Promise<{ id:
     notFound();
   }
 
+  const safeContent = sanitizeFeedHtml(update.content);
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-6">
           <Link
-            href="/m365-updates"
+            href="/release-plans/m365"
             className="inline-flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -55,7 +58,7 @@ export default async function M365UpdatePage({ params }: { params: Promise<{ id:
             <div className="prose dark:prose-invert max-w-none">
               <div 
                 className="text-gray-700 dark:text-gray-200"
-                dangerouslySetInnerHTML={{ __html: update.content }} 
+                dangerouslySetInnerHTML={{ __html: safeContent }} 
               />
             </div>
 

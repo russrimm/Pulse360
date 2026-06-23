@@ -1,21 +1,10 @@
-import { getAzureUpdates } from '@/lib/api';
-import { AzureUpdatesClient } from '@/components/AzureUpdatesClient';
-
-export const revalidate = 3600;
+import { redirect } from 'next/navigation';
 
 export const metadata = {
-  title: 'Azure Updates | Microsoft 365 Message Center',
-  description: 'Stay informed about the latest Azure updates and changes.',
+  title: 'Azure Updates (Moved) | Pulse 360',
+  robots: { index: false }
 };
 
-export default async function AzureUpdatesPage() {
-  const updates = await getAzureUpdates();
-
-  return (
-    <div className="min-h-screen bg-white dark:bg-black">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <AzureUpdatesClient initialUpdates={updates} />
-      </div>
-    </div>
-  );
-} 
+export default function AzureUpdatesLegacyRedirect() {
+  redirect('/release-plans/azure');
+}

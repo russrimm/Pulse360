@@ -1,0 +1,3 @@
+# Inbox folder — placeholder so the directory is tracked.
+# Agents drop decision files here as decisions/inbox/{agent}-{slug}.md.
+# Scribe merges them into ../decisions.md and clears this folder.

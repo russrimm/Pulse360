@@ -1,6 +1,7 @@
 'use client';
 
 import { format } from 'date-fns';
+import { SafeHtml } from '@/components/SafeHtml';
 import Link from 'next/link';
 import Image from 'next/image';
 
@@ -141,10 +142,7 @@ export const M365UpdateCard: React.FC<M365UpdateCardProps> = ({ update, onClick 
                 <h3 className="w-full break-words whitespace-normal overflow-hidden text-base font-medium text-gray-900 dark:text-white group-hover:text-primary-700 dark:group-hover:text-primary-400 transition-colors tracking-tight text-center">{update.title}</h3>
               </div>
               <div className="mt-2 text-sm text-gray-600 dark:text-gray-400 flex-grow">
-                <div 
-                  className="max-w-none dark:prose-invert"
-                  dangerouslySetInnerHTML={{ __html: update.content }}
-                />
+                <SafeHtml html={update.content} className="max-w-none dark:prose-invert" />
               </div>
             </div>
           </div>

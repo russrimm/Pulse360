@@ -1,6 +1,7 @@
 'use client';
 
 import { format } from 'date-fns';
+import { SafeHtml } from '@/components/SafeHtml';
 import Link from 'next/link';
 import Image from 'next/image';
 
@@ -154,10 +155,7 @@ export const ReleasePlanCard: React.FC<ReleasePlanCardProps> = ({ plan, onClick,
               <h3 className="text-base font-medium text-gray-900 dark:text-white group-hover:text-primary-700 dark:group-hover:text-primary-400 transition-colors tracking-tight text-center">{plan.title}</h3>
             </div>
             <div className="mt-2 text-sm text-gray-600 dark:text-gray-400">
-              <div 
-                className="line-clamp-3 prose dark:prose-invert prose-sm max-w-none"
-                dangerouslySetInnerHTML={{ __html: plan.businessValue }}
-              />
+              <SafeHtml html={plan.businessValue} className="line-clamp-3 prose dark:prose-invert prose-sm max-w-none" />
             </div>
           </div>
         </div>

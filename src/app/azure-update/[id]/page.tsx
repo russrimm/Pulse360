@@ -1,4 +1,5 @@
-import { getAzureUpdates } from '@/lib/api';
+import { getAzureUpdates } from '@/lib/api.server';
+import { sanitizeFeedHtml } from '@/lib/feed/sanitize';
 import { notFound } from 'next/navigation';
 import { format } from 'date-fns';
 import Link from 'next/link';
@@ -26,12 +27,14 @@ export default async function AzureUpdatePage({ params }: { params: Promise<{ id
     notFound();
   }
 
+  const safeDescription = sanitizeFeedHtml(update.description);
+
   return (
     <div className="min-h-screen bg-white dark:bg-black">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-6">
           <Link
-            href="/azure-updates"
+            href="/release-plans/azure"
             className="inline-flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -130,7 +133,7 @@ export default async function AzureUpdatePage({ params }: { params: Promise<{ id
 
             {/* Content */}
             <div className="prose dark:prose-invert max-w-none [&_*]:!text-gray-700 [&_*]:dark:!text-gray-300 [&_a]:!text-primary-600 [&_a]:dark:!text-primary-400 [&_a]:!no-underline [&_a:hover]:!text-primary-700 [&_a:hover]:dark:!text-primary-300 [&_strong]:!text-gray-900 [&_strong]:dark:!text-white [&_h1]:!text-gray-900 [&_h1]:dark:!text-white [&_h2]:!text-gray-900 [&_h2]:dark:!text-white [&_h3]:!text-gray-900 [&_h3]:dark:!text-white [&_h4]:!text-gray-900 [&_h4]:dark:!text-white [&_h5]:!text-gray-900 [&_h5]:dark:!text-white [&_h6]:!text-gray-900 [&_h6]:dark:!text-white [&_code]:!text-gray-900 [&_code]:dark:!text-gray-100 [&_code]:!bg-gray-100 [&_code]:dark:!bg-gray-800 [&_pre]:!text-gray-900 [&_pre]:dark:!text-gray-100 [&_pre]:!bg-gray-100 [&_pre]:dark:!bg-gray-800 [&_p]:!text-gray-700 [&_p]:dark:!text-gray-300 [&_ul]:!text-gray-700 [&_ul]:dark:!text-gray-300 [&_ol]:!text-gray-700 [&_ol]:dark:!text-gray-300 [&_li]:!text-gray-700 [&_li]:dark:!text-gray-300 [&_blockquote]:!text-gray-700 [&_blockquote]:dark:!text-gray-300 [&_blockquote]:!border-gray-200 [&_blockquote]:dark:!border-gray-700 [&_*]:!bg-transparent [&_*]:dark:!bg-transparent">
-              <div dangerouslySetInnerHTML={{ __html: update.description }} />
+              <div dangerouslySetInnerHTML={{ __html: safeDescription }} />
             </div>
 
             {/* Products */}

@@ -1,0 +1,13 @@
+{
+  "universe": "The Expanse",
+  "agents": [
+    { "persistent_name": "Miller", "role": "Lead", "universe": "The Expanse", "created_at": "2026-06-20T11:38:29-05:00", "legacy_named": false, "status": "active" },
+    { "persistent_name": "Naomi", "role": "Frontend Dev", "universe": "The Expanse", "created_at": "2026-06-20T11:38:29-05:00", "legacy_named": false, "status": "active" },
+    { "persistent_name": "Amos", "role": "Backend Dev", "universe": "The Expanse", "created_at": "2026-06-20T11:38:29-05:00", "legacy_named": false, "status": "active" },
+    { "persistent_name": "Alex", "role": "Data / Integrations", "universe": "The Expanse", "created_at": "2026-06-20T11:38:29-05:00", "legacy_named": false, "status": "active" },
+    { "persistent_name": "Bobbie", "role": "Tester", "universe": "The Expanse", "created_at": "2026-06-20T11:38:29-05:00", "legacy_named": false, "status": "active" },
+    { "persistent_name": "Scribe", "role": "Memory & Logs", "universe": "exempt", "created_at": "2026-06-20T11:38:29-05:00", "legacy_named": false, "status": "active" },
+    { "persistent_name": "Ralph", "role": "Work Monitor", "universe": "exempt", "created_at": "2026-06-20T11:38:29-05:00", "legacy_named": false, "status": "active" },
+    { "persistent_name": "Rai", "role": "RAI Reviewer", "universe": "exempt", "created_at": "2026-06-20T11:38:29-05:00", "legacy_named": false, "status": "active" }
+  ]
+}

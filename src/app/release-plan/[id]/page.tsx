@@ -1,4 +1,4 @@
-import { getReleasePlans } from '@/lib/api';
+import { getReleasePlans } from '@/lib/api.server';
 import { ReleasePlanDetail } from '@/components/ReleasePlanDetail';
 import { notFound } from 'next/navigation';
 
