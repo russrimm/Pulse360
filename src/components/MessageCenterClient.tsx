@@ -6,7 +6,7 @@ import type { Message } from '@/lib/types';
 export default function MessageCenterClient() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [hasError, setHasError] = useState(false);
 
   useEffect(() => {
     fetch('/api/messages')
@@ -19,14 +19,17 @@ export default function MessageCenterClient() {
         return res.json();
       })
       .then((msgs) => {
-        setMessages(Array.isArray(msgs) ? msgs : []);
-        setError(null);
+        if (Array.isArray(msgs)) {
+          setMessages(msgs);
+        } else {
+          setMessages([]);
+          setHasError(true);
+        }
         setLoading(false);
       })
-      .catch((err) => {
-        console.error('Failed to load messages:', err);
+      .catch(() => {
         setMessages([]);
-        setError(err instanceof Error ? err.message : 'Failed to load messages');
+        setHasError(true);
         setLoading(false);
       });
   }, []);
@@ -46,17 +49,9 @@ export default function MessageCenterClient() {
             Stay informed about Microsoft 365 service updates and changes
           </p>
         </div>
-        {error && (
-          <div className="mb-6 rounded-lg border border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-900/20 p-4 text-center">
-            <p className="text-sm text-red-700 dark:text-red-300">
-              Unable to load messages: {error}
-            </p>
-            <button
-              onClick={() => window.location.reload()}
-              className="mt-2 text-sm font-medium text-red-600 dark:text-red-400 hover:underline"
-            >
-              Try again
-            </button>
+        {hasError && (
+          <div className="mb-6 rounded border border-yellow-300 bg-yellow-50 px-4 py-3 text-sm text-yellow-800 dark:border-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-200">
+            Messages are temporarily unavailable. Please try again shortly.
           </div>
         )}
         <HomeContent messages={messages} />
