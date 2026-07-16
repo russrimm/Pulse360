@@ -270,6 +270,14 @@ export async function getMessage(id: string): Promise<Message | null> {
     }
 
     const requestPath = `/admin/serviceAnnouncement/messages?$filter=id eq '${id}'`;
+    const getMessageFetchError = (status: number, statusText: string, errorText?: string): Error => {
+      const permissionHint =
+        status === 403
+          ? ' Ensure the app has the ServiceMessage.Read.All application permission in Microsoft Graph.'
+          : '';
+      const errorSuffix = errorText ? ` - ${errorText}` : '';
+      return new Error(`Failed to fetch message: ${status} ${statusText}${errorSuffix}${permissionHint}`);
+    };
     let requestBaseUrl = GRAPH_BASE_URL;
     let response = await fetch(graphUrl(requestPath, 'v1.0', requestBaseUrl), {
       headers,
@@ -287,12 +295,13 @@ export async function getMessage(id: string): Promise<Message | null> {
           next: { revalidate: 86400 },
         });
       } else {
-        throw new Error(`Failed to fetch message: ${response.status} ${response.statusText}`);
+        throw getMessageFetchError(response.status, response.statusText, errorText);
       }
     }
 
     if (!response.ok) {
-      throw new Error(`Failed to fetch message: ${response.status} ${response.statusText}`);
+      const errorText = await response.text();
+      throw getMessageFetchError(response.status, response.statusText, errorText);
     }
 
     const data: GraphApiResponse = await response.json();
