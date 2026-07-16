@@ -301,7 +301,7 @@ export async function getMessage(id: string): Promise<Message | null> {
             status === 403
               ? ' Ensure the app has the ServiceMessage.Read.All application permission in Microsoft Graph.'
               : '';
-          throw new Error(`Failed to fetch message: ${status} ${response.statusText}${permissionHint}`);
+          throw new Error(`Failed to fetch message: ${status} ${response.statusText} - ${errorText}${permissionHint}`);
         }
       }
     }
