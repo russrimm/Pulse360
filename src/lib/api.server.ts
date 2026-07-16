@@ -270,7 +270,7 @@ export async function getMessage(id: string): Promise<Message | null> {
     }
 
     const requestPath = `/admin/serviceAnnouncement/messages?$filter=id eq '${id}'`;
-    const getMessageFetchError = (status: number, statusText: string, errorText?: string): Error => {
+    const buildMessageFetchError = (status: number, statusText: string, errorText?: string): Error => {
       const permissionHint =
         status === 403
           ? ' Ensure the app has the ServiceMessage.Read.All application permission in Microsoft Graph.'
@@ -295,13 +295,13 @@ export async function getMessage(id: string): Promise<Message | null> {
           next: { revalidate: 86400 },
         });
       } else {
-        throw getMessageFetchError(response.status, response.statusText, errorText);
+        throw buildMessageFetchError(response.status, response.statusText, errorText);
       }
     }
 
     if (!response.ok) {
       const errorText = await response.text();
-      throw getMessageFetchError(response.status, response.statusText, errorText);
+      throw buildMessageFetchError(response.status, response.statusText, errorText);
     }
 
     const data: GraphApiResponse = await response.json();
