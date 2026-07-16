@@ -278,6 +278,9 @@ export async function getMessage(id: string): Promise<Message | null> {
 
     if (isApimMode && hasLocalCredentials && (response.status === 401 || response.status === 403)) {
       const errorText = await response.text();
+      // 403 from APIM typically means the APIM policy failed to inject credentials (e.g. Named
+      // Values misconfigured). Fall back to direct Graph using local credentials.
+      // For 401, only fall back when the token was empty (APIM-side auth gap).
       if (response.status === 403 || isEmptyAccessTokenGraphError(errorText)) {
         const token = await getToken();
         headers['Authorization'] = `Bearer ${token}`;
