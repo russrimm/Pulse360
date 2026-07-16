@@ -208,8 +208,8 @@ export async function getMessages(): Promise<Message[]> {
           isApimMode &&
           hasLocalCredentials &&
           !didFallbackToDirectGraph &&
-          response.status === 401 &&
-          isEmptyAccessTokenGraphError(errorText);
+          (response.status === 403 ||
+            (response.status === 401 && isEmptyAccessTokenGraphError(errorText)));
 
         if (canFallbackToDirectGraph) {
           const token = await getToken();
@@ -276,9 +276,9 @@ export async function getMessage(id: string): Promise<Message | null> {
       next: { revalidate: 86400 },
     });
 
-    if (isApimMode && hasLocalCredentials && response.status === 401) {
+    if (isApimMode && hasLocalCredentials && (response.status === 401 || response.status === 403)) {
       const errorText = await response.text();
-      if (isEmptyAccessTokenGraphError(errorText)) {
+      if (response.status === 403 || isEmptyAccessTokenGraphError(errorText)) {
         const token = await getToken();
         headers['Authorization'] = `Bearer ${token}`;
         requestBaseUrl = DIRECT_GRAPH_BASE_URL;
