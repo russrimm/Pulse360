@@ -204,12 +204,15 @@ export async function getMessages(): Promise<Message[]> {
       if (!response.ok) {
         const errorText = await response.text();
 
+        const is401EmptyToken =
+          response.status === 401 && isEmptyAccessTokenGraphError(errorText);
+        const is403Forbidden = response.status === 403;
+
         const canFallbackToDirectGraph =
           isApimMode &&
           hasLocalCredentials &&
           !didFallbackToDirectGraph &&
-          response.status === 401 &&
-          isEmptyAccessTokenGraphError(errorText);
+          (is401EmptyToken || is403Forbidden);
 
         if (canFallbackToDirectGraph) {
           const token = await getToken();
@@ -222,8 +225,12 @@ export async function getMessages(): Promise<Message[]> {
           continue;
         }
 
+        const permissionHint =
+          response.status === 403
+            ? ' Ensure the app has the ServiceMessage.Read.All application permission in Microsoft Graph.'
+            : '';
         throw new Error(
-          `Failed to fetch messages: ${response.status} ${response.statusText} - ${errorText}`
+          `Failed to fetch messages: ${response.status} ${response.statusText} - ${errorText}${permissionHint}`
         );
       }
 
@@ -276,18 +283,26 @@ export async function getMessage(id: string): Promise<Message | null> {
       next: { revalidate: 86400 },
     });
 
-    if (isApimMode && hasLocalCredentials && response.status === 401) {
-      const errorText = await response.text();
-      if (isEmptyAccessTokenGraphError(errorText)) {
-        const token = await getToken();
-        headers['Authorization'] = `Bearer ${token}`;
-        requestBaseUrl = DIRECT_GRAPH_BASE_URL;
-        response = await fetch(graphUrl(requestPath, 'v1.0', requestBaseUrl), {
-          headers,
-          next: { revalidate: 86400 },
-        });
-      } else {
-        throw new Error(`Failed to fetch message: ${response.status} ${response.statusText}`);
+    if (isApimMode && hasLocalCredentials && !response.ok) {
+      const status = response.status;
+      if (status === 401 || status === 403) {
+        const errorText = await response.text();
+        const canFallback = status === 403 || isEmptyAccessTokenGraphError(errorText);
+        if (canFallback) {
+          const token = await getToken();
+          headers['Authorization'] = `Bearer ${token}`;
+          requestBaseUrl = DIRECT_GRAPH_BASE_URL;
+          response = await fetch(graphUrl(requestPath, 'v1.0', requestBaseUrl), {
+            headers,
+            next: { revalidate: 86400 },
+          });
+        } else {
+          const permissionHint =
+            status === 403
+              ? ' Ensure the app has the ServiceMessage.Read.All application permission in Microsoft Graph.'
+              : '';
+          throw new Error(`Failed to fetch message: ${status} ${response.statusText}${permissionHint}`);
+        }
       }
     }
 
