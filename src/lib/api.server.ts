@@ -277,8 +277,7 @@ export async function getMessage(id: string): Promise<Message | null> {
     });
 
     if (isApimMode && hasLocalCredentials && (response.status === 401 || response.status === 403)) {
-      const errorText = await response.text();
-      if (response.status === 403 || isEmptyAccessTokenGraphError(errorText)) {
+      if (response.status === 403 || isEmptyAccessTokenGraphError(await response.text())) {
         const token = await getToken();
         headers['Authorization'] = `Bearer ${token}`;
         requestBaseUrl = DIRECT_GRAPH_BASE_URL;
