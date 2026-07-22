@@ -68,9 +68,9 @@ test('switches between Microsoft and Azure lifecycle views', async ({ page }) =>
   await expect(page.getByRole('heading', { name: 'Azure Feature Retirements' })).toBeVisible();
   await expect(page.getByText(/Azure feature retirement dates sourced from the/)).toBeVisible();
   await expect(page.getByText(/Microsoft product support and Azure feature retirement dates sourced from the/)).not.toBeVisible();
-  await expect(page.getByRole('link', { name: 'Microsoft Lifecycle export' })).not.toBeVisible();
-  await expect(page.getByRole('link', { name: 'Azure RSS source' }).first())
-    .toHaveAttribute('href', 'https://www.microsoft.com/releasecommunications/api/v2/azure');
+  await expect(page.getByRole('link', { name: 'Microsoft Lifecycle export' }).first())
+    .toHaveAttribute('href', 'https://learn.microsoft.com/en-us/lifecycle/products/export/');
+  await expect(page.getByRole('link', { name: 'Azure RSS source' })).not.toBeVisible();
   await expect(page.getByRole('columnheader', { name: /Product Listing Name/ })).toBeVisible();
   await expect(page.getByRole('columnheader', { name: 'Azure Feature', exact: true })).toBeVisible();
   await expect(page.getByRole('columnheader', { name: /Release End Date/ })).toBeVisible();
@@ -107,5 +107,8 @@ test('shows the actual date with the end of support countdown', async ({ page })
   await page.goto('http://localhost:3000/ms-lifecycle');
   await page.getByRole('tab', { name: 'Azure Lifecycle' }).click();
 
+  await expect(page.getByRole('link', { name: 'Microsoft Lifecycle export' }).first())
+    .toHaveAttribute('href', 'https://learn.microsoft.com/en-us/lifecycle/products/export/');
+  await expect(page.getByRole('link', { name: 'Azure RSS source' })).toHaveCount(0);
   await expect(page.getByRole('cell', { name: '3 months · Oct 12, 2026', exact: true })).toBeVisible();
 });

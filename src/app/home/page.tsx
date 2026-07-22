@@ -1,3 +1,4 @@
+import { ArrowUpRightIcon, CalendarDaysIcon } from '@heroicons/react/24/outline';
 import Image from 'next/image';
 import Link from 'next/link';
 
@@ -24,6 +25,11 @@ export default function HomePage() {
       title: 'Security & Advisories',
       description: 'Security, service health & incident posture',
     },
+    {
+      href: '/ms-lifecycle',
+      title: 'Microsoft Support Lifecycle',
+      description: 'Plan ahead with Microsoft product support dates and Azure feature retirements.',
+    },
   ];
 
   // Central set of hero cards that use an image instead of a visible heading
@@ -46,76 +52,93 @@ export default function HomePage() {
     '/security': { src: '/images/securityadvisories.png', alt: 'Security & Advisories' },
   };
 
-  const cardBaseClasses =
-    'flex flex-col rounded-3xl border border-gray-200/60 dark:border-gray-800/70 bg-white/80 dark:bg-gray-900/65 backdrop-blur-lg shadow-[0_4px_18px_-6px_rgba(0,0,0,0.20)] dark:shadow-[0_6px_30px_-10px_rgba(0,0,0,0.70)] p-5 overflow-hidden focus:outline-none focus-visible:ring-4 focus-visible:ring-primary-300/60 dark:focus-visible:ring-primary-800/60 transition-all duration-500 hover:shadow-2xl hover:-translate-y-1.5 hover:border-primary-300/50 dark:hover:border-primary-600/50 hover:bg-white/90 dark:hover:bg-gray-900/75 h-full';
-
   return (
-    <main className="relative w-full min-h-[calc(100vh-4rem)] flex flex-col items-center overflow-hidden bg-white dark:bg-black pt-24 md:pt-28">
-      {/* Floating icons removed per request */}
-      <div className="relative w-full max-w-7xl px-4 md:px-10 flex flex-col z-0">
-        {/* 2x2 Corner Grid (header removed per request) */}
-        <section
-          aria-labelledby="hub-navigation-heading"
-          className="relative flex-1 flex items-center"
-        >
+    <main className="relative min-h-full overflow-hidden bg-slate-50 text-slate-950 dark:bg-neutral-950 dark:text-white">
+      <div
+        className="pointer-events-none absolute inset-0 opacity-60 dark:opacity-20"
+        style={{
+          backgroundImage:
+            'linear-gradient(rgba(15, 23, 42, 0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(15, 23, 42, 0.04) 1px, transparent 1px)',
+          backgroundSize: '32px 32px',
+        }}
+        aria-hidden="true"
+      />
+
+      <div className="relative mx-auto w-full max-w-6xl px-4 py-10 sm:px-6 sm:py-14 lg:px-8 lg:py-16">
+        <header className="mb-8 max-w-3xl sm:mb-10">
+          <p className="mb-3 text-xs font-semibold uppercase tracking-[0.18em] text-sky-700 dark:text-sky-300">
+            Microsoft updates, one view
+          </p>
+          <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-600 dark:text-slate-300 sm:text-base">
+            Follow service changes, product roadmaps, security advisories, and support milestones
+            across the Microsoft cloud.
+          </p>
+        </header>
+
+        <section aria-labelledby="hub-navigation-heading">
           <h2 id="hub-navigation-heading" className="sr-only">
-            Primary navigation cards
+            Explore Pulse 360
           </h2>
-          <div className="grid grid-cols-2 gap-5 md:gap-6 w-full max-w-4xl mx-auto h-full place-items-stretch content-center auto-rows-[13rem] md:auto-rows-[15rem] stagger-children">
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {cards.map((card, idx) => (
-              <div
+              <Link
                 key={card.href}
-                className="relative group stagger-animate animate-fade-up will-change-transform"
+                href={card.href}
+                aria-labelledby={`card-${idx}-title`}
+                className={`group relative flex min-h-64 flex-col overflow-hidden rounded-lg border border-slate-200 bg-white p-5 shadow-sm transition duration-300 hover:-translate-y-1 hover:border-slate-300 hover:shadow-xl focus:outline-none focus-visible:ring-4 focus-visible:ring-sky-300/60 dark:border-neutral-800 dark:bg-neutral-900 dark:hover:border-neutral-700 ${
+                  card.href === '/ms-lifecycle' ? 'sm:col-span-2 lg:col-span-4 lg:min-h-52' : ''
+                }`}
               >
-                <Link
-                  href={card.href}
-                  className={cardBaseClasses}
-                  aria-labelledby={HERO_CARD_PATHS.has(card.href) ? undefined : `card-${idx}-title`}
+                <span
+                  className={`absolute inset-x-0 top-0 h-1 bg-gradient-to-r ${
+                    card.href === '/ms-lifecycle'
+                      ? 'from-blue-600 to-sky-400'
+                      : 'from-slate-800 to-sky-500 dark:from-slate-400 dark:to-sky-400'
+                  }`}
+                  aria-hidden="true"
+                />
+
+                <div
+                  className={`flex flex-1 ${
+                    card.href === '/ms-lifecycle' ? 'items-center gap-6' : 'flex-col'
+                  }`}
                 >
-                  <div className="flex-1 flex flex-col items-center justify-center text-center">
-                    {heroImages[card.href] && (
-                      <>
-                        <Image
-                          src={heroImages[card.href].src}
-                          alt={heroImages[card.href].alt}
-                          width={160}
-                          height={90}
-                          priority={heroImages[card.href].priority}
-                          className="w-32 h-auto mb-4 rounded-md shadow-sm dark:shadow-none object-contain"
-                        />
-                        {/* Provide an off-screen heading for screen readers to ensure a clear accessible name */}
-                        <h3 id={`card-${idx}-title`} className="sr-only">
-                          {card.title}
-                        </h3>
-                      </>
-                    )}
-                    {!HERO_CARD_PATHS.has(card.href) && (
-                      <h3
-                        id={`card-${idx}-title`}
-                        className="text-[1.05rem] md:text-lg font-semibold text-gray-900 dark:text-gray-100 tracking-tight"
-                      >
-                        {card.title}
-                      </h3>
-                    )}
-                    <p
-                      className={`mt-1.5 text-xs md:text-[0.8rem] text-gray-700 dark:text-gray-300 leading-relaxed line-clamp-4 ${
-                        HERO_CARD_PATHS.has(card.href) ? 'mt-0' : ''
-                      }`}
+                  {card.href === '/ms-lifecycle' ? (
+                    <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-lg bg-blue-50 text-blue-700 dark:bg-blue-950 dark:text-blue-300">
+                      <CalendarDaysIcon className="h-7 w-7" aria-hidden="true" />
+                    </div>
+                  ) : (
+                    <Image
+                      src={heroImages[card.href].src}
+                      alt=""
+                      width={160}
+                      height={90}
+                      priority={heroImages[card.href].priority}
+                      className="mt-5 h-16 w-auto max-w-full object-contain object-left dark:brightness-110"
+                    />
+                  )}
+
+                  <div className={card.href === '/ms-lifecycle' ? 'max-w-2xl' : 'pt-6'}>
+                    <h3
+                      id={`card-${idx}-title`}
+                      className="text-lg font-semibold tracking-normal text-slate-950 dark:text-white"
                     >
+                      {card.title}
+                    </h3>
+                    <p className="mt-2 text-sm leading-6 text-slate-600 dark:text-slate-300">
                       {card.description}
                     </p>
                   </div>
-                  {/* CTA removed per request */}
-                  {/* Glow effect */}
-                  <span
-                    className="pointer-events-none absolute inset-0 rounded-3xl ring-2 ring-transparent group-hover:ring-primary-300/50 dark:group-hover:ring-primary-700/40 transition"
+                </div>
+
+                <span className="mt-5 inline-flex items-center gap-1.5 text-sm font-semibold text-slate-900 dark:text-slate-100">
+                  Explore
+                  <ArrowUpRightIcon
+                    className="h-4 w-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
                     aria-hidden="true"
                   />
-                  <div className="pointer-events-none absolute -bottom-14 -right-14 h-44 w-44 rounded-full bg-primary-400/10 dark:bg-primary-600/10 blur-3xl opacity-0 group-hover:opacity-100 transition duration-700" />
-                  {/* Subtle gradient overlay accent */}
-                  <div className="pointer-events-none absolute inset-px rounded-[calc(theme(borderRadius.3xl)-2px)] bg-gradient-to-br from-primary-400/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition duration-700" />
-                </Link>
-              </div>
+                </span>
+              </Link>
             ))}
           </div>
         </section>

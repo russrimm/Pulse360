@@ -72,9 +72,7 @@ interface LifecycleGridProps {
   columnOptions: ColumnOption[];
 }
 
-const PAGE_SIZE = 50;
 const LIFECYCLE_EXPORT_URL = 'https://learn.microsoft.com/en-us/lifecycle/products/export/';
-const AZURE_LIFECYCLE_SOURCE_URL = 'https://www.microsoft.com/releasecommunications/api/v2/azure';
 
 const MICROSOFT_COLUMN_OPTIONS: ColumnOption[] = [
   { id: 'product', label: 'Product Listing Name' },
@@ -175,14 +173,12 @@ function LifecycleGrid({
   const [dropdownFilter, setDropdownFilter] = useState('All');
   const [sortField, setSortField] = useState<SortField>('product');
   const [sortDir, setSortDir] = useState<SortDir>('asc');
-  const [page, setPage] = useState(1);
   const [visibleColumns, setVisibleColumns] = useState<ColumnId[]>(columnOptions.map(column => column.id));
 
   useEffect(() => {
     setVisibleColumns(columnOptions.map(column => column.id));
     setSortField('product');
     setSortDir('asc');
-    setPage(1);
   }, [columnOptions]);
 
   const dropdownFilterOptions = useMemo(() => {
@@ -221,9 +217,6 @@ function LifecycleGrid({
       });
   }, [rows, search, dropdownFilter, dropdownFilterField, sortField, sortDir]);
 
-  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
-  const paginated = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
-
   const isVisible = (columnId: ColumnId) => visibleColumns.includes(columnId);
 
   function handleSort(field: SortField) {
@@ -233,7 +226,6 @@ function LifecycleGrid({
       setSortField(field);
       setSortDir('asc');
     }
-    setPage(1);
   }
 
   function toggleColumn(columnId: ColumnId) {
@@ -268,19 +260,13 @@ function LifecycleGrid({
         <input
           type="search"
           value={search}
-          onChange={event => {
-            setSearch(event.target.value);
-            setPage(1);
-          }}
+          onChange={event => setSearch(event.target.value)}
           placeholder={searchPlaceholder}
           className="flex-1 px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
         />
         <select
           value={dropdownFilter}
-          onChange={event => {
-            setDropdownFilter(event.target.value);
-            setPage(1);
-          }}
+          onChange={event => setDropdownFilter(event.target.value)}
           className="px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
         >
           {dropdownFilterOptions.map(value => (
@@ -427,14 +413,14 @@ function LifecycleGrid({
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
-            {paginated.length === 0 ? (
+            {filtered.length === 0 ? (
               <tr>
                 <td colSpan={visibleColumns.length} className="px-4 py-12 text-center text-gray-400 dark:text-gray-500">
                   No items match the current filters.
                 </td>
               </tr>
             ) : (
-              paginated.map((row, index) => {
+              filtered.map((row, index) => {
                 const status = getExpiryStatus(row);
                 return (
                   <tr
@@ -474,29 +460,6 @@ function LifecycleGrid({
         </table>
       </div>
 
-      {totalPages > 1 && (
-        <div className="flex items-center justify-between mt-4 text-sm">
-          <span className="text-gray-500 dark:text-gray-400">
-            Page {page} of {totalPages}
-          </span>
-          <div className="flex gap-2">
-            <button
-              onClick={() => setPage(current => Math.max(1, current - 1))}
-              disabled={page === 1}
-              className="px-3 py-1.5 rounded-lg border border-gray-300 dark:border-gray-600 disabled:opacity-40 hover:bg-gray-50 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300"
-            >
-              Previous
-            </button>
-            <button
-              onClick={() => setPage(current => Math.min(totalPages, current + 1))}
-              disabled={page === totalPages}
-              className="px-3 py-1.5 rounded-lg border border-gray-300 dark:border-gray-600 disabled:opacity-40 hover:bg-gray-50 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300"
-            >
-              Next
-            </button>
-          </div>
-        </div>
-      )}
     </section>
   );
 }
@@ -579,12 +542,12 @@ export function MsLifecycleClient() {
           <>
             Azure feature retirement dates sourced from the{' '}
             <a
-              href={AZURE_LIFECYCLE_SOURCE_URL}
+              href={LIFECYCLE_EXPORT_URL}
               target="_blank"
               rel="noopener noreferrer"
               className="text-primary-600 underline hover:no-underline dark:text-primary-400"
             >
-              Azure RSS source
+              Microsoft Lifecycle export
             </a>
             .
           </>
@@ -645,8 +608,9 @@ export function MsLifecycleClient() {
         <div className="min-h-0 flex-1" role="tabpanel" id="azure-lifecycle-panel" aria-labelledby="azure-lifecycle-tab">
           <LifecycleGrid
             rows={splitRows.azureFeatureRows}
-            sourceUrl={AZURE_LIFECYCLE_SOURCE_URL}
-            sourceLabel="Azure RSS source"
+            sourceUrl={data.sourceUrl}
+            sourceHref={LIFECYCLE_EXPORT_URL}
+            sourceLabel="Microsoft Lifecycle export"
             cachedAt={data.cachedAt}
             fromCache={data.fromCache}
             searchPlaceholder="Search Azure feature or release…"
