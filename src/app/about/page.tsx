@@ -113,16 +113,6 @@ export default function AboutPage() {
             All public feeds are cached server-side (1–24 hours depending on source). The RSS proxy only fetches from an allowlisted set of <code>*.microsoft.com</code> hosts. No personal data is collected or stored.
           </p>
 
-          <h2 className="text-xl font-semibold mt-8 mb-3">Using the Site</h2>
-          <ul>
-            <li><b>Global search:</b> Every list page has a search bar. Matching is case- and whitespace-insensitive against titles, product names, and (where applicable) message IDs.</li>
-            <li><b>Filters:</b> Product, Area, Date, and Major Changes filters live above each list. Active filters pulse red so it&apos;s obvious when results are scoped. Click <b>Clear</b> to reset.</li>
-            <li><b>Drill-through:</b> Every card is fully clickable and links to a full detail page.</li>
-            <li><b>MSRC month picker:</b> The security page exposes a dropdown of every month MSRC has published. Pick a month to fetch the full CVE bundle for that period.</li>
-            <li><b>Theme:</b> Use the toggle in the top-right to switch light / dark / system.</li>
-            <li><b>Keyboard nav:</b> Navigation, popovers, and cards are all reachable by keyboard. <code>Esc</code> closes popovers and modals.</li>
-          </ul>
-
           <h2 className="text-xl font-semibold mt-8 mb-3">Deploy It in Your Own Tenant</h2>
           <p>
             Pulse 360° is open source. If you&apos;d like to run your own instance — pointed at your organization&apos;s tenant for live Message Center data — clone the repo, create an Entra app registration with the <code>ServiceMessage.Read.All</code> permission, add your credentials to <code>.env.local</code>, and deploy to Vercel or any Node.js host.
@@ -145,6 +135,18 @@ export default function AboutPage() {
           </p>
           <p className="mt-2">
             If you&apos;re curious about the approach, reach out to your Microsoft CSAM and ask to schedule a call. Happy to share everything learned along the way — including all the mistakes.
+          </p>
+          <p className="mt-2">
+            For more articles and perspectives, stop by{' '}
+            <a
+              href="https://www.russrimmerman.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-primary-600 dark:text-primary-400 underline font-medium"
+            >
+              my blog
+            </a>
+            .
           </p>
 
           <p className="mt-8">Thanks for visiting! Feedback, ideas, or just want to say hi — <a href="mailto:russ.rimmerman@microsoft.com?subject=Pulse 360 Feedback" className="text-primary-600 dark:text-primary-400 underline">email me</a>.</p>
