@@ -3,28 +3,16 @@ import { MsLifecycleClient } from '@/components/MsLifecycleClient';
 import { LoadingSpinner } from '@/components/LoadingSpinner';
 
 export const metadata = {
-  title: 'Microsoft Lifecycle | Pulse 360',
-  description: 'Microsoft product lifecycle end-of-support and retirement dates',
+  title: 'Microsoft Support Lifecycle | Pulse 360',
+  description: 'Microsoft product lifecycle and Azure feature retirement dates',
 };
 
 export default function MsLifecyclePage() {
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Microsoft Product Lifecycle</h1>
-        <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-          End-of-support and retirement dates sourced from the{' '}
-          <a
-            href="https://learn.microsoft.com/en-us/lifecycle/products/export/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-primary-600 dark:text-primary-400 underline hover:no-underline"
-          >
-            Microsoft Lifecycle export
-          </a>
-          .
-        </p>
-      </div>
+    <div className="mx-auto flex min-h-0 w-full max-w-7xl flex-1 flex-col px-4 py-4 sm:px-6 md:h-[calc(100dvh-8rem)] md:flex-none md:overflow-hidden lg:px-8">
+      <header className="mb-2 shrink-0 text-center">
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-white sm:text-3xl">Microsoft Support Lifecycle</h1>
+      </header>
       <Suspense fallback={<LoadingSpinner />}>
         <MsLifecycleClient />
       </Suspense>

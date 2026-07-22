@@ -50,6 +50,7 @@ Pulse 360° pulls signals from the official Microsoft update channels and render
 - **Fabric & Power Platform Roadmap** — grouped by product, collapsible, drill-through detail pages
 - **Product News** — aggregated RSS/Atom feeds for Power BI, Power Apps, Power Automate, Power Platform, Microsoft News, Tech Community, Learn Blog, Copilot, Copilot Studio, Azure AI Foundry, Azure AI/ML, Semantic Kernel, VS Code, Windows, and Microsoft Fabric Blog
 - **M365 / Azure Updates** — dedicated feeds with per-item detail pages
+- **Microsoft Product Lifecycle** — end-of-support and retirement dates from the official Microsoft Lifecycle export
 - **Global filtering and search** — Product, Area, Date, and Major Changes filters; case- and whitespace-insensitive search
 
 Every list is sorted newest-first, every card is keyboard-navigable, and every page works in both light and dark mode.
@@ -132,6 +133,7 @@ Key design choices:
 | `devblogs.microsoft.com/foundry/feed/` | Azure AI Foundry news | Public RSS | 1 h |
 | `devblogs.microsoft.com/*`, `blogs.windows.com`, `blogs.microsoft.com`, `techcommunity.microsoft.com`, `azure.microsoft.com`, `cloudblogs.microsoft.com`, `powerplatform.microsoft.com`, `www.microsoft.com`, `microsoft.com` | Product News feeds | Public RSS via `/api/proxy-rss` allowlist | 10 min edge / 1 h app |
 | `learn.microsoft.com` (HTML table scrape) | Copilot Studio release plan | Public | 1 h |
+| `learn.microsoft.com/en-us/lifecycle/products/export/` | Microsoft product lifecycle dates | Public | daily |
 
 If an upstream is down, list endpoints return `200` with an empty array so the UI degrades gracefully — never a 5xx visible to the user.
 
@@ -479,6 +481,7 @@ The generated client is **not** committed (`/src/generated/prisma` is in `.gitig
 | `/product-news/vscode` | VS Code blog |
 | `/product-news/windows` | Windows blog |
 | `/powerplatd365` | Power Platform / D365 landing |
+| `/ms-lifecycle` | Microsoft product lifecycle — end-of-support and retirement dates |
 | `/map`, `/test-map` | Experimental map-based visualizations |
 
 ### API routes
@@ -548,12 +551,23 @@ The ESLint config covers TypeScript, React, Next.js, JSON, CSS, and Markdown fil
 
 Pulse 360° is built for Vercel but runs anywhere Node 20.19+, 22.12+, or 24.x can host Next.js 16.
 
-**Vercel (recommended):**
+**GitHub Actions (included workflow):**
+
+The repo ships with a GitHub Actions workflow in `.github/workflows/` for Azure Static Web Apps CI/CD.
+
+1. Fork or clone the repo to your GitHub account.
+2. Add the following secrets under **Settings → Secrets and variables → Actions**:
+   - `AZURE_CLIENT_ID`, `AZURE_TENANT_ID`, `AZURE_CLIENT_SECRET`
+   - `AZURE_API_URL` — set to `https://graph.microsoft.com` for direct mode, or your APIM endpoint URL for APIM mode.
+   - `DATABASE_URL` — only if you use Prisma.
+3. Push to `main` (or your deployment branch) — the workflow builds and deploys automatically.
+
+**Vercel:**
 
 1. Import the repo in Vercel → **New Project**.
 2. Framework preset: **Next.js** (auto-detected).
 3. Add the env vars under **Settings → Environment Variables** (`AZURE_CLIENT_ID`, `AZURE_TENANT_ID`, `AZURE_CLIENT_SECRET`, plus `DATABASE_URL` only if you use Prisma).
-4. Deploy. The production domain in use is <https://www.mspulse360.app>.
+4. Deploy. 
 
 **Self-host:**
 

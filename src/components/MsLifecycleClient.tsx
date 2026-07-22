@@ -1,15 +1,22 @@
 'use client';
 
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
+import * as Popover from '@radix-ui/react-popover';
 
 interface LifecycleRow {
   product: string;
-  version: string;
+  edition: string;
+  release: string;
   category: string;
+  supportPolicy: string;
   startDate: string | null;
-  endOfSupportDate: string | null;
+  mainStreamEndDate: string | null;
   extendedEndDate: string | null;
   retirementDate: string | null;
+  releaseStartDate: string | null;
+  releaseEndDate: string | null;
+  docsUrl: string;
+  endOfSupportDate: string | null;
 }
 
 interface ApiResponse {
@@ -20,23 +27,89 @@ interface ApiResponse {
   error?: string;
 }
 
-type SortField = 'product' | 'endOfSupportDate' | 'retirementDate' | 'extendedEndDate';
+type SortField =
+  | 'product'
+  | 'startDate'
+  | 'mainStreamEndDate'
+  | 'extendedEndDate'
+  | 'retirementDate'
+  | 'releaseStartDate'
+  | 'releaseEndDate'
+  | 'endOfSupportDate';
 type SortDir = 'asc' | 'desc';
+type LifecycleView = 'microsoft' | 'azure';
+type ColumnId =
+  | 'product'
+  | 'edition'
+  | 'release'
+  | 'category'
+  | 'supportPolicy'
+  | 'startDate'
+  | 'mainStreamEndDate'
+  | 'extendedEndDate'
+  | 'retirementDate'
+  | 'releaseStartDate'
+  | 'releaseEndDate'
+  | 'docsUrl'
+  | 'endOfSupportDate';
 
-const STATUS_FILTERS = ['All', 'Expiring Soon', 'Expired', 'Active'] as const;
-type StatusFilter = (typeof STATUS_FILTERS)[number];
+interface ColumnOption {
+  id: ColumnId;
+  label: string;
+}
+
+interface LifecycleGridProps {
+  title?: string;
+  rows: LifecycleRow[];
+  sourceUrl: string;
+  sourceHref?: string;
+  sourceLabel?: string;
+  cachedAt: string;
+  fromCache: boolean;
+  searchPlaceholder: string;
+  dropdownFilterField: 'product' | 'category';
+  dropdownFilterLabel: string;
+  columnOptions: ColumnOption[];
+}
+
+const PAGE_SIZE = 50;
+const LIFECYCLE_EXPORT_URL = 'https://learn.microsoft.com/en-us/lifecycle/products/export/';
+const AZURE_LIFECYCLE_SOURCE_URL = 'https://www.microsoft.com/releasecommunications/api/v2/azure';
+
+const MICROSOFT_COLUMN_OPTIONS: ColumnOption[] = [
+  { id: 'product', label: 'Product Listing Name' },
+  { id: 'edition', label: 'Edition' },
+  { id: 'release', label: 'Release' },
+  { id: 'supportPolicy', label: 'Support Policy' },
+  { id: 'startDate', label: 'Start Date' },
+  { id: 'mainStreamEndDate', label: 'Mainstream End Date' },
+  { id: 'extendedEndDate', label: 'Extended End Date' },
+  { id: 'retirementDate', label: 'Retirement Date' },
+  { id: 'releaseStartDate', label: 'Release Start Date' },
+  { id: 'releaseEndDate', label: 'Release End Date' },
+  { id: 'docsUrl', label: 'Docs' },
+  { id: 'endOfSupportDate', label: 'End of Support' },
+];
+
+const AZURE_FEATURE_COLUMN_OPTIONS: ColumnOption[] = [
+  { id: 'product', label: 'Product Listing Name' },
+  { id: 'category', label: 'Azure Feature' },
+  { id: 'releaseEndDate', label: 'Release End Date' },
+  { id: 'docsUrl', label: 'DocsUrl' },
+  { id: 'endOfSupportDate', label: 'End of Support' },
+];
 
 function getExpiryStatus(row: LifecycleRow): 'expired' | 'expiring-soon' | 'active' | 'unknown' {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
-  const soonMs = 180 * 24 * 60 * 60 * 1000; // 180 days
+  const soonMs = 180 * 24 * 60 * 60 * 1000;
 
   const eos = row.endOfSupportDate ? new Date(row.endOfSupportDate) : null;
   const ext = row.extendedEndDate ? new Date(row.extendedEndDate) : null;
   const ret = row.retirementDate ? new Date(row.retirementDate) : null;
+  const ms = row.mainStreamEndDate ? new Date(row.mainStreamEndDate) : null;
+  const dates = [eos, ms, ext, ret].filter(Boolean) as Date[];
 
-  // Use the latest known date as the "support end"
-  const dates = [eos, ext, ret].filter(Boolean) as Date[];
   if (dates.length === 0) return 'unknown';
 
   const latest = new Date(Math.max(...dates.map(d => d.getTime())));
@@ -46,31 +119,38 @@ function getExpiryStatus(row: LifecycleRow): 'expired' | 'expiring-soon' | 'acti
   return 'active';
 }
 
-function formatDate(d: string | null): string {
-  if (!d) return '—';
-  const date = new Date(d);
-  if (isNaN(date.getTime())) return d;
+function formatDate(value: string | null): string {
+  if (!value) return '—';
+  const date = new Date(value);
+  if (isNaN(date.getTime())) return value;
   return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
 }
 
-function StatusBadge({ status }: { status: ReturnType<typeof getExpiryStatus> }) {
-  const map = {
-    expired: 'bg-red-100 text-red-800 dark:bg-red-900/40 dark:text-red-300',
-    'expiring-soon': 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/40 dark:text-yellow-300',
-    active: 'bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-300',
-    unknown: 'bg-gray-100 text-gray-500 dark:bg-gray-700 dark:text-gray-400',
-  };
-  const label = {
-    expired: 'Expired',
-    'expiring-soon': 'Expiring Soon',
-    active: 'Active',
-    unknown: 'Unknown',
-  };
-  return (
-    <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-medium ${map[status]}`}>
-      {label[status]}
-    </span>
-  );
+function getMonthsRemaining(value: string): string | null {
+  const endDate = new Date(value);
+  if (isNaN(endDate.getTime())) return null;
+
+  const today = new Date();
+  const todayUtc = Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate());
+  const endDateUtc = Date.UTC(endDate.getUTCFullYear(), endDate.getUTCMonth(), endDate.getUTCDate());
+
+  if (endDateUtc < todayUtc) return 'Out of Support';
+
+  const monthsRemaining = (endDate.getUTCFullYear() - today.getUTCFullYear()) * 12
+    + endDate.getUTCMonth() - today.getUTCMonth();
+
+  if (monthsRemaining === 0) return 'Less than 1 month';
+  return `${monthsRemaining} month${monthsRemaining === 1 ? '' : 's'}`;
+}
+
+function formatEndOfSupport(row: LifecycleRow): string {
+  const sourceStatus = formatDate(row.endOfSupportDate);
+  if (!row.endOfSupportDate?.toLowerCase().includes('month') || !row.releaseEndDate) return sourceStatus;
+
+  const remaining = getMonthsRemaining(row.releaseEndDate);
+  if (!remaining) return sourceStatus;
+
+  return `${remaining} · ${formatDate(row.releaseEndDate)}`;
 }
 
 function SortIcon({ field, sortField, sortDir }: { field: SortField; sortField: SortField; sortDir: SortDir }) {
@@ -78,54 +158,55 @@ function SortIcon({ field, sortField, sortDir }: { field: SortField; sortField: 
   return <span className="ml-1">{sortDir === 'asc' ? '↑' : '↓'}</span>;
 }
 
-const PAGE_SIZE = 50;
-
-export function MsLifecycleClient() {
-  const [data, setData] = useState<ApiResponse | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+function LifecycleGrid({
+  title,
+  rows,
+  sourceUrl,
+  sourceHref,
+  sourceLabel,
+  cachedAt,
+  fromCache,
+  searchPlaceholder,
+  dropdownFilterField,
+  dropdownFilterLabel,
+  columnOptions,
+}: LifecycleGridProps) {
   const [search, setSearch] = useState('');
-  const [categoryFilter, setCategoryFilter] = useState('All');
-  const [statusFilter, setStatusFilter] = useState<StatusFilter>('All');
-  const [sortField, setSortField] = useState<SortField>('endOfSupportDate');
+  const [dropdownFilter, setDropdownFilter] = useState('All');
+  const [sortField, setSortField] = useState<SortField>('product');
   const [sortDir, setSortDir] = useState<SortDir>('asc');
   const [page, setPage] = useState(1);
+  const [visibleColumns, setVisibleColumns] = useState<ColumnId[]>(columnOptions.map(column => column.id));
 
   useEffect(() => {
-    setLoading(true);
-    fetch('/api/mslifecycle')
-      .then(r => r.json())
-      .then((json: ApiResponse) => {
-        if (json.error) throw new Error(json.error);
-        setData(json);
-      })
-      .catch(e => setError(e.message))
-      .finally(() => setLoading(false));
-  }, []);
+    setVisibleColumns(columnOptions.map(column => column.id));
+    setSortField('product');
+    setSortDir('asc');
+    setPage(1);
+  }, [columnOptions]);
 
-  const categories = useMemo(() => {
-    if (!data) return [];
-    const cats = Array.from(new Set(data.rows.map(r => r.category).filter(Boolean))).sort();
-    return ['All', ...cats];
-  }, [data]);
+  const dropdownFilterOptions = useMemo(() => {
+    const values = Array.from(new Set(rows.map(row => row[dropdownFilterField]).filter(Boolean))).sort();
+    return ['All', ...values];
+  }, [rows, dropdownFilterField]);
 
   const filtered = useMemo(() => {
-    if (!data) return [];
-    const q = search.toLowerCase();
-    return data.rows
-      .filter(r => {
-        if (q && !r.product.toLowerCase().includes(q) && !r.version.toLowerCase().includes(q)) return false;
-        if (categoryFilter !== 'All' && r.category !== categoryFilter) return false;
-        if (statusFilter !== 'All') {
-          const s = getExpiryStatus(r);
-          if (statusFilter === 'Expired' && s !== 'expired') return false;
-          if (statusFilter === 'Expiring Soon' && s !== 'expiring-soon') return false;
-          if (statusFilter === 'Active' && s !== 'active') return false;
-        }
+    const query = search.toLowerCase();
+
+    return rows
+      .filter(row => {
+        const release = row.release.toLowerCase();
+        const category = row.category.toLowerCase();
+
+        if (query && !row.product.toLowerCase().includes(query) && !release.includes(query) && !category.includes(query)) return false;
+        if (dropdownFilter !== 'All' && row[dropdownFilterField] !== dropdownFilter) return false;
+
         return true;
       })
       .sort((a, b) => {
-        let va: string, vb: string;
+        let va: string;
+        let vb: string;
+
         if (sortField === 'product') {
           va = a.product.toLowerCase();
           vb = b.product.toLowerCase();
@@ -133,18 +214,21 @@ export function MsLifecycleClient() {
           va = a[sortField] ?? '9999-12-31';
           vb = b[sortField] ?? '9999-12-31';
         }
+
         if (va < vb) return sortDir === 'asc' ? -1 : 1;
         if (va > vb) return sortDir === 'asc' ? 1 : -1;
         return 0;
       });
-  }, [data, search, categoryFilter, statusFilter, sortField, sortDir]);
+  }, [rows, search, dropdownFilter, dropdownFilterField, sortField, sortDir]);
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   const paginated = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
+  const isVisible = (columnId: ColumnId) => visibleColumns.includes(columnId);
+
   function handleSort(field: SortField) {
     if (field === sortField) {
-      setSortDir(d => (d === 'asc' ? 'desc' : 'asc'));
+      setSortDir(current => (current === 'asc' ? 'desc' : 'asc'));
     } else {
       setSortField(field);
       setSortDir('asc');
@@ -152,20 +236,306 @@ export function MsLifecycleClient() {
     setPage(1);
   }
 
-  function handleSearch(v: string) {
-    setSearch(v);
-    setPage(1);
+  function toggleColumn(columnId: ColumnId) {
+    setVisibleColumns(current => {
+      if (current.includes(columnId)) {
+        if (current.length === 1) return current;
+
+        const next = current.filter(id => id !== columnId);
+        if (columnId === sortField) {
+          const fallbackSort = next.includes('product')
+            ? 'product'
+            : (next.find(id => id === 'startDate' || id === 'mainStreamEndDate' || id === 'extendedEndDate' || id === 'retirementDate' || id === 'releaseStartDate' || id === 'releaseEndDate' || id === 'endOfSupportDate') as SortField | undefined);
+
+          if (fallbackSort) {
+            setSortField(fallbackSort);
+            setSortDir('asc');
+          }
+        }
+
+        return next;
+      }
+
+      return [...current, columnId];
+    });
   }
 
-  function handleCategory(v: string) {
-    setCategoryFilter(v);
-    setPage(1);
-  }
+  return (
+    <section className="mb-10 flex min-h-0 flex-col md:mb-0 md:h-full">
+      {title && <h2 className="mb-2 text-lg font-semibold text-gray-900 dark:text-white">{title}</h2>}
 
-  function handleStatus(v: StatusFilter) {
-    setStatusFilter(v);
-    setPage(1);
-  }
+      <div className="mb-2 flex flex-col gap-2 sm:flex-row">
+        <input
+          type="search"
+          value={search}
+          onChange={event => {
+            setSearch(event.target.value);
+            setPage(1);
+          }}
+          placeholder={searchPlaceholder}
+          className="flex-1 px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
+        />
+        <select
+          value={dropdownFilter}
+          onChange={event => {
+            setDropdownFilter(event.target.value);
+            setPage(1);
+          }}
+          className="px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
+        >
+          {dropdownFilterOptions.map(value => (
+            <option key={value} value={value}>{value === 'All' ? `All ${dropdownFilterLabel}` : value}</option>
+          ))}
+        </select>
+        <Popover.Root>
+          <Popover.Trigger asChild>
+            <button
+              type="button"
+              aria-label="Choose columns"
+              title="Choose columns"
+              className="inline-flex items-center justify-center px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-primary-500"
+            >
+              <svg aria-hidden="true" viewBox="0 0 20 20" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.8">
+                <rect x="2.5" y="3" width="4" height="14" rx="1.2" />
+                <rect x="8" y="3" width="4" height="14" rx="1.2" />
+                <rect x="13.5" y="3" width="4" height="14" rx="1.2" />
+              </svg>
+            </button>
+          </Popover.Trigger>
+          <Popover.Portal>
+            <Popover.Content sideOffset={8} align="end" className="z-50 w-72 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 shadow-2xl p-3">
+              <div className="mb-2 text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                Select Columns
+              </div>
+              <div className="space-y-1 max-h-72 overflow-auto pr-1">
+                {columnOptions.map(option => (
+                  <label key={option.id} className="flex items-center gap-2 rounded-md px-2 py-1.5 hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer text-sm text-gray-700 dark:text-gray-200">
+                    <input
+                      type="checkbox"
+                      checked={isVisible(option.id)}
+                      onChange={() => toggleColumn(option.id)}
+                      disabled={visibleColumns.length === 1 && isVisible(option.id)}
+                      className="h-4 w-4 rounded border-gray-300 text-primary-600 focus:ring-primary-500"
+                    />
+                    <span>{option.label}</span>
+                  </label>
+                ))}
+              </div>
+            </Popover.Content>
+          </Popover.Portal>
+        </Popover.Root>
+      </div>
+
+      <div className="mb-2 flex items-center justify-between gap-4 text-xs text-gray-500 dark:text-gray-400">
+        <span>
+          {filtered.length.toLocaleString()} item{filtered.length !== 1 ? 's' : ''} matching
+          {rows.length !== filtered.length && <> (of {rows.length.toLocaleString()})</>}
+          {' '}
+          &bull; source:{' '}
+          <a href={sourceHref ?? sourceUrl} target="_blank" rel="noopener noreferrer" className="text-primary-600 dark:text-primary-400 underline hover:no-underline">{sourceLabel ?? sourceUrl.split('/').pop()}</a>
+        </span>
+        <span>
+          Cached {new Date(cachedAt).toLocaleString()}
+          {fromCache ? ' (cached)' : ' (fresh)'}
+        </span>
+      </div>
+
+      <div
+        data-testid="lifecycle-table-scroll"
+        className="overflow-x-scroll overflow-y-auto rounded-xl border border-gray-200 dark:border-gray-700 md:min-h-0 md:flex-1"
+      >
+        <table className="min-w-full text-sm">
+          <thead className="bg-gray-50 dark:bg-gray-800 sticky top-0">
+            <tr>
+              {isVisible('product') && (
+                <th
+                  className="px-4 py-3 text-left font-semibold text-gray-700 dark:text-gray-300 cursor-pointer whitespace-nowrap hover:bg-gray-100 dark:hover:bg-gray-700"
+                  onClick={() => handleSort('product')}
+                >
+                  {columnOptions.find(c => c.id === 'product')?.label ?? 'Product'}
+                  <SortIcon field="product" sortField={sortField} sortDir={sortDir} />
+                </th>
+              )}
+              {isVisible('edition') && <th className="px-4 py-3 text-left font-semibold text-gray-700 dark:text-gray-300 whitespace-nowrap">{columnOptions.find(c => c.id === 'edition')?.label}</th>}
+              {isVisible('release') && <th className="px-4 py-3 text-left font-semibold text-gray-700 dark:text-gray-300 whitespace-nowrap">{columnOptions.find(c => c.id === 'release')?.label}</th>}
+              {isVisible('category') && <th className="px-4 py-3 text-left font-semibold text-gray-700 dark:text-gray-300 whitespace-nowrap">{columnOptions.find(c => c.id === 'category')?.label}</th>}
+              {isVisible('supportPolicy') && <th className="px-4 py-3 text-left font-semibold text-gray-700 dark:text-gray-300 whitespace-nowrap">{columnOptions.find(c => c.id === 'supportPolicy')?.label}</th>}
+              {isVisible('startDate') && (
+                <th
+                  className="px-4 py-3 text-left font-semibold text-gray-700 dark:text-gray-300 cursor-pointer whitespace-nowrap hover:bg-gray-100 dark:hover:bg-gray-700"
+                  onClick={() => handleSort('startDate')}
+                >
+                  {columnOptions.find(c => c.id === 'startDate')?.label}
+                  <SortIcon field="startDate" sortField={sortField} sortDir={sortDir} />
+                </th>
+              )}
+              {isVisible('mainStreamEndDate') && (
+                <th
+                  className="px-4 py-3 text-left font-semibold text-gray-700 dark:text-gray-300 cursor-pointer whitespace-nowrap hover:bg-gray-100 dark:hover:bg-gray-700"
+                  onClick={() => handleSort('mainStreamEndDate')}
+                >
+                  {columnOptions.find(c => c.id === 'mainStreamEndDate')?.label}
+                  <SortIcon field="mainStreamEndDate" sortField={sortField} sortDir={sortDir} />
+                </th>
+              )}
+              {isVisible('extendedEndDate') && (
+                <th
+                  className="px-4 py-3 text-left font-semibold text-gray-700 dark:text-gray-300 cursor-pointer whitespace-nowrap hover:bg-gray-100 dark:hover:bg-gray-700"
+                  onClick={() => handleSort('extendedEndDate')}
+                >
+                  {columnOptions.find(c => c.id === 'extendedEndDate')?.label}
+                  <SortIcon field="extendedEndDate" sortField={sortField} sortDir={sortDir} />
+                </th>
+              )}
+              {isVisible('retirementDate') && (
+                <th
+                  className="px-4 py-3 text-left font-semibold text-gray-700 dark:text-gray-300 cursor-pointer whitespace-nowrap hover:bg-gray-100 dark:hover:bg-gray-700"
+                  onClick={() => handleSort('retirementDate')}
+                >
+                  {columnOptions.find(c => c.id === 'retirementDate')?.label}
+                  <SortIcon field="retirementDate" sortField={sortField} sortDir={sortDir} />
+                </th>
+              )}
+              {isVisible('releaseStartDate') && (
+                <th
+                  className="px-4 py-3 text-left font-semibold text-gray-700 dark:text-gray-300 cursor-pointer whitespace-nowrap hover:bg-gray-100 dark:hover:bg-gray-700"
+                  onClick={() => handleSort('releaseStartDate')}
+                >
+                  {columnOptions.find(c => c.id === 'releaseStartDate')?.label}
+                  <SortIcon field="releaseStartDate" sortField={sortField} sortDir={sortDir} />
+                </th>
+              )}
+              {isVisible('releaseEndDate') && (
+                <th
+                  className="px-4 py-3 text-left font-semibold text-gray-700 dark:text-gray-300 cursor-pointer whitespace-nowrap hover:bg-gray-100 dark:hover:bg-gray-700"
+                  onClick={() => handleSort('releaseEndDate')}
+                >
+                  {columnOptions.find(c => c.id === 'releaseEndDate')?.label}
+                  <SortIcon field="releaseEndDate" sortField={sortField} sortDir={sortDir} />
+                </th>
+              )}
+              {isVisible('docsUrl') && <th className="px-4 py-3 text-left font-semibold text-gray-700 dark:text-gray-300 whitespace-nowrap">{columnOptions.find(c => c.id === 'docsUrl')?.label}</th>}
+              {isVisible('endOfSupportDate') && (
+                <th
+                  className="px-4 py-3 text-left font-semibold text-gray-700 dark:text-gray-300 cursor-pointer whitespace-nowrap hover:bg-gray-100 dark:hover:bg-gray-700"
+                  onClick={() => handleSort('endOfSupportDate')}
+                >
+                  {columnOptions.find(c => c.id === 'endOfSupportDate')?.label}
+                  <SortIcon field="endOfSupportDate" sortField={sortField} sortDir={sortDir} />
+                </th>
+              )}
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
+            {paginated.length === 0 ? (
+              <tr>
+                <td colSpan={visibleColumns.length} className="px-4 py-12 text-center text-gray-400 dark:text-gray-500">
+                  No items match the current filters.
+                </td>
+              </tr>
+            ) : (
+              paginated.map((row, index) => {
+                const status = getExpiryStatus(row);
+                return (
+                  <tr
+                    key={`${row.product}-${row.category}-${index}`}
+                    className={`hover:bg-gray-50 dark:hover:bg-gray-800/50 ${
+                      status === 'expired'
+                        ? 'bg-red-50/40 dark:bg-red-950/20'
+                        : status === 'expiring-soon'
+                          ? 'bg-yellow-50/40 dark:bg-yellow-950/20'
+                          : ''
+                    }`}
+                  >
+                    {isVisible('product') && <td className="px-4 py-3 font-medium text-gray-900 dark:text-gray-100">{row.product}</td>}
+                    {isVisible('edition') && <td className="px-4 py-3 text-gray-600 dark:text-gray-400">{row.edition || '—'}</td>}
+                    {isVisible('release') && <td className="px-4 py-3 text-gray-600 dark:text-gray-400">{row.release || '—'}</td>}
+                    {isVisible('category') && <td className="px-4 py-3 text-gray-600 dark:text-gray-400">{row.category || '—'}</td>}
+                    {isVisible('supportPolicy') && <td className="px-4 py-3 text-gray-600 dark:text-gray-400">{row.supportPolicy || '—'}</td>}
+                    {isVisible('startDate') && <td className="px-4 py-3 text-gray-600 dark:text-gray-400 whitespace-nowrap">{formatDate(row.startDate)}</td>}
+                    {isVisible('mainStreamEndDate') && <td className="px-4 py-3 text-gray-600 dark:text-gray-400 whitespace-nowrap">{formatDate(row.mainStreamEndDate)}</td>}
+                    {isVisible('extendedEndDate') && <td className="px-4 py-3 text-gray-600 dark:text-gray-400 whitespace-nowrap">{formatDate(row.extendedEndDate)}</td>}
+                    {isVisible('retirementDate') && <td className="px-4 py-3 text-gray-600 dark:text-gray-400 whitespace-nowrap">{formatDate(row.retirementDate)}</td>}
+                    {isVisible('releaseStartDate') && <td className="px-4 py-3 text-gray-600 dark:text-gray-400 whitespace-nowrap">{formatDate(row.releaseStartDate)}</td>}
+                    {isVisible('releaseEndDate') && <td className="px-4 py-3 text-gray-600 dark:text-gray-400 whitespace-nowrap">{formatDate(row.releaseEndDate)}</td>}
+                    {isVisible('docsUrl') && (
+                      <td className="px-4 py-3">
+                        {row.docsUrl ? (
+                          <a href={row.docsUrl} target="_blank" rel="noopener noreferrer" className="text-primary-600 dark:text-primary-400 underline hover:no-underline text-xs">Docs</a>
+                        ) : '—'}
+                      </td>
+                    )}
+                    {isVisible('endOfSupportDate') && <td className="px-4 py-3 text-gray-600 dark:text-gray-400 whitespace-nowrap">{formatEndOfSupport(row)}</td>}
+                  </tr>
+                );
+              })
+            )}
+          </tbody>
+        </table>
+      </div>
+
+      {totalPages > 1 && (
+        <div className="flex items-center justify-between mt-4 text-sm">
+          <span className="text-gray-500 dark:text-gray-400">
+            Page {page} of {totalPages}
+          </span>
+          <div className="flex gap-2">
+            <button
+              onClick={() => setPage(current => Math.max(1, current - 1))}
+              disabled={page === 1}
+              className="px-3 py-1.5 rounded-lg border border-gray-300 dark:border-gray-600 disabled:opacity-40 hover:bg-gray-50 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300"
+            >
+              Previous
+            </button>
+            <button
+              onClick={() => setPage(current => Math.min(totalPages, current + 1))}
+              disabled={page === totalPages}
+              className="px-3 py-1.5 rounded-lg border border-gray-300 dark:border-gray-600 disabled:opacity-40 hover:bg-gray-50 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300"
+            >
+              Next
+            </button>
+          </div>
+        </div>
+      )}
+    </section>
+  );
+}
+
+function isAzureFeatureRetirementRow(row: LifecycleRow): boolean {
+  return Boolean(row.category?.trim());
+}
+
+export function MsLifecycleClient() {
+  const [data, setData] = useState<ApiResponse | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [lifecycleView, setLifecycleView] = useState<LifecycleView>('microsoft');
+
+  useEffect(() => {
+    setLoading(true);
+    fetch('/api/mslifecycle')
+      .then(response => response.json())
+      .then((json: ApiResponse) => {
+        if (json.error) throw new Error(json.error);
+        setData(json);
+      })
+      .catch(fetchError => setError(fetchError.message))
+      .finally(() => setLoading(false));
+  }, []);
+
+  const splitRows = useMemo(() => {
+    if (!data) {
+      return {
+        microsoftProductRows: [] as LifecycleRow[],
+        azureFeatureRows: [] as LifecycleRow[],
+      };
+    }
+
+    const microsoftProductRows = data.rows.filter(row => !isAzureFeatureRetirementRow(row));
+    const azureFeatureRows = data.rows.filter(isAzureFeatureRetirementRow);
+
+    return { microsoftProductRows, azureFeatureRows };
+  }, [data]);
 
   if (loading) {
     return (
@@ -190,139 +560,100 @@ export function MsLifecycleClient() {
   if (!data) return null;
 
   return (
-    <div>
-      {/* Filters */}
-      <div className="flex flex-col sm:flex-row gap-3 mb-4">
-        <input
-          type="search"
-          value={search}
-          onChange={e => handleSearch(e.target.value)}
-          placeholder="Search product or version…"
-          className="flex-1 px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
-        />
-        <select
-          value={categoryFilter}
-          onChange={e => handleCategory(e.target.value)}
-          className="px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
-        >
-          {categories.map(c => (
-            <option key={c} value={c}>{c}</option>
-          ))}
-        </select>
-        <select
-          value={statusFilter}
-          onChange={e => handleStatus(e.target.value as StatusFilter)}
-          className="px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
-        >
-          {STATUS_FILTERS.map(s => (
-            <option key={s} value={s}>{s}</option>
-          ))}
-        </select>
-      </div>
-
-      {/* Stats row */}
-      <div className="flex items-center justify-between mb-3 text-sm text-gray-500 dark:text-gray-400">
-        <span>
-          {filtered.length.toLocaleString()} product{filtered.length !== 1 ? 's' : ''} matching
-          {data && (
-            <> &bull; source: <a href={data.sourceUrl} target="_blank" rel="noopener noreferrer" className="text-primary-600 dark:text-primary-400 underline hover:no-underline">{data.sourceUrl.split('/').pop()}</a></>
-          )}
-        </span>
-        <span>
-          Cached {new Date(data.cachedAt).toLocaleString()}
-          {data.fromCache ? ' (cached)' : ' (fresh)'}
-        </span>
-      </div>
-
-      {/* Table */}
-      <div className="overflow-x-auto rounded-xl border border-gray-200 dark:border-gray-700">
-        <table className="min-w-full text-sm">
-          <thead className="bg-gray-50 dark:bg-gray-800 sticky top-0">
-            <tr>
-              <th
-                className="px-4 py-3 text-left font-semibold text-gray-700 dark:text-gray-300 cursor-pointer whitespace-nowrap hover:bg-gray-100 dark:hover:bg-gray-700"
-                onClick={() => handleSort('product')}
-              >
-                Product <SortIcon field="product" sortField={sortField} sortDir={sortDir} />
-              </th>
-              <th className="px-4 py-3 text-left font-semibold text-gray-700 dark:text-gray-300 whitespace-nowrap">Version</th>
-              <th className="px-4 py-3 text-left font-semibold text-gray-700 dark:text-gray-300 whitespace-nowrap">Category</th>
-              <th
-                className="px-4 py-3 text-left font-semibold text-gray-700 dark:text-gray-300 cursor-pointer whitespace-nowrap hover:bg-gray-100 dark:hover:bg-gray-700"
-                onClick={() => handleSort('endOfSupportDate')}
-              >
-                End of Support <SortIcon field="endOfSupportDate" sortField={sortField} sortDir={sortDir} />
-              </th>
-              <th
-                className="px-4 py-3 text-left font-semibold text-gray-700 dark:text-gray-300 cursor-pointer whitespace-nowrap hover:bg-gray-100 dark:hover:bg-gray-700"
-                onClick={() => handleSort('extendedEndDate')}
-              >
-                Extended End <SortIcon field="extendedEndDate" sortField={sortField} sortDir={sortDir} />
-              </th>
-              <th
-                className="px-4 py-3 text-left font-semibold text-gray-700 dark:text-gray-300 cursor-pointer whitespace-nowrap hover:bg-gray-100 dark:hover:bg-gray-700"
-                onClick={() => handleSort('retirementDate')}
-              >
-                Retirement <SortIcon field="retirementDate" sortField={sortField} sortDir={sortDir} />
-              </th>
-              <th className="px-4 py-3 text-left font-semibold text-gray-700 dark:text-gray-300 whitespace-nowrap">Status</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
-            {paginated.length === 0 ? (
-              <tr>
-                <td colSpan={7} className="px-4 py-12 text-center text-gray-400 dark:text-gray-500">
-                  No products match the current filters.
-                </td>
-              </tr>
-            ) : (
-              paginated.map((row, i) => {
-                const status = getExpiryStatus(row);
-                return (
-                  <tr
-                    key={i}
-                    className={`hover:bg-gray-50 dark:hover:bg-gray-800/50 ${
-                      status === 'expired' ? 'bg-red-50/40 dark:bg-red-950/20' :
-                      status === 'expiring-soon' ? 'bg-yellow-50/40 dark:bg-yellow-950/20' : ''
-                    }`}
-                  >
-                    <td className="px-4 py-3 font-medium text-gray-900 dark:text-gray-100">{row.product}</td>
-                    <td className="px-4 py-3 text-gray-600 dark:text-gray-400">{row.version || '—'}</td>
-                    <td className="px-4 py-3 text-gray-600 dark:text-gray-400">{row.category || '—'}</td>
-                    <td className="px-4 py-3 text-gray-600 dark:text-gray-400 whitespace-nowrap">{formatDate(row.endOfSupportDate)}</td>
-                    <td className="px-4 py-3 text-gray-600 dark:text-gray-400 whitespace-nowrap">{formatDate(row.extendedEndDate)}</td>
-                    <td className="px-4 py-3 text-gray-600 dark:text-gray-400 whitespace-nowrap">{formatDate(row.retirementDate)}</td>
-                    <td className="px-4 py-3"><StatusBadge status={status} /></td>
-                  </tr>
-                );
-              })
-            )}
-          </tbody>
-        </table>
-      </div>
-
-      {/* Pagination */}
-      {totalPages > 1 && (
-        <div className="flex items-center justify-between mt-4 text-sm">
-          <span className="text-gray-500 dark:text-gray-400">
-            Page {page} of {totalPages}
-          </span>
-          <div className="flex gap-2">
-            <button
-              onClick={() => setPage(p => Math.max(1, p - 1))}
-              disabled={page === 1}
-              className="px-3 py-1.5 rounded-lg border border-gray-300 dark:border-gray-600 disabled:opacity-40 hover:bg-gray-50 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300"
+    <div className="flex min-h-0 flex-1 flex-col">
+      <p className="mb-3 text-center text-sm text-gray-500 dark:text-gray-400">
+        {lifecycleView === 'microsoft' ? (
+          <>
+            Microsoft product support and Azure feature retirement dates sourced from the{' '}
+            <a
+              href={LIFECYCLE_EXPORT_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-primary-600 underline hover:no-underline dark:text-primary-400"
             >
-              Previous
-            </button>
-            <button
-              onClick={() => setPage(p => Math.min(totalPages, p + 1))}
-              disabled={page === totalPages}
-              className="px-3 py-1.5 rounded-lg border border-gray-300 dark:border-gray-600 disabled:opacity-40 hover:bg-gray-50 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300"
+              Microsoft Lifecycle export
+            </a>
+            .
+          </>
+        ) : (
+          <>
+            Azure feature retirement dates sourced from the{' '}
+            <a
+              href={AZURE_LIFECYCLE_SOURCE_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-primary-600 underline hover:no-underline dark:text-primary-400"
             >
-              Next
-            </button>
-          </div>
+              Azure RSS source
+            </a>
+            .
+          </>
+        )}
+      </p>
+
+      <div
+        role="tablist"
+        aria-label="Lifecycle view"
+        className="mb-3 grid w-full grid-cols-2 rounded-lg border border-gray-200 bg-gray-100 p-0.5 dark:border-gray-700 dark:bg-gray-800 sm:mx-auto sm:max-w-lg"
+      >
+        <button
+          type="button"
+          role="tab"
+          id="microsoft-lifecycle-tab"
+          aria-controls="microsoft-lifecycle-panel"
+          aria-selected={lifecycleView === 'microsoft'}
+          onClick={() => setLifecycleView('microsoft')}
+          className={`min-h-10 rounded-md px-2 py-1.5 text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900 ${
+            lifecycleView === 'microsoft'
+              ? 'bg-white text-primary-700 shadow-sm dark:bg-gray-900 dark:text-primary-300'
+              : 'text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100'
+          }`}
+        >
+          Microsoft Product Lifecycle
+        </button>
+        <button
+          type="button"
+          role="tab"
+          id="azure-lifecycle-tab"
+          aria-controls="azure-lifecycle-panel"
+          aria-selected={lifecycleView === 'azure'}
+          onClick={() => setLifecycleView('azure')}
+          className={`min-h-10 rounded-md px-2 py-1.5 text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900 ${
+            lifecycleView === 'azure'
+              ? 'bg-white text-primary-700 shadow-sm dark:bg-gray-900 dark:text-primary-300'
+              : 'text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100'
+          }`}
+        >
+          Azure Lifecycle
+        </button>
+      </div>
+
+      {lifecycleView === 'microsoft' ? (
+        <div className="min-h-0 flex-1" role="tabpanel" id="microsoft-lifecycle-panel" aria-labelledby="microsoft-lifecycle-tab">
+          <LifecycleGrid
+            rows={splitRows.microsoftProductRows}
+            sourceUrl={data.sourceUrl}
+            cachedAt={data.cachedAt}
+            fromCache={data.fromCache}
+            searchPlaceholder="Search Microsoft product or release…"
+            dropdownFilterField="product"
+            dropdownFilterLabel="products"
+            columnOptions={MICROSOFT_COLUMN_OPTIONS}
+          />
+        </div>
+      ) : (
+        <div className="min-h-0 flex-1" role="tabpanel" id="azure-lifecycle-panel" aria-labelledby="azure-lifecycle-tab">
+          <LifecycleGrid
+            rows={splitRows.azureFeatureRows}
+            sourceUrl={AZURE_LIFECYCLE_SOURCE_URL}
+            sourceLabel="Azure RSS source"
+            cachedAt={data.cachedAt}
+            fromCache={data.fromCache}
+            searchPlaceholder="Search Azure feature or release…"
+            dropdownFilterField="category"
+            dropdownFilterLabel="Azure features"
+            columnOptions={AZURE_FEATURE_COLUMN_OPTIONS}
+          />
         </div>
       )}
     </div>

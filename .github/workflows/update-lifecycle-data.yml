@@ -1,0 +1,45 @@
+name: Update Microsoft Lifecycle Data
+
+on:
+  schedule:
+    # Run weekly on Monday at 2 AM UTC
+    - cron: '0 2 * * 1'
+  workflow_dispatch: # Allow manual trigger
+
+jobs:
+  update-lifecycle:
+    runs-on: ubuntu-latest
+    name: Fetch and Update Lifecycle Data
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install dependencies
+        run: npm ci --omit=dev --workspaces-update-depth=0
+
+      - name: Fetch and parse lifecycle data
+        run: node scripts/update-lifecycle-data.mjs
+
+      - name: Check for changes
+        id: changes
+        run: |
+          if git diff --exit-code public/data/lifecycle.json > /dev/null 2>&1; then
+            echo "changed=false" >> $GITHUB_OUTPUT
+          else
+            echo "changed=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Commit and push if changed
+        if: steps.changes.outputs.changed == 'true'
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add public/data/lifecycle.json
+          git commit -m 'chore: update Microsoft lifecycle data'
+          git push

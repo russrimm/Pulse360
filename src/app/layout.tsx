@@ -11,7 +11,7 @@ import { ReactQueryProvider } from '@/components/ReactQueryProvider'
 import { FilterProvider } from '@/components/FilterContext'
 
 import { Analytics } from "@vercel/analytics/next"
-import { SpeedInsights } from "@vercel/speed-insights/next"
+import { SafeSpeedInsights } from "@/components/SafeSpeedInsights"
 
 const inter = Inter({
   subsets: ['latin'],
@@ -60,11 +60,11 @@ export default function RootLayout({
                 <div className="min-h-screen flex flex-col">
                   <Navbar />
                   <NavigationTabs />
-                  <main className="flex-1">
+                  <main className="flex-1 flex flex-col min-h-0">
                     {children}
                   </main>
                   <Analytics />
-                  <SpeedInsights />
+                  <SafeSpeedInsights />
                 </div>
               </FilterProvider>
             </ErrorBoundary>

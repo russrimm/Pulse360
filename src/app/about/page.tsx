@@ -3,63 +3,153 @@ import Image from 'next/image'
 
 export default function AboutPage() {
   return (
-    <main className="max-w-2xl mx-auto px-4 py-12 sm:py-20 flex flex-col items-center">
+    <main className="max-w-3xl mx-auto px-4 py-12 sm:py-20 flex flex-col items-center">
       <div className="bg-white/80 dark:bg-gray-900/80 rounded-2xl shadow-xl border border-gray-200 dark:border-gray-700 p-8 w-full">
         <div className="flex flex-col items-center mb-6">
           <Image src="/icons/azure/general/10005-icon-service-Information.svg" alt="About" width={48} height={48} className="mb-2" />
           <h1 className="text-3xl font-bold text-primary-700 dark:text-primary-300 mb-1 text-center">Welcome to Pulse 360°</h1>
-          <p className="text-gray-600 dark:text-gray-300 text-center text-lg">A Vibe Coding Project by a Non-Coder</p>
+          <p className="text-gray-600 dark:text-gray-300 text-center text-lg">Your unified Microsoft update dashboard</p>
         </div>
         <div className="prose dark:prose-invert max-w-none text-gray-800 dark:text-gray-200">
-          <p>Hey there,</p>
+
           <p>
-            For years, I've had ideas for apps and websites—some brilliant, some questionable, all of them just out of reach. Why? Because I never had the attention span (or, let's be honest, the patience) to sit down and actually learn to code. I'd dabble in PowerShell, tinker with batch files, and then get distracted by something shiny (or a snack).
+            Pulse 360° is a single-pane-of-glass dashboard that aggregates Microsoft&apos;s official update streams — Microsoft 365, Azure, Fabric, Power Platform, Dynamics 365, Copilot, security advisories, and more — into one fast, searchable, filterable interface with full dark-mode support.
           </p>
+
+          <h2 className="text-xl font-semibold mt-8 mb-3">Capabilities</h2>
+
+          <h3 className="text-lg font-semibold mt-6 mb-2">📬 Message Center</h3>
           <p>
-            Then along came Vibe Coding. Suddenly, building something real didn't mean memorizing syntax or debugging for hours. It meant describing what I wanted, letting an AI do the heavy lifting, and poking it until it worked. The rest, as they say, is history—and this site is the proof. What's next for Vibe Coding? Bing Context Engineering.
+            Live Microsoft 365 tenant messages pulled directly from Microsoft Graph. Search and filter by product, service area, or impact level. Each message drills through to a full detail view with action type, impact, and last-updated timestamps.
           </p>
-          <h2 className="text-xl font-semibold mt-8 mb-2">How This Site Was Made (No Magic, Just Prompts)</h2>
+
+          <h3 className="text-lg font-semibold mt-6 mb-2">🔵 Azure Updates</h3>
+          <p>
+            The complete Azure product update feed with per-item detail pages. Filter by product tag, search by keyword, and sort by publish date.
+          </p>
+
+          <h3 className="text-lg font-semibold mt-6 mb-2">🟦 Microsoft 365 Updates</h3>
+          <p>
+            M365 service update announcements with the same search-and-filter experience as Azure Updates. Covers Exchange, Teams, SharePoint, and all M365 services.
+          </p>
+
+          <h3 className="text-lg font-semibold mt-6 mb-2">🛡️ MSRC Security Updates</h3>
+          <p>
+            The Microsoft Security Response Center CVRF feed with a month picker. Browse every published CVE by month, expand individual entries to see affected products, max severity, CVSS score, KB article links, downloadable patches, weakness (CWE) info, and full revision history.
+          </p>
+
+          <h3 className="text-lg font-semibold mt-6 mb-2">🗺️ Release Plans</h3>
+          <p>
+            Forward-looking release planners for four product families — Azure, Microsoft 365, Microsoft Fabric, and Dynamics 365 / Power Platform — plus a combined roadmap view. Each plan item links to a detail page with full description, timeline, and product context.
+          </p>
+
+          <h3 className="text-lg font-semibold mt-6 mb-2">🧵 Fabric &amp; Power Platform Roadmap</h3>
+          <p>
+            The official Fabric and Power Platform roadmap grouped by product area with collapsible sections and drill-through detail pages.
+          </p>
+
+          <h3 className="text-lg font-semibold mt-6 mb-2">📰 Product News</h3>
+          <p>
+            Aggregated blog and RSS feeds from across the Microsoft ecosystem, all in one hub. Individual sub-feeds include:
+          </p>
           <ul>
-            <li><b>Stack:</b> Next.js 15 App Router, React, TypeScript, Tailwind, Shadcn UI, Radix UI, Viem, Wagmi, and a parade of SVGs. Do I know what all actually means? Yes to SVGs!</li>
-            <li><b>Design:</b> Modern, mobile-first, and accessibility-friendly. If it looks weird on your phone, blame the AI (or me).</li>
-            <li><b>Development:</b> 100% prompt-driven. I described what I wanted, the AI wrote the code, and I poked it until it worked. No Stack Overflow rabbit holes required.</li>
+            <li>Azure AI Foundry</li>
+            <li>Azure AI / Machine Learning</li>
+            <li>Copilot &amp; Copilot Studio</li>
+            <li>Microsoft Fabric Blog</li>
+            <li>Power BI, Power Apps, Power Automate &amp; Power Platform</li>
+            <li>Semantic Kernel</li>
+            <li>Microsoft Learn Blog</li>
+            <li>Microsoft News &amp; Tech Community</li>
+            <li>VS Code &amp; Windows Blogs</li>
+            <li>All Things Azure</li>
           </ul>
-          <h2 className="text-xl font-semibold mt-8 mb-2">If You Want to Build Something Like This…</h2>
-          <p>Here are the kinds of prompts that worked best for each part of the site:</p>
+
+          <h3 className="text-lg font-semibold mt-6 mb-2">🕒 Microsoft Product Lifecycle</h3>
+          <p>
+            End-of-support and retirement dates for Microsoft products, sourced from the official Microsoft Lifecycle export on learn.microsoft.com. Search and filter to track when products in your environment reach end-of-support.
+          </p>
+
+          <h2 className="text-xl font-semibold mt-8 mb-3">Data Sources</h2>
+          <table className="w-full text-sm border-collapse">
+            <thead>
+              <tr className="border-b border-gray-200 dark:border-gray-700">
+                <th className="text-left py-2 pr-4 font-semibold">Feature</th>
+                <th className="text-left py-2 font-semibold">Source</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr className="border-b border-gray-100 dark:border-gray-800">
+                <td className="py-2 pr-4 align-top">Message Center</td>
+                <td className="py-2 align-top">Microsoft Graph API — <code>serviceAnnouncement/messages</code> (app-only OAuth, requires your tenant credentials)</td>
+              </tr>
+              <tr className="border-b border-gray-100 dark:border-gray-800">
+                <td className="py-2 pr-4 align-top">MSRC Security Updates</td>
+                <td className="py-2 align-top">MSRC CVRF API — <code>api.msrc.microsoft.com/cvrf/v3.0</code> (public)</td>
+              </tr>
+              <tr className="border-b border-gray-100 dark:border-gray-800">
+                <td className="py-2 pr-4 align-top">Azure &amp; M365 Updates</td>
+                <td className="py-2 align-top">Microsoft RSS feeds via a server-side allowlisted proxy</td>
+              </tr>
+              <tr className="border-b border-gray-100 dark:border-gray-800">
+                <td className="py-2 pr-4 align-top">Fabric / Power Platform Roadmap</td>
+                <td className="py-2 align-top">Release Planner API — <code>releaseplanner.azure-api.net</code> (public)</td>
+              </tr>
+              <tr className="border-b border-gray-100 dark:border-gray-800">
+                <td className="py-2 pr-4 align-top">Release Plans</td>
+                <td className="py-2 align-top">Release Planner API for Azure, M365, Fabric &amp; Dynamics / Power Platform (public)</td>
+              </tr>
+              <tr className="border-b border-gray-100 dark:border-gray-800">
+                <td className="py-2 pr-4 align-top">Product News</td>
+                <td className="py-2 align-top">Public RSS / Atom feeds from <code>devblogs.microsoft.com</code>, <code>techcommunity.microsoft.com</code>, <code>powerplatform.microsoft.com</code>, and other <code>*.microsoft.com</code> blog domains</td>
+              </tr>
+              <tr>
+                <td className="py-2 pr-4 align-top">Microsoft Product Lifecycle</td>
+                <td className="py-2 align-top">Microsoft Lifecycle export on <code>learn.microsoft.com</code> (public)</td>
+              </tr>
+            </tbody>
+          </table>
+          <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
+            All public feeds are cached server-side (1–24 hours depending on source). The RSS proxy only fetches from an allowlisted set of <code>*.microsoft.com</code> hosts. No personal data is collected or stored.
+          </p>
+
+          <h2 className="text-xl font-semibold mt-8 mb-3">Using the Site</h2>
           <ul>
-            <li><b>Landing Page & Navbar:</b> <code>"Create a modern Next.js landing page with a sticky navbar, logo, and responsive design. Support dark and light mode."</code></li>
-            <li><b>Product Filters & Cards:</b> <code>"Show a grid of product cards with SVG icons, filterable by product. Make it mobile-friendly and accessible."</code></li>
-            <li><b>Azure Updates & News:</b> <code>"Fetch and display Azure updates from an API. Use infinite scroll, search, and filter by product. Make it look modern."</code></li>
-            <li><b>Detail Views:</b> <code>"Add a detail page for each update with a back arrow, date, and all the tags. Keep the layout clean."</code></li>
-            <li><b>SVG Icon Consistency:</b> <code>"Map product names to SVG icons. Use the right icon everywhere, even in filters and cards."</code></li>
-            <li><b>Accessibility & Polish:</b> <code>"Make sure all buttons are accessible, keyboard-friendly, and have focus states. Make it look modern."</code></li>
-            <li><b>About Page (this one!):</b> <code>"Write a fun, modern about page styled like a welcome email. Explain the project, the stack, and how prompts drove the build. Make it entertaining but concise."</code></li>
+            <li><b>Global search:</b> Every list page has a search bar. Matching is case- and whitespace-insensitive against titles, product names, and (where applicable) message IDs.</li>
+            <li><b>Filters:</b> Product, Area, Date, and Major Changes filters live above each list. Active filters pulse red so it&apos;s obvious when results are scoped. Click <b>Clear</b> to reset.</li>
+            <li><b>Drill-through:</b> Every card is fully clickable and links to a full detail page.</li>
+            <li><b>MSRC month picker:</b> The security page exposes a dropdown of every month MSRC has published. Pick a month to fetch the full CVE bundle for that period.</li>
+            <li><b>Theme:</b> Use the toggle in the top-right to switch light / dark / system.</li>
+            <li><b>Keyboard nav:</b> Navigation, popovers, and cards are all reachable by keyboard. <code>Esc</code> closes popovers and modals.</li>
           </ul>
-          <h2 className="text-xl font-semibold mt-8 mb-2">Lessons Learned</h2>
-          <ul>
-            <li>AI is a great coding partner, but it's not psychic. Be specific, be patient, and don't be afraid to say, "No, do it again."</li>
-            <li>Modern frameworks are powerful, but you don't need to know everything to get started. Just start.</li>
-            <li>Debugging is 80% of the job. The other 20% is asking, "Why is there a horizontal scrollbar?"</li>
-            <li>Every bug is a learning opportunity. Or a reason to take a coffee break.</li>
-          </ul>
-          <h2 className="text-xl font-semibold mt-8 mb-2">Vibe Coding Tips & Tricks</h2>
-          <ul>
-            <li><b>Be the AI's eyes:</b> Instead of telling the AI exactly how to fix something, describe what you see and what you don't like. For example, say "The button looks off-center on mobile" or "The card titles are getting cut off"—not "Change the margin to 8px." The AI often has a better (or weirder) way to fix it than you'd think.</li>
-            <li><b>Iterate fast:</b> Don't stress about getting the perfect prompt. Try something, see what happens, and adjust. The more you describe, the better the results.</li>
-            <li><b>Be curious:</b> Ask the AI why it made a change, or what it thinks is best. Sometimes it has a clever (or wild) idea.</li>
-            <li><b>Give feedback:</b> If the AI does something weird, just say so. It learns from your reactions.</li>
-          </ul>
-          <h2 className="text-xl font-semibold mt-8 mb-2">Recommendations for Successful Vibe Coding</h2>
-          <ul>
-            <li><b>Use the right rules for the job:</b> If you have specific requirements or want to guide the AI, set up rules that match your needs. The right rules make the AI way more effective.</li>
-            <li><b>Leverage MCPs (Model Capability Plugins):</b> Extend what the AI can do by using MCPs—these let you add new tools, APIs, or data sources to the model. If you need something special, ask about adding an MCP!</li>
-            <li><b>Mix and match:</b> Combine rules and MCPs to create a custom workflow that fits your project. The more you tailor the setup, the better the results.</li>
-          </ul>
-          <h2 className="text-xl font-semibold mt-8 mb-2">Want to Build Something Like This?</h2>
-          <p>If you're curious how this site was made, or want to build your own, I'm happy to share everything I learned (and all the mistakes I made). Just reach out to your Microsoft CSAM and ask to schedule a call with me. Let's vibe code together!</p>
-          <p className="mt-8">Thanks for visiting! If you have feedback, ideas, or just want to say hi, <a href="mailto:russ.rimmerman@microsoft.com?subject=Pulse 360 Feedback" className="text-primary-600 dark:text-primary-400 underline">email me</a>. Happy Vibe Coding!</p>
+
+          <h2 className="text-xl font-semibold mt-8 mb-3">Deploy It in Your Own Tenant</h2>
+          <p>
+            Pulse 360° is open source. If you&apos;d like to run your own instance — pointed at your organization&apos;s tenant for live Message Center data — clone the repo, create an Entra app registration with the <code>ServiceMessage.Read.All</code> permission, add your credentials to <code>.env.local</code>, and deploy to Vercel or any Node.js host.
+          </p>
+          <p className="mt-2">
+            <a
+              href="https://github.com/russrimm/Pulse360"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-primary-600 dark:text-primary-400 underline font-medium"
+            >
+              github.com/russrimm/Pulse360
+            </a>
+            {' '}— full setup instructions, environment variable reference, and deployment guide are in the README.
+          </p>
+
+          <h2 className="text-xl font-semibold mt-8 mb-3">How This Site Was Made</h2>
+          <p>
+            This is a vibe coding project — built entirely through prompt-driven development with GitHub Copilot, without memorizing syntax or spending hours on Stack Overflow. The stack is Next.js 16 App Router, React 19, TypeScript, Tailwind CSS 4, and Radix UI. Server Components do the heavy lifting; client components add interactivity.
+          </p>
+          <p className="mt-2">
+            If you&apos;re curious about the approach, reach out to your Microsoft CSAM and ask to schedule a call. Happy to share everything learned along the way — including all the mistakes.
+          </p>
+
+          <p className="mt-8">Thanks for visiting! Feedback, ideas, or just want to say hi — <a href="mailto:russ.rimmerman@microsoft.com?subject=Pulse 360 Feedback" className="text-primary-600 dark:text-primary-400 underline">email me</a>.</p>
         </div>
       </div>
     </main>
   )
-} 
+}

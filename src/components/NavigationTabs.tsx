@@ -126,7 +126,7 @@ export function NavigationTabs() {
       dropdown: true,
     },
     {
-      name: 'MS Lifecycle',
+      name: 'Microsoft Support Lifecycle',
       href: '/ms-lifecycle',
       icon: (
         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

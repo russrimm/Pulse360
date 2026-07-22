@@ -1,20 +1,64 @@
 import { NextResponse } from 'next/server';
+import { readFileSync } from 'fs';
+import { join } from 'path';
 import ExcelJS from 'exceljs';
 
 const LEARN_EXPORT_PAGE = 'https://learn.microsoft.com/en-us/lifecycle/products/export/';
 // Cache TTL: 24 hours (in seconds)
 const CACHE_TTL = 60 * 60 * 24;
+// Path to persistent data file
+const DATA_FILE = join(process.cwd(), 'public', 'data', 'lifecycle.json');
 
 let cachedData: { rows: LifecycleRow[]; fetchedAt: number; sourceUrl: string } | null = null;
 
 export interface LifecycleRow {
   product: string;
-  version: string;
+  edition: string;
+  release: string;
   category: string;
+  supportPolicy: string;
   startDate: string | null;
-  endOfSupportDate: string | null;
+  mainStreamEndDate: string | null;
   extendedEndDate: string | null;
   retirementDate: string | null;
+  releaseStartDate: string | null;
+  releaseEndDate: string | null;
+  docsUrl: string;
+  endOfSupportDate: string | null;
+}
+
+interface LegacyLifecycleRow {
+  product: string;
+  edition?: string;
+  release?: string;
+  category: string;
+  supportPolicy?: string;
+  startDate: string | null;
+  mainStreamEndDate?: string | null;
+  extendedEndDate: string | null;
+  retirementDate: string | null;
+  releaseStartDate?: string | null;
+  releaseEndDate?: string | null;
+  docsUrl?: string;
+  endOfSupportDate: string | null;
+}
+
+function normalizeLifecycleRow(row: LegacyLifecycleRow): LifecycleRow {
+  return {
+    product: row.product,
+    edition: row.edition ?? '',
+    release: row.release ?? '',
+    category: row.category,
+    supportPolicy: row.supportPolicy ?? '',
+    startDate: row.startDate,
+    mainStreamEndDate: row.mainStreamEndDate ?? null,
+    extendedEndDate: row.extendedEndDate,
+    retirementDate: row.retirementDate,
+    releaseStartDate: row.releaseStartDate ?? null,
+    releaseEndDate: row.releaseEndDate ?? null,
+    docsUrl: row.docsUrl ?? '',
+    endOfSupportDate: row.endOfSupportDate,
+  };
 }
 
 async function getXlsxUrl(): Promise<string> {
@@ -118,13 +162,19 @@ async function fetchAndParseLifecycle(): Promise<{ rows: LifecycleRow[]; sourceU
     return -1;
   };
 
-  const iProduct = colIdx(['product name', 'listingname', 'listing name', 'product']);
-  const iVersion = colIdx(['version', 'edition', 'release']);
-  const iCategory = colIdx(['category', 'type', 'family', 'azurefeature', 'azure feature']);
+  const iProduct = colIdx(['product listing name', 'product name', 'listingname', 'listing name', 'product']);
+  const iEdition = colIdx(['edition']);
+  const iRelease = colIdx(['release']);
+  const iCategory = colIdx(['azure feature', 'azurefeature', 'category', 'type', 'family']);
+  const iSupportPolicy = colIdx(['support policy', 'supportpolicy']);
   const iStart = colIdx(['start date', 'general availability', 'launch date']);
-  const iEOS = colIdx(['end of support', 'mainstream end', 'support end', 'enddate', 'end date']);
-  const iExtended = colIdx(['extended', 'extended end']);
-  const iRetirement = colIdx(['retirement', 'retired']);
+  const iMainStream = colIdx(['mainstream end date', 'mainstream end']);
+  const iExtended = colIdx(['extended end date', 'extended end', 'extended']);
+  const iRetirement = colIdx(['retirement date', 'retirement', 'retired']);
+  const iReleaseStart = colIdx(['release start date', 'release start']);
+  const iReleaseEnd = colIdx(['release end date', 'release end']);
+  const iDocsUrl = colIdx(['docsurl', 'docs url', 'documentation url', 'url']);
+  const iEOS = colIdx(['end of support', 'support end', 'enddate', 'end date']);
 
   const rows: LifecycleRow[] = [];
 
@@ -135,12 +185,18 @@ async function fetchAndParseLifecycle(): Promise<{ rows: LifecycleRow[]; sourceU
 
     rows.push({
       product,
-      version: iVersion >= 0 ? cellToString(row[iVersion]) : '',
+      edition: iEdition >= 0 ? cellToString(row[iEdition]) : '',
+      release: iRelease >= 0 ? cellToString(row[iRelease]) : '',
       category: iCategory >= 0 ? cellToString(row[iCategory]) : '',
+      supportPolicy: iSupportPolicy >= 0 ? cellToString(row[iSupportPolicy]) : '',
       startDate: iStart >= 0 ? cellToISO(row[iStart]) : null,
-      endOfSupportDate: iEOS >= 0 ? cellToISO(row[iEOS]) : null,
+      mainStreamEndDate: iMainStream >= 0 ? cellToISO(row[iMainStream]) : null,
       extendedEndDate: iExtended >= 0 ? cellToISO(row[iExtended]) : null,
       retirementDate: iRetirement >= 0 ? cellToISO(row[iRetirement]) : null,
+      releaseStartDate: iReleaseStart >= 0 ? cellToISO(row[iReleaseStart]) : null,
+      releaseEndDate: iReleaseEnd >= 0 ? cellToISO(row[iReleaseEnd]) : null,
+      docsUrl: iDocsUrl >= 0 ? cellToString(row[iDocsUrl]) : '',
+      endOfSupportDate: iEOS >= 0 ? cellToISO(row[iEOS]) : null,
     });
   }
 
@@ -158,9 +214,42 @@ export async function GET() {
         sourceUrl: cachedData.sourceUrl,
         cachedAt: new Date(cachedData.fetchedAt).toISOString(),
         fromCache: true,
+        source: 'memory',
       });
     }
 
+    // Try to load from persistent file
+    try {
+      const fileContent = readFileSync(DATA_FILE, 'utf-8');
+      const data = JSON.parse(fileContent);
+
+      if (data.rows && Array.isArray(data.rows)) {
+        const hasReleaseField = data.rows.length === 0 || data.rows.some((row: LegacyLifecycleRow) => 'release' in row);
+        if (!hasReleaseField) {
+          throw new Error('Lifecycle cache uses legacy schema without release field');
+        }
+
+        const normalizedRows = (data.rows as LegacyLifecycleRow[]).map(normalizeLifecycleRow);
+        cachedData = {
+          rows: normalizedRows,
+          fetchedAt: new Date(data.fetchedAt).getTime(),
+          sourceUrl: data.sourceUrl,
+        };
+
+        return NextResponse.json({
+          rows: normalizedRows,
+          sourceUrl: data.sourceUrl,
+          cachedAt: data.fetchedAt,
+          fromCache: true,
+          source: 'file',
+        });
+      }
+    } catch (fileError) {
+      // File doesn't exist or is invalid, fall back to fetching
+      console.warn('Could not read lifecycle data file, fetching fresh data:', fileError);
+    }
+
+    // Fall back to fetching fresh data if file doesn't exist or is invalid
     const { rows, sourceUrl } = await fetchAndParseLifecycle();
     cachedData = { rows, fetchedAt: now, sourceUrl };
 
@@ -169,6 +258,7 @@ export async function GET() {
       sourceUrl,
       cachedAt: new Date(now).toISOString(),
       fromCache: false,
+      source: 'live-fetch',
     });
   } catch (e: unknown) {
     const message = e instanceof Error ? e.message : 'Unknown error';
