@@ -160,12 +160,15 @@ export const MessageCard: React.FC<MessageCardProps> = ({ message, onClick }) =>
               )
             })()}
           </div>
-          <div className="flex flex-col items-end gap-y-0.5 min-w-0 max-w-[8rem]">
-            {uniqueServices.length > 0 && uniqueServices.map((service) => (
+        </div>
+        {/* Service/product names: centered, full-width, wrapping so long names stay visible */}
+        {uniqueServices.length > 0 && (
+          <div className="w-full flex flex-wrap items-center justify-center gap-x-2 gap-y-0.5 px-4 pt-1.5 min-w-0">
+            {uniqueServices.map((service) => (
               <span
                 key={service}
                 title={service}
-                className="text-blue-700 dark:text-blue-200 px-1 py-0.5 text-xs font-medium flex items-center gap-1 z-10 w-full overflow-hidden"
+                className="text-blue-700 dark:text-blue-200 text-xs font-medium inline-flex items-center gap-1 z-10 min-w-0 max-w-full"
               >
                 {(() => {
                   const iconPath = service.startsWith('Microsoft 365') ? '/icons/m365.svg' : serviceIcons[service]
@@ -179,13 +182,13 @@ export const MessageCard: React.FC<MessageCardProps> = ({ message, onClick }) =>
                     />
                   )
                 })()}
-                <span className="text-[11px] font-normal truncate min-w-0">
+                <span className="text-[11px] font-normal break-words text-center">
                   {service}
                 </span>
               </span>
             ))}
           </div>
-        </div>
+        )}
         
         <div className={`relative flex flex-col h-full ${message.isMajorChange ? 'p-6' : 'pt-0 px-6 pb-8'}`}>
           <div className="flex-grow flex flex-col">
