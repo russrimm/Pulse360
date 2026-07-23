@@ -57,7 +57,73 @@ Every list is sorted newest-first, every card is keyboard-navigable, and every p
 
 ## Screenshots
 
-The repo currently ships without screenshots in `public/`. If you take any while developing, drop them into `public/images/` and link them here.
+Below are screenshots of every major page in both **dark** and **light** mode.
+
+### Home
+
+| Dark | Light |
+|------|-------|
+| ![Home – Dark](docs/screenshots/home-dark.png) | ![Home – Light](docs/screenshots/home-light.png) |
+
+### Message Center
+
+| Dark | Light |
+|------|-------|
+| ![Message Center – Dark](docs/screenshots/message-center-dark.png) | ![Message Center – Light](docs/screenshots/message-center-light.png) |
+
+### MSRC Security Updates
+
+| Dark | Light |
+|------|-------|
+| ![MSRC – Dark](docs/screenshots/msrc-dark.png) | ![MSRC – Light](docs/screenshots/msrc-light.png) |
+
+### Release Plans
+
+| Dark | Light |
+|------|-------|
+| ![Release Plans – Dark](docs/screenshots/release-plans-dark.png) | ![Release Plans – Light](docs/screenshots/release-plans-light.png) |
+
+### Fabric Roadmap
+
+| Dark | Light |
+|------|-------|
+| ![Fabric Roadmap – Dark](docs/screenshots/fabric-roadmap-dark.png) | ![Fabric Roadmap – Light](docs/screenshots/fabric-roadmap-light.png) |
+
+### Product News
+
+| Dark | Light |
+|------|-------|
+| ![Product News – Dark](docs/screenshots/product-news-dark.png) | ![Product News – Light](docs/screenshots/product-news-light.png) |
+
+### M365 Updates
+
+| Dark | Light |
+|------|-------|
+| ![M365 Updates – Dark](docs/screenshots/m365-updates-dark.png) | ![M365 Updates – Light](docs/screenshots/m365-updates-light.png) |
+
+### Azure Updates
+
+| Dark | Light |
+|------|-------|
+| ![Azure Updates – Dark](docs/screenshots/azure-updates-dark.png) | ![Azure Updates – Light](docs/screenshots/azure-updates-light.png) |
+
+### Microsoft Product Lifecycle
+
+| Dark | Light |
+|------|-------|
+| ![MS Lifecycle – Dark](docs/screenshots/ms-lifecycle-dark.png) | ![MS Lifecycle – Light](docs/screenshots/ms-lifecycle-light.png) |
+
+### Security
+
+| Dark | Light |
+|------|-------|
+| ![Security – Dark](docs/screenshots/security-dark.png) | ![Security – Light](docs/screenshots/security-light.png) |
+
+### About
+
+| Dark | Light |
+|------|-------|
+| ![About – Dark](docs/screenshots/about-dark.png) | ![About – Light](docs/screenshots/about-light.png) |
 
 ---
 
