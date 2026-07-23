@@ -3,12 +3,12 @@
 ## Build & Dev Commands
 
 ```bash
-npm run dev          # Start dev server (Next.js)
-npm run build        # Production build
-npm run lint         # ESLint (flat config: eslint.config.mjs)
-npm run lint:fix     # ESLint with auto-fix
-npm run type-check   # TypeScript type checking (tsc --noEmit)
-npm run format       # Prettier
+pnpm dev             # Start dev server (Next.js)
+pnpm build           # Production build
+pnpm lint            # ESLint (flat config: eslint.config.mjs)
+pnpm lint:fix        # ESLint with auto-fix
+pnpm type-check      # TypeScript type checking (tsc --noEmit)
+pnpm format          # Prettier
 ```
 
 ### Testing
@@ -16,9 +16,9 @@ npm run format       # Prettier
 Playwright is configured for E2E tests in `./tests/`:
 
 ```bash
-npx playwright test                        # Run all tests
-npx playwright test tests/example.spec.ts  # Run a single test file
-npx playwright test --project=chromium     # Single browser
+pnpm exec playwright test                        # Run all tests
+pnpm exec playwright test tests/example.spec.ts  # Run a single test file
+pnpm exec playwright test --project=chromium     # Single browser
 ```
 
 ## Architecture
