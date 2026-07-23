@@ -33,7 +33,7 @@ jobs:
           app_location: "/"
           api_location: ""
           output_location: ".next"
-          app_build_command: "pnpm run build"
+          app_build_command: "npm install -g pnpm@10.34.5 && pnpm install --frozen-lockfile && pnpm run build"
           api_build_command: ""
           app_artifact_location: ".next"
 
