@@ -80,7 +80,7 @@ The repo currently ships without screenshots in `public/`. If you take any while
 | Tests | **Playwright 1.57** (Chromium, Firefox, WebKit) |
 | Hosting target | Vercel (works on Node 20.19+, 22.12+, and 24.x with Next.js 16) |
 
-**Engines:** Node `^20.19.0 || ^22.12.0 || ^24.0.0`, npm `>=10.0.0`.
+**Engines:** Node `^20.19.0 || ^22.12.0 || ^24.0.0`, pnpm `>=9.0.0`.
 
 ---
 
@@ -192,14 +192,14 @@ If an upstream is down, list endpoints return `200` with an empty array so the U
 
 ## Quick start
 
-Prereqs: **Node 20.19+ (or 22.12+ or 24.x)**, **npm 10+**, **Git**. Node 24 is recommended for local development (see `.nvmrc`). Postgres only if you intend to use the Prisma models (most features don't need it).
+Prereqs: **Node 20.19+ (or 22.12+ or 24.x)**, **pnpm 9+** (enable with `corepack enable` or `npm i -g pnpm`), **Git**. Node 24 is recommended for local development (see `.nvmrc`). Postgres only if you intend to use the Prisma models (most features don't need it).
 
 ```bash
 git clone https://github.com/russrimm/Pulse360.git
 cd Pulse360
-npm install
+pnpm install
 # Create .env.local — see Configuration below
-npm run dev
+pnpm dev
 ```
 
 Open <http://localhost:3000>. The root path redirects to `/home`.
@@ -223,49 +223,49 @@ Supported files:
 Sync to current repo (preview only):
 
 ```bash
-npm run dotfiles:check
+pnpm dotfiles:check
 ```
 
 Sync to current repo (write missing files, keep differing files):
 
 ```bash
-npm run dotfiles:sync
+pnpm dotfiles:sync
 ```
 
 Sync to another repo and overwrite differences:
 
 ```bash
-npm run dotfiles:sync -- --target ../another-repo --force
+pnpm dotfiles:sync -- --target ../another-repo --force
 ```
 
 Auto-populate all repos under a parent folder (safe mode: no overwrites):
 
 ```bash
-npm run dotfiles:sync:all
+pnpm dotfiles:sync:all
 ```
 
 Auto-populate all repos and overwrite differing files:
 
 ```bash
-npm run dotfiles:sync:all -- --force
+pnpm dotfiles:sync:all -- --force
 ```
 
 Control scan depth when auto-populating:
 
 ```bash
-npm run dotfiles:sync:all -- --max-depth 2
+pnpm dotfiles:sync:all -- --max-depth 2
 ```
 
 Sync only a subset:
 
 ```bash
-npm run dotfiles:sync -- --target ../another-repo --files .gitignore,.nvmrc
+pnpm dotfiles:sync -- --target ../another-repo --files .gitignore,.nvmrc
 ```
 
 List available files:
 
 ```bash
-npm run dotfiles:sync -- --list
+pnpm dotfiles:sync -- --list
 ```
 
 ### Optional: bootstrap from a global dotfiles repo
@@ -285,25 +285,25 @@ export DOTFILES_REPO_URL=git@github.com:you/dotfiles.git
 Bootstrap and sync this repo (dry run):
 
 ```bash
-npm run dotfiles:bootstrap -- --dry-run
+pnpm dotfiles:bootstrap -- --dry-run
 ```
 
 Bootstrap and sync this repo (apply changes):
 
 ```bash
-npm run dotfiles:bootstrap -- --force
+pnpm dotfiles:bootstrap -- --force
 ```
 
 Bootstrap and auto-populate all repos under parent folder:
 
 ```bash
-npm run dotfiles:bootstrap:all -- --force
+pnpm dotfiles:bootstrap:all -- --force
 ```
 
 Use a custom templates folder from the central repo:
 
 ```bash
-npm run dotfiles:bootstrap -- --repo git@github.com:you/dotfiles.git --templates-path dotfiles/templates --force
+pnpm dotfiles:bootstrap -- --repo git@github.com:you/dotfiles.git --templates-path dotfiles/templates --force
 ```
 
 ### Bootstrap tools, extensions, skills, and agents
@@ -327,26 +327,26 @@ Copilot user asset source folder:
 Run bootstrap in dry-run mode:
 
 ```bash
-npm run dotfiles:bootstrap -- --repo git@github.com:you/dotfiles.git --all-repos --scan-root .. --dry-run
+pnpm dotfiles:bootstrap -- --repo git@github.com:you/dotfiles.git --all-repos --scan-root .. --dry-run
 ```
 
 Apply bootstrap for all repos:
 
 ```bash
-npm run dotfiles:bootstrap -- --repo git@github.com:you/dotfiles.git --all-repos --scan-root .. --force
+pnpm dotfiles:bootstrap -- --repo git@github.com:you/dotfiles.git --all-repos --scan-root .. --force
 ```
 
 Skip selected setup phases:
 
 ```bash
-npm run dotfiles:bootstrap -- --repo git@github.com:you/dotfiles.git --all-repos --skip-tools --skip-extensions
+pnpm dotfiles:bootstrap -- --repo git@github.com:you/dotfiles.git --all-repos --skip-tools --skip-extensions
 ```
 
 Set your repo URL once:
 
 ```bash
 export DOTFILES_REPO_URL=git@github.com:you/dotfiles.git
-npm run dotfiles:bootstrap -- --all-repos --scan-root .. --force
+pnpm dotfiles:bootstrap -- --all-repos --scan-root .. --force
 ```
 
 ---
@@ -424,15 +424,15 @@ The generated client is **not** committed (`/src/generated/prisma` is in `.gitig
 
 | Command | What it does |
 |---|---|
-| `npm run dev` | Start Next.js with Turbopack on port 3000 |
-| `npm run build` | Production build (runs `next build`) |
-| `npm start` | Serve the production build |
-| `npm run clean` | Delete `.next/` |
-| `npm run lint` | ESLint over the whole repo |
-| `npm run lint:fix` | ESLint with autofix |
-| `npm run type-check` | `tsc --noEmit` (no emit, types only) |
-| `npm run format` | Prettier over the whole repo |
-| `npx playwright test` | Run Playwright tests across Chromium, Firefox, WebKit |
+| `pnpm dev` | Start Next.js with Turbopack on port 3000 |
+| `pnpm build` | Production build (runs `next build`) |
+| `pnpm start` | Serve the production build |
+| `pnpm clean` | Delete `.next/` |
+| `pnpm lint` | ESLint over the whole repo |
+| `pnpm lint:fix` | ESLint with autofix |
+| `pnpm type-check` | `tsc --noEmit` (no emit, types only) |
+| `pnpm format` | Prettier over the whole repo |
+| `pnpm exec playwright test` | Run Playwright tests across Chromium, Firefox, WebKit |
 
 ---
 
@@ -530,17 +530,17 @@ npx playwright test --ui    # interactive mode
 npx playwright show-report  # last HTML report
 ```
 
-Specs live in `tests/`. The starter `tests/example.spec.ts` is a placeholder — add real coverage as features stabilize. The Playwright config does **not** auto-start `next dev`; either run `npm run dev` first, or uncomment the `webServer` block in `playwright.config.ts`.
+Specs live in `tests/`. The starter `tests/example.spec.ts` is a placeholder — add real coverage as features stabilize. The Playwright config does **not** auto-start `next dev`; either run `pnpm dev` first, or uncomment the `webServer` block in `playwright.config.ts`.
 
 ---
 
 ## Linting, formatting, and type checks
 
 ```bash
-npm run lint           # ESLint (flat config in eslint.config.mjs)
-npm run lint:fix       # ESLint with autofix
-npm run type-check     # tsc --noEmit
-npm run format         # Prettier write
+pnpm lint              # ESLint (flat config in eslint.config.mjs)
+pnpm lint:fix          # ESLint with autofix
+pnpm type-check        # tsc --noEmit
+pnpm format            # Prettier write
 ```
 
 The ESLint config covers TypeScript, React, Next.js, JSON, CSS, and Markdown files. A pre-commit hook is **not** wired up; add one (e.g. `husky` + `lint-staged`) if your workflow needs it.
@@ -572,9 +572,9 @@ The repo ships with a GitHub Actions workflow in `.github/workflows/` for Azure 
 **Self-host:**
 
 ```bash
-npm ci
-npm run build
-npm start   # serves on port 3000
+pnpm install --prod --frozen-lockfile
+pnpm build
+pnpm start   # serves on port 3000
 ```
 
 Put it behind a reverse proxy (Caddy / nginx / CloudFront) with HTTPS terminated upstream. Set `NODE_ENV=production`.
@@ -634,7 +634,7 @@ Run `npx playwright install` once to download browser binaries.
 
 Issues and PRs welcome. Before opening a PR:
 
-1. Run `npm run lint && npm run type-check`.
+1. Run `pnpm lint && pnpm type-check`.
 2. If you add or change a route, update **Routes reference** above.
 3. If you add a new upstream host (RSS or image), add it to the allowlist in `/api/proxy-rss` *and* `next.config.js` `images.remotePatterns` as appropriate.
 4. Keep components server-rendered by default; only opt into `'use client'` when you need state, effects, or browser APIs.

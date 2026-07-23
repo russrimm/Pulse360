@@ -33,7 +33,7 @@ jobs:
           app_location: "/"
           api_location: ""
           output_location: ".next"
-          app_build_command: "npm run build"
+          app_build_command: "pnpm run build"
           api_build_command: ""
           app_artifact_location: ".next"
 
