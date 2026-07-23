@@ -252,6 +252,11 @@ export async function getMessages(): Promise<Message[]> {
 }
 
 export async function getMessage(id: string): Promise<Message | null> {
+  // Validate message ID format to prevent OData injection (IDs are "MC" + digits)
+  if (!/^MC\d+$/i.test(id)) {
+    throw new Error('Invalid message ID format');
+  }
+
   if (!hasRequiredEnvVars) {
     if (isDev) throw new Error('Message not found');
     return null;
