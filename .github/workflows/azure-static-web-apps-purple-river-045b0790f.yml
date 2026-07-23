@@ -33,7 +33,7 @@ jobs:
           app_location: "/"
           api_location: ""
           output_location: ".next"
-          app_build_command: "npm install -g pnpm@10.34.5 && rm -rf node_modules && pnpm install --frozen-lockfile && pnpm run build && if [ -d .next/node_modules ]; then cp -RL .next/node_modules .next/node_modules-real && rm -rf .next/node_modules && mv .next/node_modules-real .next/node_modules; fi"
+          app_build_command: "npm install -g pnpm@10.34.5 && rm -rf node_modules && pnpm install --frozen-lockfile && pnpm run build && if [ -d .next/node_modules ]; then cp -RL .next/node_modules .next/node_modules-real && rm -rf .next/node_modules && mv .next/node_modules-real .next/node_modules; fi && rm -rf node_modules"
           api_build_command: ""
           app_artifact_location: ".next"
 
