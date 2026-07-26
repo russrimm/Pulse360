@@ -32,7 +32,8 @@ export async function GET(req: NextRequest) {
       const data = await res.json();
       return NextResponse.json(data);
     }
-  } catch (e: any) {
-    return NextResponse.json({ error: e?.message || 'Unknown error' }, { status: 500 });
+  } catch (e) {
+    console.error('MSRC API error:', e);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 } 

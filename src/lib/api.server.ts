@@ -644,6 +644,11 @@ export async function getM365Updates(): Promise<M365Update[]> {
 }
 
 export async function getM365Update(id: string): Promise<M365Update | null> {
+  // Validate ID format to prevent path traversal
+  if (!/^[A-Za-z0-9_-]+$/.test(id)) {
+    throw new Error('Invalid update ID format');
+  }
+
   try {
     const response = await fetch(
       `https://www.microsoft.com/releasecommunications/api/v2/m365/rss/${id}`,
