@@ -106,8 +106,20 @@ export function MessageList({ messages: messagesProp }: MessageListProps) {
     // Do NOT reset selectedTags on every messages change
   }, [messages]);
 
-  // Derive visible messages synchronously — no useEffect flash
-  const visibleMessages = filteredMessages.slice(0, page * ITEMS_PER_PAGE);
+  // When any filter is active, show all matching messages so the filter is
+  // visibly applied. Otherwise fall back to infinite-scroll pagination.
+  // Without this, the top-N most-recent messages (page 1) often satisfy
+  // recent-days date filters too, so the count would change but the rendered
+  // cards would not — making the filter look broken.
+  const hasActiveFilter =
+    searchQuery !== '' ||
+    selectedServices.length > 0 ||
+    selectedTags.length > 0 ||
+    selectedDateFilter !== 'all' ||
+    showMajorChangesOnly;
+  const visibleMessages = hasActiveFilter
+    ? filteredMessages
+    : filteredMessages.slice(0, page * ITEMS_PER_PAGE);
 
   // Reset to first page when filters/search changes
   const prevFilteredLengthRef = useRef(filteredMessages.length);
