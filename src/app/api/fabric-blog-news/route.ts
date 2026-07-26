@@ -20,6 +20,7 @@ export async function GET() {
     }))
     return NextResponse.json(result)
   } catch (err) {
-    return NextResponse.json({ error: 'Failed to parse feed', details: String(err) }, { status: 500 })
+    console.error('fabric-blog-news parse error:', err)
+    return NextResponse.json({ error: 'Failed to parse feed' }, { status: 500 })
   }
 } 

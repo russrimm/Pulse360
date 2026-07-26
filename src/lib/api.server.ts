@@ -252,6 +252,11 @@ export async function getMessages(): Promise<Message[]> {
 }
 
 export async function getMessage(id: string): Promise<Message | null> {
+  // Validate message ID format to prevent OData injection (IDs are "MC" + digits)
+  if (!/^MC\d+$/i.test(id)) {
+    throw new Error('Invalid message ID format');
+  }
+
   if (!hasRequiredEnvVars) {
     if (isDev) throw new Error('Message not found');
     return null;
@@ -639,6 +644,11 @@ export async function getM365Updates(): Promise<M365Update[]> {
 }
 
 export async function getM365Update(id: string): Promise<M365Update | null> {
+  // Validate ID format to prevent path traversal
+  if (!/^[A-Za-z0-9_-]+$/.test(id)) {
+    throw new Error('Invalid update ID format');
+  }
+
   try {
     const response = await fetch(
       `https://www.microsoft.com/releasecommunications/api/v2/m365/rss/${id}`,
