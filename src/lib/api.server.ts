@@ -329,6 +329,16 @@ export async function getMessage(id: string): Promise<Message | null> {
   }
 }
 
+// In-memory cache for release-planner product responses. Sidesteps Next.js's
+// 2MB Data Cache entry limit (which logs a warning and skips caching for the
+// large Dynamics 365 product payload).
+interface ReleasePlannerProductCacheEntry {
+  plans: unknown[];
+  cachedAt: number;
+}
+const RELEASE_PLANNER_MEMORY_TTL_MS = 60 * 60 * 1000;
+const releasePlannerMemoryCache = new Map<string, ReleasePlannerProductCacheEntry>();
+
 export async function getReleasePlans() {
   interface ReleasePlanProduct {
     id: string;
@@ -498,6 +508,11 @@ export async function getReleasePlans() {
     const candidateProducts = PRODUCT_CATALOG.filter(product => !emptyCache.products[product.id]);
     const productResults = await Promise.all(
       candidateProducts.map(async product => {
+        const cached = releasePlannerMemoryCache.get(product.id);
+        if (cached && Date.now() - cached.cachedAt < RELEASE_PLANNER_MEMORY_TTL_MS) {
+          return { product, plans: cached.plans as ReleasePlanApiItem[], failed: false };
+        }
+
         const controller = new AbortController();
         const timeout = setTimeout(() => controller.abort(), RELEASE_PLANNER_TIMEOUT_MS);
 
@@ -507,7 +522,10 @@ export async function getReleasePlans() {
             method: 'GET',
             redirect: 'follow',
             signal: controller.signal,
-            next: { revalidate: 3600 },
+            // Deliberately no `next: { revalidate }` — some product payloads
+            // exceed Next.js's 2MB Data Cache entry limit. We cache in-memory
+            // above instead.
+            cache: 'no-store',
           });
 
           if (!response.ok) {
@@ -517,6 +535,8 @@ export async function getReleasePlans() {
           const body = await response.text();
           const payload = parseReleasePlannerPayload(body);
           const plans = Array.isArray(payload.results) ? payload.results : [];
+
+          releasePlannerMemoryCache.set(product.id, { plans, cachedAt: Date.now() });
 
           return { product, plans, failed: false };
         } catch {
