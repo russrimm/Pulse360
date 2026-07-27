@@ -27,15 +27,6 @@ export default function SecurityPage() {
                 <div className="pointer-events-none absolute inset-px rounded-[calc(theme(borderRadius.3xl)-2px)] bg-gradient-to-br from-primary-400/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition duration-700" />
               </Link>
             </div>
-            <div className="stagger-animate animate-fade-up will-change-transform animation-delay-[80ms]">
-              <Link href="/msrc/blog" className={cardBase}>
-                <h3 className="text-base font-semibold text-gray-900 dark:text-gray-100 tracking-tight">MSRC Blog</h3>
-                <p className="mt-2 text-xs md:text-sm text-gray-600 dark:text-gray-400 leading-relaxed max-w-[22ch]">Deep dives, disclosures & insights from the Microsoft Security Response Center team.</p>
-                <span className="pointer-events-none absolute inset-0 rounded-3xl ring-2 ring-transparent group-hover:ring-primary-300/50 dark:group-hover:ring-primary-700/40 transition" aria-hidden="true" />
-                <div className="pointer-events-none absolute -bottom-14 -right-14 h-44 w-44 rounded-full bg-primary-400/10 dark:bg-primary-600/10 blur-3xl opacity-0 group-hover:opacity-100 transition duration-700" />
-                <div className="pointer-events-none absolute inset-px rounded-[calc(theme(borderRadius.3xl)-2px)] bg-gradient-to-br from-primary-400/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition duration-700" />
-              </Link>
-            </div>
           </div>
         </section>
         <div className="mt-12">
