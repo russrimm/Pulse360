@@ -1,6 +1,6 @@
 import 'server-only';
 import { M365Update, Message, MessageStatus } from './types';
-import { prisma } from './prisma';
+import { getPrisma } from './prisma';
 import type { MessageCenterUpdate } from '@/generated/prisma';
 import { XMLParser } from 'fast-xml-parser';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
@@ -172,7 +172,7 @@ export async function getMessages(): Promise<Message[]> {
   // in the DB (including previously-archived messages).
   await ensureMessagesSynced();
 
-  const rows = await prisma.messageCenterUpdate.findMany({
+  const rows = await getPrisma().messageCenterUpdate.findMany({
     orderBy: { lastUpdated: 'desc' },
   });
 
@@ -260,7 +260,7 @@ export async function getMessage(id: string): Promise<Message | null> {
   }
 
   // Try DB first — this is the common path and works even for archived rows.
-  const row = await prisma.messageCenterUpdate.findUnique({ where: { id } });
+  const row = await getPrisma().messageCenterUpdate.findUnique({ where: { id } });
   if (row) {
     // Background-refresh so archived/expired status stays current.
     void ensureMessagesSynced().catch(() => undefined);
@@ -280,7 +280,7 @@ export async function getMessage(id: string): Promise<Message | null> {
     }
 
     // Seed into DB in the background so subsequent reads are cheap.
-    void prisma.messageCenterUpdate
+    void getPrisma().messageCenterUpdate
       .upsert({
         where: { id: message.id },
         create: graphMessageToDbInput(message, deriveStatus(message, 'active')),
@@ -364,6 +364,7 @@ async function ensureMessagesSynced(): Promise<void> {
   }
 
   try {
+    const prisma = getPrisma();
     const state = await prisma.syncState.findUnique({
       where: { key: MESSAGE_CENTER_SYNC_KEY },
     });
@@ -389,6 +390,7 @@ async function ensureMessagesSynced(): Promise<void> {
 }
 
 export async function syncMessagesFromGraph(): Promise<void> {
+  const prisma = getPrisma();
   const graphMessages = await fetchAllMessagesFromGraph();
   const now = new Date();
   const seenIds = new Set(graphMessages.map(m => m.id));

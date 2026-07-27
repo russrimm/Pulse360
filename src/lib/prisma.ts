@@ -5,7 +5,6 @@ import { PrismaPg } from '@prisma/adapter-pg';
 // Reuse a single PrismaClient across hot reloads in dev to avoid exhausting
 // the connection pool. In production each serverless invocation gets its own.
 declare global {
-   
   var __pulse360Prisma: PrismaClient | undefined;
 }
 
@@ -23,9 +22,10 @@ function createPrismaClient(): PrismaClient {
   });
 }
 
-export const prisma: PrismaClient =
-  globalThis.__pulse360Prisma ?? createPrismaClient();
+export function getPrisma(): PrismaClient {
+  if (!globalThis.__pulse360Prisma) {
+    globalThis.__pulse360Prisma = createPrismaClient();
+  }
 
-if (process.env.NODE_ENV !== 'production') {
-  globalThis.__pulse360Prisma = prisma;
+  return globalThis.__pulse360Prisma;
 }

@@ -34,6 +34,9 @@ importers:
       '@prisma/client':
         specifier: ^7.1.0
         version: 7.8.0(prisma@7.8.0(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(typescript@5.9.3))(typescript@5.9.3)
+      '@prisma/client-runtime-utils':
+        specifier: ^7.1.0
+        version: 7.8.0
       '@radix-ui/react-accordion':
         specifier: ^1.2.12
         version: 1.2.16(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
@@ -1380,7 +1383,7 @@ packages:
     resolution: {integrity: sha1-gbdS5ux9QrQHdLrirQ8l6nddTDM=, tarball: https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/@prisma/adapter-pg/-/adapter-pg-7.9.0-dev.25.tgz}
 
   '@prisma/client-runtime-utils@7.8.0':
-    resolution: {integrity: sha1-ICwKKsKV4ZZ33r1KLRjcNfnM+yE=, tarball: https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/@prisma/client-runtime-utils/-/client-runtime-utils-7.8.0.tgz}
+    resolution: {integrity: sha1-ICwKKsKV4ZZ33r1KLRjcNfnM+yE=, tarball: https://ms-feed-2.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/@prisma/client-runtime-utils/-/client-runtime-utils-7.8.0.tgz}
 
   '@prisma/client@7.8.0':
     resolution: {integrity: sha1-3OL7ACOMcz9r7et2lUewH2m4bUI=, tarball: https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/@prisma/client/-/client-7.8.0.tgz}
