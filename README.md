@@ -441,11 +441,16 @@ AZURE_CLIENT_SECRET=replace_with_real_secret_value
 # AZURE_API_URL=https://graph.microsoft.com/v1.0
 ```
 
+### Required environment variables (Message Center cache)
+
+| Variable | Purpose |
+|---|---|
+| `DATABASE_URL` | Postgres connection string used by Prisma to cache Microsoft Graph **Message Center** updates. Required for the `/message-center` route. See [Database (Prisma) — Neon quickstart](#database-prisma) below. |
+
 ### Optional environment variables
 
 | Variable | Purpose |
 |---|---|
-| `DATABASE_URL` | Postgres connection string for the Prisma models (User, Preference, PublishedListing). Only required if you run `prisma migrate` or query those models. |
 | `NEXTAUTH_URL`, `NEXTAUTH_SECRET` | Required only if you wire up the `[...nextauth]` route for user sign-in. |
 
 ### Creating the Microsoft Entra app registration
@@ -464,25 +469,35 @@ You should now be able to start the app and load `/message-center` with live ten
 
 ### Database (Prisma)
 
-Prisma is included for future user-preference / published-listing features. None of the live pages require Postgres today.
+Pulse 360 uses Postgres via Prisma to **cache Microsoft Graph Message Center updates**. Microsoft's live Graph feed drops messages once they are archived or expired; the cache preserves them so they remain viewable in the UI with an **Archived** or **Expired** badge.
 
-If you want to enable it:
+**On-demand refresh (TTL 1h):** the first request after the TTL elapses fetches from Graph, upserts every row, and reconciles rows missing from the response — marking them `archived` (with `archivedAt`) or `expired` (when `actionRequiredByDateTime` is past). Nothing is ever hard-deleted.
 
-```bash
-# 1. Set DATABASE_URL in .env.local
-echo 'DATABASE_URL="postgresql://user:pass@localhost:5432/pulse360?schema=public"' >> .env.local
+#### Neon quickstart (recommended — free tier, scales to zero)
 
-# 2. Generate the client (writes to src/generated/prisma)
-npx prisma generate
+1. Create a free project at [neon.tech](https://neon.tech).
+2. Copy the **pooled** connection string (uses PgBouncer, works in serverless).
+3. Add it to `.env.local`:
 
-# 3. Push schema to a fresh dev DB
-npx prisma db push
+   ```bash
+   echo 'DATABASE_URL="postgresql://user:pass@ep-xxxx-pooler.region.aws.neon.tech/neondb?sslmode=require"' >> .env.local
+   ```
 
-# 4. (Optional) Open Prisma Studio
-npx prisma studio
-```
+4. Generate the Prisma client and apply the schema:
 
-The generated client is **not** committed (`/src/generated/prisma` is in `.gitignore`).
+   ```bash
+   pnpm exec prisma generate
+   pnpm exec prisma migrate deploy
+   ```
+
+5. In Vercel, add `DATABASE_URL` under **Project → Settings → Environment Variables** for **Production**, **Preview**, and **Development**, using the same connection string. The `build` script already runs `prisma generate && prisma migrate deploy` so new migrations reach production automatically on each deploy.
+
+#### Notes
+
+- Prisma 7 requires `prisma.config.ts` at the repo root (already committed). The datasource URL is read from `DATABASE_URL` there — do **not** re-add `url` to `schema.prisma`.
+- The generated client is **not** committed (`/src/generated/prisma` is in `.gitignore`); `pnpm install` runs `prisma generate` automatically via the `postinstall` hook.
+- Any Postgres-compatible provider works (Neon, Supabase, Azure Database for PostgreSQL, local Postgres in Docker). SQLite is not supported on Vercel because its serverless filesystem is ephemeral.
+- Optional: `pnpm exec prisma studio` opens a GUI to browse the cached rows.
 
 ---
 
@@ -615,25 +630,16 @@ The ESLint config covers TypeScript, React, Next.js, JSON, CSS, and Markdown fil
 
 ## Deployment
 
-Pulse 360° is built for Vercel but runs anywhere Node 20.19+, 22.12+, or 24.x can host Next.js 16.
+Pulse 360° is hosted on **Vercel** and runs anywhere Node 20.19+, 22.12+, or 24.x can host Next.js 16.
 
-**GitHub Actions (included workflow):**
-
-The repo ships with a GitHub Actions workflow in `.github/workflows/` for Azure Static Web Apps CI/CD.
-
-1. Fork or clone the repo to your GitHub account.
-2. Add the following secrets under **Settings → Secrets and variables → Actions**:
-   - `AZURE_CLIENT_ID`, `AZURE_TENANT_ID`, `AZURE_CLIENT_SECRET`
-   - `AZURE_API_URL` — set to `https://graph.microsoft.com` for direct mode, or your APIM endpoint URL for APIM mode.
-   - `DATABASE_URL` — only if you use Prisma.
-3. Push to `main` (or your deployment branch) — the workflow builds and deploys automatically.
-
-**Vercel:**
+**Vercel (recommended):**
 
 1. Import the repo in Vercel → **New Project**.
 2. Framework preset: **Next.js** (auto-detected).
-3. Add the env vars under **Settings → Environment Variables** (`AZURE_CLIENT_ID`, `AZURE_TENANT_ID`, `AZURE_CLIENT_SECRET`, plus `DATABASE_URL` only if you use Prisma).
-4. Deploy. 
+3. Add env vars under **Settings → Environment Variables** for **Production**, **Preview**, and **Development**:
+   - `AZURE_CLIENT_ID`, `AZURE_TENANT_ID`, `AZURE_CLIENT_SECRET` (or `AZURE_API_URL` pointing at your APIM endpoint in APIM mode)
+   - `DATABASE_URL` — required for `/message-center` (see [Database (Prisma)](#database-prisma))
+4. Deploy. The `build` script runs `prisma generate && prisma migrate deploy && next build`, so schema changes are applied to Neon on every production deploy.
 
 **Self-host:**
 

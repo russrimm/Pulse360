@@ -116,6 +116,28 @@ export const MessageCard: React.FC<MessageCardProps> = ({ message, onClick }) =>
                 </span>
               </div>
             </div>
+          ) : message.status === 'archived' ? (
+            <div className="w-full bg-gray-100 dark:bg-gray-800 border-b border-gray-300 dark:border-gray-700">
+              <div className="flex items-center justify-center py-1.5">
+                <span className="inline-flex items-center px-3 py-1 text-sm font-medium text-gray-700 dark:text-gray-300" title="This message has been removed from Microsoft's live feed but is preserved here for reference.">
+                  <svg className="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
+                  </svg>
+                  Archived
+                </span>
+              </div>
+            </div>
+          ) : message.status === 'expired' ? (
+            <div className="w-full bg-amber-50 dark:bg-amber-900/30 border-b border-amber-200 dark:border-amber-800">
+              <div className="flex items-center justify-center py-1.5">
+                <span className="inline-flex items-center px-3 py-1 text-sm font-medium text-amber-800 dark:text-amber-200" title="The action-required date on this message has passed.">
+                  <svg className="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  Expired
+                </span>
+              </div>
+            </div>
           ) : (
             <div className="h-[38px]" />
           )}

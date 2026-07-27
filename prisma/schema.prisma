@@ -11,7 +11,6 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
 }
 
 model User {
@@ -47,4 +46,41 @@ model PublishedListing {
   docsUrl          String?
 
   @@unique([product, edition, release])
+}
+
+/// Cached copy of a Microsoft 365 Message Center message. Graph drops
+/// archived/expired messages from its live feed, so we persist everything
+/// here and mark rows that disappear from Graph as "archived" instead of
+/// deleting them. `status` is derived during sync:
+///   active   -> present in the latest Graph fetch
+///   archived -> previously seen, no longer returned by Graph
+///   expired  -> `actionRequiredByDateTime` has passed
+model MessageCenterUpdate {
+  id                       String    @id
+  title                    String
+  service                  String[]  @default([])
+  tags                     String[]  @default([])
+  content                  String
+  summary                  String
+  details                  Json      @default("[]")
+  isMajorChange            Boolean   @default(false)
+  severity                 String?
+  actionRequiredByDateTime DateTime?
+  published                DateTime?
+  lastUpdated              DateTime?
+  status                   String    @default("active")
+  firstSeenAt              DateTime  @default(now())
+  lastSeenAt               DateTime  @default(now())
+  archivedAt               DateTime?
+
+  @@index([status])
+  @@index([lastUpdated])
+}
+
+/// Tracks the last successful sync for on-demand TTL refresh.
+model SyncState {
+  key        String    @id
+  lastSyncAt DateTime
+  lastError  String?
+  updatedAt  DateTime  @updatedAt
 }
