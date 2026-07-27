@@ -168,14 +168,25 @@ interface GraphApiResponse {
 }
 
 export async function getMessages(): Promise<Message[]> {
-  // Try TTL-based sync from Graph. If it fails, we still serve whatever's
-  // in the DB (including previously-archived messages).
-  await ensureMessagesSynced();
-
-  const rows = await getPrisma().messageCenterUpdate.findMany({
+  const prisma = getPrisma();
+  const rows = await prisma.messageCenterUpdate.findMany({
     orderBy: { lastUpdated: 'desc' },
   });
 
+  // Vercel Cron (see vercel.json → /api/cron/sync-messages) is the baseline
+  // sync path. On-demand sync here is a safety net:
+  //   - DB has rows: fire-and-forget so page loads never block on Graph.
+  //   - DB empty (first-ever deploy or wipe): block once so users don't see
+  //     an empty screen before cron fires.
+  if (rows.length === 0) {
+    await ensureMessagesSynced();
+    const rehydrated = await prisma.messageCenterUpdate.findMany({
+      orderBy: { lastUpdated: 'desc' },
+    });
+    return rehydrated.map(rowToMessage);
+  }
+
+  void ensureMessagesSynced().catch(() => undefined);
   return rows.map(rowToMessage);
 }
 
