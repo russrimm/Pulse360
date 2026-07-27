@@ -102,7 +102,18 @@ export const MessageCard: React.FC<MessageCardProps> = ({ message, onClick }) =>
 
   return (
     <Link href={`/message/${message.id}`} className="block min-w-0 h-full">
-      <div onClick={handleClick} className="group bg-white/80 dark:bg-gray-800/50 backdrop-blur-sm rounded-xl shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-200 dark:border-gray-700/50 hover:border-primary-200 dark:hover:border-primary-800 hover:-translate-y-1 h-full cursor-pointer flex flex-col min-w-0 overflow-hidden">
+      <div onClick={handleClick} className={`group relative bg-white/80 dark:bg-gray-800/50 backdrop-blur-sm rounded-xl shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-200 dark:border-gray-700/50 hover:border-primary-200 dark:hover:border-primary-800 hover:-translate-y-1 h-full cursor-pointer flex flex-col min-w-0 overflow-hidden ${message.status === 'archived' ? 'opacity-90' : ''}`}>
+        {/* Archived watermark overlay */}
+        {message.status === 'archived' && (
+          <div
+            className="pointer-events-none absolute inset-0 z-30 flex items-center justify-center"
+            aria-hidden="true"
+          >
+            <span className="select-none -rotate-[20deg] whitespace-nowrap text-3xl sm:text-4xl font-black uppercase tracking-widest text-gray-500/25 dark:text-gray-200/20 border-4 border-gray-500/25 dark:border-gray-200/20 rounded-md px-4 py-1">
+              Archived
+            </span>
+          </div>
+        )}
         {/* Major Change banner at the very top */}
   <div className="min-h-[38px]">
           {message.isMajorChange ? (
