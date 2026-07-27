@@ -1,0 +1,42 @@
+name: Sync Message Center to Neon
+
+# GitHub Actions is the primary sync schedule (every 15 minutes). The Vercel
+# Cron in vercel.json runs daily as a backstop in case Actions is delayed or
+# disabled. Both hit the same protected endpoint, and syncMessagesFromGraph is
+# idempotent (upserts + status reconciliation).
+on:
+  schedule:
+    - cron: '*/15 * * * *'
+  workflow_dispatch: # allow manual trigger from the Actions tab
+
+concurrency:
+  group: sync-message-center
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: POST /api/cron/sync-messages
+        env:
+          SYNC_URL: ${{ secrets.SYNC_URL }}
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+        run: |
+          if [ -z "$SYNC_URL" ] || [ -z "$CRON_SECRET" ]; then
+            echo "::error::SYNC_URL and CRON_SECRET repo secrets must be set." >&2
+            exit 1
+          fi
+
+          response=$(curl -sS -o response.json -w "%{http_code}" \
+            --max-time 90 \
+            -H "Authorization: Bearer $CRON_SECRET" \
+            "$SYNC_URL")
+
+          echo "HTTP $response"
+          cat response.json || true
+
+          if [ "$response" != "200" ]; then
+            echo "::error::Sync endpoint returned HTTP $response" >&2
+            exit 1
+          fi
