@@ -441,11 +441,16 @@ AZURE_CLIENT_SECRET=replace_with_real_secret_value
 # AZURE_API_URL=https://graph.microsoft.com/v1.0
 ```
 
+### Required environment variables (Message Center cache)
+
+| Variable | Purpose |
+|---|---|
+| `DATABASE_URL` | Postgres connection string used by Prisma to cache Microsoft Graph **Message Center** updates. Required for the `/message-center` route. See [Database (Prisma) — Neon quickstart](#database-prisma) below. |
+
 ### Optional environment variables
 
 | Variable | Purpose |
 |---|---|
-| `DATABASE_URL` | Postgres connection string for the Prisma models (User, Preference, PublishedListing). Only required if you run `prisma migrate` or query those models. |
 | `NEXTAUTH_URL`, `NEXTAUTH_SECRET` | Required only if you wire up the `[...nextauth]` route for user sign-in. |
 
 ### Creating the Microsoft Entra app registration
@@ -464,25 +469,35 @@ You should now be able to start the app and load `/message-center` with live ten
 
 ### Database (Prisma)
 
-Prisma is included for future user-preference / published-listing features. None of the live pages require Postgres today.
+Pulse 360 uses Postgres via Prisma to **cache Microsoft Graph Message Center updates**. Microsoft's live Graph feed drops messages once they are archived or expired; the cache preserves them so they remain viewable in the UI with an **Archived** or **Expired** badge.
 
-If you want to enable it:
+**On-demand refresh (TTL 1h):** the first request after the TTL elapses fetches from Graph, upserts every row, and reconciles rows missing from the response — marking them `archived` (with `archivedAt`) or `expired` (when `actionRequiredByDateTime` is past). Nothing is ever hard-deleted.
 
-```bash
-# 1. Set DATABASE_URL in .env.local
-echo 'DATABASE_URL="postgresql://user:pass@localhost:5432/pulse360?schema=public"' >> .env.local
+#### Neon quickstart (recommended — free tier, scales to zero)
 
-# 2. Generate the client (writes to src/generated/prisma)
-npx prisma generate
+1. Create a free project at [neon.tech](https://neon.tech).
+2. Copy the **pooled** connection string (uses PgBouncer, works in serverless).
+3. Add it to `.env.local`:
 
-# 3. Push schema to a fresh dev DB
-npx prisma db push
+   ```bash
+   echo 'DATABASE_URL="postgresql://user:pass@ep-xxxx-pooler.region.aws.neon.tech/neondb?sslmode=require"' >> .env.local
+   ```
 
-# 4. (Optional) Open Prisma Studio
-npx prisma studio
-```
+4. Generate the Prisma client and apply the schema:
 
-The generated client is **not** committed (`/src/generated/prisma` is in `.gitignore`).
+   ```bash
+   pnpm exec prisma generate
+   pnpm exec prisma migrate deploy
+   ```
+
+5. In Azure Static Web Apps, add `DATABASE_URL` under **Configuration → Application settings** using the same connection string. Run `pnpm exec prisma migrate deploy` as part of your build step so new migrations reach production.
+
+#### Notes
+
+- Prisma 7 requires `prisma.config.ts` at the repo root (already committed). The datasource URL is read from `DATABASE_URL` there — do **not** re-add `url` to `schema.prisma`.
+- The generated client is **not** committed (`/src/generated/prisma` is in `.gitignore`); `pnpm install` runs `prisma generate` automatically via the `postinstall` hook.
+- Any Postgres-compatible provider works (Neon, Supabase, Azure Database for PostgreSQL, local Postgres in Docker). SQLite is not supported on Azure Static Web Apps because its filesystem is ephemeral.
+- Optional: `pnpm exec prisma studio` opens a GUI to browse the cached rows.
 
 ---
 

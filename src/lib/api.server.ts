@@ -1,5 +1,7 @@
 import 'server-only';
-import { M365Update, Message } from './types';
+import { M365Update, Message, MessageStatus } from './types';
+import { prisma } from './prisma';
+import type { MessageCenterUpdate } from '@/generated/prisma';
 import { XMLParser } from 'fast-xml-parser';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
@@ -166,6 +168,18 @@ interface GraphApiResponse {
 }
 
 export async function getMessages(): Promise<Message[]> {
+  // Try TTL-based sync from Graph. If it fails, we still serve whatever's
+  // in the DB (including previously-archived messages).
+  await ensureMessagesSynced();
+
+  const rows = await prisma.messageCenterUpdate.findMany({
+    orderBy: { lastUpdated: 'desc' },
+  });
+
+  return rows.map(rowToMessage);
+}
+
+async function fetchAllMessagesFromGraph(): Promise<GraphApiMessage[]> {
   if (!hasRequiredEnvVars) {
     throw new Error(
       'API not configured. Set AZURE_API_URL (APIM endpoint) or AZURE_CLIENT_ID + AZURE_TENANT_ID + AZURE_CLIENT_SECRET (direct Graph).'
@@ -198,7 +212,8 @@ export async function getMessages(): Promise<Message[]> {
       pageCount++;
       const response = await fetch(nextLink, {
         headers,
-        next: { revalidate: 3600 },
+        // Persistence is our cache now; skip Next's fetch cache.
+        cache: 'no-store',
       });
 
       if (!response.ok) {
@@ -232,20 +247,7 @@ export async function getMessages(): Promise<Message[]> {
       nextLink = data['@odata.nextLink'];
     }
 
-    return allMessages.map(message => ({
-      id: message.id,
-      title: message.title,
-      service: message.services ?? [],
-      lastUpdated: message.lastModifiedDateTime,
-      published: message.startDateTime,
-      tags: message.tags ?? [],
-      content: message.body?.content ?? '',
-      summary: message.details?.find(v => v.name === 'Summary')?.value || '',
-      details: message.details || [],
-      isMajorChange: message.isMajorChange || false,
-      actionRequiredByDateTime: message.actionRequiredByDateTime,
-      severity: message.severity,
-    }));
+    return allMessages;
   } catch (error) {
     throw error;
   }
@@ -257,12 +259,45 @@ export async function getMessage(id: string): Promise<Message | null> {
     throw new Error('Invalid message ID format');
   }
 
+  // Try DB first — this is the common path and works even for archived rows.
+  const row = await prisma.messageCenterUpdate.findUnique({ where: { id } });
+  if (row) {
+    // Background-refresh so archived/expired status stays current.
+    void ensureMessagesSynced().catch(() => undefined);
+    return rowToMessage(row);
+  }
+
   if (!hasRequiredEnvVars) {
     if (isDev) throw new Error('Message not found');
     return null;
   }
 
   try {
+    const message = await fetchMessageFromGraph(id);
+    if (!message) {
+      if (isDev) throw new Error(`Message not found: ${id}`);
+      return null;
+    }
+
+    // Seed into DB in the background so subsequent reads are cheap.
+    void prisma.messageCenterUpdate
+      .upsert({
+        where: { id: message.id },
+        create: graphMessageToDbInput(message, deriveStatus(message, 'active')),
+        update: graphMessageToDbUpdate(message, deriveStatus(message, 'active')),
+      })
+      .catch(err => console.error('Failed to seed single message into DB:', err));
+
+    return graphMessageToApiShape(message, {
+      status: deriveStatus(message, 'active'),
+    });
+  } catch (error) {
+    if (isDev) throw error;
+    return null;
+  }
+}
+
+async function fetchMessageFromGraph(id: string): Promise<GraphApiMessage | null> {
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
     };
@@ -278,7 +313,7 @@ export async function getMessage(id: string): Promise<Message | null> {
     let requestBaseUrl = GRAPH_BASE_URL;
     let response = await fetch(graphUrl(requestPath, 'v1.0', requestBaseUrl), {
       headers,
-      next: { revalidate: 86400 },
+      cache: 'no-store',
     });
 
     if (isApimMode && hasLocalCredentials && response.status === 401) {
@@ -289,7 +324,7 @@ export async function getMessage(id: string): Promise<Message | null> {
         requestBaseUrl = DIRECT_GRAPH_BASE_URL;
         response = await fetch(graphUrl(requestPath, 'v1.0', requestBaseUrl), {
           headers,
-          next: { revalidate: 86400 },
+          cache: 'no-store',
         });
       } else {
         throw new Error(`Failed to fetch message: ${response.status} ${response.statusText}`);
@@ -302,31 +337,197 @@ export async function getMessage(id: string): Promise<Message | null> {
 
     const data: GraphApiResponse = await response.json();
     if (!data.value || data.value.length === 0) {
-      throw new Error(`Message not found: ${id}`);
+      return null;
     }
 
-    const message = data.value[0];
-    return {
-      id: message.id,
-      title: message.title,
-      service: message.services ?? [],
-      lastUpdated: message.lastModifiedDateTime,
-      published: message.startDateTime,
-      tags: message.tags ?? [],
-      content: message.body?.content ?? '',
-      summary: message.details?.find(v => v.name === 'Summary')?.value || '',
-      details:
-        message.details?.filter(
-          detail => !['RoadmapIds', 'FeatureStatusJson'].includes(detail.name)
-        ) || [],
-      isMajorChange: message.isMajorChange || false,
-      actionRequiredByDateTime: message.actionRequiredByDateTime,
-      severity: message.severity,
-    };
-  } catch (error) {
-    if (isDev) throw error;
-    return null;
+    return data.value[0];
+}
+
+// --------------------------------------------------------------------------
+// Sync + reconciliation: Graph -> Postgres
+// --------------------------------------------------------------------------
+
+const MESSAGE_CENTER_SYNC_KEY = 'messageCenter';
+const SYNC_TTL_MS = 60 * 60 * 1000; // 1 hour
+
+/** In-flight sync so concurrent requests coalesce into one Graph pull. */
+let inFlightMessageSync: Promise<void> | null = null;
+
+async function ensureMessagesSynced(): Promise<void> {
+  if (!hasRequiredEnvVars) {
+    // No Graph creds — DB is the source of truth in this environment.
+    return;
   }
+
+  if (inFlightMessageSync) {
+    return inFlightMessageSync;
+  }
+
+  try {
+    const state = await prisma.syncState.findUnique({
+      where: { key: MESSAGE_CENTER_SYNC_KEY },
+    });
+    const isFresh = state && Date.now() - state.lastSyncAt.getTime() < SYNC_TTL_MS;
+    if (isFresh) {
+      return;
+    }
+  } catch (err) {
+    // DB unreachable — surface, but don't retry-loop; caller decides.
+    console.error('SyncState lookup failed:', err);
+    return;
+  }
+
+  inFlightMessageSync = syncMessagesFromGraph()
+    .catch(err => {
+      console.error('Message Center sync failed; serving stale DB rows:', err);
+    })
+    .finally(() => {
+      inFlightMessageSync = null;
+    });
+
+  return inFlightMessageSync;
+}
+
+export async function syncMessagesFromGraph(): Promise<void> {
+  const graphMessages = await fetchAllMessagesFromGraph();
+  const now = new Date();
+  const seenIds = new Set(graphMessages.map(m => m.id));
+
+  // Upsert every message returned by Graph. Chunk to avoid a single huge tx.
+  const CHUNK = 50;
+  for (let i = 0; i < graphMessages.length; i += CHUNK) {
+    const chunk = graphMessages.slice(i, i + CHUNK);
+    await prisma.$transaction(
+      chunk.map(m => {
+        const status = deriveStatus(m, 'active');
+        return prisma.messageCenterUpdate.upsert({
+          where: { id: m.id },
+          create: graphMessageToDbInput(m, status),
+          update: graphMessageToDbUpdate(m, status),
+        });
+      })
+    );
+  }
+
+  // Mark any previously-active rows that Graph no longer returns.
+  const stale = await prisma.messageCenterUpdate.findMany({
+    where: {
+      status: 'active',
+      id: { notIn: Array.from(seenIds) },
+    },
+    select: { id: true, actionRequiredByDateTime: true },
+  });
+
+  if (stale.length > 0) {
+    await prisma.$transaction(
+      stale.map(row =>
+        prisma.messageCenterUpdate.update({
+          where: { id: row.id },
+          data: {
+            status: isPastDate(row.actionRequiredByDateTime) ? 'expired' : 'archived',
+            archivedAt: now,
+          },
+        })
+      )
+    );
+  }
+
+  // Also flip still-in-Graph but past-due rows to expired.
+  await prisma.messageCenterUpdate.updateMany({
+    where: {
+      status: 'active',
+      actionRequiredByDateTime: { lt: now },
+    },
+    data: { status: 'expired' },
+  });
+
+  await prisma.syncState.upsert({
+    where: { key: MESSAGE_CENTER_SYNC_KEY },
+    create: { key: MESSAGE_CENTER_SYNC_KEY, lastSyncAt: now, lastError: null },
+    update: { lastSyncAt: now, lastError: null },
+  });
+}
+
+function deriveStatus(m: GraphApiMessage, defaultStatus: MessageStatus): MessageStatus {
+  return isPastDate(m.actionRequiredByDateTime) ? 'expired' : defaultStatus;
+}
+
+function isPastDate(value: string | Date | null | undefined): boolean {
+  if (!value) return false;
+  const d = value instanceof Date ? value : new Date(value);
+  return !Number.isNaN(d.getTime()) && d.getTime() < Date.now();
+}
+
+function graphMessageToDbInput(m: GraphApiMessage, status: MessageStatus) {
+  return {
+    id: m.id,
+    title: m.title,
+    service: m.services ?? [],
+    tags: m.tags ?? [],
+    content: m.body?.content ?? '',
+    summary: m.details?.find(v => v.name === 'Summary')?.value || '',
+    details: (m.details ?? []) as unknown as object,
+    isMajorChange: m.isMajorChange || false,
+    severity: m.severity ?? null,
+    actionRequiredByDateTime: m.actionRequiredByDateTime
+      ? new Date(m.actionRequiredByDateTime)
+      : null,
+    published: m.startDateTime ? new Date(m.startDateTime) : null,
+    lastUpdated: m.lastModifiedDateTime ? new Date(m.lastModifiedDateTime) : null,
+    status,
+  };
+}
+
+function graphMessageToDbUpdate(m: GraphApiMessage, status: MessageStatus) {
+  return {
+    ...graphMessageToDbInput(m, status),
+    lastSeenAt: new Date(),
+    // If the message reappears in Graph, clear any archive marker.
+    archivedAt: null,
+  };
+}
+
+function rowToMessage(row: MessageCenterUpdate): Message {
+  return {
+    id: row.id,
+    title: row.title,
+    service: row.service,
+    lastUpdated: (row.lastUpdated ?? row.lastSeenAt).toISOString(),
+    published: (row.published ?? row.firstSeenAt).toISOString(),
+    tags: row.tags,
+    content: row.content,
+    summary: row.summary,
+    details: (row.details as unknown as { name: string; value: string }[]) ?? [],
+    isMajorChange: row.isMajorChange,
+    actionRequiredByDateTime: row.actionRequiredByDateTime?.toISOString(),
+    severity: row.severity ?? '',
+    status: (row.status as MessageStatus) ?? 'active',
+    archivedAt: row.archivedAt?.toISOString(),
+  };
+}
+
+function graphMessageToApiShape(
+  m: GraphApiMessage,
+  opts: { status: MessageStatus }
+): Message {
+  return {
+    id: m.id,
+    title: m.title,
+    service: m.services ?? [],
+    lastUpdated: m.lastModifiedDateTime,
+    published: m.startDateTime,
+    tags: m.tags ?? [],
+    content: m.body?.content ?? '',
+    summary: m.details?.find(v => v.name === 'Summary')?.value || '',
+    details:
+      m.details?.filter(
+        detail => !['RoadmapIds', 'FeatureStatusJson'].includes(detail.name)
+      ) || [],
+    isMajorChange: m.isMajorChange || false,
+    actionRequiredByDateTime: m.actionRequiredByDateTime,
+    severity: m.severity,
+    status: opts.status,
+  };
 }
 
 export async function getReleasePlans() {

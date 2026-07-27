@@ -1,3 +1,5 @@
+export type MessageStatus = 'active' | 'archived' | 'expired';
+
 export interface Message {
   id: string;
   title: string;
@@ -14,6 +16,8 @@ export interface Message {
   isMajorChange: boolean;
   actionRequiredByDateTime?: string;
   severity: string;
+  status: MessageStatus;
+  archivedAt?: string;
 }
 
 export interface MessageResponse {

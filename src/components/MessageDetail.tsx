@@ -123,6 +123,28 @@ export function MessageDetail({ message }: MessageDetailProps) {
                 Major Change
               </span>
             )}
+            {message.status === 'archived' && (
+              <span
+                className="inline-flex items-center px-2 py-1 rounded-md text-xs font-semibold bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-700"
+                title={
+                  message.archivedAt
+                    ? `Archived on ${new Date(message.archivedAt).toLocaleDateString()} — no longer in Microsoft's live feed.`
+                    : "This message has been removed from Microsoft's live feed but is preserved here for reference."
+                }
+              >
+                <svg className="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" /></svg>
+                Archived
+              </span>
+            )}
+            {message.status === 'expired' && (
+              <span
+                className="inline-flex items-center px-2 py-1 rounded-md text-xs font-semibold bg-amber-50 dark:bg-amber-900/40 text-amber-800 dark:text-amber-200 border border-amber-200 dark:border-amber-700"
+                title="The action-required date on this message has passed."
+              >
+                <svg className="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                Expired
+              </span>
+            )}
             {message.tags.map(tag => (
               <span key={tag} className="inline-flex items-center px-2 py-1 rounded-md text-xs font-semibold bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-200 border border-gray-200 dark:border-gray-700">
                 {tag}
