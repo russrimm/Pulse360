@@ -144,9 +144,9 @@ Below are screenshots of every major page in both **dark** and **light** mode.
 | Sanitization | `isomorphic-dompurify` (server-rendered HTML from feeds) |
 | Telemetry | `@vercel/analytics`, `@vercel/speed-insights` |
 | Tests | **Playwright 1.57** (Chromium, Firefox, WebKit) |
-| Hosting target | Vercel (works on Node 20.19+, 22.12+, and 24.x with Next.js 16) |
+| Hosting target | Vercel (works on Node 20.19+ and 22.12+ with Next.js 16) |
 
-**Engines:** Node `^20.19.0 || ^22.12.0 || ^24.0.0`, pnpm `>=9.0.0`.
+**Engines:** Node `^20.19.0 || ^22.12.0`, pnpm `>=9.0.0`.
 
 ---
 
@@ -258,7 +258,7 @@ If an upstream is down, list endpoints return `200` with an empty array so the U
 
 ## Quick start
 
-Prereqs: **Node 20.19+ (or 22.12+ or 24.x)**, **pnpm 9+** (enable with `corepack enable` or `npm i -g pnpm`), **Git**. Node 24 is recommended for local development (see `.nvmrc`). Postgres only if you intend to use the Prisma models (most features don't need it).
+Prereqs: **Node 20.19+ (or 22.12+)**, **pnpm 9+** (enable with `corepack enable` or `npm i -g pnpm`), **Git**. Node 22 is recommended for local development (see `.nvmrc`). Postgres only if you intend to use the Prisma models (most features don't need it).
 
 ```bash
 git clone https://github.com/russrimm/Pulse360.git
@@ -513,7 +513,7 @@ Pulse 360 uses Postgres via Prisma to **cache Microsoft Graph Message Center upd
 | `pnpm lint:fix` | ESLint with autofix |
 | `pnpm type-check` | `tsc --noEmit` (no emit, types only) |
 | `pnpm format` | Prettier over the whole repo |
-| `pnpm exec playwright test` | Run Playwright tests across Chromium, Firefox, WebKit |
+| `npx playwright test` | Run Playwright tests across Chromium, Firefox, WebKit |
 
 ---
 
@@ -630,7 +630,7 @@ The ESLint config covers TypeScript, React, Next.js, JSON, CSS, and Markdown fil
 
 ## Deployment
 
-Pulse 360° is hosted on **Vercel** and runs anywhere Node 20.19+, 22.12+, or 24.x can host Next.js 16.
+Pulse 360° is hosted on **Vercel** and runs anywhere Node 20.19+ or 22.12+ can host Next.js 16.
 
 **Vercel (recommended):**
 
@@ -650,6 +650,10 @@ pnpm start   # serves on port 3000
 ```
 
 Put it behind a reverse proxy (Caddy / nginx / CloudFront) with HTTPS terminated upstream. Set `NODE_ENV=production`.
+
+**Azure Static Web Apps (npm-vs-pnpm note):**
+
+The repo also includes an Azure Static Web Apps workflow at `.github/workflows/azure-static-web-apps-purple-river-045b0790f.yml`. That workflow sets `app_build_command: "npm run build"` even though the project's `packageManager` is `pnpm@10.34.5`. This is intentional: SWA's Oryx builder doesn't invoke pnpm reliably, so the workflow uses npm (which reads the committed `package-lock.json`) for the cloud build. Local development, contributor tooling, and the `update-lifecycle-data.yml` workflow all continue to use pnpm.
 
 **Notes:**
 
