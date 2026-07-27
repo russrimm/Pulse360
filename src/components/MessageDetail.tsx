@@ -111,6 +111,17 @@ export function MessageDetail({ message }: MessageDetailProps) {
         </Link>
       </div>
       <div className="w-full max-w-3xl bg-white dark:bg-gray-900 rounded-3xl shadow-xl border border-gray-200 dark:border-gray-800 overflow-hidden relative">
+        {/* Archived watermark overlay */}
+        {message.status === 'archived' && (
+          <div
+            className="pointer-events-none absolute inset-0 z-30 flex items-start justify-center pt-32"
+            aria-hidden="true"
+          >
+            <span className="select-none -rotate-[20deg] whitespace-nowrap text-6xl sm:text-8xl font-black uppercase tracking-widest text-gray-500/20 dark:text-gray-200/15 border-[6px] border-gray-500/20 dark:border-gray-200/15 rounded-lg px-6 py-2">
+              Archived
+            </span>
+          </div>
+        )}
         {/* Meta info row */}
         <div className="flex flex-wrap items-center justify-between gap-2 px-6 pt-6 pb-2 border-b border-gray-100 dark:border-gray-800">
           <span className="inline-flex items-center px-2 py-1 rounded-md text-xs font-semibold bg-gray-100 dark:bg-gray-800 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-700">
