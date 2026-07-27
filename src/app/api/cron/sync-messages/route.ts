@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { syncMessagesFromGraph } from '@/lib/api.server';
 
-// Vercel Cron hits this hourly (see vercel.json). Also callable manually with
+// Vercel Cron hits this daily (see vercel.json). Also callable manually with
 // `Authorization: Bearer $CRON_SECRET`. When `CRON_SECRET` is unset, refuses
 // in production so the endpoint isn't a public "burn my Graph quota" button.
 export const runtime = 'nodejs';

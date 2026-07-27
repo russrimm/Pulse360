@@ -173,7 +173,7 @@ export async function getMessages(): Promise<Message[]> {
     orderBy: { lastUpdated: 'desc' },
   });
 
-  // Vercel Cron (see vercel.json → /api/cron/sync-messages) is the primary
+  // Vercel Cron (see vercel.json → /api/cron/sync-messages) is the baseline
   // sync path. On-demand sync here is a safety net:
   //   - DB has rows: fire-and-forget so page loads never block on Graph.
   //   - DB empty (first-ever deploy or wipe): block once so users don't see
