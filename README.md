@@ -513,7 +513,7 @@ Pulse 360 uses Postgres via Prisma to **cache Microsoft Graph Message Center upd
 | `pnpm lint:fix` | ESLint with autofix |
 | `pnpm type-check` | `tsc --noEmit` (no emit, types only) |
 | `pnpm format` | Prettier over the whole repo |
-| `pnpm exec playwright test` | Run Playwright tests across Chromium, Firefox, WebKit |
+| `npx playwright test` | Run Playwright tests across Chromium, Firefox, WebKit |
 
 ---
 
@@ -650,6 +650,10 @@ pnpm start   # serves on port 3000
 ```
 
 Put it behind a reverse proxy (Caddy / nginx / CloudFront) with HTTPS terminated upstream. Set `NODE_ENV=production`.
+
+**Azure Static Web Apps (npm-vs-pnpm note):**
+
+The repo also includes an Azure Static Web Apps workflow at `.github/workflows/azure-static-web-apps-purple-river-045b0790f.yml`. That workflow sets `app_build_command: "npm run build"` even though the project's `packageManager` is `pnpm@10.34.5`. This is intentional: SWA's Oryx builder doesn't invoke pnpm reliably, so the workflow uses npm (which reads the committed `package-lock.json`) for the cloud build. Local development, contributor tooling, and the `update-lifecycle-data.yml` workflow all continue to use pnpm.
 
 **Notes:**
 
