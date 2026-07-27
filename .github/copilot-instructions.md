@@ -1,15 +1,21 @@
 # Copilot Instructions for Pulse360
 
+Package manager: **pnpm 10.x** (declared in `packageManager`; `engines` requires Node `^20.19.0 || ^22.12.0` and pnpm `>=9.0.0`).
+
 ## Build & Dev Commands
 
 ```bash
-pnpm dev             # Start dev server (Next.js)
-pnpm build           # Production build
+pnpm dev             # Start dev server (next dev)
+pnpm build           # prisma generate → prisma migrate (if configured) → next build
+pnpm start           # Start production server (next start)
 pnpm lint            # ESLint (flat config: eslint.config.mjs)
 pnpm lint:fix        # ESLint with auto-fix
 pnpm type-check      # TypeScript type checking (tsc --noEmit)
 pnpm format          # Prettier
+pnpm clean           # rimraf .next
 ```
+
+The `build` script runs `prisma generate`, then `scripts/prisma-migrate-if-configured.mjs` (applies migrations only when a valid `DATABASE_URL` is set), then `next build`.
 
 ### Testing
 
@@ -25,12 +31,14 @@ pnpm exec playwright test --project=chromium     # Single browser
 
 ### Stack
 
-- **Next.js 16 App Router** with React 19, TypeScript, Tailwind CSS v4
-- **UI**: Shadcn UI + Radix UI primitives
-- **State**: Zustand (`src/components/filterStore.ts`) for client-side filter state; React Server Components for data fetching
-- **Database**: PostgreSQL via Prisma (schema at `prisma/schema.prisma`, generated client output to `src/generated/prisma`)
-- **Auth**: next-auth
-- **Deployment**: Azure Static Web Apps (CI/CD in `.github/workflows/`)
+- **Next.js 16 App Router** with React 19, TypeScript (strict), Tailwind CSS v4 (`@tailwindcss/postcss`)
+- **UI**: Radix UI primitives (`@radix-ui/react-accordion`, `-popover`, `-icons`), Headless UI, Heroicons, `react-icons`, Swiper carousels; HTML sanitization via `sanitize-html`
+- **State**: Zustand (`src/components/filterStore.ts`) for client-side filter state; React Server Components for data fetching; `@tanstack/react-query` where client fetching is needed
+- **Database**: PostgreSQL via Prisma 7 (schema at `prisma/schema.prisma`, client generated to `src/generated/prisma`, imported as `@/generated/prisma`). Access it through the shared helper in `src/lib/prisma.ts` (`getPrisma()`), not `new PrismaClient()`.
+- **Auth**: `next-auth` v4 (route at `src/app/api/auth/[...nextauth]/route.ts`, helpers in `src/lib/auth.ts`)
+- **Feeds & parsing**: `rss-parser`, `fast-xml-parser`, `xml2js`
+- **Analytics**: `@vercel/analytics`, `@vercel/speed-insights`
+- **Deployment**: Azure Static Web Apps (CI/CD in `.github/workflows/azure-static-web-apps-*.yml`); scheduled workflows `sync-message-center.yml` and `update-lifecycle-data.yml` also live there
 
 ### Data Flow
 
@@ -38,8 +46,8 @@ The app aggregates Microsoft data from multiple sources:
 
 - **Server-side** (`src/lib/api.server.ts`): Calls Microsoft Graph API through Azure API Management (APIM). In production (APIM mode), the app sends unauthenticated requests to APIM which handles token acquisition via Named Values. In local dev, the app can acquire tokens directly using `AZURE_CLIENT_ID`, `AZURE_CLIENT_SECRET`, `AZURE_TENANT_ID`. Imports `'server-only'` to enforce server boundary.
 - **Client-side** (`src/lib/api.client.ts`): Fetches from internal Next.js API routes (`/api/*`) that proxy and parse RSS/XML feeds.
-- **API routes** (`src/app/api/`): ~20 route handlers for proxying Microsoft RSS feeds (product news, blog feeds), MSRC security data, and message center data.
-- **APIM mode detection**: When `AZURE_API_URL` points to a non-`graph.microsoft.com` host, the app skips local token acquisition (APIM handles auth). A `graphUrl(path, version)` helper builds URLs supporting both `/v1.0` and `/beta`.
+- **API routes** (`src/app/api/`): ~22 route handlers for proxying Microsoft RSS feeds (product news, blog feeds per product — Copilot, Copilot Studio, Power Platform, Power Apps, Power Automate, Power BI, Fabric, Azure AI/ML, Azure AI Foundry, Semantic Kernel, Learn blog, Tech Community, etc.), MSRC security data, Microsoft Lifecycle data, message center data, an image proxy, and a `cron/sync-messages` endpoint invoked by the scheduled workflow.
+- **APIM mode detection**: When `AZURE_API_URL` points to a non-`graph.microsoft.com` host, the app skips local token acquisition (APIM handles auth). A `graphUrl(path, version)` helper builds URLs supporting both `/v1.0` and `/beta`. Bare hostnames in `AZURE_API_URL` are auto-prefixed with `https://`.
 - **Pagination**: Graph API pagination is capped at 10 pages × 500 items to avoid serverless timeouts.
 
 ### Path Alias
@@ -48,10 +56,13 @@ The app aggregates Microsoft data from multiple sources:
 
 ### Key Directories
 
-- `src/app/` — Next.js App Router pages. Each product area (message-center, fabric-roadmap, azure-updates, msrc, release-plans, product-news, m365-updates) has its own route with detail pages via `[id]` segments.
-- `src/components/` — All React components (no subdirectory nesting). Contains both server and client components.
-- `src/lib/` — Data fetching (`api.server.ts`, `api.client.ts`, `fabricApi.ts`), types (`types.ts`), and icon helpers.
+- `src/app/` — Next.js App Router pages. Product-area routes include `message-center`, `fabric-roadmap`, `azure-updates`, `msrc`, `release-plans`, `product-news`, `m365-updates`, `ms-lifecycle`, and `powerplatd365`, most with `[id]` detail segments. Non-product routes: `home`, `about`, `security`.
+- `src/components/` — All React components live directly here (~39 files, no subdirectory nesting). Contains both server and client components plus the Zustand `filterStore.ts`.
+- `src/lib/` — Data fetching and shared helpers: `api.server.ts`, `api.client.ts`, `fabricApi.ts`, `types.ts`, `prisma.ts` (shared Prisma client), `auth.ts` (next-auth config), `getProductIcon.ts`, `releasePlanIcons.ts`.
+- `src/generated/prisma/` — Prisma client output (generated by `prisma generate`; do not hand-edit).
 - `src/types/` — Module declarations (SVG, xml2js).
+- `scripts/` — Node maintenance scripts (`prisma-migrate-if-configured.mjs`, `sync-dotfiles.mjs`, `bootstrap-dotfiles.mjs`).
+- `tests/` — Playwright specs (`example.spec.ts`, `sanitize.spec.ts`, `ms-lifecycle.spec.ts`, `feed-pages.spec.ts`).
 
 ## Conventions
 
@@ -63,7 +74,8 @@ The app aggregates Microsoft data from multiple sources:
 - **Wrap client components in Suspense** with fallback.
 - **Descriptive boolean variable names** with auxiliary verbs: `isLoading`, `hasError`, `showMajorChangesOnly`.
 - **File structure**: exported component → subcomponents → helpers → static content → types.
-- **images.remotePatterns** (not `images.domains`) in `next.config.js`.
+- **images.remotePatterns** (not `images.domains`) in `next.config.js` — currently allows `devblogs.microsoft.com` and `winblogs.thesourcemediaassets.com`. Add new remote image hosts here.
+- **Security headers** are set globally in `next.config.js` (`X-Frame-Options: DENY`, `X-Content-Type-Options`, HSTS, `Referrer-Policy`, `Permissions-Policy`) — preserve them when editing that file.
 
 ## Environment Variables
 
@@ -79,7 +91,8 @@ Only one env var is needed — APIM handles Graph auth:
 - `AZURE_TENANT_ID` — Directory (tenant) ID
 - `AZURE_CLIENT_SECRET` — Client secret value
 - `AZURE_API_URL` — Set to `https://graph.microsoft.com` (no version path)
-- `DATABASE_URL` — PostgreSQL connection string for Prisma (optional)
+- `DATABASE_URL` — PostgreSQL connection string for Prisma. Required for message-center persistence; when unset, `prisma-migrate-if-configured.mjs` skips migrations at build time.
+- `NEXTAUTH_URL` / `NEXTAUTH_SECRET` — required for `next-auth` in non-dev environments.
 
 ## Strict TypeScript
 
