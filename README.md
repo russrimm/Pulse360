@@ -144,9 +144,9 @@ Below are screenshots of every major page in both **dark** and **light** mode.
 | Sanitization | `isomorphic-dompurify` (server-rendered HTML from feeds) |
 | Telemetry | `@vercel/analytics`, `@vercel/speed-insights` |
 | Tests | **Playwright 1.57** (Chromium, Firefox, WebKit) |
-| Hosting target | Vercel (works on Node 20.19+, 22.12+, and 24.x with Next.js 16) |
+| Hosting target | Vercel (works on Node 20.19+ and 22.12+ with Next.js 16) |
 
-**Engines:** Node `^20.19.0 || ^22.12.0 || ^24.0.0`, pnpm `>=9.0.0`.
+**Engines:** Node `^20.19.0 || ^22.12.0`, pnpm `>=9.0.0`.
 
 ---
 
@@ -258,7 +258,7 @@ If an upstream is down, list endpoints return `200` with an empty array so the U
 
 ## Quick start
 
-Prereqs: **Node 20.19+ (or 22.12+ or 24.x)**, **pnpm 9+** (enable with `corepack enable` or `npm i -g pnpm`), **Git**. Node 24 is recommended for local development (see `.nvmrc`). Postgres only if you intend to use the Prisma models (most features don't need it).
+Prereqs: **Node 20.19+ (or 22.12+)**, **pnpm 9+** (enable with `corepack enable` or `npm i -g pnpm`), **Git**. Node 22 is recommended for local development (see `.nvmrc`). Postgres only if you intend to use the Prisma models (most features don't need it).
 
 ```bash
 git clone https://github.com/russrimm/Pulse360.git
@@ -630,7 +630,7 @@ The ESLint config covers TypeScript, React, Next.js, JSON, CSS, and Markdown fil
 
 ## Deployment
 
-Pulse 360° is hosted on **Vercel** and runs anywhere Node 20.19+, 22.12+, or 24.x can host Next.js 16.
+Pulse 360° is hosted on **Vercel** and runs anywhere Node 20.19+ or 22.12+ can host Next.js 16.
 
 **Vercel (recommended):**
 
