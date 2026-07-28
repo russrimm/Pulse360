@@ -1,4 +1,4 @@
-import { useState, useMemo, useRef, useEffect, useCallback } from 'react';
+import { useMemo, useRef } from 'react';
 import type { Message } from '@/lib/types';
 import { useFilterContext } from './FilterContext';
 
@@ -7,10 +7,13 @@ interface TagsFilterProps {
 }
 
 export function TagsFilter({ messages }: TagsFilterProps) {
-  const { selectedTags, setSelectedTags } = useFilterContext();
-  // Use local state for open/close
-  const [isOpen, setIsOpen] = useState(false);
-  const setOpen = setIsOpen;
+  const {
+    openFilter,
+    setOpenFilter,
+    selectedTags,
+    setSelectedTags,
+  } = useFilterContext();
+  const isOpen = openFilter === 'tags';
 
   // Get unique tags from messages
   const uniqueTags = useMemo(() => {
@@ -19,26 +22,11 @@ export function TagsFilter({ messages }: TagsFilterProps) {
   }, [messages]);
 
   const dropdownRef = useRef<HTMLDivElement>(null);
-  const internalClick = useRef(false);
-
-  // Click outside handler (same as ProductFilter)
-  const handleClickOutside = useCallback((event: MouseEvent) => {
-    if (internalClick.current) {
-      internalClick.current = false;
-      return;
-    }
-    if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-      setOpen(false);
-    }
-  }, [setOpen]);
-
-  // Remove useEffect for click outside
 
   return (
     <div className="relative w-full md:w-auto" ref={dropdownRef}>
-      {/* Prevent event bubbling to avoid closing other filter dialogs */}
       <button
-        onClick={() => setOpen(!isOpen)}
+        onClick={() => setOpenFilter(isOpen ? null : 'tags')}
         className="flex items-center justify-center gap-2 px-4 h-8 text-gray-700 dark:text-gray-200 bg-white/80 dark:bg-gray-800/50 backdrop-blur-sm border border-gray-200 dark:border-gray-700/50 rounded-lg shadow-[inset_0_2px_4px_rgba(0,0,0,0.05)] dark:shadow-[inset_0_2px_4px_rgba(0,0,0,0.2)] hover:shadow-[inset_0_2px_4px_rgba(0,0,0,0.1)] dark:hover:shadow-[inset_0_2px_4px_rgba(0,0,0,0.3)] hover:border-primary-200 dark:hover:border-primary-800 hover:shadow-[0_0_0_1px_rgba(59,130,246,0.5)] dark:hover:shadow-[0_0_0_1px_rgba(59,130,246,0.5)] transition-all duration-300 relative w-full md:w-auto min-h-[32px]"
         aria-label="Filter tags"
       >
@@ -103,7 +91,7 @@ export function TagsFilter({ messages }: TagsFilterProps) {
             <button
               onClick={() => {
                 setSelectedTags([]);
-                setOpen(false);
+                setOpenFilter(null);
               }}
               className="w-full px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
             >

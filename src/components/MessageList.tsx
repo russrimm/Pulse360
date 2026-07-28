@@ -314,7 +314,10 @@ export function MessageList({ messages: messagesProp }: MessageListProps) {
             </div>
             <div className="w-full md:w-auto">
             <button
-              onClick={() => setShowMajorChangesOnly(!showMajorChangesOnly)}
+              onClick={() => {
+                setOpenFilter(null);
+                setShowMajorChangesOnly(!showMajorChangesOnly);
+              }}
                 className={`flex items-center justify-center gap-2 px-4 min-h-[32px] w-full md:w-auto text-gray-700 dark:text-gray-200 bg-white/80 dark:bg-gray-800/50 backdrop-blur-sm border border-gray-200 dark:border-gray-700/50 rounded-lg shadow-[inset_0_2px_4px_rgba(0,0,0,0.05)] dark:shadow-[inset_0_2px_4px_rgba(0,0,0,0.2)] hover:shadow-[0_0_0_1px_rgba(59,130,246,0.5)] dark:hover:shadow-[0_0_0_1px_rgba(59,130,246,0.5)] hover:border-primary-200 dark:hover:border-primary-800 transition-all duration-300 relative ${showMajorChangesOnly ? 'bg-red-50 dark:bg-red-900/30 border-red-200 dark:border-red-800 text-red-700 dark:text-red-300 animate-pulse-slow' : ''}`}
               aria-label="Filter major changes"
             >
