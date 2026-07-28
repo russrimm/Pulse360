@@ -2,6 +2,7 @@
 
 import React, { useEffect, useMemo, useState } from 'react';
 import * as Popover from '@radix-ui/react-popover';
+import { addMonths } from 'date-fns';
 
 interface LifecycleRow {
   product: string;
@@ -38,6 +39,7 @@ type SortField =
   | 'endOfSupportDate';
 type SortDir = 'asc' | 'desc';
 type LifecycleView = 'microsoft' | 'azure';
+type ExpirationWindow = 3 | 6 | 9 | 12;
 type ColumnId =
   | 'product'
   | 'edition'
@@ -70,6 +72,7 @@ interface LifecycleGridProps {
   dropdownFilterField: 'product' | 'category';
   dropdownFilterLabel: string;
   columnOptions: ColumnOption[];
+  showExpirationFilter?: boolean;
 }
 
 const LIFECYCLE_EXPORT_URL = 'https://learn.microsoft.com/en-us/lifecycle/products/export/';
@@ -96,6 +99,30 @@ const AZURE_FEATURE_COLUMN_OPTIONS: ColumnOption[] = [
   { id: 'docsUrl', label: 'DocsUrl' },
   { id: 'endOfSupportDate', label: 'End of Support' },
 ];
+
+const EXPIRATION_WINDOW_OPTIONS: ExpirationWindow[] = [3, 6, 9, 12];
+const EXPIRATION_DATE_FIELDS = ['mainStreamEndDate', 'extendedEndDate', 'retirementDate'] as const;
+
+function parseLifecycleDate(value: string): Date | null {
+  const dateOnlyMatch = value.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  const date = dateOnlyMatch
+    ? new Date(Number(dateOnlyMatch[1]), Number(dateOnlyMatch[2]) - 1, Number(dateOnlyMatch[3]))
+    : new Date(value);
+
+  return isNaN(date.getTime()) ? null : date;
+}
+
+function isExpiringWithin(row: LifecycleRow, months: ExpirationWindow, today: Date): boolean {
+  const cutoff = addMonths(today, months);
+
+  return EXPIRATION_DATE_FIELDS.some(field => {
+    const value = row[field];
+    if (!value) return false;
+
+    const expirationDate = parseLifecycleDate(value);
+    return expirationDate !== null && expirationDate >= today && expirationDate <= cutoff;
+  });
+}
 
 function getExpiryStatus(row: LifecycleRow): 'expired' | 'expiring-soon' | 'active' | 'unknown' {
   const today = new Date();
@@ -168,9 +195,11 @@ function LifecycleGrid({
   dropdownFilterField,
   dropdownFilterLabel,
   columnOptions,
+  showExpirationFilter = false,
 }: LifecycleGridProps) {
   const [search, setSearch] = useState('');
   const [dropdownFilter, setDropdownFilter] = useState('All');
+  const [expirationWindow, setExpirationWindow] = useState<ExpirationWindow | 'All'>('All');
   const [sortField, setSortField] = useState<SortField>('product');
   const [sortDir, setSortDir] = useState<SortDir>('asc');
   const [visibleColumns, setVisibleColumns] = useState<ColumnId[]>(columnOptions.map(column => column.id));
@@ -188,6 +217,8 @@ function LifecycleGrid({
 
   const filtered = useMemo(() => {
     const query = search.toLowerCase();
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
 
     return rows
       .filter(row => {
@@ -196,6 +227,7 @@ function LifecycleGrid({
 
         if (query && !row.product.toLowerCase().includes(query) && !release.includes(query) && !category.includes(query)) return false;
         if (dropdownFilter !== 'All' && row[dropdownFilterField] !== dropdownFilter) return false;
+        if (expirationWindow !== 'All' && !isExpiringWithin(row, expirationWindow, today)) return false;
 
         return true;
       })
@@ -215,7 +247,7 @@ function LifecycleGrid({
         if (va > vb) return sortDir === 'asc' ? 1 : -1;
         return 0;
       });
-  }, [rows, search, dropdownFilter, dropdownFilterField, sortField, sortDir]);
+  }, [rows, search, dropdownFilter, dropdownFilterField, expirationWindow, sortField, sortDir]);
 
   const isVisible = (columnId: ColumnId) => visibleColumns.includes(columnId);
 
@@ -265,6 +297,7 @@ function LifecycleGrid({
           className="flex-1 px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
         />
         <select
+          aria-label={`Filter by ${dropdownFilterLabel}`}
           value={dropdownFilter}
           onChange={event => setDropdownFilter(event.target.value)}
           className="px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
@@ -273,6 +306,22 @@ function LifecycleGrid({
             <option key={value} value={value}>{value === 'All' ? `All ${dropdownFilterLabel}` : value}</option>
           ))}
         </select>
+        {showExpirationFilter && (
+          <select
+            aria-label="Filter by expiration date"
+            value={expirationWindow}
+            onChange={event => {
+              const value = event.target.value;
+              setExpirationWindow(value === 'All' ? 'All' : (Number(value) as ExpirationWindow));
+            }}
+            className="px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
+          >
+            <option value="All">All expiration dates</option>
+            {EXPIRATION_WINDOW_OPTIONS.map(months => (
+              <option key={months} value={months}>Expiring within {months} months</option>
+            ))}
+          </select>
+        )}
         <Popover.Root>
           <Popover.Trigger asChild>
             <button
@@ -602,6 +651,7 @@ export function MsLifecycleClient() {
             dropdownFilterField="product"
             dropdownFilterLabel="products"
             columnOptions={MICROSOFT_COLUMN_OPTIONS}
+            showExpirationFilter
           />
         </div>
       ) : (

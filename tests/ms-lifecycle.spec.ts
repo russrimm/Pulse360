@@ -112,3 +112,51 @@ test('shows the actual date with the end of support countdown', async ({ page })
   await expect(page.getByRole('link', { name: 'Azure RSS source' })).toHaveCount(0);
   await expect(page.getByRole('cell', { name: '3 months · Oct 12, 2026', exact: true })).toBeVisible();
 });
+
+test('filters Microsoft products by lifecycle dates within future month windows', async ({ page }) => {
+  await page.clock.setFixedTime(new Date('2026-07-28T12:00:00'));
+  await page.route('**/api/mslifecycle', route => route.fulfill({
+    contentType: 'application/json',
+    body: JSON.stringify({
+      rows: [
+        { ...lifecycleRow, product: 'Past Product', mainStreamEndDate: '2026-07-27', category: '' },
+        { ...lifecycleRow, product: 'Three Month Product', mainStreamEndDate: '2026-10-28', category: '' },
+        { ...lifecycleRow, product: 'Six Month Product', extendedEndDate: '2026-12-15', category: '' },
+        { ...lifecycleRow, product: 'Nine Month Product', retirementDate: '2027-03-15', category: '' },
+        { ...lifecycleRow, product: 'Twelve Month Product', retirementDate: '2027-07-28', category: '' },
+        { ...lifecycleRow, product: 'Beyond Window Product', retirementDate: '2027-08-01', category: '' },
+      ],
+      sourceUrl: 'https://example.com/lifecycle.xlsx',
+      cachedAt: '2026-07-28T12:00:00.000Z',
+      fromCache: true,
+    }),
+  }));
+
+  await page.goto('http://localhost:3000/ms-lifecycle');
+
+  const expirationFilter = page.getByRole('combobox', { name: 'Filter by expiration date' });
+  await expect(expirationFilter.getByRole('option')).toHaveText([
+    'All expiration dates',
+    'Expiring within 3 months',
+    'Expiring within 6 months',
+    'Expiring within 9 months',
+    'Expiring within 12 months',
+  ]);
+
+  await expirationFilter.selectOption('3');
+  await expect(page.getByRole('cell', { name: 'Three Month Product', exact: true })).toBeVisible();
+  await expect(page.getByRole('cell', { name: 'Six Month Product', exact: true })).not.toBeVisible();
+  await expect(page.getByRole('cell', { name: 'Past Product', exact: true })).not.toBeVisible();
+
+  await expirationFilter.selectOption('6');
+  await expect(page.getByRole('cell', { name: 'Six Month Product', exact: true })).toBeVisible();
+  await expect(page.getByRole('cell', { name: 'Nine Month Product', exact: true })).not.toBeVisible();
+
+  await expirationFilter.selectOption('9');
+  await expect(page.getByRole('cell', { name: 'Nine Month Product', exact: true })).toBeVisible();
+  await expect(page.getByRole('cell', { name: 'Twelve Month Product', exact: true })).not.toBeVisible();
+
+  await expirationFilter.selectOption('12');
+  await expect(page.getByRole('cell', { name: 'Twelve Month Product', exact: true })).toBeVisible();
+  await expect(page.getByRole('cell', { name: 'Beyond Window Product', exact: true })).not.toBeVisible();
+});
