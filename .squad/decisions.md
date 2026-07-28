@@ -135,7 +135,7 @@ Canonical, append-only ledger of scope, architecture, and process decisions. Onl
 
 *What is covered:* IP-literal SSRF protection rejects IPv4 private/loopback/link-local ranges (0/8, 10/8, 127/8, 169.254/16, 172.16/12, 192.168/16), IPv6 loopback (`::1`), IPv6 link-local (`fe80::/10`), and literal hostnames (`localhost`, `0.0.0.0`).
 
-*Known gap:* DNS-resolution pinning is not implemented. A hostname on the allowlist could theoretically resolve to a private IP via DNS rebinding. This risk is low in practice because (a) the allowlist is exclusively Microsoft-controlled domains that resolve to public Azure/CDN IPs, and (b) Vercel's network egress enforces additional controls. Full mitigation would require a Node `dns.lookup` call followed by an IP-range check before `fetch` — deferred as a hardening item.
+*Known gap:* DNS-resolution pinning is not implemented. A hostname on the allowlist could theoretically resolve to a private IP via DNS rebinding. This risk is low in practice because (a) the allowlist is exclusively Microsoft-controlled domains that resolve to public Azure/CDN IPs, and (b) Azure network egress enforces additional controls. Full mitigation would require a Node `dns.lookup` call followed by an IP-range check before `fetch` — deferred as a hardening item.
 
 ### 2026-06-20: SafeHtml component + sanitization rollout to 8 dangerouslySetInnerHTML sites
 **By:** Naomi

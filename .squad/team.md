@@ -4,7 +4,7 @@
 
 - **Project:** Pulse 360° (`mcviewer`) — a product-agnostic Microsoft news & update portal.
 - **What it does:** Unifies Microsoft's official update streams (Microsoft 365, Azure, Fabric, Power Platform, Dynamics 365, Copilot, MSRC) into a single fast, filterable, dark-mode-first dashboard. Live at https://www.mspulse360.app
-- **Tech stack:** Next.js 16 (App Router), React 19, TypeScript 5.9, Tailwind CSS 4, Radix UI, Headless UI, Prisma 7 + Postgres, Zustand, TanStack Query, next-auth + MSAL (Microsoft Entra), Playwright. Deployed on Vercel.
+- **Tech stack:** Next.js 16 (App Router), React 19, TypeScript 5.9, Tailwind CSS 4, Radix UI, Headless UI, Prisma 7 + Postgres, Zustand, TanStack Query, next-auth + MSAL (Microsoft Entra), Playwright. Deployed on Azure Static Web Apps.
 - **Data layer:** RSS/Atom + XML feed ingestion (`fast-xml-parser`, `rss-parser`, `xml2js`), sanitized via `isomorphic-dompurify`. Many `src/app/api/*` route handlers proxy and normalize Microsoft feeds.
 - **Requested by / Product owner:** Russ Rimmerman (Russ)
 - **Repo:** russrimm/Pulse360

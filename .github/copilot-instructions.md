@@ -37,7 +37,7 @@ pnpm exec playwright test --project=chromium     # Single browser
 - **Database**: PostgreSQL via Prisma 7 (schema at `prisma/schema.prisma`, client generated to `src/generated/prisma`, imported as `@/generated/prisma`). Access it through the shared helper in `src/lib/prisma.ts` (`getPrisma()`), not `new PrismaClient()`.
 - **Auth**: `next-auth` v4 (route at `src/app/api/auth/[...nextauth]/route.ts`, helpers in `src/lib/auth.ts`)
 - **Feeds & parsing**: `rss-parser`, `fast-xml-parser`, `xml2js`
-- **Analytics**: `@vercel/analytics`, `@vercel/speed-insights`
+- **Analytics**: Optional analytics and performance monitoring integrations
 - **Deployment**: Azure Static Web Apps (CI/CD in `.github/workflows/azure-static-web-apps-*.yml`); scheduled workflows `sync-message-center.yml` and `update-lifecycle-data.yml` also live there
 
 ### Data Flow
