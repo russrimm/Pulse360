@@ -115,7 +115,7 @@ export default function AboutPage() {
 
           <h2 className="text-xl font-semibold mt-8 mb-3">Deploy It in Your Own Tenant</h2>
           <p>
-            Pulse 360° is open source. If you&apos;d like to run your own instance — pointed at your organization&apos;s tenant for live Message Center data — clone the repo, create an Entra app registration with the <code>ServiceMessage.Read.All</code> permission, add your credentials to <code>.env.local</code>, and deploy to Vercel or any Node.js host.
+            Pulse 360° is open source. If you&apos;d like to run your own instance — pointed at your organization&apos;s tenant for live Message Center data — clone the repo, create an Entra app registration with the <code>ServiceMessage.Read.All</code> permission, add your credentials to <code>.env.local</code>, and deploy to Azure Static Web Apps or another Azure service that supports Node.js.
           </p>
           <p className="mt-2">
             <a

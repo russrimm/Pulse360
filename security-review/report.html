@@ -229,7 +229,7 @@ const res = await fetch(url);</code></pre>
     <li>Hit cloud metadata endpoints (Azure IMDS at <code>http://169.254.169.254/metadata/instance</code>)</li>
     <li>Read local files via <code>file://</code> (depending on fetch runtime)</li>
     <li>Use the server as a relay to mask the attacker's IP when attacking third parties</li>
-    <li>Cause egress traffic that pivots into Vercel/Microsoft infrastructure</li>
+    <li>Cause egress traffic that pivots into Azure/Microsoft infrastructure</li>
   </ul>
   <h4>Fix</h4>
   <pre><code>const ALLOWED_HOSTS = new Set([
@@ -316,11 +316,11 @@ const res = await fetch(parsed.toString(), { redirect: 'manual' });</code></pre>
       { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=()' },
       { key: 'Content-Security-Policy', value:
         "default-src 'self'; " +
-        "script-src 'self' 'unsafe-inline' va.vercel-scripts.com vitals.vercel-insights.com; " +
+        "script-src 'self' 'unsafe-inline'; " +
         "style-src 'self' 'unsafe-inline'; " +
         "img-src 'self' data: https:; " +
         "font-src 'self' data:; " +
-        "connect-src 'self' https://graph.microsoft.com https://login.microsoftonline.com va.vercel-scripts.com vitals.vercel-insights.com; " +
+        "connect-src 'self' https://graph.microsoft.com https://login.microsoftonline.com; " +
         "frame-ancestors 'none'; " +
         "base-uri 'self'; " +
         "form-action 'self';" },
@@ -375,24 +375,7 @@ export const cleanHtml = (html: string) =>
   <h4>Issue</h4>
   <p>Anyone can hammer <code>/api/messages</code> to exhaust the Graph API quota (incurring real Azure cost / tenant-wide throttle) or <code>/api/proxy-rss</code> to relay traffic. There is no per-IP or per-route rate limit, and no middleware.</p>
   <h4>Fix</h4>
-  <p>Add Vercel's <code>@upstash/ratelimit</code> + Upstash Redis (free tier) and create <code>middleware.ts</code> at the project root applying limits to <code>/api/*</code>:</p>
-  <pre><code>// middleware.ts
-import { Ratelimit } from '@upstash/ratelimit';
-import { Redis } from '@upstash/redis';
-import { NextRequest, NextResponse } from 'next/server';
-
-const limiter = new Ratelimit({
-  redis: Redis.fromEnv(),
-  limiter: Ratelimit.slidingWindow(30, '1 m'),
-});
-
-export async function middleware(req: NextRequest) {
-  const ip = req.headers.get('x-forwarded-for') ?? 'anon';
-  const { success } = await limiter.limit(ip);
-  if (!success) return new NextResponse('Too Many Requests', { status: 429 });
-  return NextResponse.next();
-}
-export const config = { matcher: '/api/:path*' };</code></pre>
+  <p>Add rate limiting with Azure API Management or an Azure Front Door Web Application Firewall rate-limit rule, applying limits to <code>/api/*</code>. Use stricter thresholds for Graph-backed routes than for cached public feeds.</p>
 </div>
 
 <div class="finding high">
@@ -470,9 +453,9 @@ export const config = { matcher: '/api/:path*' };</code></pre>
   <p>The Azure AD client secret is created with multi-year expiry in Azure and stored statically. There is no calendar reminder, no rotation runbook, and no detection if it leaks. The secret rotated during this review is good for ~2 years and then will silently expire.</p>
   <h4>Fix</h4>
   <ul>
-    <li>Store secrets in Vercel project env settings (or Azure Key Vault for non-Vercel environments) with notes on expiry.</li>
+    <li>Store secrets in Azure Static Web Apps environment variables or Azure Key Vault, with notes on expiry.</li>
     <li>Set a calendar reminder 30 days before expiry.</li>
-    <li>Better: migrate from client-secret to Federated Identity Credentials (Workload Identity Federation) — no secret to rotate. Azure supports FIC for GitHub Actions and Vercel today.</li>
+    <li>Better: migrate from client-secret to Federated Identity Credentials (Workload Identity Federation) — no secret to rotate. Azure supports FIC for GitHub Actions and Azure-hosted workloads.</li>
   </ul>
 </div>
 
@@ -488,7 +471,7 @@ export const config = { matcher: '/api/:path*' };</code></pre>
 }</code></pre>
   <p>This pattern blanket-mutes every log on the production server, including security-relevant errors. When something goes wrong in production you have no breadcrumbs.</p>
   <h4>Fix</h4>
-  <p>Remove the override entirely. Use Vercel's built-in log aggregation or wire up Sentry / Application Insights. Keep <code>console.error</code> active at minimum.</p>
+  <p>Remove the override entirely. Use Azure Monitor and Application Insights for log aggregation. Keep <code>console.error</code> active at minimum.</p>
 </div>
 
 <div class="finding low">
@@ -519,7 +502,7 @@ export const config = { matcher: '/api/:path*' };</code></pre>
   <h3>Phase 0 — Emergency (do today, before any other work)</h3>
   <ul>
     <li>Rotate the Azure AD client secret in Azure Portal (Certificates &amp; secrets → New client secret).</li>
-    <li>Update <code>.env.local</code> and Vercel project env settings with the new secret.</li>
+    <li>Update <code>.env.local</code> and Azure Static Web Apps environment variables with the new secret.</li>
     <li>Confirm the old secret is revoked in Azure.</li>
   </ul>
   <p class="footer-note">Why this is Phase 0: the current secret has been shipping to every browser visitor. Until rotated, anyone who saved the bundle still has working credentials.</p>
@@ -528,7 +511,7 @@ export const config = { matcher: '/api/:path*' };</code></pre>
 <div class="phase">
   <h3>Phase 1 — Secrets &amp; SSRF (1–2 days, single PR)</h3>
   <ul>
-    <li><strong>Finding #1:</strong> Rename all <code>NEXT_PUBLIC_*</code> credentials → server-only names. Update <code>src/lib/api.ts</code>, <code>src/app/api/messages/route.ts</code>, and Vercel env settings. Add <code>import 'server-only';</code> to <code>src/lib/api.ts</code>.</li>
+    <li><strong>Finding #1:</strong> Rename all <code>NEXT_PUBLIC_*</code> credentials → server-only names. Update <code>src/lib/api.ts</code>, <code>src/app/api/messages/route.ts</code>, and Azure Static Web Apps environment variables. Add <code>import 'server-only';</code> to <code>src/lib/api.ts</code>.</li>
     <li><strong>Finding #2:</strong> Add host allowlist to <code>/api/proxy-rss</code> OR delete the route if unused.</li>
     <li><strong>Finding #10:</strong> Delete <code>..env</code>; update <code>.gitignore</code> to <code>*.env*</code>; add gitleaks pre-commit hook.</li>
     <li><strong>Finding #11:</strong> Strip env var names from error responses.</li>
@@ -572,7 +555,7 @@ export const config = { matcher: '/api/:path*' };</code></pre>
 <div class="phase">
   <h3>Phase 5 — Hardening (ongoing, multiple PRs)</h3>
   <ul>
-    <li><strong>Finding #15:</strong> Migrate from client secret to Federated Identity Credentials for Vercel (eliminates rotation).</li>
+    <li><strong>Finding #15:</strong> Migrate from client secret to Federated Identity Credentials for Azure hosting (eliminates rotation).</li>
     <li><strong>Finding #9:</strong> Add NextAuth + Entra ID sign-in for routes that should be gated.</li>
     <li><strong>Finding #12:</strong> Document CSRF strategy before adding any POST/DELETE route.</li>
     <li><strong>Finding #14:</strong> Add a CORS unit test that fails on accidental <code>*</code>.</li>
