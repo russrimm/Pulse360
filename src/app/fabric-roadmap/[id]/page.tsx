@@ -1,11 +1,6 @@
 import { notFound } from 'next/navigation'
 import { ReleasePlanDetail } from '@/components/ReleasePlanDetail'
-import { getFabricRoadmap } from '@/lib/fabricApi' // You may need to create this helper if not present
-
-interface PageProps {
-  params: { id: string };
-  searchParams?: { [key: string]: string | string[] | undefined };
-}
+import { getFabricRoadmaps } from '@/lib/fabricApi'
 
 export default async function FabricRoadmapDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -24,11 +19,12 @@ export default async function FabricRoadmapDetailPage({ params }: { params: Prom
   ]
 
   // Fetch all plans from all productIds
-  const allPlans = (
-    await Promise.all(productIds.map(getFabricRoadmap))
-  ).flat()
+  const { items: allPlans, failedProductIds } = await getFabricRoadmaps(productIds)
 
   const plan = allPlans.find(p => p.ReleaseItemID === id)
+  if (!plan && failedProductIds.length > 0) {
+    throw new Error('Fabric roadmap data is temporarily incomplete')
+  }
   if (!plan) return notFound()
 
   // Map to ReleasePlanDetail shape if needed

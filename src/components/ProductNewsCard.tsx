@@ -1,8 +1,9 @@
-﻿'use client';
+'use client';
 
 import type { ReactNode } from 'react';
-import { useEffect, useState } from 'react';
 import type { ProductNews } from '@/lib/types';
+import { getFeedTimestamp } from '@/lib/feed/normalize';
+import { normalizeFeedText } from '@/lib/feed/text';
 
 interface ProductNewsCardProps {
   news: ProductNews;
@@ -22,16 +23,9 @@ function getAuthorSlug(author: string): string {
     .replace(/(^-|-$)/g, '');
 }
 
-function formatPublishDate(value: string | undefined): string | null {
-  if (!value) return null;
-  const date = new Date(value);
-  return Number.isNaN(date.getTime()) ? null : dateFormatter.format(date);
-}
-
 function Author({ author }: { author: string }) {
   const slug = getAuthorSlug(author);
   if (!slug) return null;
-
   return (
     <p className="mb-2 text-center text-xs text-gray-500 dark:text-gray-400">
       Published by{' '}
@@ -48,27 +42,12 @@ function Author({ author }: { author: string }) {
 }
 
 export function ProductNewsCard({ news }: ProductNewsCardProps) {
-  const [decodedTitle, setDecodedTitle] = useState(news.title);
-  const [decodedDescription, setDecodedDescription] = useState(news.description);
-  const [decodedAuthor, setDecodedAuthor] = useState(news.author);
-
-  useEffect(() => {
-    function decodeHtmlEntities(text: string): string {
-      const textarea = document.createElement('textarea');
-      textarea.innerHTML = text;
-      return textarea.value;
-    }
-
-    const title = typeof news.title === 'string' ? news.title : '';
-    const description = typeof news.description === 'string' ? news.description : '';
-    const author = typeof news.author === 'string' ? news.author : '';
-
-    setDecodedTitle(decodeHtmlEntities(title));
-    setDecodedDescription(decodeHtmlEntities(description.replace(/<[^>]*>/g, '')));
-    setDecodedAuthor(decodeHtmlEntities(author));
-  }, [news.author, news.description, news.title]);
-
-  const formattedDate = formatPublishDate(news.publishDate);
+  const title = normalizeFeedText(typeof news.title === 'string' ? news.title : '');
+  const description = normalizeFeedText(
+    typeof news.description === 'string' ? news.description : ''
+  );
+  const author = normalizeFeedText(typeof news.author === 'string' ? news.author : '');
+  const publishTimestamp = getFeedTimestamp(news.publishDate);
   const hasLink = typeof news.link === 'string' && news.link.startsWith('https://');
 
   return (
@@ -83,24 +62,24 @@ export function ProductNewsCard({ news }: ProductNewsCardProps) {
                 rel="noopener noreferrer"
                 className="hover:text-primary-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 dark:hover:text-primary-400"
               >
-                {decodedTitle || 'Untitled update'}
+                {title || 'Untitled update'}
               </a>
             ) : (
-              decodedTitle || 'Untitled update'
+              title || 'Untitled update'
             )}
           </h3>
-          {formattedDate ? (
+          {publishTimestamp ? (
             <time
               dateTime={news.publishDate}
-              className="mb-0 block text-center text-xs font-medium text-gray-500 dark:text-gray-400"
+              className="block text-center text-xs font-medium text-gray-500 dark:text-gray-400"
             >
-              {formattedDate}
+              {dateFormatter.format(new Date(publishTimestamp))}
             </time>
           ) : null}
-          {decodedAuthor ? <Author author={decodedAuthor} /> : null}
-          {decodedDescription ? (
+          {author ? <Author author={author} /> : null}
+          {description ? (
             <p className="mt-2 line-clamp-3 break-words text-center text-base text-gray-700 dark:text-gray-300">
-              {decodedDescription}
+              {description}
             </p>
           ) : null}
         </div>
@@ -111,7 +90,7 @@ export function ProductNewsCard({ news }: ProductNewsCardProps) {
               target="_blank"
               rel="noopener noreferrer"
               className="text-sm font-medium text-primary-600 hover:text-primary-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 dark:text-primary-400 dark:hover:text-primary-300"
-              aria-label={`Read ${decodedTitle || 'this update'}`}
+              aria-label={`Read ${title || 'this update'}`}
             >
               Read more <span aria-hidden="true">&rarr;</span>
             </a>

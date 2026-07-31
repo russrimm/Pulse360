@@ -100,7 +100,6 @@ function SecurityUpdatesContent() {
   const [error, setError] = useState<string | null>(null);
   const [selectedMonth, setSelectedMonth] = useState<string>();
   const [releaseDate, setReleaseDate] = useState('');
-  const [revisionHistory, setRevisionHistory] = useState<unknown[]>();
   const [productTree, setProductTree] = useState<ProductTree>();
   const [isLoadingMonths, setIsLoadingMonths] = useState(true);
   const [isLoadingUpdates, setIsLoadingUpdates] = useState(false);
@@ -144,7 +143,6 @@ function SecurityUpdatesContent() {
       .then(data => {
         setVulnerabilities(Array.isArray(data.Vulnerability) ? data.Vulnerability : []);
         setReleaseDate(data.ReleaseDate || '');
-        setRevisionHistory(data.RevisionHistory);
         setProductTree(data.ProductTree);
       })
       .catch(fetchError => {
@@ -232,9 +230,6 @@ function SecurityUpdatesContent() {
             <CVECard
               key={`${vulnerability.ID}-${vulnerability.CVE?.[0] ?? ''}`}
               vuln={vulnerability}
-              month={selectedMonth ?? ''}
-              releaseDate={releaseDate}
-              revisionHistory={revisionHistory}
               productTree={productTree}
             />
           ))}

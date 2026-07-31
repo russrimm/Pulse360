@@ -13,7 +13,7 @@ interface ProductNewsLayoutProps {
   icon: string | ReactNode;
 }
 
-let products = [
+const products = [
   {
     name: 'Power Platform',
     icon: '/icons/PowerPlatform_scalable.svg',
@@ -57,13 +57,6 @@ let products = [
     href: '/product-news/windows',
   },
 ];
-
-// Move 'Finance and Operations cross-app capabilities' to the end if present
-const idx = products.findIndex(p => p.name === 'Finance and Operations cross-app capabilities')
-if (idx !== -1) {
-  const [item] = products.splice(idx, 1)
-  products.push(item)
-}
 
 function getAuthorSlug(author: string) {
   if (!author) return ''
@@ -123,10 +116,9 @@ function decodeHtmlEntities(text: string) {
 }
 
 function AuthorButton({ author, title, slug }: { author: string; title?: string; slug: string }) {
-  if (!author || !author.trim()) return null
   const pathname = usePathname()
+  if (!author || !author.trim()) return null
   const isSelected = pathname === `/product-news/author/${slug}`
-  const isCorp = author === 'Microsoft Corporate'
   const isJudson = author.toLowerCase().replace(/[^a-z]/g, '').includes('judsonalthoff')
   return (
     <Link

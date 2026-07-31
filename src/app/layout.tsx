@@ -1,13 +1,11 @@
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
-import './globals.css';
 import { ThemeProvider } from 'next-themes';
 import Navbar from '@/components/Navbar';
 import { NavigationTabs } from '@/components/NavigationTabs';
-import { ErrorBoundary } from '@/components/ErrorBoundary';
-
 import { Analytics } from '@vercel/analytics/next';
 import { SafeSpeedInsights } from '@/components/SafeSpeedInsights';
+import './globals.css';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -19,20 +17,21 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: 'Pulse 360°',
-  description: 'Stay informed about Microsoft 365 service updates and changes',
-  metadataBase: new URL('https://www.russrimmerman.com'),
+  title: { default: 'Pulse 360°', template: '%s' },
+  description:
+    'Microsoft cloud news, roadmaps, lifecycle dates, security updates, and tenant Message Center changes.',
+  metadataBase: new URL('https://www.mspulse360.app'),
   applicationName: 'Pulse 360',
   openGraph: {
     type: 'website',
-    title: 'Pulse 360',
+    title: 'Pulse 360°',
     description: 'Track Microsoft cloud news, roadmaps, lifecycle dates, and security updates.',
     url: '/',
     siteName: 'Pulse 360',
   },
   twitter: {
     card: 'summary',
-    title: 'Pulse 360',
+    title: 'Pulse 360°',
     description: 'Track Microsoft cloud news, roadmaps, lifecycle dates, and security updates.',
   },
   icons: {
@@ -40,9 +39,7 @@ export const metadata: Metadata = {
     shortcut: '/siteicon.png',
     apple: '/siteicon.png',
   },
-  other: {
-    'apple-touch-icon': '/siteicon.png',
-  },
+  other: { 'apple-touch-icon': '/siteicon.png' },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -68,17 +65,15 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           enableSystem
           disableTransitionOnChange
         >
-          <ErrorBoundary>
-            <div className="min-h-screen flex flex-col">
-              <Navbar />
-              <NavigationTabs />
-              <main id="main-content" className="flex-1 flex flex-col min-h-0">
-                {children}
-              </main>
-              <Analytics />
-              <SafeSpeedInsights />
-            </div>
-          </ErrorBoundary>
+          <div className="min-h-screen flex flex-col">
+            <Navbar />
+            <NavigationTabs />
+            <main id="main-content" className="flex-1 flex flex-col min-h-0">
+              {children}
+            </main>
+            <Analytics />
+            <SafeSpeedInsights />
+          </div>
         </ThemeProvider>
       </body>
     </html>

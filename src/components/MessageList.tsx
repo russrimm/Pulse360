@@ -7,6 +7,7 @@ import { Message } from '@/lib/types';
 import { TagsFilter } from '@/components/TagsFilter';
 import { endOfDay, isAfter, isWithinInterval, parseISO, startOfDay, subDays } from 'date-fns';
 import { useFilterContext } from './FilterContext';
+import { matchesMessageSearch } from '@/lib/messageSearch';
 
 interface MessageListProps {
   messages: Message[];
@@ -15,7 +16,7 @@ interface MessageListProps {
 const ITEMS_PER_PAGE = 12;
 
 export function MessageList({ messages: messagesProp }: MessageListProps) {
-  const messages = Array.isArray(messagesProp) ? messagesProp : [];
+  const messages = messagesProp;
   const [page, setPage] = useState(1);
   const observerRef = useRef<IntersectionObserver | null>(null);
   const loadMoreRef = useRef<HTMLDivElement>(null);
@@ -52,10 +53,7 @@ export function MessageList({ messages: messagesProp }: MessageListProps) {
           !message.title.includes(MAINTENANCE_PHRASE)
       )
       .filter(message => {
-        const matchesSearch =
-          deferredSearchQuery === '' ||
-          message.title.toLowerCase().includes(deferredSearchQuery) ||
-          message.content.toLowerCase().includes(deferredSearchQuery);
+        const matchesSearch = matchesMessageSearch(message, deferredSearchQuery);
         const matchesServices =
           selectedServices.length === 0 ||
           message.service.some(service => selectedServices.includes(service));
@@ -157,7 +155,7 @@ export function MessageList({ messages: messagesProp }: MessageListProps) {
           autoComplete="off"
           value={searchQuery}
           onChange={event => setSearchQuery(event.target.value)}
-          placeholder="Search titles and message content…"
+          placeholder="Search titles, content, services, tags, or ID…"
           className="w-full rounded-xl border border-gray-200 bg-white/80 px-4 py-3 text-gray-900 shadow-sm transition-[border-color,box-shadow] placeholder:text-gray-500 focus:outline-none focus-visible:border-primary-500 focus-visible:ring-2 focus-visible:ring-primary-500 dark:border-gray-700 dark:bg-gray-800/80 dark:text-white dark:placeholder:text-gray-400"
         />
         <p

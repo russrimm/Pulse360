@@ -2,381 +2,302 @@
 
 **Audit date:** July 31, 2026
 **Repository:** `russrimm/Pulse360`
-**Branch:** `russrimm-bookish-meme`
-**Implementation commit:** `8b57d17e5703ca143dcd1f06e36bdc56065c1fe2` (`Audit and harden product data flows`)
-**Scope:** Product correctness, tenant privacy, feed reliability, SSRF/input validation, caching and pagination, stale-data behavior, Microsoft security data, lifecycle data, accessibility, responsive interaction, SEO, performance, dependencies, CI, tests, and deployment documentation.
+**Branch:** `russrimm-pulse360-deep-audit`
+**Baseline:** `4d594a71ab58134f64c472cb995b3c8043187126`
 
 ## Executive summary
 
-The audit prioritized misleading update data, tenant-specific Message Center exposure, destructive synchronization risks, broken Microsoft feeds, lifecycle accuracy, security-update usability, accessibility, and measurable runtime/dependency risk.
+This audit covered product correctness, tenant-data exposure, feed and date normalization, MSRC/CVE accuracy, Graph authentication boundaries, SSRF protection, caching and resilience, Prisma persistence, search and filtering, accessibility, SEO, Server/Client boundaries, rendering and network performance, tests, CI, dependencies, and operational documentation.
 
-The implementation made Message Center fail closed in production unless access is explicitly configured, protected tenant responses from shared caching, hardened Graph synchronization and proxy endpoints, corrected stale or unstable feed behavior, repaired the lifecycle export pipeline, improved MSRC navigation and loading behavior, and delivered accessibility and performance improvements across shared UI components.
+The work was delivered in two reviewed commits:
 
-The production dependency audit improved from **1 critical, 9 high, and 10 moderate findings** to **0 critical, 2 high, and 1 moderate finding**. The remaining findings are transitive Prisma and ExcelJS dependency paths described under [Deferred recommendations](#deferred-recommendations).
+| Commit                                     | Description                                                                                                                                                       |
+| ------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `7875b0d4da6fd3d4c40e2c0733cdd22849d98c33` | Corrected data accuracy, restored core workflows, hardened proxy boundaries, improved resilience and caching, added SEO/error handling, and established CI gates. |
+| `6f09b6e22ed6d74afdb9ed6f4a471116f0c3acff` | Added formatter tooling, request-deduplicated per-item metadata, and focused accessibility/rendering fixes.                                                       |
 
-No real credentials were used. No deployment, production database, Azure resource, Entra application, or other cloud resource was created or modified.
+No credentials were used, no deployment was performed, and no cloud resources or settings were changed.
 
 ## Implemented changes
 
-### 1. Message Center tenant privacy and access control
+### 1. MSRC and CVE accuracy
 
-- Added `src/lib/message-center-auth.ts` to centralize Message Center access decisions.
-- Production now fails closed when interactive authentication is not configured.
-- Anonymous tenant-data publication requires the explicit `MESSAGE_CENTER_PUBLIC=true` override.
-- Development remains usable without interactive authentication for local work.
-- Configured authentication uses a dedicated single-tenant Entra application rather than the app-only Graph credentials.
-- Removed the previous `common` tenant fallback from `src/lib/auth.ts`; `AUTH_AZURE_AD_TENANT_ID` is required when interactive authentication is enabled.
-- Protected both `/message-center` and `/message/[id]` before tenant data is read.
-- Marked Message Center pages dynamic and `noindex` so authenticated content is not statically generated or indexed.
-- Added `private, no-store, max-age=0` and `Vary: Cookie` to `/api/messages` responses.
-- Changed Message Center upstream failures to return a generic `503` response without leaking implementation details.
-- Added explicit production configuration guidance to `.env.example` and `README.md` for:
-  - `AUTH_AZURE_AD_CLIENT_ID`
-  - `AUTH_AZURE_AD_CLIENT_SECRET`
-  - `AUTH_AZURE_AD_TENANT_ID`
-  - `NEXTAUTH_URL`
-  - `NEXTAUTH_SECRET`
-  - `MESSAGE_CENTER_PUBLIC`
-  - `CRON_SECRET`
+The MSRC CVRF schema was being interpreted incorrectly:
 
-**Primary evidence:** `src/lib/message-center-auth.ts`, `src/lib/auth.ts`, `src/app/api/messages/route.ts`, `src/app/message-center/page.tsx`, `src/app/message/[id]/page.tsx`, `.env.example`, `README.md`.
+- Impact was searched by a string threat type, but CVRF supplies numeric threat type `0`.
+- Severity was read from a nonexistent `Severity` property and could fall back to a numeric CVSS base score, causing a number such as `4.3` to be labeled as "Max Severity."
+- CVRF severity is actually threat type `3`, with the rating in `Description.Value`.
 
-### 2. Graph authentication, pagination, and synchronization safety
+Changes:
 
-- Normalized `AZURE_API_URL` values, including bare hostnames and Graph URLs that already contain `/v1.0` or `/beta`.
-- Restricted normalized API bases to HTTP(S) and removed query/fragment input.
-- Added an in-process app-only Graph token cache with an expiry safety margin to avoid requesting a token for every Graph operation.
-- Added a 10-second token-request timeout.
-- Preserved APIM mode and its direct-Graph fallback when local credentials are also configured.
-- Retained the 10-page Graph pagination cap but now throws if a continuation link remains after the cap. This prevents a partial dataset from being treated as complete.
-- Added a destructive-sync guard: when Graph returns zero rows while active rows already exist, synchronization fails instead of archiving the entire active dataset.
-- Parallelized the Graph fetch and active-row count used by that safety check.
-- Kept stale persisted rows available when background synchronization fails.
-- Added typed Graph and Microsoft 365 release payloads where this code was changed.
+- Added typed MSRC normalization helpers in `src/lib/msrc.ts`.
+- Mapped threat type `0` to impact and threat type `3` to the MSRC severity label.
+- Removed the invalid CVSS-number-as-severity fallback.
+- Simplified `src/components/CVECard.tsx` and removed unused/dead detail-formatting code.
+- Replaced the remaining raw Microsoft Graph product icon with `next/image`.
 
-**Primary evidence:** `src/lib/api.server.ts` (token cache near lines 105-176, pagination guard near line 297, empty-result reconciliation guard near line 448).
+Result: the MSRC table now reports the source-provided impact and severity labels rather than misleading values.
 
-### 3. Scheduled sync endpoint hardening
+### 2. Lifecycle date correctness
 
-- Added constant-time comparison for the cron bearer secret with `node:crypto` `timingSafeEqual`.
-- Kept production fail-closed behavior when `CRON_SECRET` is missing.
-- Added private/no-store response headers.
-- Replaced raw exception text in HTTP responses with `Message Center sync failed` while retaining server-side logging.
+Date-only lifecycle values such as `2026-07-31` were parsed as UTC in one code path and compared with local midnight. In negative UTC offsets, this could mark a product expired one calendar day early.
 
-**Primary evidence:** `src/app/api/cron/sync-messages/route.ts`.
+Changes:
 
-### 4. RSS and image proxy hardening
+- Added local-calendar date parsing and status derivation in `src/lib/lifecycle.ts`.
+- Reused the normalized parser in `src/components/MsLifecycleClient.tsx`.
+- Added a regression test proving a product is not expired on its retirement date.
 
-#### RSS proxy
+### 3. Feed identity, date, and text normalization
 
-- Preserved the explicit Microsoft-source hostname allowlist and HTTPS-only requirement.
-- Added a maximum URL length.
-- Continued to use `redirect: 'manual'` so redirects cannot bypass host validation.
-- Added a 15-second upstream timeout.
-- Added a Microsoft-compatible `User-Agent` and explicit RSS/XML `Accept` header.
-- Added a 5 MB response limit using both `Content-Length` and actual UTF-8 body size.
-- Added public edge caching with stale-while-revalidate.
-- Added XML CSP sandboxing and `X-Content-Type-Options: nosniff`.
-- Returned `502` for upstream failures instead of presenting them as internal application failures.
+RSS GUID handling assumed all GUIDs were parsed as objects with a `#text` property. `fast-xml-parser` returns an unattributed GUID as a plain string, so stable source IDs could be discarded in favor of mutable links.
 
-#### Image proxy
+Changes:
 
-- Preserved the Microsoft/CDN hostname allowlist and private/loopback literal-address checks.
-- Added a 4,096-character URL limit.
-- Preserved manual redirect handling and the 10-second timeout.
-- Restricted accepted media types to known image MIME types.
-- Added a 10 MB limit checked through both `Content-Length` and a bounded streaming transform.
-- Added CSP sandboxing and `nosniff` to proxied images, including SVG.
+- Added feed helpers in `src/lib/feed/normalize.ts`.
+- Preserved both plain-string and attributed RSS GUIDs.
+- Converted malformed feed dates to timestamp `0` for deterministic oldest-first placement instead of `NaN` sort behavior.
+- Stopped malformed or missing dates from being displayed as the current date.
+- Added pure entity decoding for numeric/basic entities.
+- Added `src/lib/feed/text.ts` to normalize feed text through the existing sanitizer, preserving the full named-entity set without client-side DOM effects.
+- Updated `src/lib/api.client.ts` and `src/components/ProductNewsCard.tsx` to use the shared helpers.
 
-**Primary evidence:** `src/app/api/proxy-rss/route.ts`, `src/app/api/image-proxy/route.ts`, `src/lib/feed/upstream.ts`.
+Result: feed identity is stable, malformed dates are not misleading, extended entities render correctly, and news cards no longer perform state-setting entity-decoding effects after hydration.
 
-### 5. Feed correctness and source reliability
+### 4. Message Center workflow, freshness, and source attribution
 
-- Added `src/lib/feed/upstream.ts` as a shared resilient Microsoft feed fetcher with timeout, caching, request headers, and safe response headers.
-- Added `src/lib/feed/sources.ts` to centralize the current Copilot Studio release-wave source.
-- Updated Copilot Studio from the stale 2024 Wave 2 page to the validated **2026 Wave 1** release-plan page.
-- Removed the fabricated current timestamp from Copilot Studio features. Planned features no longer appear newly published every time the page is loaded.
-- Replaced positional Copilot Studio IDs with deterministic IDs based on source links and feature slugs.
-- Replaced redirecting or bot-blocked Fabric and Power BI URLs with their working canonical community RSS endpoints:
-  - Fabric updates: `fbc_fabricupdatesblogs`
-  - Power BI updates: `fbc_pbiupdatesblog`
-- Added the user agent required for those upstreams to respond successfully.
-- Reworked Fabric feed parsing to use typed unknown-value guards and deterministic IDs rather than array indexes.
-- Removed timestamp-based Azure AI identifiers.
-- Stopped substituting the current time when Azure AI items have no valid publication date.
-- Normalized Azure AI GUID objects to stable strings.
-- Added typed RSS parsing helpers in `src/lib/api.client.ts` and removed redundant try/catch wrappers in changed paths.
-- Changed affected route failures to explicit upstream `502` responses rather than success-shaped empty payloads.
+`MessageList` already contained search-filter logic, but no search input was rendered, leaving the flagship Message Center workflow inaccessible.
 
-**Primary evidence:** `src/lib/feed/sources.ts`, `src/lib/feed/upstream.ts`, `src/app/api/copilot-studio-news/route.ts`, `src/app/api/fabric-blog-news/route.ts`, `src/app/api/power-bi-news/route.ts`, `src/app/api/azure-ai-ml-news/route.ts`, `src/lib/api.client.ts`.
+Changes:
 
-### 6. Microsoft Lifecycle data integrity and stale-data handling
+- Rendered the shared search control in `src/components/MessageList.tsx`.
+- Added `src/lib/messageSearch.ts`.
+- Search now covers message ID, title, content, summary, services, and tags, case-insensitively.
+- Added an accessible search label.
+- Converted `src/app/message-center/page.tsx` to server-side data loading.
+- Removed the client-side `MessageCenterClient` fetch waterfall.
+- Displayed the source as Microsoft Graph Message Center for the configured tenant.
+- Displayed the last successful sync time and a stale-data warning when the sync is missing or more than two hours old.
+- Added a public shared-cache policy of `s-maxage=60, stale-while-revalidate=300` to `/api/messages`.
+- Kept the intentionally anonymous/public route behavior unchanged.
 
-- Repaired `scripts/update-lifecycle-data.mjs`, whose output schema did not match the route/UI schema.
-- The scheduled exporter now emits schema version 2 with:
-  - `edition`
-  - `release`
-  - `supportPolicy`
-  - `mainStreamEndDate`
-  - `extendedEndDate`
-  - `retirementDate`
-  - `releaseStartDate`
-  - `releaseEndDate`
-  - `docsUrl`
-  - `endOfSupportDate`
-- Added dynamic header detection failure handling and a required product-column check.
-- Invalid date strings now normalize to `null` instead of being passed through as misleading date values.
-- Preserved compatibility with the previous `version` field while moving to `release`.
-- Added persisted-cache timestamp validation.
-- Added an 8-day stale threshold and surfaced stale status from both file and memory caches.
-- Added a visible stale-data warning in the lifecycle UI.
-- Dynamically imports ExcelJS only when the committed JSON file cannot serve the request, reducing normal route startup and bundle tracing work.
-- Refreshed `public/data/lifecycle.json` from the official Microsoft export.
-- The refreshed file contains **2,942 lifecycle rows** and schema version 2.
-- Changed lifecycle API failures to generic `503` responses while logging the underlying server error.
+Result: Message Center search is usable, initial content is server-rendered, repeat anonymous requests can use shared caching, and users can see when and where the tenant data was sourced.
 
-**Primary evidence:** `scripts/update-lifecycle-data.mjs`, `src/app/api/mslifecycle/route.ts`, `src/components/MsLifecycleClient.tsx`, `public/data/lifecycle.json`.
+### 5. Microsoft 365 detail performance
 
-### 7. Microsoft Security Response Center accuracy and UX
+`src/app/m365-update/[id]/page.tsx` downloaded the entire Microsoft 365 update feed and searched it for one item even though `getM365Update(id)` already provided a single-item loader.
 
-- Tightened `monthId` validation to real three-letter month abbreviations.
-- Added 15-second MSRC request timeouts.
-- Added 15-minute CVRF caching and one-hour update-list caching with stale-while-revalidate response headers.
-- Converted upstream failures to `502` with generic client messages.
-- Added typed runtime validation for the update-month list.
-- Split month-list loading from selected-month CVRF loading to avoid repeatedly refetching the month list.
-- Added `AbortController` cancellation for both request types.
-- Added explicit loading state rather than treating an empty vulnerability array as loading forever.
-- Added a distinct empty state when a month legitimately has no published vulnerabilities.
-- Kept the selected month in the URL with `router.replace`, making month selection shareable and restorable.
-- Validated a requested URL month against the available month list before using it.
-- Added visible attribution and a direct link to the Microsoft Security Update Guide.
-- Replaced array-index CVE keys with stable vulnerability/CVE identifiers.
-- Added accessible labels and error/status announcements.
+Changes:
 
-**Primary evidence:** `src/app/api/msrc/route.ts`, `src/app/msrc/page.tsx`.
+- Switched the detail route to `getM365Update(id)`.
+- Reused the same loader in the RSS detail alias.
+- Added request-level React cache wrappers in both routes so `generateMetadata` and page rendering share the same result.
 
-### 8. Search, filtering, and pagination UX
+### 6. Fabric roadmap caching and resilience
 
-- Added a visible Message Center search field that searches titles and message content.
-- Added `useDeferredValue` so filtering large persisted Message Center datasets does not block typing.
-- Added an `aria-live` result count and a pending-results announcement.
-- Made custom date-range endpoints inclusive with `isWithinInterval`.
-- Reset pagination when any search/filter value changes.
-- Kept Message Center rendering bounded to 12 items per page even while filters are active, avoiding an unbounded filtered render.
-- Retained intersection-observer loading and added a keyboard-accessible **Load more** button as a deterministic fallback.
-- Added an explicit no-results state.
-- Removed duplicate imperative router navigation from Message Center cards; the card link is now the single navigation mechanism and supports standard browser link behavior.
-- Reworked the shared `SearchBar` to handle controlled and uncontrolled usage correctly.
-- Added labels, names, `type="search"`, `autocomplete="off"`, accessible clear controls, improved placeholders, and visible focus styles.
+Fabric detail pages fan out across multiple product IDs. Those upstream calls were uncached, and the Microsoft Fabric endpoint was verified to emit malformed JSON in at least two forms:
 
-**Primary evidence:** `src/components/MessageList.tsx`, `src/components/MessageCard.tsx`, `src/components/SearchBar.tsx`.
+- Raw control characters inside JSON strings.
+- Invalid markdown-style escapes such as `\_`.
 
-### 9. Accessibility and interface-guideline improvements
+Changes:
 
-- Added a keyboard-visible **Skip to main content** link and matching `main-content` target.
-- Removed the forced initial dark class so system theme selection works correctly.
-- Updated the theme toggle to use `resolvedTheme`, reserve layout space before hydration, provide a specific action label, and expose a 40x40 target.
-- Added navigation labels, icon-link labels, decorative icon treatment, and focus-visible rings in the navbar.
-- Rebuilt Product News cards around semantic `article`, heading, anchor, and `time` elements rather than clickable `div` behavior.
-- Removed the client-side author-title network request from every Product News card.
-- Avoided displaying an invented date when publication data is absent.
-- Added empty-content handling and stable external-link labels.
-- Improved the image modal with `role="dialog"`, `aria-modal`, initial focus, Escape handling, background-scroll locking, focus restoration, and backdrop-only dismissal.
-- Added status semantics and reduced-motion handling to loading indicators.
-- Added alert semantics to Message Center errors.
-- Replaced changed `transition-all` usage with explicit transition properties and added reduced-motion variants where relevant.
+- Centralized Fabric fetching and response validation in `src/lib/fabricApi.ts`.
+- Added one-hour Next.js fetch revalidation.
+- Added a bounded repair pass that only runs after normal `JSON.parse` fails.
+- Escaped raw control characters and removed invalid string escape prefixes while preserving valid JSON escapes.
+- Rejected responses that still were not valid roadmap payloads.
+- Added `Promise.allSettled` batch loading.
+- Kept successful product areas when one upstream product fails.
+- Logged failed product IDs and displayed a visible partial-data warning.
+- Avoided returning a false 404 for a detail item when one or more product sources failed; incomplete lookups now surface as temporary upstream failures.
+- Continued to fail explicitly if every Fabric product source fails.
+- Removed duplicate Fabric fetching logic from `src/app/release-plans/fabric/page.tsx`.
 
-**Primary evidence:** `src/app/layout.tsx`, `src/components/Navbar.tsx`, `src/components/ThemeToggle.tsx`, `src/components/ProductNewsCard.tsx`, `src/components/ImageModal.tsx`, `src/components/LoadingSpinner.tsx`, `src/components/MessageCenterClient.tsx`.
+Result: repeated page loads are cached, known malformed upstream responses are recoverable, and one failed product source no longer blanks the whole Fabric roadmap.
 
-### 10. React and network performance
+### 7. Image-proxy and response hardening
 
-- Removed root-level React Query and filter providers so unrelated routes no longer inherit those client boundaries.
-- Scoped React Query to Product News routes.
-- Added five-minute query freshness, 30-minute garbage collection, and disabled refetch-on-window-focus for slowly changing Microsoft feeds.
-- Removed the unused Zustand store and dependency.
-- Removed dead imports and duplicate event navigation from Message Center cards.
-- Deferred ExcelJS loading to the lifecycle live-fetch fallback path.
-- Added Graph token reuse and shared feed request caching.
-- Bounded long lists through Message Center pagination.
+The image proxy accepted broad suffixes such as `azureedge.net`, `windows.net`, and Akamai domains. Those namespaces include customer-provisionable hosts and allowed the site to proxy attacker-controlled images through the Pulse 360 origin.
 
-**Primary evidence:** `src/app/layout.tsx`, `src/app/product-news/layout.tsx`, `src/components/ReactQueryProvider.tsx`, deleted `src/components/filterStore.ts`, `src/app/api/mslifecycle/route.ts`, `src/lib/api.server.ts`.
+Changes:
 
-### 11. Dependency health and package management
+- Moved validation into `src/lib/imageProxySecurity.ts`.
+- Removed customer-provisionable Azure Storage/CDN and broad Akamai suffixes.
+- Retained Microsoft-controlled host families required by the portal.
+- Preserved HTTPS-only URLs, private/loopback/link-local literal rejection, manual redirect handling, upstream content-type validation, and request timeouts.
+- Added regression tests for allowed Microsoft hosts, blocked AzureEdge/Blob/Akamai hosts, and private literals.
+- Added a page-level `Content-Security-Policy-Report-Only` header in `next.config.js`.
+- Added AVIF image output and increased the image optimizer minimum cache TTL to 24 hours.
 
-- Updated:
-  - `next` to `^16.2.11`
-  - `next-auth` to `^4.24.15`
-  - `fast-xml-parser` to `^5.10.1`
-- Added safe transitive overrides for `@hono/node-server`, `fast-uri`, and `valibot`.
-- Added Prettier as the formatter script's declared development dependency.
-- Removed unused runtime dependencies:
-  - `@azure/msal-browser`
-  - `@headlessui/react`
-  - `@microsoft/agents-activity`
-  - `@microsoft/agents-copilotstudio-client`
-  - `node-fetch`
-  - `react-icons`
-  - `rss-parser`
-  - `swiper`
-  - `zustand`
-- Removed obsolete type packages for node-fetch and react-icons.
-- Removed `package-lock.json`; `pnpm-lock.yaml` is now the single lockfile for the declared pnpm project.
-- Regenerated the pnpm lockfile.
+The CSP is intentionally report-only so violations can be observed before enforcement.
 
-**Primary evidence:** `package.json`, `pnpm-lock.yaml`, deleted `package-lock.json`.
+### 8. Error handling and route resilience
 
-### 12. CI, dependency automation, and deployment consistency
+The entire application was wrapped in a custom client class boundary. It could remove the full application chrome and did not catch Server Component failures during rendering.
 
-- Added `.github/workflows/quality.yml` to install with pnpm, generate Prisma, type-check, run sanitizer security tests, and build on pushes and pull requests.
-- Added `.github/dependabot.yml` for npm and GitHub Actions updates with production/development dependency grouping.
-- Updated the Azure Static Web Apps workflow to install pnpm, cache pnpm packages, and run `pnpm build` rather than npm.
-- Documented secure Message Center deployment behavior in README and `.env.example`.
+Changes:
 
-**Primary evidence:** `.github/workflows/quality.yml`, `.github/dependabot.yml`, `.github/workflows/azure-static-web-apps-purple-river-045b0790f.yml`, `README.md`, `.env.example`.
+- Added `src/app/error.tsx` using the Next.js route error convention.
+- Preserved navigation and layout when a route fails.
+- Added a retry action using the provided `reset()` callback.
+- Removed `src/components/ErrorBoundary.tsx` and its root-layout wrapper.
 
-## Changed-file inventory
+### 9. SEO, canonical URLs, and shareability
 
-| File                                                                 | Change                                                                                       |
-| -------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
-| `.env.example`                                                       | Added secure interactive auth, explicit public-mode, and cron-secret configuration guidance. |
-| `.github/dependabot.yml`                                             | Added npm and GitHub Actions dependency update automation.                                   |
-| `.github/workflows/azure-static-web-apps-purple-river-045b0790f.yml` | Standardized deployment builds on pnpm.                                                      |
-| `.github/workflows/quality.yml`                                      | Added type-check, sanitizer tests, and production-build CI.                                  |
-| `README.md`                                                          | Documented production Message Center privacy and configuration requirements.                 |
-| `package-lock.json`                                                  | Removed obsolete secondary lockfile.                                                         |
-| `package.json`                                                       | Patched vulnerable packages, removed unused dependencies, added Prettier and safe overrides. |
-| `pnpm-lock.yaml`                                                     | Regenerated after dependency updates/removals/overrides.                                     |
-| `public/data/lifecycle.json`                                         | Refreshed official lifecycle dataset to schema v2 with 2,942 rows.                           |
-| `scripts/update-lifecycle-data.mjs`                                  | Repaired lifecycle export schema and validation.                                             |
-| `src/app/api/azure-ai-ml-news/route.ts`                              | Added stable IDs, valid-date handling, typed parsing, caching, and resilient fetch behavior. |
-| `src/app/api/copilot-studio-news/route.ts`                           | Updated to the current release-plan source with timeout and safe response headers.           |
-| `src/app/api/cron/sync-messages/route.ts`                            | Added constant-time auth, no-store headers, and generic failures.                            |
-| `src/app/api/fabric-blog-news/route.ts`                              | Switched to canonical RSS and typed deterministic parsing.                                   |
-| `src/app/api/image-proxy/route.ts`                                   | Added URL/MIME/body limits and response sandboxing.                                          |
-| `src/app/api/messages/route.ts`                                      | Added access control, private caching, and generic 503 handling.                             |
-| `src/app/api/mslifecycle/route.ts`                                   | Added schema compatibility, stale detection, dynamic ExcelJS import, and safe errors.        |
-| `src/app/api/msrc/route.ts`                                          | Added strict validation, timeouts, caching, and safe upstream errors.                        |
-| `src/app/api/power-bi-news/route.ts`                                 | Switched to the working canonical RSS endpoint.                                              |
-| `src/app/api/proxy-rss/route.ts`                                     | Added host/URL/body controls, timeouts, caching, CSP, and no-sniff.                          |
-| `src/app/layout.tsx`                                                 | Added SEO/share metadata and skip navigation; narrowed root client boundaries.               |
-| `src/app/message-center/page.tsx`                                    | Added fail-closed access, dynamic/noindex rendering, and route-scoped filter provider.       |
-| `src/app/message/[id]/page.tsx`                                      | Added fail-closed access, dynamic/noindex rendering, and cleaned async params handling.      |
-| `src/app/msrc/page.tsx`                                              | Reworked fetching, URL state, source attribution, loading/error/empty UX, and types.         |
-| `src/app/product-news/azure-ai-ml/page.tsx`                          | Switched card keys to stable feed IDs and improved loading/error output.                     |
-| `src/app/product-news/layout.tsx`                                    | Scoped React Query to Product News.                                                          |
-| `src/components/ImageModal.tsx`                                      | Added accessible dialog/focus/scroll behavior.                                               |
-| `src/components/LoadingSpinner.tsx`                                  | Added status semantics and reduced-motion support.                                           |
-| `src/components/MessageCard.tsx`                                     | Removed dead bundle code and duplicate navigation; improved focus/motion behavior.           |
-| `src/components/MessageCenterClient.tsx`                             | Improved loading and error announcements.                                                    |
-| `src/components/MessageList.tsx`                                     | Added deferred search, bounded pagination, inclusive dates, live counts, and empty state.    |
-| `src/components/MsLifecycleClient.tsx`                               | Added stale-data warning and related lifecycle response support.                             |
-| `src/components/Navbar.tsx`                                          | Improved semantics, labels, targets, and focus states.                                       |
-| `src/components/ProductNewsCard.tsx`                                 | Rebuilt semantic card behavior; removed per-card author fetch and invented dates.            |
-| `src/components/ReactQueryProvider.tsx`                              | Added feed-appropriate query defaults.                                                       |
-| `src/components/SearchBar.tsx`                                       | Fixed controlled behavior and added accessible form semantics.                               |
-| `src/components/ThemeToggle.tsx`                                     | Fixed system-theme behavior, hydration layout, labels, and target size.                      |
-| `src/components/filterStore.ts`                                      | Removed unused Zustand implementation.                                                       |
-| `src/lib/api.client.ts`                                              | Added typed RSS helpers and corrected Copilot Studio IDs/dates/source labels.                |
-| `src/lib/api.server.ts`                                              | Added Graph URL normalization, token caching, sync safety, and typed payloads.               |
-| `src/lib/auth.ts`                                                    | Required explicit tenant configuration and removed unsafe assertions/common fallback.        |
-| `src/lib/feed/sources.ts`                                            | Added centralized current release-plan constants.                                            |
-| `src/lib/feed/upstream.ts`                                           | Added shared resilient feed fetching and safe response headers.                              |
-| `src/lib/message-center-auth.ts`                                     | Added centralized fail-closed tenant-data access policy.                                     |
+Changes:
 
-## Validation results
+- Corrected `metadataBase` from `https://www.russrimmerman.com` to the live site, `https://www.mspulse360.app`.
+- Added root Open Graph and Twitter metadata.
+- Added `src/app/robots.ts`; API routes are disallowed from crawling and the sitemap is declared.
+- Added `src/app/sitemap.ts` for the portal's primary static routes.
+- Added `src/lib/detailMetadata.ts`.
+- Added per-item metadata for:
+  - `src/app/message/[id]/page.tsx`
+  - `src/app/m365-update/[id]/page.tsx`
+  - `src/app/m365-update/rss/[id]/page.tsx`
+- Metadata includes a canonical URL, article Open Graph fields, Twitter summary fields, entity-decoded plain-text titles, and descriptions capped at 160 characters.
+- The RSS alias canonicalizes to the primary `/m365-update/[id]` route.
+- Missing detail records are marked `noindex, nofollow`.
+- Existing single-item loaders are wrapped with React `cache()` so metadata and page rendering do not duplicate work within a request.
 
-| Validation                                                      | Exact result                                                                                           |
-| --------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
-| `pnpm type-check`                                               | Passed with exit code 0.                                                                               |
-| Changed-source ESLint                                           | Passed with exit code 0 for every added or modified TS/TSX/MJS file.                                   |
-| `pnpm exec playwright test sanitize.spec.ts --project=chromium` | **11 passed** in the final run.                                                                        |
-| `node scripts/update-lifecycle-data.mjs`                        | Successfully fetched the official XLSX and parsed **2,942** entries.                                   |
-| `pnpm build`                                                    | Passed on **Next.js 16.2.11**; compilation and TypeScript succeeded; **55/55** static pages generated. |
-| Fabric feed smoke test                                          | HTTP **200** from the final canonical route.                                                           |
-| Power BI feed smoke test                                        | HTTP **200** from the final canonical route.                                                           |
-| Copilot Studio feed smoke test                                  | HTTP **200**.                                                                                          |
-| Azure AI feed smoke test                                        | Returned 10 items; first item had a stable string GUID.                                                |
-| Lifecycle API smoke test                                        | Returned **2,942 rows**, `stale=false`, source `file`.                                                 |
-| Production Message Center without auth configuration            | HTTP **503**, confirming fail-closed behavior.                                                         |
-| Cron endpoint without `CRON_SECRET`                             | HTTP **503**, confirming fail-closed behavior.                                                         |
-| Invalid MSRC `monthId`                                          | HTTP **400**.                                                                                          |
-| Disallowed image-proxy host                                     | HTTP **400**.                                                                                          |
-| HTTP URL supplied to RSS proxy                                  | HTTP **400**.                                                                                          |
-| Production dependency audit before remediation                  | 1 critical, 9 high, 10 moderate.                                                                       |
-| Production dependency audit after remediation                   | 0 critical, 2 high, 1 moderate.                                                                        |
-| `git diff --check` before commit                                | Passed.                                                                                                |
-| Final implementation commit                                     | `8b57d17e5703ca143dcd1f06e36bdc56065c1fe2`.                                                            |
+### 10. Accessibility and interaction fixes
+
+Changes:
+
+- Product-filter listbox options now expose `aria-selected`.
+- Options are keyboard-focusable and include the service key used by Enter-key selection.
+- Persisted product filters are hydrated only once. This prevents a stale local-storage value from immediately undoing "Clear all" before the debounced removal completes.
+- The image modal now:
+  - Uses `next/image`.
+  - Exposes dialog and modal semantics.
+  - Moves focus to the close button.
+  - Restores prior focus on close.
+  - Supports Escape.
+  - Closes only when the backdrop itself is selected, not for clicks inside the image container.
+
+### 11. Linting, formatting, CI, and repository hygiene
+
+The ESLint 9 flat configuration did not include `eslint-config-next`, so Next.js performance, accessibility, and framework rules were not active even though the package was installed.
+
+Changes:
+
+- Replaced the duplicate legacy `.eslintrc.json` path with the flat:
+  - `eslint-config-next/core-web-vitals`
+  - `eslint-config-next/typescript`
+- Preserved selected legacy rules as warnings to expose the backlog without making unrelated cleanup a release blocker.
+- Fixed a real conditional Hook call in `src/components/ProductNewsLayout.tsx`.
+- Added `.github/workflows/ci.yml` for:
+  - Frozen pnpm installation.
+  - Prisma client generation.
+  - Lint.
+  - Type-check.
+  - Deterministic Playwright tests.
+  - Production build.
+- Added Prettier `3.9.6` as a development dependency so the existing `pnpm format` script is valid.
+- Added formatter verification for the changed files.
+- Removed:
+  - The unused client Message Center wrapper.
+  - The obsolete custom root error boundary.
+  - A tracked Windows shortcut named `SearchBar.tsx - Shortcut.lnk`.
+  - The unrelated Playwright scaffold test in `tests-examples/demo-todo-app.spec.ts`.
+
+The targeted follow-up reduced the warning count from 164 to 157 without attempting a broad warning-only refactor.
+
+## Test coverage added
+
+`tests/data-integrity.spec.ts` covers:
+
+- MSRC impact and severity mapping.
+- Rejection of numeric CVSS scores as severity labels.
+- Local-calendar lifecycle parsing.
+- Retirement-date boundary behavior.
+- Plain and attributed RSS GUID normalization.
+- Malformed feed date sorting.
+- Basic, numeric, hexadecimal, and extended named-entity normalization.
+- Message Center search fields and case handling.
+- Allowed and blocked image-proxy hosts.
+- Private literal SSRF rejection.
+- Fabric malformed JSON repair.
+- Fabric invalid response rejection.
+- Partial Fabric source failure behavior.
+- Metadata sanitization, canonical fields, length bounds, and missing-record indexing behavior.
+
+The existing sanitizer regression suite remained green and continued to cover scripts, event handlers, dangerous URL schemes, iframes, proxied images, hardened links, structural HTML, and plain-text extraction.
+
+## Validation evidence
+
+Final validation after both commits:
+
+| Check                            | Result                                                                                                                                                 |
+| -------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `pnpm exec prettier --check ...` | Passed; all targeted files use Prettier formatting.                                                                                                    |
+| `pnpm lint`                      | Passed with exit code 0, 0 errors, and 157 non-blocking warnings.                                                                                      |
+| `pnpm type-check`                | Passed.                                                                                                                                                |
+| Deterministic Playwright suite   | 27 tests passed.                                                                                                                                       |
+| `pnpm build`                     | Passed with Next.js 16.2.10; TypeScript passed and 57/57 static pages generated.                                                                       |
+| Production smoke test            | `/home`, `/robots.txt`, and `/sitemap.xml` returned 200; a customer AzureEdge image URL was rejected with 400; the report-only CSP header was present. |
+| `git diff --check`               | Passed before each commit.                                                                                                                             |
+
+The build correctly skipped Prisma migrations because `DATABASE_URL` was not set.
+
+## Review findings resolved before commit
+
+Independent final diff reviews caught and prompted fixes for:
+
+1. A Fabric fan-out regression where one failed product source could reject the full `Promise.all` and blank the roadmap.
+2. Persisted filters being reapplied immediately after a user selected "Clear all."
+3. A narrowed entity decoder that would have rendered extended named entities such as `&mdash;` literally.
+
+All three issues were corrected and regression-tested before the final commits were accepted.
+
+## Security and privacy assessment
+
+No high- or medium-severity exploitable vulnerability was identified in the reviewed scope.
+
+Reviewed controls that were retained:
+
+- Cron sync fails closed in production when `CRON_SECRET` is missing.
+- RSS proxy targets are HTTPS-only, exact-host allowlisted, and do not follow unchecked redirects.
+- Author feed slugs are constrained before being used in fixed Microsoft URLs.
+- MSRC month IDs are strictly validated.
+- Graph credentials and access tokens remain server-only.
+- Message IDs are validated before being interpolated into OData filters.
+- Graph pagination remains bounded.
+- Prisma access uses parameterized client operations rather than raw SQL.
+- Feed HTML remains sanitized before rendering.
+
+## Explicit product decision: anonymous tenant Message Center data
+
+`/api/messages` intentionally serves the configured tenant's Message Center data to anonymous visitors. This audit did **not** change that policy.
+
+The route documentation currently describes the behavior as intentional, while the installed NextAuth scaffolding does not enforce a session gate on the route. This must remain an urgent, explicit product-owner decision:
+
+- If the configured tenant's Message Center data is intended for public publication, retain and document the anonymous policy.
+- If it may include tenant-sensitive operational information, require authenticated and authorized access before production use.
+
+This decision should not be inferred from the presence of NextAuth; route-level authorization is not currently enforced.
 
 ## Deferred recommendations
 
-### P0 - Configure production tenant access before enabling Message Center
+The following items were intentionally not included because they require broader product, architectural, or infrastructure decisions:
 
-Configure `DATABASE_URL`, Graph credentials or APIM, the dedicated interactive Entra application, `NEXTAUTH_URL`, `NEXTAUTH_SECRET`, and `CRON_SECRET`. Keep `MESSAGE_CENTER_PUBLIC` unset/false unless publishing tenant administrator communications is an explicit product decision.
+1. **Message Center authorization:** Resolve the anonymous tenant-data decision described above.
+2. **Product News Server Components:** Convert the remaining client-fetched category pages to Server Components to remove first-render waterfalls, browser XML parsing, and ineffective browser-side `next.revalidate` options.
+3. **Feed error and stale states:** Standardize feed loaders so an upstream failure is distinguishable from a legitimate empty feed.
+4. **Remaining detail metadata:** Add per-item metadata to Azure Update, Release Plan, and Fabric detail routes after introducing safe request-deduplicated single-item loaders. The current Azure and release-plan pages fetch full collections.
+5. **Rate limiting:** Add a platform-approved distributed limiter to public proxy routes. No speculative external service was selected during this audit.
+6. **Browser E2E automation:** Configure Playwright `webServer` and mocked data so feed-page browser tests run rather than self-skip when no server is available.
+7. **Lint backlog:** Address the remaining 157 warnings in focused changes rather than a broad churn-only cleanup.
+8. **CSP enforcement:** Review report-only CSP telemetry and move to an enforced policy after required sources and nonces are confirmed.
 
-**Evidence:** `.env.example:30-52`, `README.md:448-471`, `src/lib/message-center-auth.ts`.
+## Constraints and blockers
 
-### P1 - Resolve remaining transitive dependency advisories
+There was no repository, checkout, access, or content-exclusion blocker.
 
-The final production audit has no critical findings. Remaining findings are:
+Environment limitations encountered and resolved:
 
-- **2 high findings** associated with vulnerable `brace-expansion` paths under ExcelJS/archiver.
-- **1 moderate finding** in the Prisma development chain through `@hono/node-server`.
+- The bundled Corepack had an outdated signing-key set. The already-installed pinned pnpm `10.34.5` shim was used instead.
+- Prettier was referenced by a package script but absent from dependencies; it was added in the follow-up commit.
 
-A safe direct upgrade was not available through the configured Microsoft package feed for the Prisma package set used by this repository. Avoid broad transitive major-version forcing without validating Prisma generation, migrations, Excel parsing, and deployment packaging.
-
-**Evidence:** `package.json:22-35`, `package.json:78-82`, `pnpm-lock.yaml` entries for Prisma, ExcelJS, Hono, and brace-expansion.
-
-### P1 - Pay down the existing full-repository lint baseline
-
-Changed source files pass ESLint, but `pnpm lint -- --quiet` still reports **144 pre-existing errors** in untouched legacy source, Markdown, Tailwind CSS, and declarations. Address these in focused cleanup changes so CI can eventually enforce full-repository linting.
-
-Representative areas include legacy unused imports/state, explicit `any` in `CVECard.tsx` and older feed pages, Markdown fenced-code languages, Tailwind at-rule parsing, and CSS baseline/no-important rules.
-
-**Evidence:** `eslint.config.mjs:34-57` and the existing files reported by the full lint run.
-
-### P1 - Add distributed rate limiting and centralized observability
-
-Public feed/proxy endpoints have input, timeout, host, and body controls but no distributed request-rate enforcement. In-memory limiting would be misleading on serverless multi-instance hosting. Select a deployment-supported shared limiter and telemetry destination before implementation.
-
-Recommended signals include upstream latency/status by source, Graph pages/items per sync, sync age and archive counts, stale lifecycle age, proxy rejection reason, and user-visible feed empty/error rates.
-
-**Evidence:** `src/app/api/proxy-rss/route.ts`, `src/app/api/image-proxy/route.ts`, `src/app/api/cron/sync-messages/route.ts`.
-
-### P2 - Make Playwright server configuration portable
-
-Several browser tests hard-code `http://localhost:3000`, while the Playwright `webServer` and `baseURL` configuration are disabled. Enable a managed test server and use `baseURL` so tests can run reliably when port 3000 is occupied.
-
-**Evidence:** `tests/feed-pages.spec.ts:16`, `tests/ms-lifecycle.spec.ts:42,107,135`, `playwright.config.ts:28-29,76`.
-
-### P2 - Define bookmark, alert, and export product requirements
-
-The repository has a generic `Preference` model but no dedicated bookmark, alert subscription, delivery schedule, export history, or tenant/user ownership model. Implementing these without requirements would risk storing tenant content incorrectly or choosing an unsupported delivery service.
-
-Define identity scope, retention, tenant isolation, notification channels, export formats, and authorization before implementation.
-
-**Evidence:** `prisma/schema.prisma:16-31`.
-
-### P2 - Continue route metadata and URL-state coverage
-
-Root metadata and product-news metadata are improved, and Message Center is intentionally noindex. Additional public detail routes can receive canonical/Open Graph metadata after public deployment URLs and desired indexability are confirmed. Other complex filter pages can progressively move state into query parameters for shareability.
-
-**Evidence:** `src/app/layout.tsx`, route metadata files, current client-side filter implementations.
-
-## Blockers and constraints
-
-- No real Graph, Entra, NextAuth, APIM, Postgres, or cron credentials were used, so authenticated tenant-data and live database behavior could not be exercised end-to-end.
-- No production or cloud resource changes were authorized or performed.
-- Another local process occupied port 3000 during the audit. The browser suites hard-code that port, so the complete browser suite could not be run against the audited server. Targeted sanitizer tests and production route smoke tests were run successfully on port 3100.
-- The configured Microsoft package feed did not expose a compatible stable Prisma upgrade that resolved the remaining Prisma transitive advisory. The repository's Prisma package versions are also not fully uniform (`@prisma/adapter-pg` is a 7.9 development build while generated client tooling resolved to 7.8), so a coordinated Prisma upgrade requires separate validation.
-- Full-repository lint is blocked by the 144 pre-existing errors described above; all changed source files pass.
-- Distributed rate limiting, external alert delivery, and centralized observability require explicit infrastructure/product choices and were intentionally not implemented speculatively.
-
-## Commit record
-
-```text
-8b57d17e5703ca143dcd1f06e36bdc56065c1fe2
-Audit and harden product data flows
-```
-
-The commit includes the required Copilot co-author and session trailers. The worktree was clean after the implementation commit.
+Live Graph, APIM, tenant database synchronization, and Prisma migrations were not exercised because credentials and `DATABASE_URL` were intentionally unavailable. No attempt was made to obtain or use credentials.

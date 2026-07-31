@@ -226,6 +226,22 @@ export async function getMessages(): Promise<Message[]> {
   return rows.map(rowToMessage);
 }
 
+export async function getMessageSyncMetadata(): Promise<{
+  lastSyncAt: string | null;
+  isStale: boolean;
+}> {
+  const state = await getPrisma().syncState.findUnique({
+    where: { key: MESSAGE_CENTER_SYNC_KEY },
+    select: { lastSyncAt: true },
+  });
+  const lastSyncAt = state?.lastSyncAt ?? null;
+
+  return {
+    lastSyncAt: lastSyncAt?.toISOString() ?? null,
+    isStale: !lastSyncAt || Date.now() - lastSyncAt.getTime() > MESSAGE_CENTER_STALE_MS,
+  };
+}
+
 async function fetchAllMessagesFromGraph(): Promise<GraphApiMessage[]> {
   if (!hasRequiredEnvVars) {
     throw new Error(
@@ -396,6 +412,7 @@ async function fetchMessageFromGraph(id: string): Promise<GraphApiMessage | null
 
 const MESSAGE_CENTER_SYNC_KEY = 'messageCenter';
 const SYNC_TTL_MS = 60 * 60 * 1000; // 1 hour
+const MESSAGE_CENTER_STALE_MS = 2 * 60 * 60 * 1000;
 
 /** In-flight sync so concurrent requests coalesce into one Graph pull. */
 let inFlightMessageSync: Promise<void> | null = null;

@@ -1,27 +1,6 @@
 import { FabricRoadmapContent } from '@/components/FabricRoadmapContent';
 import Image from 'next/image';
-
-interface FabricRoadmapItem {
-  ReleaseItemID: string;
-  FeatureName: string;
-  FeatureDescription: string;
-  ReleaseDate: string;
-  ReleaseType: string;
-  ReleaseStatus: string;
-  ProductName: string;
-}
-
-const FABRIC_API_BASE = 'https://releaseplanner.azure-api.net/fabric/fabric-json/?productId=';
-async function getFabricRoadmap(productId: string): Promise<FabricRoadmapItem[]> {
-  const res = await fetch(`${FABRIC_API_BASE}${productId}`, { cache: 'no-store' });
-  const text = await res.text();
-  try {
-    const data = JSON.parse(text);
-    return data.results;
-  } catch {
-    return [];
-  }
-}
+import { getFabricRoadmaps, type FabricRoadmapItem } from '@/lib/fabricApi';
 
 function mapToReleasePlan(item: FabricRoadmapItem) {
   return {
@@ -58,33 +37,20 @@ export default async function FabricReleasePlansPage() {
   const sqlDatabaseProductId = '347da228-ea54-ef11-a317-0022480a694f';
   const adminGovSecProductId = 'b6e2a7e2-2dc7-ee11-9079-000d3a3419a8';
 
-  const [roadmap, dataEngineeringRoadmap, dataFactoryRoadmap, dataScienceRoadmap, dataWarehouseRoadmap, oneLakeRoadmap, powerBiRoadmap, fabricDevExpRoadmap, realTimeIntelligenceRoadmap, sqlDatabaseRoadmap, adminGovSecRoadmap] = await Promise.all([
-    getFabricRoadmap(fabricProductId),
-    getFabricRoadmap(dataEngineeringProductId),
-    getFabricRoadmap(dataFactoryProductId),
-    getFabricRoadmap(dataScienceProductId),
-    getFabricRoadmap(dataWarehouseProductId),
-    getFabricRoadmap(oneLakeProductId),
-    getFabricRoadmap(powerBiProductId),
-    getFabricRoadmap(fabricDevExpProductId),
-    getFabricRoadmap(realTimeIntelligenceProductId),
-    getFabricRoadmap(sqlDatabaseProductId),
-    getFabricRoadmap(adminGovSecProductId)
+  const { items, failedProductIds } = await getFabricRoadmaps([
+    fabricProductId,
+    dataEngineeringProductId,
+    dataFactoryProductId,
+    dataScienceProductId,
+    dataWarehouseProductId,
+    oneLakeProductId,
+    powerBiProductId,
+    fabricDevExpProductId,
+    realTimeIntelligenceProductId,
+    sqlDatabaseProductId,
+    adminGovSecProductId,
   ]);
-
-  const allPlans = [
-    ...roadmap.map(mapToReleasePlan),
-    ...dataEngineeringRoadmap.map(mapToReleasePlan),
-    ...dataFactoryRoadmap.map(mapToReleasePlan),
-    ...dataScienceRoadmap.map(mapToReleasePlan),
-    ...dataWarehouseRoadmap.map(mapToReleasePlan),
-    ...oneLakeRoadmap.map(mapToReleasePlan),
-    ...powerBiRoadmap.map(mapToReleasePlan),
-    ...fabricDevExpRoadmap.map(mapToReleasePlan),
-    ...realTimeIntelligenceRoadmap.map(mapToReleasePlan),
-    ...sqlDatabaseRoadmap.map(mapToReleasePlan),
-    ...adminGovSecRoadmap.map(mapToReleasePlan),
-  ];
+  const allPlans = items.map(mapToReleasePlan);
 
   return (
     <div className="min-h-screen">
@@ -96,6 +62,15 @@ export default async function FabricReleasePlansPage() {
             <p className="text-gray-600 dark:text-gray-400">Browse upcoming and shipped features from the Microsoft Fabric public roadmap.</p>
           </div>
         </div>
+        {failedProductIds.length > 0 && (
+          <p
+            role="status"
+            className="mb-6 rounded-lg border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-900 dark:border-amber-700 dark:bg-amber-950/40 dark:text-amber-200"
+          >
+            Some Fabric roadmap product areas are temporarily unavailable. Showing data from the
+            remaining sources.
+          </p>
+        )}
         <FabricRoadmapContent allPlans={allPlans} />
       </div>
     </div>

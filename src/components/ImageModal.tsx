@@ -1,11 +1,25 @@
 'use client';
 
+import Image from 'next/image';
 import { useEffect, useRef } from 'react';
 
 interface ImageModalProps {
   src: string;
   alt: string;
   onClose: () => void;
+}
+
+function normalizeImageSrc(src: string): string {
+  if (src.startsWith('/')) return src;
+  try {
+    const parsed = new URL(src);
+    if (parsed.pathname.startsWith('/api/image-proxy')) {
+      return `${parsed.pathname}${parsed.search}`;
+    }
+  } catch {
+    return src;
+  }
+  return src;
 }
 
 export function ImageModal({ src, alt, onClose }: ImageModalProps) {
@@ -40,13 +54,19 @@ export function ImageModal({ src, alt, onClose }: ImageModalProps) {
         if (event.currentTarget === event.target) onClose();
       }}
     >
-      <div className="relative max-h-[90vh] max-w-[90vw]">
-        <img src={src} alt={alt} className="max-h-[90vh] max-w-full object-contain" />
+      <div className="relative h-[90vh] w-[90vw]">
+        <Image
+          src={normalizeImageSrc(src)}
+          alt={alt}
+          fill
+          sizes="90vw"
+          className="object-contain"
+        />
         <button
           ref={closeButtonRef}
           type="button"
           onClick={onClose}
-          className="absolute right-4 top-4 rounded text-white hover:text-gray-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-white"
+          className="absolute right-4 top-4 z-10 rounded text-white hover:text-gray-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-white"
           aria-label="Close image preview"
         >
           <svg
