@@ -36,15 +36,16 @@ const serviceIconMap: Record<string, string> = {
   'Exchange Online': '/icons/exchange.svg',
   'Microsoft Forms': '/icons/forms.svg',
   'Microsoft Intune': '/icons/intune.svg',
-  'Planner': '/icons/planner.svg',
+  Planner: '/icons/planner.svg',
   'Microsoft Entra': '/icons/entra.svg',
   'Microsoft Bookings': '/icons/Bookings.svg',
-  'Excel': '/icons/Excel.svg',
-  'Exchange': '/icons/exchange.svg',
-  'Forms': '/icons/forms.svg',
-  'Bookings': '/icons/Bookings.svg',
-  'Access': '/icons/Access.svg',
-  'Azure Information Protection': '/icons/azure/security/10229-icon-service-Azure-Information-Protection.svg',
+  Excel: '/icons/Excel.svg',
+  Exchange: '/icons/exchange.svg',
+  Forms: '/icons/forms.svg',
+  Bookings: '/icons/Bookings.svg',
+  Access: '/icons/Access.svg',
+  'Azure Information Protection':
+    '/icons/azure/security/10229-icon-service-Azure-Information-Protection.svg',
   'Dynamics 365 Apps': '/icons/Dynamics365_scalable.svg',
   'Dynamics 365 Sales': '/icons/Sales_scalable.svg',
   'Dynamics 365 Marketing': '/icons/Marketing_scalable.svg',
@@ -73,20 +74,20 @@ const serviceIconMap: Record<string, string> = {
   'Microsoft Viva': '/icons/viva.svg',
   'Microsoft Purview': '/icons/purview.svg',
   'Microsoft Defender XDR': '/icons/defender.svg',
-  'Windows': '/icons/Windows.svg',
+  Windows: '/icons/Windows.svg',
   'Windows 365': '/icons/Windows.svg',
   'Microsoft Power Automate in Microsoft 365': '/icons/PowerAutomate_scalable.svg',
   'Power Apps in Microsoft 365': '/icons/PowerApps_scalable.svg',
   'Microsoft Copilot Studio': '/icons/CopilotStudio_scalable.svg',
   'AI Builder': '/icons/AIBuilder_scalable.svg',
-  'OneDrive': '/icons/onedrive.svg',
-  'Outlook': '/icons/Outlook.svg',
-  'OneNote': '/icons/OneNote.svg',
-  'PowerApps': '/icons/PowerApps_scalable.svg',
-  'PowerPoint': '/icons/PowerPoint.svg',
-  'SharePoint': '/icons/sharepoint.svg',
-  'Visio': '/icons/Visio.svg',
-  'Word': '/icons/Word.svg',
+  OneDrive: '/icons/onedrive.svg',
+  Outlook: '/icons/Outlook.svg',
+  OneNote: '/icons/OneNote.svg',
+  PowerApps: '/icons/PowerApps_scalable.svg',
+  PowerPoint: '/icons/PowerPoint.svg',
+  SharePoint: '/icons/sharepoint.svg',
+  Visio: '/icons/Visio.svg',
+  Word: '/icons/Word.svg',
   'Microsoft Project': '/icons/Project.svg',
   'Microsoft Purview compliance portal': '/icons/purview.svg',
   'Microsoft Edge': '/icons/edge.svg',
@@ -109,32 +110,40 @@ function getServiceIcon(service: string): string | undefined {
   return serviceIconMap[service] || getProductIcon(service) || undefined;
 }
 
-export function ProductFilter({ services, selectedServices, onFilterChange, isOpen, setOpen }: ProductFilterProps) {
+export function ProductFilter({
+  services,
+  selectedServices,
+  onFilterChange,
+  isOpen,
+  setOpen,
+}: ProductFilterProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const dropdownRef = useRef<HTMLDivElement>(null);
   const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const hasLoadedSavedFiltersRef = useRef(false);
 
   // Memoize selection check
   const isServiceSelected = useCallback(
     (service: string): boolean =>
-      selectedServices.some(
-        s => s.trim().toLowerCase() === service.trim().toLowerCase()
-      ),
+      selectedServices.some(s => s.trim().toLowerCase() === service.trim().toLowerCase()),
     [selectedServices]
   );
 
   // Memoize toggle function
-  const toggleService = useCallback((service: string) => {
-    if (isServiceSelected(service)) {
-      // Remove the service
-      const newSelection = selectedServices.filter(
-        s => s.trim().toLowerCase() !== service.trim().toLowerCase()
-      );
-      onFilterChange(newSelection);
-    } else {
-      onFilterChange([...selectedServices, service]);
-    }
-  }, [selectedServices, onFilterChange, isServiceSelected]);
+  const toggleService = useCallback(
+    (service: string) => {
+      if (isServiceSelected(service)) {
+        // Remove the service
+        const newSelection = selectedServices.filter(
+          s => s.trim().toLowerCase() !== service.trim().toLowerCase()
+        );
+        onFilterChange(newSelection);
+      } else {
+        onFilterChange([...selectedServices, service]);
+      }
+    },
+    [selectedServices, onFilterChange, isServiceSelected]
+  );
 
   // Clear all function
   const handleClearAll = useCallback(() => {
@@ -143,32 +152,36 @@ export function ProductFilter({ services, selectedServices, onFilterChange, isOp
   }, [onFilterChange, setOpen]);
 
   // Memoize sorted services
-  const sortedServices = useMemo(() => 
-    [...services].sort(),
-    [services]
-  );
+  const sortedServices = useMemo(() => [...services].sort(), [services]);
 
   // Handle keyboard navigation
-  const handleKeyDown = useCallback((event: KeyboardEvent) => {
-    if (!isOpen) return;
-    
-    if (event.key === 'Escape') {
-      setOpen(false);
-    } else if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
-      event.preventDefault();
-      const options = Array.from(document.querySelectorAll('[role="option"]'));
-      const currentIndex = options.findIndex(option => option === document.activeElement);
-      const nextIndex = event.key === 'ArrowDown' 
-        ? Math.min(currentIndex + 1, options.length - 1)
-        : Math.max(currentIndex - 1, 0);
-      (options[nextIndex] as HTMLElement)?.focus();
-    } else if (event.key === 'Enter' && document.activeElement?.getAttribute('role') === 'option') {
-      const service = document.activeElement.getAttribute('data-service');
-      if (service) {
-        toggleService(service);
+  const handleKeyDown = useCallback(
+    (event: KeyboardEvent) => {
+      if (!isOpen) return;
+
+      if (event.key === 'Escape') {
+        setOpen(false);
+      } else if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+        event.preventDefault();
+        const options = Array.from(document.querySelectorAll('[role="option"]'));
+        const currentIndex = options.findIndex(option => option === document.activeElement);
+        const nextIndex =
+          event.key === 'ArrowDown'
+            ? Math.min(currentIndex + 1, options.length - 1)
+            : Math.max(currentIndex - 1, 0);
+        (options[nextIndex] as HTMLElement)?.focus();
+      } else if (
+        event.key === 'Enter' &&
+        document.activeElement?.getAttribute('role') === 'option'
+      ) {
+        const service = document.activeElement.getAttribute('data-service');
+        if (service) {
+          toggleService(service);
+        }
       }
-    }
-  }, [isOpen, setOpen, toggleService]);
+    },
+    [isOpen, setOpen, toggleService]
+  );
 
   useEffect(() => {
     document.addEventListener('keydown', handleKeyDown);
@@ -179,25 +192,23 @@ export function ProductFilter({ services, selectedServices, onFilterChange, isOp
 
   // Load saved filters on mount
   useEffect(() => {
+    if (hasLoadedSavedFiltersRef.current) return;
+    hasLoadedSavedFiltersRef.current = true;
+
     try {
       const savedFilters = localStorage.getItem(STORAGE_KEY);
       if (savedFilters) {
         const parsedFilters = JSON.parse(savedFilters);
         // Only apply saved filters if they exist in current services
-        const validFilters = parsedFilters.filter((filter: string) => 
-          services.includes(filter)
-        );
-        if (
-          validFilters.length > 0 &&
-          selectedServices.length === 0
-        ) {
+        const validFilters = parsedFilters.filter((filter: string) => services.includes(filter));
+        if (validFilters.length > 0 && selectedServices.length === 0) {
           onFilterChange(validFilters);
         }
       }
     } catch (error) {
       console.error('Error loading saved filters:', error);
     }
-  }, []);
+  }, [onFilterChange, selectedServices.length, services]);
 
   // Save filters with debounce
   useEffect(() => {
@@ -225,10 +236,9 @@ export function ProductFilter({ services, selectedServices, onFilterChange, isOp
   }, [selectedServices]);
 
   // Memoize filtered services
-  const filteredServices = useMemo(() => 
-    sortedServices.filter(service => 
-      service.toLowerCase().includes(searchQuery.toLowerCase())
-    ),
+  const filteredServices = useMemo(
+    () =>
+      sortedServices.filter(service => service.toLowerCase().includes(searchQuery.toLowerCase())),
     [sortedServices, searchQuery]
   );
 
@@ -239,12 +249,7 @@ export function ProductFilter({ services, selectedServices, onFilterChange, isOp
         className="flex items-center justify-center gap-2 px-4 h-8 text-gray-700 dark:text-gray-200 bg-white/80 dark:bg-gray-800/50 backdrop-blur-sm border border-gray-200 dark:border-gray-700/50 rounded-lg shadow-[inset_0_2px_4px_rgba(0,0,0,0.05)] dark:shadow-[inset_0_2px_4px_rgba(0,0,0,0.2)] hover:shadow-[inset_0_2px_4px_rgba(0,0,0,0.1)] dark:hover:shadow-[inset_0_2px_4px_rgba(0,0,0,0.3)] hover:border-primary-200 dark:hover:border-primary-800 hover:shadow-[0_0_0_1px_rgba(59,130,246,0.5)] dark:hover:shadow-[0_0_0_1px_rgba(59,130,246,0.5)] transition-all duration-300 relative w-full md:w-auto min-h-[32px]"
         aria-label="Filter products"
       >
-        <svg
-          className="w-5 h-5"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
+        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path
             strokeLinecap="round"
             strokeLinejoin="round"
@@ -261,7 +266,7 @@ export function ProductFilter({ services, selectedServices, onFilterChange, isOp
       </button>
 
       {isOpen && (
-        <div 
+        <div
           className="absolute z-50 w-72 mt-1 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow-lg transition-opacity duration-150 opacity-100 animate-fadein"
           role="dialog"
           aria-label="Product filter options"
@@ -278,22 +283,28 @@ export function ProductFilter({ services, selectedServices, onFilterChange, isOp
                 type="text"
                 placeholder="Search products..."
                 value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                onChange={e => setSearchQuery(e.target.value)}
                 className="w-full px-3 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white"
               />
             </div>
           </div>
           <div className="max-h-60 overflow-y-auto p-2" role="listbox">
-            {filteredServices.map((service) => {
-              const iconSrc = getServiceIcon(service)
-                || (service === 'Microsoft Power Automate' ? '/icons/PowerAutomate_scalable.svg'
-                : service.startsWith('Dynamics 365 Customer Insights') ? '/icons/CustomerInsights_scalable.svg'
-                : undefined);
+            {filteredServices.map(service => {
+              const iconSrc =
+                getServiceIcon(service) ||
+                (service === 'Microsoft Power Automate'
+                  ? '/icons/PowerAutomate_scalable.svg'
+                  : service.startsWith('Dynamics 365 Customer Insights')
+                    ? '/icons/CustomerInsights_scalable.svg'
+                    : undefined);
               return (
                 <label
                   key={service}
                   className="flex items-center px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary-500"
                   role="option"
+                  aria-selected={isServiceSelected(service)}
+                  data-service={service}
+                  tabIndex={0}
                 >
                   <input
                     type="checkbox"
@@ -304,13 +315,13 @@ export function ProductFilter({ services, selectedServices, onFilterChange, isOp
                   <span className="ml-2 text-sm text-gray-700 dark:text-gray-200 flex items-center gap-2">
                     {iconSrc && (
                       <Image
-                        src={iconSrc} 
+                        src={iconSrc}
                         alt={`${service} icon`}
                         className="w-4 h-4 object-contain"
                         width={16}
                         height={16}
                         loading="lazy"
-                        onError={(e) => {
+                        onError={e => {
                           e.currentTarget.style.display = 'none';
                         }}
                       />
@@ -333,4 +344,4 @@ export function ProductFilter({ services, selectedServices, onFilterChange, isOp
       )}
     </div>
   );
-} 
+}

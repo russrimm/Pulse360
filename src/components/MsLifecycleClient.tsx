@@ -3,6 +3,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import * as Popover from '@radix-ui/react-popover';
 import { addMonths } from 'date-fns';
+import { getLifecycleExpiryStatus, parseLifecycleDate } from '@/lib/lifecycle';
 
 interface LifecycleRow {
   product: string;
@@ -103,15 +104,6 @@ const AZURE_FEATURE_COLUMN_OPTIONS: ColumnOption[] = [
 const EXPIRATION_WINDOW_OPTIONS: ExpirationWindow[] = [3, 6, 9, 12];
 const EXPIRATION_DATE_FIELDS = ['mainStreamEndDate', 'extendedEndDate', 'retirementDate'] as const;
 
-function parseLifecycleDate(value: string): Date | null {
-  const dateOnlyMatch = value.match(/^(\d{4})-(\d{2})-(\d{2})$/);
-  const date = dateOnlyMatch
-    ? new Date(Number(dateOnlyMatch[1]), Number(dateOnlyMatch[2]) - 1, Number(dateOnlyMatch[3]))
-    : new Date(value);
-
-  return isNaN(date.getTime()) ? null : date;
-}
-
 function isExpiringWithin(row: LifecycleRow, months: ExpirationWindow, today: Date): boolean {
   const cutoff = addMonths(today, months);
 
@@ -122,26 +114,6 @@ function isExpiringWithin(row: LifecycleRow, months: ExpirationWindow, today: Da
     const expirationDate = parseLifecycleDate(value);
     return expirationDate !== null && expirationDate >= today && expirationDate <= cutoff;
   });
-}
-
-function getExpiryStatus(row: LifecycleRow): 'expired' | 'expiring-soon' | 'active' | 'unknown' {
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  const soonMs = 180 * 24 * 60 * 60 * 1000;
-
-  const eos = row.endOfSupportDate ? new Date(row.endOfSupportDate) : null;
-  const ext = row.extendedEndDate ? new Date(row.extendedEndDate) : null;
-  const ret = row.retirementDate ? new Date(row.retirementDate) : null;
-  const ms = row.mainStreamEndDate ? new Date(row.mainStreamEndDate) : null;
-  const dates = [eos, ms, ext, ret].filter(Boolean) as Date[];
-
-  if (dates.length === 0) return 'unknown';
-
-  const latest = new Date(Math.max(...dates.map(d => d.getTime())));
-
-  if (latest < today) return 'expired';
-  if (latest.getTime() - today.getTime() <= soonMs) return 'expiring-soon';
-  return 'active';
 }
 
 function formatDate(value: string | null): string {
@@ -470,7 +442,7 @@ function LifecycleGrid({
               </tr>
             ) : (
               filtered.map((row, index) => {
-                const status = getExpiryStatus(row);
+                const status = getLifecycleExpiryStatus(row);
                 return (
                   <tr
                     key={`${row.product}-${row.category}-${index}`}

@@ -1,5 +1,6 @@
 import { XMLParser } from 'fast-xml-parser';
 import { ProductNews } from './types';
+import { getFeedItemId, getFeedTimestamp } from './feed/normalize';
 
 export async function getPowerAppsNews(): Promise<ProductNews[]> {
   try {
@@ -20,7 +21,7 @@ export async function getPowerAppsNews(): Promise<ProductNews[]> {
     const items = result.rss.channel.item;
 
     const news: ProductNews[] = items.map((item: any) => ({
-      id: item.guid?.['#text'] || item.link,
+      id: getFeedItemId(item.guid, item.link),
       title: item.title,
       link: item.link,
       description: item.description,
@@ -30,7 +31,7 @@ export async function getPowerAppsNews(): Promise<ProductNews[]> {
     }));
 
     return news.sort(
-      (a, b) => new Date(b.publishDate).getTime() - new Date(a.publishDate).getTime()
+      (a, b) => getFeedTimestamp(b.publishDate) - getFeedTimestamp(a.publishDate)
     );
   } catch (error) {
     return [];
@@ -56,7 +57,7 @@ export async function getPowerPlatformNews(): Promise<ProductNews[]> {
     const items = result.rss.channel.item;
 
     const news: ProductNews[] = items.map((item: any) => ({
-      id: item.guid?.['#text'] || item.link,
+      id: getFeedItemId(item.guid, item.link),
       title: item.title,
       link: item.link,
       description: item.description,
@@ -66,7 +67,7 @@ export async function getPowerPlatformNews(): Promise<ProductNews[]> {
     }));
 
     return news.sort(
-      (a, b) => new Date(b.publishDate).getTime() - new Date(a.publishDate).getTime()
+      (a, b) => getFeedTimestamp(b.publishDate) - getFeedTimestamp(a.publishDate)
     );
   } catch (error) {
     return [];
@@ -96,7 +97,7 @@ export async function getPowerAutomateNews(): Promise<ProductNews[]> {
 
     return result.rss.channel.item
       .map((item: any) => ({
-        id: item.guid?.['#text'] || item.link,
+        id: getFeedItemId(item.guid, item.link),
         title: item.title,
         description: item.description,
         link: item.link,
@@ -106,7 +107,7 @@ export async function getPowerAutomateNews(): Promise<ProductNews[]> {
       }))
       .sort(
         (a: ProductNews, b: ProductNews) =>
-          new Date(b.publishDate).getTime() - new Date(a.publishDate).getTime()
+          getFeedTimestamp(b.publishDate) - getFeedTimestamp(a.publishDate)
       );
   } catch (error) {
     return [];
@@ -136,7 +137,7 @@ export async function getPowerBINews(): Promise<ProductNews[]> {
 
     return result.rss.channel.item
       .map((item: any) => ({
-        id: item.guid?.['#text'] || item.link,
+        id: getFeedItemId(item.guid, item.link),
         title: item.title,
         description: item.description,
         link: item.link,
@@ -146,7 +147,7 @@ export async function getPowerBINews(): Promise<ProductNews[]> {
       }))
       .sort(
         (a: ProductNews, b: ProductNews) =>
-          new Date(b.publishDate).getTime() - new Date(a.publishDate).getTime()
+          getFeedTimestamp(b.publishDate) - getFeedTimestamp(a.publishDate)
       );
   } catch (error) {
     return [];
@@ -241,7 +242,7 @@ export async function getLearnBlogNews(): Promise<ProductNews[]> {
     const items = result.rss.channel.item;
 
     const news: ProductNews[] = items.map((item: any) => ({
-      id: item.guid?.['#text'] || item.link,
+      id: getFeedItemId(item.guid, item.link),
       title: item.title,
       link: item.link,
       description: item.description,
@@ -251,7 +252,7 @@ export async function getLearnBlogNews(): Promise<ProductNews[]> {
     }));
 
     return news.sort(
-      (a, b) => new Date(b.publishDate).getTime() - new Date(a.publishDate).getTime()
+      (a, b) => getFeedTimestamp(b.publishDate) - getFeedTimestamp(a.publishDate)
     );
   } catch (error) {
     return [];
@@ -301,7 +302,7 @@ export async function getMicrosoftNews(): Promise<ProductNews[]> {
     });
 
     return filteredNews.sort(
-      (a, b) => new Date(b.publishDate).getTime() - new Date(a.publishDate).getTime()
+      (a, b) => getFeedTimestamp(b.publishDate) - getFeedTimestamp(a.publishDate)
     );
   } catch (error) {
     throw error;
@@ -341,7 +342,7 @@ export async function getTechCommunityNews(): Promise<ProductNews[]> {
     });
 
     return news.sort(
-      (a, b) => new Date(b.publishDate).getTime() - new Date(a.publishDate).getTime()
+      (a, b) => getFeedTimestamp(b.publishDate) - getFeedTimestamp(a.publishDate)
     );
   } catch (error) {
     throw error;
@@ -367,7 +368,7 @@ export async function getCopilotNews(): Promise<ProductNews[]> {
     const items = result.rss.channel.item;
 
     const news: ProductNews[] = items.map((item: any) => ({
-      id: item.guid?.['#text'] || item.link,
+      id: getFeedItemId(item.guid, item.link),
       title: item.title,
       link: item.link,
       description: item.description,
@@ -377,7 +378,7 @@ export async function getCopilotNews(): Promise<ProductNews[]> {
     }));
 
     return news.sort(
-      (a, b) => new Date(b.publishDate).getTime() - new Date(a.publishDate).getTime()
+      (a, b) => getFeedTimestamp(b.publishDate) - getFeedTimestamp(a.publishDate)
     );
   } catch (error) {
     return [];
@@ -406,7 +407,7 @@ export async function getSemanticKernelNews(): Promise<ProductNews[]> {
     const result = parser.parse(xmlText);
     const items = result.rss.channel.item;
     const news: ProductNews[] = items.map((item: any) => ({
-      id: item.guid?.['#text'] || item.link,
+      id: getFeedItemId(item.guid, item.link),
       title: item.title,
       link: item.link,
       description: item.description,
@@ -415,7 +416,7 @@ export async function getSemanticKernelNews(): Promise<ProductNews[]> {
       categories: Array.isArray(item.category) ? item.category : [item.category].filter(Boolean),
     }));
     return news.sort(
-      (a, b) => new Date(b.publishDate).getTime() - new Date(a.publishDate).getTime()
+      (a, b) => getFeedTimestamp(b.publishDate) - getFeedTimestamp(a.publishDate)
     );
   } catch (error) {
     return [];
@@ -438,7 +439,7 @@ export async function getAzureAIFoundryNews(): Promise<ProductNews[]> {
     const result = parser.parse(xmlText);
     const items = result.rss.channel.item;
     const news: ProductNews[] = items.map((item: any) => ({
-      id: item.guid?.['#text'] || item.link,
+      id: getFeedItemId(item.guid, item.link),
       title: item.title,
       link: item.link,
       description: item.description,
@@ -447,7 +448,7 @@ export async function getAzureAIFoundryNews(): Promise<ProductNews[]> {
       categories: Array.isArray(item.category) ? item.category : [item.category].filter(Boolean),
     }));
     return news.sort(
-      (a, b) => new Date(b.publishDate).getTime() - new Date(a.publishDate).getTime()
+      (a, b) => getFeedTimestamp(b.publishDate) - getFeedTimestamp(a.publishDate)
     );
   } catch (error) {
     return [];

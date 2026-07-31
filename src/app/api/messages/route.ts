@@ -8,7 +8,11 @@ import { getMessages } from '@/lib/api.server';
 export async function GET() {
   try {
     const messages = await getMessages();
-    return NextResponse.json(messages);
+    return NextResponse.json(messages, {
+      headers: {
+        'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=300',
+      },
+    });
   } catch (error) {
     console.error('Error in /api/messages:', error);
     return NextResponse.json(

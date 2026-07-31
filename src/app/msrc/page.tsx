@@ -4,9 +4,6 @@ import Link from 'next/link';
 import CVECard from '../../components/CVECard';
 import { useSearchParams } from 'next/navigation';
 
-const API_URL = 'https://api.msrc.microsoft.com/cvrf/v3.0/updates';
-const CVRF_URL = 'https://api.msrc.microsoft.com/cvrf/v3.0/cvrf/';
-
 interface UpdateMonth {
   ID: string;
   DocumentTitle: string;
@@ -63,7 +60,6 @@ export default function SecurityUpdatesPage() {
   const [error, setError] = useState<string | null>(null);
   const [selectedMonth, setSelectedMonth] = useState<string | undefined>(monthParam || undefined);
   const [releaseDate, setReleaseDate] = useState<string>('');
-  const [revisionHistory, setRevisionHistory] = useState<any[] | undefined>(undefined);
   const [productTree, setProductTree] = useState<any>(undefined);
 
   useEffect(() => {
@@ -80,7 +76,6 @@ export default function SecurityUpdatesPage() {
           if (!isMounted) return;
           setVulnerabilities(data.Vulnerability || []);
           setReleaseDate(data.ReleaseDate || '');
-          setRevisionHistory(data.RevisionHistory);
           setProductTree(data.ProductTree);
         }
       } catch (e: any) {
@@ -140,7 +135,7 @@ export default function SecurityUpdatesPage() {
             : vulnerabilities
                 .filter(vuln => !!vuln.Title && getFieldValue(vuln.Title).trim() !== '')
                 .map((vuln, idx) => (
-                  <CVECard key={`${vuln.ID || (vuln.CVE && vuln.CVE[0]) || ''}-${idx}`} vuln={vuln} month={selectedMonth!} releaseDate={releaseDate} revisionHistory={revisionHistory} productTree={productTree} />
+                  <CVECard key={`${vuln.ID || (vuln.CVE && vuln.CVE[0]) || ''}-${idx}`} vuln={vuln} productTree={productTree} />
                 ))
           }
         </div>

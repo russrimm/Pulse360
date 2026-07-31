@@ -6,8 +6,10 @@ import { ProductFilter } from '@/components/ProductFilter';
 import { Message } from '@/lib/types';
 import { useRouter } from 'next/navigation';
 import { TagsFilter } from '@/components/TagsFilter';
-import { addDays, isAfter, isBefore, parseISO, startOfDay, endOfDay, subDays } from 'date-fns';
+import { isAfter, isBefore, parseISO, startOfDay, endOfDay, subDays } from 'date-fns';
 import { useFilterContext } from './FilterContext';
+import { SearchBar } from '@/components/SearchBar';
+import { matchesMessageSearch } from '@/lib/messageSearch';
 
 interface MessageListProps {
   messages: Message[];
@@ -16,7 +18,7 @@ interface MessageListProps {
 const ITEMS_PER_PAGE = 12;
 
 export function MessageList({ messages: messagesProp }: MessageListProps) {
-  const messages = Array.isArray(messagesProp) ? messagesProp : [];
+  const messages = messagesProp;
   const router = useRouter();
   const [page, setPage] = useState(1);
   const observerRef = useRef<IntersectionObserver | null>(null);
@@ -49,9 +51,7 @@ export function MessageList({ messages: messagesProp }: MessageListProps) {
       .filter(message => message.title !== "Power Platform - Planned maintenance")
       .filter(message => !message.content.includes(MAINTENANCE_PHRASE) && !message.title.includes(MAINTENANCE_PHRASE))
       .filter(message => {
-        const matchesSearch = searchQuery === '' || 
-          message.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          message.content.toLowerCase().includes(searchQuery.toLowerCase());
+        const matchesSearch = matchesMessageSearch(message, searchQuery);
         const matchesServices = selectedServices.length === 0 || 
           message.service.some(service => selectedServices.includes(service));
         const matchesTags = selectedTags.length === 0 || 
@@ -104,7 +104,7 @@ export function MessageList({ messages: messagesProp }: MessageListProps) {
       setSelectedTags(selectedTags.filter(tag => uniqueTags.includes(tag)));
     }
     // Do NOT reset selectedTags on every messages change
-  }, [messages]);
+  }, [messages, selectedTags, setSelectedTags]);
 
   // When any filter is active, show all matching messages so the filter is
   // visibly applied. Otherwise fall back to infinite-scroll pagination.
@@ -156,10 +156,15 @@ export function MessageList({ messages: messagesProp }: MessageListProps) {
     router.push(`/message/${messageId}`);
   };
 
-  if (!messages) return null;
-
   return (
     <div className="relative">
+      <SearchBar
+        messages={messages}
+        onSearch={() => undefined}
+        searchQuery={searchQuery}
+        onSearchQueryChange={setSearchQuery}
+        placeholder="Search Message Center by title, content, service, or ID"
+      />
       {isLoading && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 gap-y-8 px-2 py-8">
           {[1,2,3].map(i => (
