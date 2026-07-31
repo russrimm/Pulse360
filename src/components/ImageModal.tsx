@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 
 interface ImageModalProps {
   src: string;
@@ -9,38 +9,62 @@ interface ImageModalProps {
 }
 
 export function ImageModal({ src, alt, onClose }: ImageModalProps) {
+  const closeButtonRef = useRef<HTMLButtonElement>(null);
+
   useEffect(() => {
-    const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        onClose();
-      }
-    };
+    const previouslyFocused =
+      document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    closeButtonRef.current?.focus();
+
+    function handleEscape(event: KeyboardEvent) {
+      if (event.key === 'Escape') onClose();
+    }
 
     document.addEventListener('keydown', handleEscape);
-    return () => document.removeEventListener('keydown', handleEscape);
+    return () => {
+      document.removeEventListener('keydown', handleEscape);
+      document.body.style.overflow = previousOverflow;
+      previouslyFocused?.focus();
+    };
   }, [onClose]);
 
   return (
-    <div 
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-75"
-      onClick={onClose}
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-label={alt ? `Image preview: ${alt}` : 'Image preview'}
+      className="fixed inset-0 z-50 flex overscroll-contain items-center justify-center bg-black/75 p-4"
+      onMouseDown={event => {
+        if (event.currentTarget === event.target) onClose();
+      }}
     >
-      <div className="relative max-w-[90vw] max-h-[90vh]">
-        <img
-          src={src}
-          alt={alt}
-          className="max-w-full max-h-[90vh] object-contain"
-        />
+      <div className="relative max-h-[90vh] max-w-[90vw]">
+        <img src={src} alt={alt} className="max-h-[90vh] max-w-full object-contain" />
         <button
+          ref={closeButtonRef}
+          type="button"
           onClick={onClose}
-          className="absolute top-4 right-4 text-white hover:text-gray-300 focus:outline-none"
-          aria-label="Close image"
+          className="absolute right-4 top-4 rounded text-white hover:text-gray-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-white"
+          aria-label="Close image preview"
         >
-          <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+          <svg
+            aria-hidden="true"
+            className="h-8 w-8"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M6 18L18 6M6 6l12 12"
+            />
           </svg>
         </button>
       </div>
     </div>
   );
-} 
+}

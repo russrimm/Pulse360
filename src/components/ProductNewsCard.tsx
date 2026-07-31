@@ -1,129 +1,123 @@
-'use client';
+﻿'use client';
 
-import { ProductNews } from '@/lib/types';
 import type { ReactNode } from 'react';
-import Link from 'next/link';
-import { useEffect, useState, useMemo, useCallback } from 'react';
-import { Card } from './Card';
-import Image from 'next/image';
+import { useEffect, useState } from 'react';
+import type { ProductNews } from '@/lib/types';
 
 interface ProductNewsCardProps {
   news: ProductNews;
   productIcon?: ReactNode;
 }
 
-// Helper to get author slug for Microsoft News
-function getAuthorSlug(author: string) {
-  if (!author) return ''
-  return author.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')
+const dateFormatter = new Intl.DateTimeFormat(undefined, {
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric',
+});
+
+function getAuthorSlug(author: string): string {
+  return author
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/(^-|-$)/g, '');
 }
 
-// Fetch author title from their blog page
-function useAuthorTitle(author: string | undefined) {
-  const [title, setTitle] = useState<string | null>(null)
-  useEffect(() => {
-    if (!author) return
-    const slug = getAuthorSlug(author)
-    if (!slug) return
-    const url = `https://blogs.microsoft.com/blog/author/${slug}/`
-    fetch(url)
-      .then(res => res.text())
-      .then(html => {
-        const match = html.match(/<title>(.*?)<\/title>/i)
-        if (match && match[1]) setTitle(match[1].replace(/\s*\|.*/, '').trim())
-      })
-      .catch(() => setTitle(null))
-  }, [author])
-  return title
+function formatPublishDate(value: string | undefined): string | null {
+  if (!value) return null;
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? null : dateFormatter.format(date);
 }
 
-function AuthorWithTitle({ author }: { author: string }) {
-  const slug = getAuthorSlug(author)
-  const authorUrl = `https://blogs.microsoft.com/blog/author/${slug}/`
+function Author({ author }: { author: string }) {
+  const slug = getAuthorSlug(author);
+  if (!slug) return null;
+
   return (
-    <p className="text-xs text-gray-500 dark:text-gray-400 mb-2 text-center">
+    <p className="mb-2 text-center text-xs text-gray-500 dark:text-gray-400">
       Published by{' '}
-      <a href={authorUrl} target="_blank" rel="noopener noreferrer" className="underline hover:text-primary-700">
+      <a
+        href={`https://blogs.microsoft.com/blog/author/${slug}/`}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="underline hover:text-primary-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 dark:hover:text-primary-300"
+      >
         {author}
       </a>
     </p>
-  )
+  );
 }
 
-export function ProductNewsCard({ news, productIcon }: ProductNewsCardProps) {
+export function ProductNewsCard({ news }: ProductNewsCardProps) {
   const [decodedTitle, setDecodedTitle] = useState(news.title);
   const [decodedDescription, setDecodedDescription] = useState(news.description);
   const [decodedAuthor, setDecodedAuthor] = useState(news.author);
 
   useEffect(() => {
-    const decodeHtmlEntities = (text: string) => {
+    function decodeHtmlEntities(text: string): string {
       const textarea = document.createElement('textarea');
       textarea.innerHTML = text;
       return textarea.value;
-    };
+    }
 
-    const safeTitle = typeof news.title === 'string' ? news.title : '';
-    const safeDescription = typeof news.description === 'string' ? news.description : '';
-    const safeAuthor = typeof news.author === 'string' ? news.author : '';
+    const title = typeof news.title === 'string' ? news.title : '';
+    const description = typeof news.description === 'string' ? news.description : '';
+    const author = typeof news.author === 'string' ? news.author : '';
 
-    setDecodedTitle(decodeHtmlEntities(safeTitle));
-    setDecodedDescription(decodeHtmlEntities(safeDescription.replace(/<[^>]*>/g, '')));
-    setDecodedAuthor(decodeHtmlEntities(safeAuthor));
-  }, [news]);
+    setDecodedTitle(decodeHtmlEntities(title));
+    setDecodedDescription(decodeHtmlEntities(description.replace(/<[^>]*>/g, '')));
+    setDecodedAuthor(decodeHtmlEntities(author));
+  }, [news.author, news.description, news.title]);
 
-  const isCopilotStudio = typeof productIcon === 'string' && productIcon.includes('CopilotStudio');
-  const descriptionLines = isCopilotStudio ? news.description.split('\n') : [];
-  const enabledFor = descriptionLines.find(line => line.startsWith('Enabled for:'))?.replace('Enabled for:', '').trim();
-  const publicPreview = descriptionLines.find(line => line.startsWith('Public Preview:'))?.replace('Public Preview:', '').trim();
-  const generalAvailability = descriptionLines.find(line => line.startsWith('General Availability:'))?.replace('General Availability:', '').trim();
-
-  const isValidDate = (dateStr: string | undefined) => {
-    if (!dateStr) return false;
-    const date = new Date(dateStr);
-    return !isNaN(date.getTime());
-  };
+  const formattedDate = formatPublishDate(news.publishDate);
+  const hasLink = typeof news.link === 'string' && news.link.startsWith('https://');
 
   return (
-    <div className="w-full max-w-md mx-auto min-w-0">
-      <div className="group bg-white/80 dark:bg-gray-800/50 backdrop-blur-sm rounded-xl shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-200 dark:border-gray-700/50 hover:border-primary-200 dark:hover:border-primary-800 hover:-translate-y-1 h-full cursor-pointer flex flex-col">
-        <div
-          className="p-4 flex flex-col h-full cursor-pointer min-w-0"
-          onClick={() => window.open(news.link, '_blank', 'noopener,noreferrer')}
-          tabIndex={0}
-          role="button"
-          onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') window.open(news.link, '_blank', 'noopener,noreferrer') }}
-          aria-label={`Open news: ${decodedTitle}`}
-        >
-          <div className="flex-1 w-full min-w-0">
-            <h3 className="w-full overflow-hidden text-lg font-bold text-gray-900 dark:text-white group-hover:text-primary-600 dark:group-hover:text-primary-400 mb-2 text-center" style={{ wordBreak: 'normal', overflowWrap: 'anywhere' }}>
-              {decodedTitle}
-            </h3>
-            <p className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-0 text-center">
-              {new Date(news.publishDate || new Date()).toLocaleDateString('en-US', {
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric'
-              })}
-            </p>
-            {news.author && <AuthorWithTitle author={news.author} />}
-            <p className="text-base text-gray-700 dark:text-gray-300 line-clamp-3 text-center mt-2">
+    <article className="mx-auto h-full w-full min-w-0 max-w-md rounded-xl border border-gray-200 bg-white/80 shadow-sm backdrop-blur-sm transition-[transform,box-shadow,border-color] duration-300 hover:-translate-y-1 hover:border-primary-200 hover:shadow-xl motion-reduce:transform-none motion-reduce:transition-none dark:border-gray-700/50 dark:bg-gray-800/50 dark:hover:border-primary-800">
+      <div className="flex h-full min-w-0 flex-col p-4">
+        <div className="min-w-0 flex-1">
+          <h3 className="mb-2 w-full overflow-hidden text-center text-lg font-bold text-gray-900 [overflow-wrap:anywhere] dark:text-white">
+            {hasLink ? (
+              <a
+                href={news.link}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-primary-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 dark:hover:text-primary-400"
+              >
+                {decodedTitle || 'Untitled update'}
+              </a>
+            ) : (
+              decodedTitle || 'Untitled update'
+            )}
+          </h3>
+          {formattedDate ? (
+            <time
+              dateTime={news.publishDate}
+              className="mb-0 block text-center text-xs font-medium text-gray-500 dark:text-gray-400"
+            >
+              {formattedDate}
+            </time>
+          ) : null}
+          {decodedAuthor ? <Author author={decodedAuthor} /> : null}
+          {decodedDescription ? (
+            <p className="mt-2 line-clamp-3 break-words text-center text-base text-gray-700 dark:text-gray-300">
               {decodedDescription}
             </p>
-          </div>
-          <div className="mt-4 flex items-center justify-between">
-            <div />
+          ) : null}
+        </div>
+        {hasLink ? (
+          <div className="mt-4 flex justify-end">
             <a
               href={news.link}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 text-sm font-medium"
-              tabIndex={-1}
+              className="text-sm font-medium text-primary-600 hover:text-primary-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 dark:text-primary-400 dark:hover:text-primary-300"
+              aria-label={`Read ${decodedTitle || 'this update'}`}
             >
-              Read more →
+              Read more <span aria-hidden="true">&rarr;</span>
             </a>
           </div>
-        </div>
+        ) : null}
       </div>
-    </div>
+    </article>
   );
-} 
+}

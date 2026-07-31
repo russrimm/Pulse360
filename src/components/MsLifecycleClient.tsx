@@ -26,6 +26,7 @@ interface ApiResponse {
   cachedAt: string;
   fromCache: boolean;
   error?: string;
+  isStale?: boolean;
 }
 
 type SortField =
@@ -157,12 +158,18 @@ function getMonthsRemaining(value: string): string | null {
 
   const today = new Date();
   const todayUtc = Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate());
-  const endDateUtc = Date.UTC(endDate.getUTCFullYear(), endDate.getUTCMonth(), endDate.getUTCDate());
+  const endDateUtc = Date.UTC(
+    endDate.getUTCFullYear(),
+    endDate.getUTCMonth(),
+    endDate.getUTCDate()
+  );
 
   if (endDateUtc < todayUtc) return 'Out of Support';
 
-  const monthsRemaining = (endDate.getUTCFullYear() - today.getUTCFullYear()) * 12
-    + endDate.getUTCMonth() - today.getUTCMonth();
+  const monthsRemaining =
+    (endDate.getUTCFullYear() - today.getUTCFullYear()) * 12 +
+    endDate.getUTCMonth() -
+    today.getUTCMonth();
 
   if (monthsRemaining === 0) return 'Less than 1 month';
   return `${monthsRemaining} month${monthsRemaining === 1 ? '' : 's'}`;
@@ -170,7 +177,8 @@ function getMonthsRemaining(value: string): string | null {
 
 function formatEndOfSupport(row: LifecycleRow): string {
   const sourceStatus = formatDate(row.endOfSupportDate);
-  if (!row.endOfSupportDate?.toLowerCase().includes('month') || !row.releaseEndDate) return sourceStatus;
+  if (!row.endOfSupportDate?.toLowerCase().includes('month') || !row.releaseEndDate)
+    return sourceStatus;
 
   const remaining = getMonthsRemaining(row.releaseEndDate);
   if (!remaining) return sourceStatus;
@@ -178,7 +186,15 @@ function formatEndOfSupport(row: LifecycleRow): string {
   return `${remaining} · ${formatDate(row.releaseEndDate)}`;
 }
 
-function SortIcon({ field, sortField, sortDir }: { field: SortField; sortField: SortField; sortDir: SortDir }) {
+function SortIcon({
+  field,
+  sortField,
+  sortDir,
+}: {
+  field: SortField;
+  sortField: SortField;
+  sortDir: SortDir;
+}) {
   if (field !== sortField) return <span className="ml-1 text-gray-300 dark:text-gray-600">↕</span>;
   return <span className="ml-1">{sortDir === 'asc' ? '↑' : '↓'}</span>;
 }
@@ -202,7 +218,9 @@ function LifecycleGrid({
   const [expirationWindow, setExpirationWindow] = useState<ExpirationWindow | 'All'>('All');
   const [sortField, setSortField] = useState<SortField>('product');
   const [sortDir, setSortDir] = useState<SortDir>('asc');
-  const [visibleColumns, setVisibleColumns] = useState<ColumnId[]>(columnOptions.map(column => column.id));
+  const [visibleColumns, setVisibleColumns] = useState<ColumnId[]>(
+    columnOptions.map(column => column.id)
+  );
 
   useEffect(() => {
     setVisibleColumns(columnOptions.map(column => column.id));
@@ -211,7 +229,9 @@ function LifecycleGrid({
   }, [columnOptions]);
 
   const dropdownFilterOptions = useMemo(() => {
-    const values = Array.from(new Set(rows.map(row => row[dropdownFilterField]).filter(Boolean))).sort();
+    const values = Array.from(
+      new Set(rows.map(row => row[dropdownFilterField]).filter(Boolean))
+    ).sort();
     return ['All', ...values];
   }, [rows, dropdownFilterField]);
 
@@ -225,9 +245,16 @@ function LifecycleGrid({
         const release = row.release.toLowerCase();
         const category = row.category.toLowerCase();
 
-        if (query && !row.product.toLowerCase().includes(query) && !release.includes(query) && !category.includes(query)) return false;
+        if (
+          query &&
+          !row.product.toLowerCase().includes(query) &&
+          !release.includes(query) &&
+          !category.includes(query)
+        )
+          return false;
         if (dropdownFilter !== 'All' && row[dropdownFilterField] !== dropdownFilter) return false;
-        if (expirationWindow !== 'All' && !isExpiringWithin(row, expirationWindow, today)) return false;
+        if (expirationWindow !== 'All' && !isExpiringWithin(row, expirationWindow, today))
+          return false;
 
         return true;
       })
@@ -269,7 +296,16 @@ function LifecycleGrid({
         if (columnId === sortField) {
           const fallbackSort = next.includes('product')
             ? 'product'
-            : (next.find(id => id === 'startDate' || id === 'mainStreamEndDate' || id === 'extendedEndDate' || id === 'retirementDate' || id === 'releaseStartDate' || id === 'releaseEndDate' || id === 'endOfSupportDate') as SortField | undefined);
+            : (next.find(
+                id =>
+                  id === 'startDate' ||
+                  id === 'mainStreamEndDate' ||
+                  id === 'extendedEndDate' ||
+                  id === 'retirementDate' ||
+                  id === 'releaseStartDate' ||
+                  id === 'releaseEndDate' ||
+                  id === 'endOfSupportDate'
+              ) as SortField | undefined);
 
           if (fallbackSort) {
             setSortField(fallbackSort);
@@ -286,7 +322,9 @@ function LifecycleGrid({
 
   return (
     <section className="mb-10 flex min-h-0 flex-col md:mb-0 md:h-full">
-      {title && <h2 className="mb-2 text-lg font-semibold text-gray-900 dark:text-white">{title}</h2>}
+      {title && (
+        <h2 className="mb-2 text-lg font-semibold text-gray-900 dark:text-white">{title}</h2>
+      )}
 
       <div className="mb-2 flex flex-col gap-2 sm:flex-row">
         <input
@@ -303,7 +341,9 @@ function LifecycleGrid({
           className="px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
         >
           {dropdownFilterOptions.map(value => (
-            <option key={value} value={value}>{value === 'All' ? `All ${dropdownFilterLabel}` : value}</option>
+            <option key={value} value={value}>
+              {value === 'All' ? `All ${dropdownFilterLabel}` : value}
+            </option>
           ))}
         </select>
         {showExpirationFilter && (
@@ -318,7 +358,9 @@ function LifecycleGrid({
           >
             <option value="All">All expiration dates</option>
             {EXPIRATION_WINDOW_OPTIONS.map(months => (
-              <option key={months} value={months}>Expiring within {months} months</option>
+              <option key={months} value={months}>
+                Expiring within {months} months
+              </option>
             ))}
           </select>
         )}
@@ -330,7 +372,14 @@ function LifecycleGrid({
               title="Choose columns"
               className="inline-flex items-center justify-center px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-primary-500"
             >
-              <svg aria-hidden="true" viewBox="0 0 20 20" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.8">
+              <svg
+                aria-hidden="true"
+                viewBox="0 0 20 20"
+                className="h-4 w-4"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.8"
+              >
                 <rect x="2.5" y="3" width="4" height="14" rx="1.2" />
                 <rect x="8" y="3" width="4" height="14" rx="1.2" />
                 <rect x="13.5" y="3" width="4" height="14" rx="1.2" />
@@ -338,13 +387,20 @@ function LifecycleGrid({
             </button>
           </Popover.Trigger>
           <Popover.Portal>
-            <Popover.Content sideOffset={8} align="end" className="z-50 w-72 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 shadow-2xl p-3">
+            <Popover.Content
+              sideOffset={8}
+              align="end"
+              className="z-50 w-72 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 shadow-2xl p-3"
+            >
               <div className="mb-2 text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
                 Select Columns
               </div>
               <div className="space-y-1 max-h-72 overflow-auto pr-1">
                 {columnOptions.map(option => (
-                  <label key={option.id} className="flex items-center gap-2 rounded-md px-2 py-1.5 hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer text-sm text-gray-700 dark:text-gray-200">
+                  <label
+                    key={option.id}
+                    className="flex items-center gap-2 rounded-md px-2 py-1.5 hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer text-sm text-gray-700 dark:text-gray-200"
+                  >
                     <input
                       type="checkbox"
                       checked={isVisible(option.id)}
@@ -364,10 +420,16 @@ function LifecycleGrid({
       <div className="mb-2 flex items-center justify-between gap-4 text-xs text-gray-500 dark:text-gray-400">
         <span>
           {filtered.length.toLocaleString()} item{filtered.length !== 1 ? 's' : ''} matching
-          {rows.length !== filtered.length && <> (of {rows.length.toLocaleString()})</>}
-          {' '}
-          &bull; source:{' '}
-          <a href={sourceHref ?? sourceUrl} target="_blank" rel="noopener noreferrer" className="text-primary-600 dark:text-primary-400 underline hover:no-underline">{sourceLabel ?? sourceUrl.split('/').pop()}</a>
+          {rows.length !== filtered.length && <> (of {rows.length.toLocaleString()})</>} &bull;
+          source:{' '}
+          <a
+            href={sourceHref ?? sourceUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-primary-600 dark:text-primary-400 underline hover:no-underline"
+          >
+            {sourceLabel ?? sourceUrl.split('/').pop()}
+          </a>
         </span>
         <span>
           Cached {new Date(cachedAt).toLocaleString()}
@@ -391,10 +453,26 @@ function LifecycleGrid({
                   <SortIcon field="product" sortField={sortField} sortDir={sortDir} />
                 </th>
               )}
-              {isVisible('edition') && <th className="px-4 py-3 text-left font-semibold text-gray-700 dark:text-gray-300 whitespace-nowrap">{columnOptions.find(c => c.id === 'edition')?.label}</th>}
-              {isVisible('release') && <th className="px-4 py-3 text-left font-semibold text-gray-700 dark:text-gray-300 whitespace-nowrap">{columnOptions.find(c => c.id === 'release')?.label}</th>}
-              {isVisible('category') && <th className="px-4 py-3 text-left font-semibold text-gray-700 dark:text-gray-300 whitespace-nowrap">{columnOptions.find(c => c.id === 'category')?.label}</th>}
-              {isVisible('supportPolicy') && <th className="px-4 py-3 text-left font-semibold text-gray-700 dark:text-gray-300 whitespace-nowrap">{columnOptions.find(c => c.id === 'supportPolicy')?.label}</th>}
+              {isVisible('edition') && (
+                <th className="px-4 py-3 text-left font-semibold text-gray-700 dark:text-gray-300 whitespace-nowrap">
+                  {columnOptions.find(c => c.id === 'edition')?.label}
+                </th>
+              )}
+              {isVisible('release') && (
+                <th className="px-4 py-3 text-left font-semibold text-gray-700 dark:text-gray-300 whitespace-nowrap">
+                  {columnOptions.find(c => c.id === 'release')?.label}
+                </th>
+              )}
+              {isVisible('category') && (
+                <th className="px-4 py-3 text-left font-semibold text-gray-700 dark:text-gray-300 whitespace-nowrap">
+                  {columnOptions.find(c => c.id === 'category')?.label}
+                </th>
+              )}
+              {isVisible('supportPolicy') && (
+                <th className="px-4 py-3 text-left font-semibold text-gray-700 dark:text-gray-300 whitespace-nowrap">
+                  {columnOptions.find(c => c.id === 'supportPolicy')?.label}
+                </th>
+              )}
               {isVisible('startDate') && (
                 <th
                   className="px-4 py-3 text-left font-semibold text-gray-700 dark:text-gray-300 cursor-pointer whitespace-nowrap hover:bg-gray-100 dark:hover:bg-gray-700"
@@ -449,7 +527,11 @@ function LifecycleGrid({
                   <SortIcon field="releaseEndDate" sortField={sortField} sortDir={sortDir} />
                 </th>
               )}
-              {isVisible('docsUrl') && <th className="px-4 py-3 text-left font-semibold text-gray-700 dark:text-gray-300 whitespace-nowrap">{columnOptions.find(c => c.id === 'docsUrl')?.label}</th>}
+              {isVisible('docsUrl') && (
+                <th className="px-4 py-3 text-left font-semibold text-gray-700 dark:text-gray-300 whitespace-nowrap">
+                  {columnOptions.find(c => c.id === 'docsUrl')?.label}
+                </th>
+              )}
               {isVisible('endOfSupportDate') && (
                 <th
                   className="px-4 py-3 text-left font-semibold text-gray-700 dark:text-gray-300 cursor-pointer whitespace-nowrap hover:bg-gray-100 dark:hover:bg-gray-700"
@@ -464,7 +546,10 @@ function LifecycleGrid({
           <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
             {filtered.length === 0 ? (
               <tr>
-                <td colSpan={visibleColumns.length} className="px-4 py-12 text-center text-gray-400 dark:text-gray-500">
+                <td
+                  colSpan={visibleColumns.length}
+                  className="px-4 py-12 text-center text-gray-400 dark:text-gray-500"
+                >
                   No items match the current filters.
                 </td>
               </tr>
@@ -482,25 +567,82 @@ function LifecycleGrid({
                           : ''
                     }`}
                   >
-                    {isVisible('product') && <td className="px-4 py-3 font-medium text-gray-900 dark:text-gray-100">{row.product}</td>}
-                    {isVisible('edition') && <td className="px-4 py-3 text-gray-600 dark:text-gray-400">{row.edition || '—'}</td>}
-                    {isVisible('release') && <td className="px-4 py-3 text-gray-600 dark:text-gray-400">{row.release || '—'}</td>}
-                    {isVisible('category') && <td className="px-4 py-3 text-gray-600 dark:text-gray-400">{row.category || '—'}</td>}
-                    {isVisible('supportPolicy') && <td className="px-4 py-3 text-gray-600 dark:text-gray-400">{row.supportPolicy || '—'}</td>}
-                    {isVisible('startDate') && <td className="px-4 py-3 text-gray-600 dark:text-gray-400 whitespace-nowrap">{formatDate(row.startDate)}</td>}
-                    {isVisible('mainStreamEndDate') && <td className="px-4 py-3 text-gray-600 dark:text-gray-400 whitespace-nowrap">{formatDate(row.mainStreamEndDate)}</td>}
-                    {isVisible('extendedEndDate') && <td className="px-4 py-3 text-gray-600 dark:text-gray-400 whitespace-nowrap">{formatDate(row.extendedEndDate)}</td>}
-                    {isVisible('retirementDate') && <td className="px-4 py-3 text-gray-600 dark:text-gray-400 whitespace-nowrap">{formatDate(row.retirementDate)}</td>}
-                    {isVisible('releaseStartDate') && <td className="px-4 py-3 text-gray-600 dark:text-gray-400 whitespace-nowrap">{formatDate(row.releaseStartDate)}</td>}
-                    {isVisible('releaseEndDate') && <td className="px-4 py-3 text-gray-600 dark:text-gray-400 whitespace-nowrap">{formatDate(row.releaseEndDate)}</td>}
+                    {isVisible('product') && (
+                      <td className="px-4 py-3 font-medium text-gray-900 dark:text-gray-100">
+                        {row.product}
+                      </td>
+                    )}
+                    {isVisible('edition') && (
+                      <td className="px-4 py-3 text-gray-600 dark:text-gray-400">
+                        {row.edition || '—'}
+                      </td>
+                    )}
+                    {isVisible('release') && (
+                      <td className="px-4 py-3 text-gray-600 dark:text-gray-400">
+                        {row.release || '—'}
+                      </td>
+                    )}
+                    {isVisible('category') && (
+                      <td className="px-4 py-3 text-gray-600 dark:text-gray-400">
+                        {row.category || '—'}
+                      </td>
+                    )}
+                    {isVisible('supportPolicy') && (
+                      <td className="px-4 py-3 text-gray-600 dark:text-gray-400">
+                        {row.supportPolicy || '—'}
+                      </td>
+                    )}
+                    {isVisible('startDate') && (
+                      <td className="px-4 py-3 text-gray-600 dark:text-gray-400 whitespace-nowrap">
+                        {formatDate(row.startDate)}
+                      </td>
+                    )}
+                    {isVisible('mainStreamEndDate') && (
+                      <td className="px-4 py-3 text-gray-600 dark:text-gray-400 whitespace-nowrap">
+                        {formatDate(row.mainStreamEndDate)}
+                      </td>
+                    )}
+                    {isVisible('extendedEndDate') && (
+                      <td className="px-4 py-3 text-gray-600 dark:text-gray-400 whitespace-nowrap">
+                        {formatDate(row.extendedEndDate)}
+                      </td>
+                    )}
+                    {isVisible('retirementDate') && (
+                      <td className="px-4 py-3 text-gray-600 dark:text-gray-400 whitespace-nowrap">
+                        {formatDate(row.retirementDate)}
+                      </td>
+                    )}
+                    {isVisible('releaseStartDate') && (
+                      <td className="px-4 py-3 text-gray-600 dark:text-gray-400 whitespace-nowrap">
+                        {formatDate(row.releaseStartDate)}
+                      </td>
+                    )}
+                    {isVisible('releaseEndDate') && (
+                      <td className="px-4 py-3 text-gray-600 dark:text-gray-400 whitespace-nowrap">
+                        {formatDate(row.releaseEndDate)}
+                      </td>
+                    )}
                     {isVisible('docsUrl') && (
                       <td className="px-4 py-3">
                         {row.docsUrl ? (
-                          <a href={row.docsUrl} target="_blank" rel="noopener noreferrer" className="text-primary-600 dark:text-primary-400 underline hover:no-underline text-xs">Docs</a>
-                        ) : '—'}
+                          <a
+                            href={row.docsUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-primary-600 dark:text-primary-400 underline hover:no-underline text-xs"
+                          >
+                            Docs
+                          </a>
+                        ) : (
+                          '—'
+                        )}
                       </td>
                     )}
-                    {isVisible('endOfSupportDate') && <td className="px-4 py-3 text-gray-600 dark:text-gray-400 whitespace-nowrap">{formatEndOfSupport(row)}</td>}
+                    {isVisible('endOfSupportDate') && (
+                      <td className="px-4 py-3 text-gray-600 dark:text-gray-400 whitespace-nowrap">
+                        {formatEndOfSupport(row)}
+                      </td>
+                    )}
                   </tr>
                 );
               })
@@ -508,7 +650,6 @@ function LifecycleGrid({
           </tbody>
         </table>
       </div>
-
     </section>
   );
 }
@@ -553,7 +694,14 @@ export function MsLifecycleClient() {
     return (
       <div className="flex items-center justify-center py-24 text-gray-500 dark:text-gray-400">
         <svg className="animate-spin mr-3 h-5 w-5" fill="none" viewBox="0 0 24 24">
-          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+          <circle
+            className="opacity-25"
+            cx="12"
+            cy="12"
+            r="10"
+            stroke="currentColor"
+            strokeWidth="4"
+          />
           <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
         </svg>
         Loading lifecycle data… (this may take a moment on first load)
@@ -602,6 +750,15 @@ export function MsLifecycleClient() {
           </>
         )}
       </p>
+      {data.isStale ? (
+        <p
+          className="mb-3 rounded-lg border border-amber-300 bg-amber-50 px-4 py-2 text-center text-sm text-amber-900 dark:border-amber-700 dark:bg-amber-950/40 dark:text-amber-100"
+          role="status"
+        >
+          Lifecycle data was last refreshed {new Date(data.cachedAt).toLocaleString()} and may be
+          out of date.
+        </p>
+      ) : null}
 
       <div
         role="tablist"
@@ -641,7 +798,12 @@ export function MsLifecycleClient() {
       </div>
 
       {lifecycleView === 'microsoft' ? (
-        <div className="min-h-0 flex-1" role="tabpanel" id="microsoft-lifecycle-panel" aria-labelledby="microsoft-lifecycle-tab">
+        <div
+          className="min-h-0 flex-1"
+          role="tabpanel"
+          id="microsoft-lifecycle-panel"
+          aria-labelledby="microsoft-lifecycle-tab"
+        >
           <LifecycleGrid
             rows={splitRows.microsoftProductRows}
             sourceUrl={data.sourceUrl}
@@ -655,7 +817,12 @@ export function MsLifecycleClient() {
           />
         </div>
       ) : (
-        <div className="min-h-0 flex-1" role="tabpanel" id="azure-lifecycle-panel" aria-labelledby="azure-lifecycle-tab">
+        <div
+          className="min-h-0 flex-1"
+          role="tabpanel"
+          id="azure-lifecycle-panel"
+          aria-labelledby="azure-lifecycle-tab"
+        >
           <LifecycleGrid
             rows={splitRows.azureFeatureRows}
             sourceUrl={data.sourceUrl}

@@ -29,9 +29,20 @@ const ALLOWED_APEX_DOMAINS: readonly string[] = [
   'microsoft365.com',
 ];
 
+const MAX_IMAGE_BYTES = 10 * 1024 * 1024;
+const ALLOWED_IMAGE_TYPES = new Set([
+  'image/avif',
+  'image/gif',
+  'image/jpeg',
+  'image/png',
+  'image/svg+xml',
+  'image/webp',
+  'image/x-icon',
+]);
+
 function isAllowedHost(hostname: string): boolean {
   const h = hostname.toLowerCase();
-  return ALLOWED_APEX_DOMAINS.some((apex) => h === apex || h.endsWith(`.${apex}`));
+  return ALLOWED_APEX_DOMAINS.some(apex => h === apex || h.endsWith(`.${apex}`));
 }
 
 // ---------------------------------------------------------------------------
@@ -47,7 +58,7 @@ function isPrivateIpv4(hostname: string): boolean {
   const c = Number(match[3] ?? '0');
   const d = Number(match[4] ?? '0');
 
-  if ([a, b, c, d].some((n) => n > 255)) return false;
+  if ([a, b, c, d].some(n => n > 255)) return false;
 
   return (
     a === 0 || // 0.0.0.0/8 — "this" network
@@ -93,7 +104,7 @@ function isSsrfHost(hostname: string): boolean {
 function badRequest(message: string): NextResponse {
   return NextResponse.json(
     { ok: false, error: { code: 'BAD_REQUEST', message, source: 'image-proxy' } },
-    { status: 400 },
+    { status: 400 }
   );
 }
 
@@ -107,7 +118,7 @@ function upstreamUnavailable(): NextResponse {
         source: 'image-proxy',
       },
     },
-    { status: 502 },
+    { status: 502 }
   );
 }
 
@@ -122,6 +133,10 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
   // 1. Presence check
   if (!url) {
     return badRequest('Missing required query parameter: url');
+  }
+
+  if (url.length > 4096) {
+    return badRequest('Invalid url: value is too long');
   }
 
   // 2. Parse
@@ -174,8 +189,8 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
   }
 
   // 8. Validate the upstream actually returned an image
-  const contentType = upstream.headers.get('Content-Type') ?? '';
-  if (!contentType.startsWith('image/')) {
+  const contentType = (upstream.headers.get('Content-Type') ?? '').split(';', 1)[0].toLowerCase();
+  if (!ALLOWED_IMAGE_TYPES.has(contentType)) {
     return upstreamUnavailable();
   }
 
@@ -184,11 +199,33 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
   }
 
   // 9. Stream body to client, forwarding Content-Type + long-lived cache headers
-  return new NextResponse(upstream.body, {
+
+  const contentLength = Number(upstream.headers.get('content-length'));
+  if (Number.isFinite(contentLength) && contentLength > MAX_IMAGE_BYTES) {
+    return upstreamUnavailable();
+  }
+
+  let transferredBytes = 0;
+  const limitedBody = upstream.body.pipeThrough(
+    new TransformStream<Uint8Array, Uint8Array>({
+      transform(chunk, controller) {
+        transferredBytes += chunk.byteLength;
+        if (transferredBytes > MAX_IMAGE_BYTES) {
+          controller.error(new Error('Upstream image exceeded the size limit'));
+          return;
+        }
+        controller.enqueue(chunk);
+      },
+    })
+  );
+
+  return new NextResponse(limitedBody, {
     status: 200,
     headers: {
       'Content-Type': contentType,
       'Cache-Control': 'public, max-age=86400, s-maxage=86400',
+      'Content-Security-Policy': "default-src 'none'; script-src 'none'; sandbox",
+      'X-Content-Type-Options': 'nosniff',
     },
   });
 }

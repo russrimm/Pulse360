@@ -1,11 +1,8 @@
-"use client";
-import React, { useEffect, useState } from 'react';
-import Link from 'next/link';
-import CVECard from '../../components/CVECard';
-import { useSearchParams } from 'next/navigation';
+'use client';
 
-const API_URL = 'https://api.msrc.microsoft.com/cvrf/v3.0/updates';
-const CVRF_URL = 'https://api.msrc.microsoft.com/cvrf/v3.0/cvrf/';
+import { Suspense, useEffect, useRef, useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import CVECard from '../../components/CVECard';
 
 interface UpdateMonth {
   ID: string;
@@ -15,136 +12,242 @@ interface UpdateMonth {
 
 interface Vulnerability {
   ID: string;
-  Title?: any;
-  Description?: any;
+  Title?: unknown;
+  Description?: unknown;
   CVE?: string[];
-  ProductStatuses?: any[];
-  Threats?: any[];
-  Remediations?: any[];
-  CVSSScoreSets?: any[];
-  References?: any[];
-  Acknowledgments?: any[];
+  ProductStatuses?: unknown[];
+  Threats?: unknown[];
+  Remediations?: unknown[];
+  CVSSScoreSets?: unknown[];
+  References?: unknown[];
+  Acknowledgments?: unknown[];
   ReleaseDate?: string;
-  RevisionHistory?: any[];
-  [key: string]: any;
+  RevisionHistory?: unknown[];
+  [key: string]: unknown;
 }
 
-function getFieldValue(field: any): string {
-  if (!field) return '';
+interface ProductTree {
+  FullProductName?: { ProductID: string; Value: string }[];
+}
+
+interface CvrfResponse {
+  Vulnerability?: Vulnerability[];
+  ReleaseDate?: string;
+  RevisionHistory?: unknown[];
+  ProductTree?: ProductTree;
+}
+
+function getFieldValue(field: unknown): string {
   if (typeof field === 'string') return field;
-  if (typeof field === 'object' && 'Value' in field) return field.Value;
+  if (field && typeof field === 'object' && 'Value' in field) {
+    const value = (field as { Value: unknown }).Value;
+    return typeof value === 'string' ? value : '';
+  }
   return '';
 }
 
-function formatDate(date: string | undefined) {
+function isUpdateMonth(value: unknown): value is UpdateMonth {
+  if (!value || typeof value !== 'object') return false;
+  const month = value as Record<string, unknown>;
+  return (
+    typeof month.ID === 'string' &&
+    typeof month.DocumentTitle === 'string' &&
+    typeof month.InitialReleaseDate === 'string'
+  );
+}
+
+function formatDate(date: string | undefined): string {
   if (!date) return '';
-  return new Date(date).toLocaleDateString();
+  const parsed = new Date(date);
+  return Number.isNaN(parsed.getTime()) ? '' : parsed.toLocaleDateString();
 }
 
-async function fetchMonths(): Promise<UpdateMonth[]> {
-  const res = await fetch('/api/msrc');
-  if (!res.ok) throw new Error('Failed to fetch months');
-  const data = await res.json();
-  return (data.value || []).sort((a: UpdateMonth, b: UpdateMonth) => new Date(b.InitialReleaseDate).getTime() - new Date(a.InitialReleaseDate).getTime());
+async function fetchMonths(signal: AbortSignal): Promise<UpdateMonth[]> {
+  const response = await fetch('/api/msrc', { signal });
+  if (!response.ok) throw new Error('Failed to fetch security update months');
+  const data = (await response.json()) as { value?: unknown };
+  const months = Array.isArray(data.value) ? data.value.filter(isUpdateMonth) : [];
+  return months.toSorted(
+    (a: UpdateMonth, b: UpdateMonth) =>
+      new Date(b.InitialReleaseDate).getTime() - new Date(a.InitialReleaseDate).getTime()
+  );
 }
 
-async function fetchCVEsForMonth(monthId: string): Promise<any> {
-  const res = await fetch(`/api/msrc?monthId=${encodeURIComponent(monthId)}`);
-  if (!res.ok) throw new Error('Failed to fetch CVEs for month');
-  const data = await res.json();
-  return data;
+async function fetchCVEsForMonth(monthId: string, signal: AbortSignal): Promise<CvrfResponse> {
+  const response = await fetch(`/api/msrc?monthId=${encodeURIComponent(monthId)}`, { signal });
+  if (!response.ok) throw new Error('Failed to fetch security updates for the selected month');
+  return (await response.json()) as CvrfResponse;
 }
 
-export default function SecurityUpdatesPage() {
+function LoadingState() {
+  return (
+    <div
+      className="py-16 text-center text-gray-500 dark:text-gray-400"
+      role="status"
+      aria-live="polite"
+    >
+      Loading Microsoft security updates…
+    </div>
+  );
+}
+
+function SecurityUpdatesContent() {
+  const router = useRouter();
   const searchParams = useSearchParams();
-  const monthParam = searchParams.get('month');
+  const initialMonth = useRef(searchParams.get('month'));
   const [months, setMonths] = useState<UpdateMonth[]>([]);
   const [vulnerabilities, setVulnerabilities] = useState<Vulnerability[]>([]);
   const [error, setError] = useState<string | null>(null);
-  const [selectedMonth, setSelectedMonth] = useState<string | undefined>(monthParam || undefined);
-  const [releaseDate, setReleaseDate] = useState<string>('');
-  const [revisionHistory, setRevisionHistory] = useState<any[] | undefined>(undefined);
-  const [productTree, setProductTree] = useState<any>(undefined);
+  const [selectedMonth, setSelectedMonth] = useState<string>();
+  const [releaseDate, setReleaseDate] = useState('');
+  const [revisionHistory, setRevisionHistory] = useState<unknown[]>();
+  const [productTree, setProductTree] = useState<ProductTree>();
+  const [isLoadingMonths, setIsLoadingMonths] = useState(true);
+  const [isLoadingUpdates, setIsLoadingUpdates] = useState(false);
 
   useEffect(() => {
-    let isMounted = true;
-    async function load() {
-      try {
-        const monthsData = await fetchMonths();
-        if (!isMounted) return;
-        setMonths(monthsData);
-        let monthToFetch = selectedMonth || monthsData[0]?.ID;
-        setSelectedMonth(monthToFetch);
-        if (monthToFetch) {
-          const data = await fetchCVEsForMonth(monthToFetch);
-          if (!isMounted) return;
-          setVulnerabilities(data.Vulnerability || []);
-          setReleaseDate(data.ReleaseDate || '');
-          setRevisionHistory(data.RevisionHistory);
-          setProductTree(data.ProductTree);
+    const controller = new AbortController();
+    setError(null);
+
+    fetchMonths(controller.signal)
+      .then(monthData => {
+        setMonths(monthData);
+        const requestedMonth = initialMonth.current;
+        const nextMonth =
+          requestedMonth && monthData.some(month => month.ID === requestedMonth)
+            ? requestedMonth
+            : monthData[0]?.ID;
+        setSelectedMonth(nextMonth);
+        if (nextMonth && requestedMonth !== nextMonth) {
+          router.replace(`/msrc?month=${encodeURIComponent(nextMonth)}`, { scroll: false });
         }
-      } catch (e: any) {
-        if (!isMounted) return;
-        setError(e?.message || 'Failed to load security updates.');
-      }
-    }
-    load();
-    return () => { isMounted = false; };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+      })
+      .catch(fetchError => {
+        if (fetchError instanceof DOMException && fetchError.name === 'AbortError') return;
+        setError(
+          fetchError instanceof Error ? fetchError.message : 'Failed to load security updates.'
+        );
+      })
+      .finally(() => setIsLoadingMonths(false));
+
+    return () => controller.abort();
+  }, [router]);
+
+  useEffect(() => {
+    if (!selectedMonth) return;
+
+    const controller = new AbortController();
+    setIsLoadingUpdates(true);
+    setError(null);
+
+    fetchCVEsForMonth(selectedMonth, controller.signal)
+      .then(data => {
+        setVulnerabilities(Array.isArray(data.Vulnerability) ? data.Vulnerability : []);
+        setReleaseDate(data.ReleaseDate || '');
+        setRevisionHistory(data.RevisionHistory);
+        setProductTree(data.ProductTree);
+      })
+      .catch(fetchError => {
+        if (fetchError instanceof DOMException && fetchError.name === 'AbortError') return;
+        setError(
+          fetchError instanceof Error ? fetchError.message : 'Failed to load security updates.'
+        );
+      })
+      .finally(() => setIsLoadingUpdates(false));
+
+    return () => controller.abort();
   }, [selectedMonth]);
 
-  const handleMonthChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setSelectedMonth(e.target.value);
-  };
+  function handleMonthChange(event: React.ChangeEvent<HTMLSelectElement>) {
+    const month = event.target.value;
+    setSelectedMonth(month);
+    router.replace(`/msrc?month=${encodeURIComponent(month)}`, { scroll: false });
+  }
+
+  const visibleVulnerabilities = vulnerabilities.filter(
+    vulnerability => getFieldValue(vulnerability.Title).trim() !== ''
+  );
 
   return (
-    <main className="max-w-4xl mx-auto py-8 px-4">
-      <h1 className="text-2xl font-bold mb-6 text-gray-900 dark:text-white text-center">Microsoft Security Response Center Security Updates ({selectedMonth})</h1>
-      <form className="flex justify-center mb-8" action="/msrc" method="get">
-        <label htmlFor="month" className="sr-only">Select Month</label>
-        <select
-          id="month"
-          name="month"
-          value={selectedMonth}
-          onChange={handleMonthChange}
-          className="w-full max-w-xs px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500 shadow-sm"
+    <section className="mx-auto max-w-4xl px-4 py-8" aria-labelledby="security-updates-heading">
+      <h1
+        id="security-updates-heading"
+        className="mb-3 text-center text-2xl font-bold text-gray-900 dark:text-white"
+      >
+        Microsoft Security Response Center Security Updates
+        {selectedMonth ? ` (${selectedMonth})` : ''}
+      </h1>
+      <p className="mb-6 text-center text-sm text-gray-600 dark:text-gray-400">
+        Source:{' '}
+        <a
+          href="https://msrc.microsoft.com/update-guide/"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-primary-700 underline hover:no-underline focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 dark:text-primary-400"
         >
-          {months.map((m) => (
-            <option key={m.ID} value={m.ID}>{m.DocumentTitle}</option>
-          ))}
-        </select>
-      </form>
-      {releaseDate && (
-        <div className="mb-6 text-center text-xs text-gray-500 dark:text-gray-400">Release Date: {formatDate(releaseDate)}</div>
-      )}
+          Microsoft Security Update Guide
+        </a>
+      </p>
+
+      <label
+        htmlFor="month"
+        className="mb-2 block text-center text-sm font-medium text-gray-700 dark:text-gray-300"
+      >
+        Update month
+      </label>
+      <select
+        id="month"
+        name="month"
+        value={selectedMonth ?? ''}
+        onChange={handleMonthChange}
+        disabled={isLoadingMonths || months.length === 0}
+        className="mx-auto mb-6 block w-full max-w-xs rounded-lg border border-gray-300 bg-white px-4 py-2 text-gray-900 shadow-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 disabled:cursor-not-allowed disabled:opacity-60 dark:border-gray-700 dark:bg-gray-900 dark:text-white"
+      >
+        {months.map(month => (
+          <option key={month.ID} value={month.ID}>
+            {month.DocumentTitle}
+          </option>
+        ))}
+      </select>
+
+      {releaseDate ? (
+        <p className="mb-6 text-center text-xs text-gray-500 dark:text-gray-400">
+          Release date: {formatDate(releaseDate)}
+        </p>
+      ) : null}
+
       {error ? (
-        <div className="text-center text-red-600 dark:text-red-400 py-12 text-lg">
-          {error}<br />
-          Please try again later or visit the <a href="https://msrc.microsoft.com/update-guide/" target="_blank" rel="noopener noreferrer" className="underline text-primary-700 dark:text-primary-400">MSRC Update Guide</a> directly.
+        <div className="py-12 text-center text-lg text-red-600 dark:text-red-400" role="alert">
+          {error}. Try again later or use the Microsoft Security Update Guide link above.
         </div>
+      ) : isLoadingMonths || isLoadingUpdates ? (
+        <LoadingState />
+      ) : visibleVulnerabilities.length === 0 ? (
+        <p className="py-12 text-center text-gray-600 dark:text-gray-400" role="status">
+          No published vulnerabilities were returned for this month.
+        </p>
       ) : (
         <div className="space-y-8">
-          {vulnerabilities.length === 0 && !error
-            ? [1,2,3].map(i => (
-                <div key={i} className="w-full">
-                  <div className="bg-white/80 dark:bg-gray-800/50 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700/50 p-6 animate-pulse flex flex-col h-full">
-                    <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-3/4 mb-4 mx-auto" />
-                    <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/2 mb-2 mx-auto" />
-                    <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-2/3 mb-2 mx-auto" />
-                    <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-5/6 mb-2 mx-auto" />
-                    <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-1/2 mb-6 mx-auto" />
-                    <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-24 mx-auto mt-auto" />
-                  </div>
-                </div>
-              ))
-            : vulnerabilities
-                .filter(vuln => !!vuln.Title && getFieldValue(vuln.Title).trim() !== '')
-                .map((vuln, idx) => (
-                  <CVECard key={`${vuln.ID || (vuln.CVE && vuln.CVE[0]) || ''}-${idx}`} vuln={vuln} month={selectedMonth!} releaseDate={releaseDate} revisionHistory={revisionHistory} productTree={productTree} />
-                ))
-          }
+          {visibleVulnerabilities.map(vulnerability => (
+            <CVECard
+              key={`${vulnerability.ID}-${vulnerability.CVE?.[0] ?? ''}`}
+              vuln={vulnerability}
+              month={selectedMonth ?? ''}
+              releaseDate={releaseDate}
+              revisionHistory={revisionHistory}
+              productTree={productTree}
+            />
+          ))}
         </div>
       )}
-    </main>
+    </section>
   );
-} 
+}
+
+export default function SecurityUpdatesPage() {
+  return (
+    <Suspense fallback={<LoadingState />}>
+      <SecurityUpdatesContent />
+    </Suspense>
+  );
+}

@@ -1,12 +1,11 @@
 'use client';
 
-import { useState, useEffect, useRef, useMemo } from 'react';
+import { useDeferredValue, useEffect, useMemo, useRef, useState } from 'react';
 import { MessageCard } from '@/components/MessageCard';
 import { ProductFilter } from '@/components/ProductFilter';
 import { Message } from '@/lib/types';
-import { useRouter } from 'next/navigation';
 import { TagsFilter } from '@/components/TagsFilter';
-import { addDays, isAfter, isBefore, parseISO, startOfDay, endOfDay, subDays } from 'date-fns';
+import { endOfDay, isAfter, isWithinInterval, parseISO, startOfDay, subDays } from 'date-fns';
 import { useFilterContext } from './FilterContext';
 
 interface MessageListProps {
@@ -17,15 +16,14 @@ const ITEMS_PER_PAGE = 12;
 
 export function MessageList({ messages: messagesProp }: MessageListProps) {
   const messages = Array.isArray(messagesProp) ? messagesProp : [];
-  const router = useRouter();
   const [page, setPage] = useState(1);
   const observerRef = useRef<IntersectionObserver | null>(null);
   const loadMoreRef = useRef<HTMLDivElement>(null);
-  const isInitialMount = useRef(true);
-  const [isLoading, setIsLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const deferredSearchQuery = useDeferredValue(searchQuery.trim().toLowerCase());
+  const isSearchPending = searchQuery.trim().toLowerCase() !== deferredSearchQuery;
 
-  // Zustand filter state
+  // Shared filter state
   const {
     selectedTags,
     setSelectedTags,
@@ -38,24 +36,31 @@ export function MessageList({ messages: messagesProp }: MessageListProps) {
     customDateRange,
     setCustomDateRange,
     showMajorChangesOnly,
-    setShowMajorChangesOnly
+    setShowMajorChangesOnly,
   } = useFilterContext();
 
   // Filter and sort messages
   const filteredMessages = useMemo(() => {
-    const MAINTENANCE_PHRASE = 'We have scheduled your Power Platform environment for planned service maintenance.';
+    const MAINTENANCE_PHRASE =
+      'We have scheduled your Power Platform environment for planned service maintenance.';
     return messages
       .filter(message => message.id !== 'MC1085084')
-      .filter(message => message.title !== "Power Platform - Planned maintenance")
-      .filter(message => !message.content.includes(MAINTENANCE_PHRASE) && !message.title.includes(MAINTENANCE_PHRASE))
+      .filter(message => message.title !== 'Power Platform - Planned maintenance')
+      .filter(
+        message =>
+          !message.content.includes(MAINTENANCE_PHRASE) &&
+          !message.title.includes(MAINTENANCE_PHRASE)
+      )
       .filter(message => {
-        const matchesSearch = searchQuery === '' || 
-          message.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          message.content.toLowerCase().includes(searchQuery.toLowerCase());
-        const matchesServices = selectedServices.length === 0 || 
+        const matchesSearch =
+          deferredSearchQuery === '' ||
+          message.title.toLowerCase().includes(deferredSearchQuery) ||
+          message.content.toLowerCase().includes(deferredSearchQuery);
+        const matchesServices =
+          selectedServices.length === 0 ||
           message.service.some(service => selectedServices.includes(service));
-        const matchesTags = selectedTags.length === 0 || 
-          message.tags.some(tag => selectedTags.includes(tag));
+        const matchesTags =
+          selectedTags.length === 0 || message.tags.some(tag => selectedTags.includes(tag));
         // Major changes filter
         if (showMajorChangesOnly && !message.isMajorChange) {
           return false;
@@ -68,14 +73,23 @@ export function MessageList({ messages: messagesProp }: MessageListProps) {
           matchesDate = isAfter(parseISO(message.lastUpdated), subDays(new Date(), 7));
         } else if (selectedDateFilter === 'custom' && customDateRange.from && customDateRange.to) {
           const lastUpdated = parseISO(message.lastUpdated);
-          matchesDate =
-            isAfter(lastUpdated, startOfDay(parseISO(customDateRange.from))) &&
-            isBefore(lastUpdated, endOfDay(parseISO(customDateRange.to)));
+          matchesDate = isWithinInterval(lastUpdated, {
+            start: startOfDay(parseISO(customDateRange.from)),
+            end: endOfDay(parseISO(customDateRange.to)),
+          });
         }
         return matchesSearch && matchesServices && matchesTags && matchesDate;
       })
       .sort((a, b) => new Date(b.lastUpdated).getTime() - new Date(a.lastUpdated).getTime());
-  }, [messages, searchQuery, selectedServices, selectedTags, showMajorChangesOnly, selectedDateFilter, customDateRange]);
+  }, [
+    messages,
+    deferredSearchQuery,
+    selectedServices,
+    selectedTags,
+    showMajorChangesOnly,
+    selectedDateFilter,
+    customDateRange,
+  ]);
 
   // Derive services synchronously — no useEffect flash
   const services = useMemo(
@@ -83,58 +97,36 @@ export function MessageList({ messages: messagesProp }: MessageListProps) {
     [messages]
   );
 
-  // Handle loading state — skip skeleton on initial mount
-  useEffect(() => {
-    if (isInitialMount.current) {
-      isInitialMount.current = false;
-      return;
-    }
-    setIsLoading(true);
-    const timer = requestAnimationFrame(() => {
-      setIsLoading(false);
-    });
-    return () => cancelAnimationFrame(timer);
-  }, [searchQuery, selectedServices, selectedTags]);
-
   // Update available tags only if necessary
   useEffect(() => {
-    const uniqueTags = Array.from(new Set(messages.flatMap(m => m.tags))).sort((a, b) => a.localeCompare(b));
+    const uniqueTags = Array.from(new Set(messages.flatMap(m => m.tags))).sort((a, b) =>
+      a.localeCompare(b)
+    );
     // Only reset selectedTags if any selected tag is no longer available
     if (selectedTags.some(tag => !uniqueTags.includes(tag))) {
       setSelectedTags(selectedTags.filter(tag => uniqueTags.includes(tag)));
     }
     // Do NOT reset selectedTags on every messages change
-  }, [messages]);
+  }, [messages, selectedTags, setSelectedTags]);
 
-  // When any filter is active, show all matching messages so the filter is
-  // visibly applied. Otherwise fall back to infinite-scroll pagination.
-  // Without this, the top-N most-recent messages (page 1) often satisfy
-  // recent-days date filters too, so the count would change but the rendered
-  // cards would not — making the filter look broken.
-  const hasActiveFilter =
-    searchQuery !== '' ||
-    selectedServices.length > 0 ||
-    selectedTags.length > 0 ||
-    selectedDateFilter !== 'all' ||
-    showMajorChangesOnly;
-  const visibleMessages = hasActiveFilter
-    ? filteredMessages
-    : filteredMessages.slice(0, page * ITEMS_PER_PAGE);
+  const visibleMessages = filteredMessages.slice(0, page * ITEMS_PER_PAGE);
 
-  // Reset to first page when filters/search changes
-  const prevFilteredLengthRef = useRef(filteredMessages.length);
   useEffect(() => {
-    if (prevFilteredLengthRef.current !== filteredMessages.length) {
-      prevFilteredLengthRef.current = filteredMessages.length;
-      setPage(1);
-    }
-  }, [filteredMessages.length]);
+    setPage(1);
+  }, [
+    deferredSearchQuery,
+    selectedServices,
+    selectedTags,
+    selectedDateFilter,
+    customDateRange,
+    showMajorChangesOnly,
+  ]);
 
   // Setup intersection observer for infinite scroll
   useEffect(() => {
     observerRef.current = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting && page * ITEMS_PER_PAGE < filteredMessages.length) {
+      entries => {
+        if (entries[0]?.isIntersecting && page * ITEMS_PER_PAGE < filteredMessages.length) {
           setPage(prev => prev + 1);
         }
       },
@@ -152,50 +144,54 @@ export function MessageList({ messages: messagesProp }: MessageListProps) {
     };
   }, [page, filteredMessages.length]);
 
-  const handleMessageClick = (messageId: string) => {
-    router.push(`/message/${messageId}`);
-  };
-
-  if (!messages) return null;
-
   return (
     <div className="relative">
-      {isLoading && (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 gap-y-8 px-2 py-8">
-          {[1,2,3].map(i => (
-            <div key={i} className="w-full max-w-md mx-auto min-w-0">
-              <div className="bg-white/80 dark:bg-gray-800/50 rounded-xl shadow-md border border-gray-200 dark:border-gray-700 p-4 animate-pulse flex flex-col h-full">
-                <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-3/4 mb-4 mx-auto" />
-                <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/2 mb-2 mx-auto" />
-                <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-2/3 mb-2 mx-auto" />
-                <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-5/6 mb-2 mx-auto" />
-                <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-1/2 mb-6 mx-auto" />
-                <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-24 mx-auto mt-auto" />
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
-      <div className="relative md:sticky md:top-28 z-40 backdrop-blur-md pt-0 pb-0 border-b border-gray-200/50 dark:border-gray-700/50 mt-20">
+      <div className="mx-auto mb-6 mt-8 w-full max-w-2xl">
+        <label htmlFor="message-search" className="sr-only">
+          Search Message Center updates
+        </label>
+        <input
+          id="message-search"
+          name="message-search"
+          type="search"
+          autoComplete="off"
+          value={searchQuery}
+          onChange={event => setSearchQuery(event.target.value)}
+          placeholder="Search titles and message content…"
+          className="w-full rounded-xl border border-gray-200 bg-white/80 px-4 py-3 text-gray-900 shadow-sm transition-[border-color,box-shadow] placeholder:text-gray-500 focus:outline-none focus-visible:border-primary-500 focus-visible:ring-2 focus-visible:ring-primary-500 dark:border-gray-700 dark:bg-gray-800/80 dark:text-white dark:placeholder:text-gray-400"
+        />
+        <p
+          id="message-results-status"
+          className="mt-2 text-center text-sm text-gray-600 dark:text-gray-400"
+          aria-live="polite"
+        >
+          {isSearchPending
+            ? 'Updating results…'
+            : `${filteredMessages.length} result${filteredMessages.length === 1 ? '' : 's'}`}
+        </p>
+      </div>{' '}
+      <div className="relative md:sticky md:top-28 z-40 backdrop-blur-md pt-0 pb-0 border-b border-gray-200/50 dark:border-gray-700/50 mt-6">
         <div className="mb-2">
           <div className="flex flex-wrap items-center mb-2 gap-2">
             <h2 className="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center">
               Filters
               <span className="ml-2 text-xs text-gray-600 dark:text-gray-400 font-normal">
-                (Showing {filteredMessages.length} message{filteredMessages.length !== 1 ? 's' : ''}
-                {filteredMessages.length !== messages.length && `, filtered from ${messages.length} total`})
+                (Found {filteredMessages.length} message{filteredMessages.length !== 1 ? 's' : ''}
+                {filteredMessages.length !== messages.length &&
+                  `, filtered from ${messages.length} total`}
+                )
               </span>
             </h2>
           </div>
           <div className="flex flex-col md:flex-row flex-wrap gap-2 md:gap-4 w-full">
             <div className="w-full md:w-auto">
-            <ProductFilter
-              services={services}
-              selectedServices={selectedServices}
-              onFilterChange={setSelectedServices}
-              isOpen={openFilter === 'product'}
-              setOpen={open => setOpenFilter(open ? 'product' : null)}
-            />
+              <ProductFilter
+                services={services}
+                selectedServices={selectedServices}
+                onFilterChange={setSelectedServices}
+                isOpen={openFilter === 'product'}
+                setOpen={open => setOpenFilter(open ? 'product' : null)}
+              />
             </div>
             <div className="w-full md:w-auto">
               <TagsFilter messages={messages} />
@@ -206,12 +202,7 @@ export function MessageList({ messages: messagesProp }: MessageListProps) {
                 className="flex items-center justify-center gap-2 px-4 min-h-[32px] w-full md:w-auto text-gray-700 dark:text-gray-200 bg-white/80 dark:bg-gray-800/50 backdrop-blur-sm border border-gray-200 dark:border-gray-700/50 rounded-lg shadow-[inset_0_2px_4px_rgba(0,0,0,0.05)] dark:shadow-[inset_0_2px_4px_rgba(0,0,0,0.2)] hover:shadow-[0_0_0_1px_rgba(59,130,246,0.5)] dark:hover:shadow-[0_0_0_1px_rgba(59,130,246,0.5)] hover:border-primary-200 dark:hover:border-primary-800 transition-all duration-300 relative"
                 aria-label="Filter by date"
               >
-                <svg
-                  className="w-5 h-5"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
@@ -233,7 +224,9 @@ export function MessageList({ messages: messagesProp }: MessageListProps) {
                   onClick={e => e.stopPropagation()}
                 >
                   <div className="p-4 border-b border-gray-200 dark:border-gray-700">
-                    <h3 className="text-sm font-medium text-gray-900 dark:text-white">Filter by Date</h3>
+                    <h3 className="text-sm font-medium text-gray-900 dark:text-white">
+                      Filter by Date
+                    </h3>
                   </div>
                   <div className="p-4 flex flex-col gap-2">
                     <label className="flex items-center gap-2 cursor-pointer">
@@ -275,22 +268,36 @@ export function MessageList({ messages: messagesProp }: MessageListProps) {
                     {selectedDateFilter === 'custom' && (
                       <div className="flex flex-col gap-2 mt-2">
                         <div className="flex flex-col gap-1">
-                          <label htmlFor="date-from" className="text-sm text-gray-700 dark:text-gray-200">From</label>
+                          <label
+                            htmlFor="date-from"
+                            className="text-sm text-gray-700 dark:text-gray-200"
+                          >
+                            From
+                          </label>
                           <input
                             id="date-from"
                             type="date"
                             value={customDateRange.from}
-                            onChange={e => setCustomDateRange({ ...customDateRange, from: e.target.value })}
+                            onChange={e =>
+                              setCustomDateRange({ ...customDateRange, from: e.target.value })
+                            }
                             className="border rounded px-2 py-1 text-sm text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600"
                           />
                         </div>
                         <div className="flex flex-col gap-1">
-                          <label htmlFor="date-to" className="text-sm text-gray-700 dark:text-gray-200">To</label>
+                          <label
+                            htmlFor="date-to"
+                            className="text-sm text-gray-700 dark:text-gray-200"
+                          >
+                            To
+                          </label>
                           <input
                             id="date-to"
                             type="date"
                             value={customDateRange.to}
-                            onChange={e => setCustomDateRange({ ...customDateRange, to: e.target.value })}
+                            onChange={e =>
+                              setCustomDateRange({ ...customDateRange, to: e.target.value })
+                            }
                             className="border rounded px-2 py-1 text-sm text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600"
                           />
                         </div>
@@ -313,36 +320,52 @@ export function MessageList({ messages: messagesProp }: MessageListProps) {
               )}
             </div>
             <div className="w-full md:w-auto">
-            <button
-              onClick={() => {
-                setOpenFilter(null);
-                setShowMajorChangesOnly(!showMajorChangesOnly);
-              }}
+              <button
+                onClick={() => {
+                  setOpenFilter(null);
+                  setShowMajorChangesOnly(!showMajorChangesOnly);
+                }}
                 className={`flex items-center justify-center gap-2 px-4 min-h-[32px] w-full md:w-auto text-gray-700 dark:text-gray-200 bg-white/80 dark:bg-gray-800/50 backdrop-blur-sm border border-gray-200 dark:border-gray-700/50 rounded-lg shadow-[inset_0_2px_4px_rgba(0,0,0,0.05)] dark:shadow-[inset_0_2px_4px_rgba(0,0,0,0.2)] hover:shadow-[0_0_0_1px_rgba(59,130,246,0.5)] dark:hover:shadow-[0_0_0_1px_rgba(59,130,246,0.5)] hover:border-primary-200 dark:hover:border-primary-800 transition-all duration-300 relative ${showMajorChangesOnly ? 'bg-red-50 dark:bg-red-900/30 border-red-200 dark:border-red-800 text-red-700 dark:text-red-300 animate-pulse-slow' : ''}`}
-              aria-label="Filter major changes"
-            >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-              </svg>
-              <span className="text-sm font-medium">Major Changes</span>
-              <span className="absolute -top-1 -right-1 flex items-center justify-center w-5 h-5 text-xs font-medium text-white bg-primary-600 rounded-full opacity-0">
-                0
-              </span>
-            </button>
+                aria-label="Filter major changes"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+                  />
+                </svg>
+                <span className="text-sm font-medium">Major Changes</span>
+                <span className="absolute -top-1 -right-1 flex items-center justify-center w-5 h-5 text-xs font-medium text-white bg-primary-600 rounded-full opacity-0">
+                  0
+                </span>
+              </button>
             </div>
           </div>
         </div>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pt-4">
-        {visibleMessages.map((message) => (
-          <MessageCard 
-            key={message.id} 
-            message={message} 
-            onClick={handleMessageClick}
-          />
+        {visibleMessages.map(message => (
+          <MessageCard key={message.id} message={message} />
         ))}
       </div>
-      <div ref={loadMoreRef} className="h-10" />
+      {filteredMessages.length === 0 ? (
+        <p className="py-12 text-center text-gray-600 dark:text-gray-400" role="status">
+          No Message Center updates match these filters.
+        </p>
+      ) : null}
+      {visibleMessages.length < filteredMessages.length ? (
+        <div ref={loadMoreRef} className="flex min-h-20 items-center justify-center py-4">
+          <button
+            type="button"
+            onClick={() => setPage(currentPage => currentPage + 1)}
+            className="rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:border-primary-400 hover:text-primary-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-200"
+          >
+            Load more
+          </button>
+        </div>
+      ) : null}
     </div>
   );
-} 
+}

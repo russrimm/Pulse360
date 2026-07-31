@@ -40,7 +40,7 @@ export default function AzureAIMLNewsPage() {
     >
       {loading ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 gap-y-8 px-2">
-          {[1,2,3].map(i => (
+          {[1, 2, 3].map(i => (
             <div key={i} className="w-full max-w-md mx-auto min-w-0">
               <div className="bg-white/80 dark:bg-gray-800/50 rounded-xl shadow-md border border-gray-200 dark:border-gray-700 p-4 animate-pulse flex flex-col h-full">
                 <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-3/4 mb-4 mx-auto" />
@@ -56,7 +56,7 @@ export default function AzureAIMLNewsPage() {
       ) : error ? (
         <div className="text-center py-12">
           <p className="text-red-600 dark:text-red-400">{error}</p>
-          <button 
+          <button
             onClick={() => window.location.reload()}
             className="mt-4 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
           >
@@ -65,10 +65,10 @@ export default function AzureAIMLNewsPage() {
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 gap-y-8 px-2">
-          {news.map((item, index) => (
-            <ProductNewsCard 
-              key={`azure-ai-ml-item-${index}`} 
-              news={item} 
+          {news.map(item => (
+            <ProductNewsCard
+              key={item.id}
+              news={item}
               productIcon="/icons/azure/ai + machine learning/00028-icon-service-Batch-AI.svg"
             />
           ))}
@@ -76,4 +76,4 @@ export default function AzureAIMLNewsPage() {
       )}
     </ProductNewsLayout>
   );
-} 
+}

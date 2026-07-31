@@ -18,12 +18,12 @@ export default function MessageCenterClient() {
         }
         return res.json();
       })
-      .then((msgs) => {
+      .then(msgs => {
         setMessages(Array.isArray(msgs) ? msgs : []);
         setError(null);
         setLoading(false);
       })
-      .catch((err) => {
+      .catch(err => {
         console.error('Failed to load messages:', err);
         setMessages([]);
         setError(err instanceof Error ? err.message : 'Failed to load messages');
@@ -32,7 +32,11 @@ export default function MessageCenterClient() {
   }, []);
 
   if (loading) {
-    return <div className="py-16 text-center text-gray-500">Loading messages...</div>;
+    return (
+      <div className="py-16 text-center text-gray-500" role="status" aria-live="polite">
+        Loading messages?
+      </div>
+    );
   }
 
   return (
@@ -47,7 +51,10 @@ export default function MessageCenterClient() {
           </p>
         </div>
         {error && (
-          <div className="mb-6 rounded-lg border border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-900/20 p-4">
+          <div
+            className="mb-6 rounded-lg border border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-900/20 p-4"
+            role="alert"
+          >
             <p className="text-sm font-semibold text-red-700 dark:text-red-300 mb-1">
               Unable to load messages
             </p>

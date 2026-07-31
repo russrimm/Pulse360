@@ -1,6 +1,6 @@
 # Pulse 360°
 
-> *Stay ahead. Stay informed. Stay in control.*
+> _Stay ahead. Stay informed. Stay in control._
 
 **Pulse 360°** is a product-agnostic news and update portal that unifies Microsoft's official update streams — Microsoft 365, Azure, Fabric, Power Platform, Dynamics 365, Copilot, and the Microsoft Security Response Center (MSRC) — into a single fast, filterable, dark-mode-first dashboard.
 
@@ -61,90 +61,90 @@ Below are screenshots of every major page in both **dark** and **light** mode.
 
 ### Home
 
-| Dark | Light |
-|------|-------|
+| Dark                                           | Light                                            |
+| ---------------------------------------------- | ------------------------------------------------ |
 | ![Home – Dark](docs/screenshots/home-dark.png) | ![Home – Light](docs/screenshots/home-light.png) |
 
 ### Message Center
 
-| Dark | Light |
-|------|-------|
+| Dark                                                               | Light                                                                |
+| ------------------------------------------------------------------ | -------------------------------------------------------------------- |
 | ![Message Center – Dark](docs/screenshots/message-center-dark.png) | ![Message Center – Light](docs/screenshots/message-center-light.png) |
 
 ### MSRC Security Updates
 
-| Dark | Light |
-|------|-------|
+| Dark                                           | Light                                            |
+| ---------------------------------------------- | ------------------------------------------------ |
 | ![MSRC – Dark](docs/screenshots/msrc-dark.png) | ![MSRC – Light](docs/screenshots/msrc-light.png) |
 
 ### Release Plans
 
-| Dark | Light |
-|------|-------|
+| Dark                                                             | Light                                                              |
+| ---------------------------------------------------------------- | ------------------------------------------------------------------ |
 | ![Release Plans – Dark](docs/screenshots/release-plans-dark.png) | ![Release Plans – Light](docs/screenshots/release-plans-light.png) |
 
 ### Fabric Roadmap
 
-| Dark | Light |
-|------|-------|
+| Dark                                                               | Light                                                                |
+| ------------------------------------------------------------------ | -------------------------------------------------------------------- |
 | ![Fabric Roadmap – Dark](docs/screenshots/fabric-roadmap-dark.png) | ![Fabric Roadmap – Light](docs/screenshots/fabric-roadmap-light.png) |
 
 ### Product News
 
-| Dark | Light |
-|------|-------|
+| Dark                                                           | Light                                                            |
+| -------------------------------------------------------------- | ---------------------------------------------------------------- |
 | ![Product News – Dark](docs/screenshots/product-news-dark.png) | ![Product News – Light](docs/screenshots/product-news-light.png) |
 
 ### M365 Updates
 
-| Dark | Light |
-|------|-------|
+| Dark                                                           | Light                                                            |
+| -------------------------------------------------------------- | ---------------------------------------------------------------- |
 | ![M365 Updates – Dark](docs/screenshots/m365-updates-dark.png) | ![M365 Updates – Light](docs/screenshots/m365-updates-light.png) |
 
 ### Azure Updates
 
-| Dark | Light |
-|------|-------|
+| Dark                                                             | Light                                                              |
+| ---------------------------------------------------------------- | ------------------------------------------------------------------ |
 | ![Azure Updates – Dark](docs/screenshots/azure-updates-dark.png) | ![Azure Updates – Light](docs/screenshots/azure-updates-light.png) |
 
 ### Microsoft Product Lifecycle
 
-| Dark | Light |
-|------|-------|
+| Dark                                                           | Light                                                            |
+| -------------------------------------------------------------- | ---------------------------------------------------------------- |
 | ![MS Lifecycle – Dark](docs/screenshots/ms-lifecycle-dark.png) | ![MS Lifecycle – Light](docs/screenshots/ms-lifecycle-light.png) |
 
 ### Security
 
-| Dark | Light |
-|------|-------|
+| Dark                                                   | Light                                                    |
+| ------------------------------------------------------ | -------------------------------------------------------- |
 | ![Security – Dark](docs/screenshots/security-dark.png) | ![Security – Light](docs/screenshots/security-light.png) |
 
 ### About
 
-| Dark | Light |
-|------|-------|
+| Dark                                             | Light                                              |
+| ------------------------------------------------ | -------------------------------------------------- |
 | ![About – Dark](docs/screenshots/about-dark.png) | ![About – Light](docs/screenshots/about-light.png) |
 
 ---
 
 ## Tech stack
 
-| Layer | Choice |
-|---|---|
-| Framework | **Next.js 16** (App Router, Server Components, Turbopack) |
-| Language | **TypeScript 5.9** |
-| UI runtime | **React 19** |
-| Styling | **Tailwind CSS 4** + `@tailwindcss/typography` |
-| Components | **Radix UI** primitives (Accordion, Popover, Icons) + Headless UI + Heroicons |
-| State / data | **React Query 5** for client cache, **Zustand 5** for filter state, React Server Components for fetches |
-| Database (optional) | **Prisma 7** → **PostgreSQL** (generated client lives in `src/generated/prisma`) |
-| Auth (optional) | **NextAuth 4** + **@azure/msal-browser 4** (scaffolded; see [Configuration](#configuration)) |
-| Microsoft Graph | App-only client credentials flow (no user sign-in required for Message Center) |
-| Feed parsing | `fast-xml-parser`, `xml2js`, `rss-parser` |
-| Sanitization | `isomorphic-dompurify` (server-rendered HTML from feeds) |
-| Telemetry | Optional analytics and performance monitoring integrations |
-| Tests | **Playwright 1.57** (Chromium, Firefox, WebKit) |
-| Hosting target | Azure Static Web Apps (Node 20.19+ or 22.12+ with Next.js 16) |
+| Layer               | Choice                                                                                                  |
+| ------------------- | ------------------------------------------------------------------------------------------------------- |
+| Framework           | **Next.js 16** (App Router, Server Components, Turbopack)                                               |
+| Language            | **TypeScript 5.9**                                                                                      |
+| UI runtime          | **React 19**                                                                                            |
+| Styling             | **Tailwind CSS 4** + `@tailwindcss/typography`                                                          |
+| Components          | **Radix UI** primitives (Accordion, Popover, Icons) + Headless UI + Heroicons                           |
+| State / data        | **React Query 5** for client cache, **Zustand 5** for filter state, React Server Components for fetches |
+| Database (optional) | **Prisma 7** → **PostgreSQL** (generated client lives in `src/generated/prisma`)                        |
+| Auth (optional)     | **NextAuth 4** + **@azure/msal-browser 4** (scaffolded; see [Configuration](#configuration))            |
+| Microsoft Graph     | App-only client credentials flow (no user sign-in required for Message Center)                          |
+| Feed parsing        | `fast-xml-parser`, `xml2js`, `rss-parser`                                                               |
+| Sanitization        | `isomorphic-dompurify` (server-rendered HTML from feeds)                                                |
+| Telemetry           | Optional analytics and performance monitoring integrations                                              |
+| Tests               | **Playwright 1.57** (Chromium, Firefox, WebKit)                                                         |
+| Hosting target      | Azure Static Web Apps (Node 20.19+ or 22.12+ with Next.js 16)                                           |
 
 **Engines:** Node `^20.19.0 || ^22.12.0`, pnpm `>=9.0.0`.
 
@@ -191,15 +191,15 @@ Key design choices:
 
 ## Data sources
 
-| Source | Used for | Auth | Cache |
-|---|---|---|---|
-| `graph.microsoft.com/v1.0/admin/serviceAnnouncement/messages` | M365 Message Center | App-only OAuth (client credentials) | 24 h |
-| `api.msrc.microsoft.com/cvrf/v3.0/updates` and `/cvrf/v3.0/cvrf/{monthId}` | MSRC CVE data | Public | per-request |
-| `releaseplanner.azure-api.net/fabric/fabric-json/?productId=...` | Fabric roadmap | Public | no-store |
-| `devblogs.microsoft.com/foundry/feed/` | Azure AI Foundry news | Public RSS | 1 h |
-| `devblogs.microsoft.com/*`, `blogs.windows.com`, `blogs.microsoft.com`, `techcommunity.microsoft.com`, `azure.microsoft.com`, `cloudblogs.microsoft.com`, `powerplatform.microsoft.com`, `www.microsoft.com`, `microsoft.com` | Product News feeds | Public RSS via `/api/proxy-rss` allowlist | 10 min edge / 1 h app |
-| `learn.microsoft.com` (HTML table scrape) | Copilot Studio release plan | Public | 1 h |
-| `learn.microsoft.com/en-us/lifecycle/products/export/` | Microsoft product lifecycle dates | Public | daily |
+| Source                                                                                                                                                                                                                        | Used for                          | Auth                                      | Cache                 |
+| ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------- | ----------------------------------------- | --------------------- |
+| `graph.microsoft.com/v1.0/admin/serviceAnnouncement/messages`                                                                                                                                                                 | M365 Message Center               | App-only OAuth (client credentials)       | 24 h                  |
+| `api.msrc.microsoft.com/cvrf/v3.0/updates` and `/cvrf/v3.0/cvrf/{monthId}`                                                                                                                                                    | MSRC CVE data                     | Public                                    | per-request           |
+| `releaseplanner.azure-api.net/fabric/fabric-json/?productId=...`                                                                                                                                                              | Fabric roadmap                    | Public                                    | no-store              |
+| `devblogs.microsoft.com/foundry/feed/`                                                                                                                                                                                        | Azure AI Foundry news             | Public RSS                                | 1 h                   |
+| `devblogs.microsoft.com/*`, `blogs.windows.com`, `blogs.microsoft.com`, `techcommunity.microsoft.com`, `azure.microsoft.com`, `cloudblogs.microsoft.com`, `powerplatform.microsoft.com`, `www.microsoft.com`, `microsoft.com` | Product News feeds                | Public RSS via `/api/proxy-rss` allowlist | 10 min edge / 1 h app |
+| `learn.microsoft.com` (HTML table scrape)                                                                                                                                                                                     | Copilot Studio release plan       | Public                                    | 1 h                   |
+| `learn.microsoft.com/en-us/lifecycle/products/export/`                                                                                                                                                                        | Microsoft product lifecycle dates | Public                                    | daily                 |
 
 If an upstream is down, list endpoints return `200` with an empty array so the UI degrades gracefully — never a 5xx visible to the user.
 
@@ -270,7 +270,7 @@ pnpm dev
 
 Open <http://localhost:3000>. The root path redirects to `/home`.
 
-> **No env vars?** The app still boots in production mode and the Message Center endpoint returns an empty array. RSS-driven pages (Product News, AI Foundry News, etc.) work without any credentials. In development mode, missing Graph credentials throw at startup — set them or comment out the Message Center calls.
+> **No env vars?** RSS-driven pages still work. Message Center requires Postgres and Graph configuration; in production it also fails closed until tenant sign-in is configured or anonymous publication is explicitly enabled with `MESSAGE_CENTER_PUBLIC=true`.
 
 ## Reusable dotfiles
 
@@ -423,12 +423,12 @@ pnpm dotfiles:bootstrap -- --all-repos --scan-root .. --force
 
 Pulse 360° reads its configuration from a `.env.local` file at the repo root (Next.js convention — automatically gitignored).
 
-| Variable | Required? | Purpose |
-|---|---|---|
-| `AZURE_CLIENT_ID` | Yes, for Message Center | Application (client) ID of the Entra app registration |
-| `AZURE_TENANT_ID` | Yes, for Message Center | Directory (tenant) ID |
-| `AZURE_CLIENT_SECRET` | Yes, for Message Center | Client secret value (treat as a password — rotate regularly) |
-| `AZURE_API_URL` | No | Overrides the Graph base URL. Defaults to `https://graph.microsoft.com/v1.0`. Useful only for Graph national clouds (e.g. Gov, China). |
+| Variable              | Required?               | Purpose                                                                                                                                |
+| --------------------- | ----------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
+| `AZURE_CLIENT_ID`     | Yes, for Message Center | Application (client) ID of the Entra app registration                                                                                  |
+| `AZURE_TENANT_ID`     | Yes, for Message Center | Directory (tenant) ID                                                                                                                  |
+| `AZURE_CLIENT_SECRET` | Yes, for Message Center | Client secret value (treat as a password — rotate regularly)                                                                           |
+| `AZURE_API_URL`       | No                      | Overrides the Graph base URL. Defaults to `https://graph.microsoft.com/v1.0`. Useful only for Graph national clouds (e.g. Gov, China). |
 
 Create `.env.local` (use placeholders — never commit real secrets):
 
@@ -443,15 +443,16 @@ AZURE_CLIENT_SECRET=replace_with_real_secret_value
 
 ### Required environment variables (Message Center cache)
 
-| Variable | Purpose |
-|---|---|
+| Variable       | Purpose                                                                                                                                                                                                     |
+| -------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `DATABASE_URL` | Postgres connection string used by Prisma to cache Microsoft Graph **Message Center** updates. Required for the `/message-center` route. See [Database (Prisma) — Neon quickstart](#database-prisma) below. |
 
 ### Optional environment variables
 
-| Variable | Purpose |
-|---|---|
-| `NEXTAUTH_URL`, `NEXTAUTH_SECRET` | Required only if you wire up the `[...nextauth]` route for user sign-in. |
+| Variable                                                                                                               | Purpose                                                                                                                                                                                   |
+| ---------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `NEXTAUTH_URL`, `NEXTAUTH_SECRET`, `AUTH_AZURE_AD_CLIENT_ID`, `AUTH_AZURE_AD_CLIENT_SECRET`, `AUTH_AZURE_AD_TENANT_ID` | Recommended for production. Enables single-tenant sign-in and protects Message Center list/detail routes. Use an interactive app registration separate from the Graph daemon credentials. |
+| `MESSAGE_CENTER_PUBLIC`                                                                                                | Optional. Set to `true` only when tenant-specific Message Center communications are intentionally public; production otherwise fails closed when sign-in is unconfigured.                 |
 
 ### Creating the Microsoft Entra app registration
 
@@ -464,6 +465,10 @@ The Message Center calls Microsoft Graph with the **application** permission `Se
 5. **Certificates & secrets → New client secret.** Copy the **Value** (you cannot see it again) → `AZURE_CLIENT_SECRET`.
 6. **API permissions → Add a permission → Microsoft Graph → Application permissions → `ServiceMessage.Read.All` → Add.**
 7. **Grant admin consent** for the directory. Without this, the token request will succeed but Graph will return `403`.
+
+For production, create a second, single-tenant Entra app registration for interactive sign-in. Add the web redirect URI `${NEXTAUTH_URL}/api/auth/callback/azure-ad`, then set `AUTH_AZURE_AD_CLIENT_ID`, `AUTH_AZURE_AD_CLIENT_SECRET`, `AUTH_AZURE_AD_TENANT_ID`, `NEXTAUTH_URL`, and `NEXTAUTH_SECRET`. Do not reuse the app-only Graph secret.
+
+Message Center contains tenant-specific administrator communications. Production routes fail closed if neither interactive sign-in nor the explicit `MESSAGE_CENTER_PUBLIC=true` override is configured.
 
 You should now be able to start the app and load `/message-center` with live tenant messages.
 
@@ -503,16 +508,16 @@ Pulse 360 uses Postgres via Prisma to **cache Microsoft Graph Message Center upd
 
 ## Running the app
 
-| Command | What it does |
-|---|---|
-| `pnpm dev` | Start Next.js with Turbopack on port 3000 |
-| `pnpm build` | Production build (runs `next build`) |
-| `pnpm start` | Serve the production build |
-| `pnpm clean` | Delete `.next/` |
-| `pnpm lint` | ESLint over the whole repo |
-| `pnpm lint:fix` | ESLint with autofix |
-| `pnpm type-check` | `tsc --noEmit` (no emit, types only) |
-| `pnpm format` | Prettier over the whole repo |
+| Command               | What it does                                          |
+| --------------------- | ----------------------------------------------------- |
+| `pnpm dev`            | Start Next.js with Turbopack on port 3000             |
+| `pnpm build`          | Production build (runs `next build`)                  |
+| `pnpm start`          | Serve the production build                            |
+| `pnpm clean`          | Delete `.next/`                                       |
+| `pnpm lint`           | ESLint over the whole repo                            |
+| `pnpm lint:fix`       | ESLint with autofix                                   |
+| `pnpm type-check`     | `tsc --noEmit` (no emit, types only)                  |
+| `pnpm format`         | Prettier over the whole repo                          |
 | `npx playwright test` | Run Playwright tests across Chromium, Firefox, WebKit |
 
 ---
@@ -521,71 +526,71 @@ Pulse 360 uses Postgres via Prisma to **cache Microsoft Graph Message Center upd
 
 ### Pages
 
-| Path | Purpose |
-|---|---|
-| `/` | Redirects to `/home` |
-| `/home` | Landing dashboard |
-| `/about` | About / contact |
-| `/message-center` | M365 Message Center list (search, filter, badges, impact pills) |
-| `/message/[id]` | Message detail |
-| `/m365-updates` | M365 update feed |
-| `/m365-update/[id]` | M365 update detail |
-| `/azure-updates` | Azure update feed |
-| `/azure-update/[id]` | Azure update detail |
-| `/fabric-roadmap` | Fabric + Power Platform roadmap (grouped, collapsible) |
-| `/fabric-roadmap/[id]` | Roadmap item detail |
-| `/release-plans` | Hub page |
-| `/release-plans/azure` | Azure release planner |
-| `/release-plans/m365` | M365 release planner |
-| `/release-plans/fabric` | Fabric release planner |
-| `/release-plans/dynamics-power` | Dynamics 365 + Power Platform release planner |
-| `/release-plans/roadmap` | Combined roadmap view |
-| `/release-plan/[id]` | Release plan item detail |
-| `/msrc` | MSRC CVE list with month picker |
-| `/msrc/blog` | MSRC blog feed |
-| `/security` | Security overview |
-| `/product-news` | Aggregated product news hub |
-| `/product-news/all-things-azure` | All Things Azure |
-| `/product-news/author` | Microsoft news authors index |
-| `/product-news/azure-ai-foundry` | Azure AI Foundry blog |
-| `/product-news/azure-ai-ml` | Azure AI / ML blog |
-| `/product-news/copilot` | Copilot news |
-| `/product-news/copilot-studio` | Copilot Studio release plan |
-| `/product-news/fabric-blog` | Microsoft Fabric blog |
-| `/product-news/learn-blog` | Microsoft Learn blog |
-| `/product-news/microsoft-news` | Microsoft news |
-| `/product-news/power-automate` | Power Automate blog |
-| `/product-news/power-bi` | Power BI blog |
-| `/product-news/power-platform` | Power Platform blog |
-| `/product-news/semantic-kernel` | Semantic Kernel blog |
-| `/product-news/tech-community` | Tech Community |
-| `/product-news/vscode` | VS Code blog |
-| `/product-news/windows` | Windows blog |
-| `/powerplatd365` | Power Platform / D365 landing |
-| `/ms-lifecycle` | Microsoft product lifecycle — end-of-support and retirement dates |
-| `/map`, `/test-map` | Experimental map-based visualizations |
+| Path                             | Purpose                                                           |
+| -------------------------------- | ----------------------------------------------------------------- |
+| `/`                              | Redirects to `/home`                                              |
+| `/home`                          | Landing dashboard                                                 |
+| `/about`                         | About / contact                                                   |
+| `/message-center`                | M365 Message Center list (search, filter, badges, impact pills)   |
+| `/message/[id]`                  | Message detail                                                    |
+| `/m365-updates`                  | M365 update feed                                                  |
+| `/m365-update/[id]`              | M365 update detail                                                |
+| `/azure-updates`                 | Azure update feed                                                 |
+| `/azure-update/[id]`             | Azure update detail                                               |
+| `/fabric-roadmap`                | Fabric + Power Platform roadmap (grouped, collapsible)            |
+| `/fabric-roadmap/[id]`           | Roadmap item detail                                               |
+| `/release-plans`                 | Hub page                                                          |
+| `/release-plans/azure`           | Azure release planner                                             |
+| `/release-plans/m365`            | M365 release planner                                              |
+| `/release-plans/fabric`          | Fabric release planner                                            |
+| `/release-plans/dynamics-power`  | Dynamics 365 + Power Platform release planner                     |
+| `/release-plans/roadmap`         | Combined roadmap view                                             |
+| `/release-plan/[id]`             | Release plan item detail                                          |
+| `/msrc`                          | MSRC CVE list with month picker                                   |
+| `/msrc/blog`                     | MSRC blog feed                                                    |
+| `/security`                      | Security overview                                                 |
+| `/product-news`                  | Aggregated product news hub                                       |
+| `/product-news/all-things-azure` | All Things Azure                                                  |
+| `/product-news/author`           | Microsoft news authors index                                      |
+| `/product-news/azure-ai-foundry` | Azure AI Foundry blog                                             |
+| `/product-news/azure-ai-ml`      | Azure AI / ML blog                                                |
+| `/product-news/copilot`          | Copilot news                                                      |
+| `/product-news/copilot-studio`   | Copilot Studio release plan                                       |
+| `/product-news/fabric-blog`      | Microsoft Fabric blog                                             |
+| `/product-news/learn-blog`       | Microsoft Learn blog                                              |
+| `/product-news/microsoft-news`   | Microsoft news                                                    |
+| `/product-news/power-automate`   | Power Automate blog                                               |
+| `/product-news/power-bi`         | Power BI blog                                                     |
+| `/product-news/power-platform`   | Power Platform blog                                               |
+| `/product-news/semantic-kernel`  | Semantic Kernel blog                                              |
+| `/product-news/tech-community`   | Tech Community                                                    |
+| `/product-news/vscode`           | VS Code blog                                                      |
+| `/product-news/windows`          | Windows blog                                                      |
+| `/powerplatd365`                 | Power Platform / D365 landing                                     |
+| `/ms-lifecycle`                  | Microsoft product lifecycle — end-of-support and retirement dates |
+| `/map`, `/test-map`              | Experimental map-based visualizations                             |
 
 ### API routes
 
 All under `/api/*`. None are mutating; every handler is `GET`.
 
-| Route | Upstream / behavior |
-|---|---|
-| `/api/messages` | Wraps `getMessages()` → Microsoft Graph; returns 500 on upstream failure |
-| `/api/msrc?monthId=YYYY-Mmm` | Proxies MSRC CVRF months list or a specific month; validates `monthId` strictly |
-| `/api/proxy-rss?url=https://...` | Allowlisted RSS proxy (microsoft.com hosts only); rejects non-https, unknown hosts, and follows manual redirects |
-| `/api/azure-ai-foundry-news` | DevBlogs RSS for Azure AI Foundry |
-| `/api/azure-ai-ml-news` | DevBlogs / AI feed |
-| `/api/copilot-news` | Copilot feed |
-| `/api/copilot-studio-news` | Scrapes the Learn.microsoft.com release plan table |
-| `/api/fabric-blog-news` | Fabric blog RSS |
-| `/api/learn-blog-news` | Learn blog RSS |
-| `/api/microsoft-news` | Aggregated Microsoft news feed |
-| `/api/microsoft-news-authors` | Author index |
-| `/api/power-apps-news`, `/api/power-automate-news`, `/api/power-bi-news`, `/api/power-platform-news` | Per-product blog RSS |
-| `/api/semantic-kernel-news` | Semantic Kernel feed |
-| `/api/tech-community-news` | Tech Community feed |
-| `/api/auth/[...nextauth]` | NextAuth catch-all (scaffolded; add `route.ts` if you wire up user sign-in) |
+| Route                                                                                                | Upstream / behavior                                                                                              |
+| ---------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| `/api/messages`                                                                                      | Wraps `getMessages()` → Microsoft Graph; returns 500 on upstream failure                                         |
+| `/api/msrc?monthId=YYYY-Mmm`                                                                         | Proxies MSRC CVRF months list or a specific month; validates `monthId` strictly                                  |
+| `/api/proxy-rss?url=https://...`                                                                     | Allowlisted RSS proxy (microsoft.com hosts only); rejects non-https, unknown hosts, and follows manual redirects |
+| `/api/azure-ai-foundry-news`                                                                         | DevBlogs RSS for Azure AI Foundry                                                                                |
+| `/api/azure-ai-ml-news`                                                                              | DevBlogs / AI feed                                                                                               |
+| `/api/copilot-news`                                                                                  | Copilot feed                                                                                                     |
+| `/api/copilot-studio-news`                                                                           | Scrapes the Learn.microsoft.com release plan table                                                               |
+| `/api/fabric-blog-news`                                                                              | Fabric blog RSS                                                                                                  |
+| `/api/learn-blog-news`                                                                               | Learn blog RSS                                                                                                   |
+| `/api/microsoft-news`                                                                                | Aggregated Microsoft news feed                                                                                   |
+| `/api/microsoft-news-authors`                                                                        | Author index                                                                                                     |
+| `/api/power-apps-news`, `/api/power-automate-news`, `/api/power-bi-news`, `/api/power-platform-news` | Per-product blog RSS                                                                                             |
+| `/api/semantic-kernel-news`                                                                          | Semantic Kernel feed                                                                                             |
+| `/api/tech-community-news`                                                                           | Tech Community feed                                                                                              |
+| `/api/auth/[...nextauth]`                                                                            | NextAuth catch-all (scaffolded; add `route.ts` if you wire up user sign-in)                                      |
 
 ---
 
@@ -639,6 +644,7 @@ Pulse 360° is hosted on **Azure Static Web Apps** and can also run on other Azu
 3. Add environment variables in the Azure portal:
    - `AZURE_CLIENT_ID`, `AZURE_TENANT_ID`, `AZURE_CLIENT_SECRET` (or `AZURE_API_URL` pointing at your APIM endpoint in APIM mode)
    - `DATABASE_URL` — required for `/message-center` (see [Database (Prisma)](#database-prisma))
+   - Interactive Entra and NextAuth variables listed above (recommended); otherwise Message Center remains unavailable unless explicitly made public
 4. Add the deployment token to the repository as `AZURE_STATIC_WEB_APPS_API_TOKEN_PURPLE_RIVER_045B0790F`, then run the included Azure Static Web Apps workflow. The `build` script generates the Prisma client, applies configured migrations, and builds the app.
 
 **Self-host:**
@@ -712,7 +718,7 @@ Issues and PRs welcome. Before opening a PR:
 
 1. Run `pnpm lint && pnpm type-check`.
 2. If you add or change a route, update **Routes reference** above.
-3. If you add a new upstream host (RSS or image), add it to the allowlist in `/api/proxy-rss` *and* `next.config.js` `images.remotePatterns` as appropriate.
+3. If you add a new upstream host (RSS or image), add it to the allowlist in `/api/proxy-rss` _and_ `next.config.js` `images.remotePatterns` as appropriate.
 4. Keep components server-rendered by default; only opt into `'use client'` when you need state, effects, or browser APIs.
 5. Do not commit real env values, generated Prisma clients, `.next/`, or `playwright-report/` — they're already gitignored.
 
