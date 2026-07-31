@@ -6,7 +6,6 @@ import { ThemeToggle } from '@/components/ThemeToggle'
 import { ThemeProvider } from 'next-themes'
 import Navbar from '@/components/Navbar'
 import { NavigationTabs } from '@/components/NavigationTabs'
-import { ErrorBoundary } from '@/components/ErrorBoundary'
 import { ReactQueryProvider } from '@/components/ReactQueryProvider'
 import { FilterProvider } from '@/components/FilterContext'
 
@@ -23,9 +22,23 @@ const inter = Inter({
 })
 
 export const metadata: Metadata = {
-  title: 'Pulse 360°',
+  title: {
+    default: 'Pulse 360°',
+    template: '%s',
+  },
   description: 'Stay informed about Microsoft 365 service updates and changes',
-  metadataBase: new URL('https://www.russrimmerman.com'),
+  metadataBase: new URL('https://www.mspulse360.app'),
+  openGraph: {
+    type: 'website',
+    siteName: 'Pulse 360',
+    title: 'Pulse 360°',
+    description: 'Stay informed about Microsoft 365 service updates and changes',
+  },
+  twitter: {
+    card: 'summary',
+    title: 'Pulse 360°',
+    description: 'Stay informed about Microsoft 365 service updates and changes',
+  },
   icons: {
     icon: '/siteicon.png',
     shortcut: '/siteicon.png',
@@ -55,19 +68,17 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <ReactQueryProvider>
-            <ErrorBoundary>
-              <FilterProvider>
-                <div className="min-h-screen flex flex-col">
-                  <Navbar />
-                  <NavigationTabs />
-                  <main className="flex-1 flex flex-col min-h-0">
-                    {children}
-                  </main>
-                  <Analytics />
-                  <SafeSpeedInsights />
-                </div>
-              </FilterProvider>
-            </ErrorBoundary>
+            <FilterProvider>
+              <div className="min-h-screen flex flex-col">
+                <Navbar />
+                <NavigationTabs />
+                <main className="flex-1 flex flex-col min-h-0">
+                  {children}
+                </main>
+                <Analytics />
+                <SafeSpeedInsights />
+              </div>
+            </FilterProvider>
           </ReactQueryProvider>
         </ThemeProvider>
       </body>

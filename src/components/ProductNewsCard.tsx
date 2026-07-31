@@ -2,10 +2,8 @@
 
 import { ProductNews } from '@/lib/types';
 import type { ReactNode } from 'react';
-import Link from 'next/link';
-import { useEffect, useState, useMemo, useCallback } from 'react';
-import { Card } from './Card';
-import Image from 'next/image';
+import { useEffect, useState } from 'react';
+import { getFeedTimestamp } from '@/lib/feed/normalize';
 
 interface ProductNewsCardProps {
   news: ProductNews;
@@ -16,25 +14,6 @@ interface ProductNewsCardProps {
 function getAuthorSlug(author: string) {
   if (!author) return ''
   return author.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')
-}
-
-// Fetch author title from their blog page
-function useAuthorTitle(author: string | undefined) {
-  const [title, setTitle] = useState<string | null>(null)
-  useEffect(() => {
-    if (!author) return
-    const slug = getAuthorSlug(author)
-    if (!slug) return
-    const url = `https://blogs.microsoft.com/blog/author/${slug}/`
-    fetch(url)
-      .then(res => res.text())
-      .then(html => {
-        const match = html.match(/<title>(.*?)<\/title>/i)
-        if (match && match[1]) setTitle(match[1].replace(/\s*\|.*/, '').trim())
-      })
-      .catch(() => setTitle(null))
-  }, [author])
-  return title
 }
 
 function AuthorWithTitle({ author }: { author: string }) {
@@ -50,7 +29,7 @@ function AuthorWithTitle({ author }: { author: string }) {
   )
 }
 
-export function ProductNewsCard({ news, productIcon }: ProductNewsCardProps) {
+export function ProductNewsCard({ news }: ProductNewsCardProps) {
   const [decodedTitle, setDecodedTitle] = useState(news.title);
   const [decodedDescription, setDecodedDescription] = useState(news.description);
   const [decodedAuthor, setDecodedAuthor] = useState(news.author);
@@ -71,17 +50,14 @@ export function ProductNewsCard({ news, productIcon }: ProductNewsCardProps) {
     setDecodedAuthor(decodeHtmlEntities(safeAuthor));
   }, [news]);
 
-  const isCopilotStudio = typeof productIcon === 'string' && productIcon.includes('CopilotStudio');
-  const descriptionLines = isCopilotStudio ? news.description.split('\n') : [];
-  const enabledFor = descriptionLines.find(line => line.startsWith('Enabled for:'))?.replace('Enabled for:', '').trim();
-  const publicPreview = descriptionLines.find(line => line.startsWith('Public Preview:'))?.replace('Public Preview:', '').trim();
-  const generalAvailability = descriptionLines.find(line => line.startsWith('General Availability:'))?.replace('General Availability:', '').trim();
-
-  const isValidDate = (dateStr: string | undefined) => {
-    if (!dateStr) return false;
-    const date = new Date(dateStr);
-    return !isNaN(date.getTime());
-  };
+  const publishTimestamp = getFeedTimestamp(news.publishDate);
+  const formattedPublishDate = publishTimestamp
+    ? new Date(publishTimestamp).toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+      })
+    : 'Date unavailable';
 
   return (
     <div className="w-full max-w-md mx-auto min-w-0">
@@ -98,13 +74,12 @@ export function ProductNewsCard({ news, productIcon }: ProductNewsCardProps) {
             <h3 className="w-full overflow-hidden text-lg font-bold text-gray-900 dark:text-white group-hover:text-primary-600 dark:group-hover:text-primary-400 mb-2 text-center" style={{ wordBreak: 'normal', overflowWrap: 'anywhere' }}>
               {decodedTitle}
             </h3>
-            <p className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-0 text-center">
-              {new Date(news.publishDate || new Date()).toLocaleDateString('en-US', {
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric'
-              })}
-            </p>
+            <time
+              dateTime={publishTimestamp ? news.publishDate : undefined}
+              className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-0 text-center"
+            >
+              {formattedPublishDate}
+            </time>
             {news.author && <AuthorWithTitle author={news.author} />}
             <p className="text-base text-gray-700 dark:text-gray-300 line-clamp-3 text-center mt-2">
               {decodedDescription}

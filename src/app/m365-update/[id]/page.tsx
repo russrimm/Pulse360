@@ -1,4 +1,4 @@
-import { getM365Updates } from '@/lib/api.server';
+import { getM365Update } from '@/lib/api.server';
 import { sanitizeFeedHtml } from '@/lib/feed/sanitize';
 import { notFound } from 'next/navigation';
 import { format } from 'date-fns';
@@ -57,15 +57,9 @@ const serviceIcons: Record<string, string> = {
   'Microsoft Defender for Cloud Apps': '/icons/defender.svg',
 };
 
-interface PageProps {
-  params: { id: string };
-  searchParams?: { [key: string]: string | string[] | undefined };
-}
-
 export default async function M365UpdatePage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const updates = await getM365Updates();
-  const update = updates.find(u => u.id === id);
+  const update = await getM365Update(id);
 
   if (!update) {
     notFound();
