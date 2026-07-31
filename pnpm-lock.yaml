@@ -5,29 +5,20 @@ settings:
   excludeLinksFromLockfile: false
 
 overrides:
+  '@hono/node-server': ^1.19.13
   exceljs>uuid: ^11.1.1
+  fast-uri: ^3.1.4
   postcss: ^8.5.10
   sharp: ^0.35.2
+  valibot: ^1.4.2
 
 importers:
 
   .:
     dependencies:
-      '@azure/msal-browser':
-        specifier: ^4.27.0
-        version: 4.30.0
-      '@headlessui/react':
-        specifier: ^2.2.9
-        version: 2.2.10(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       '@heroicons/react':
         specifier: ^2.2.0
         version: 2.2.0(react@19.2.7)
-      '@microsoft/agents-activity':
-        specifier: ^1.1.1
-        version: 1.6.1
-      '@microsoft/agents-copilotstudio-client':
-        specifier: ^1.1.1
-        version: 1.6.1
       '@prisma/adapter-pg':
         specifier: 7.9.0-dev.25
         version: 7.9.0-dev.25
@@ -57,10 +48,10 @@ importers:
         version: 2.16.1
       '@vercel/analytics':
         specifier: ^1.6.1
-        version: 1.6.1(next@16.2.10(@babel/core@7.29.7)(@playwright/test@1.61.1)(@types/node@25.9.5)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(react@19.2.7)
+        version: 1.6.1(next@16.2.11(@babel/core@7.29.7)(@playwright/test@1.61.1)(@types/node@25.9.5)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(react@19.2.7)
       '@vercel/speed-insights':
         specifier: ^1.3.1
-        version: 1.3.1(next@16.2.10(@babel/core@7.29.7)(@playwright/test@1.61.1)(@types/node@25.9.5)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(react@19.2.7)
+        version: 1.3.1(next@16.2.11(@babel/core@7.29.7)(@playwright/test@1.61.1)(@types/node@25.9.5)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(react@19.2.7)
       baseline-browser-mapping:
         specifier: ^2.10.38
         version: 2.10.43
@@ -71,20 +62,17 @@ importers:
         specifier: ^4.4.0
         version: 4.4.0
       fast-xml-parser:
-        specifier: ^5.3.3
-        version: 5.10.0
+        specifier: ^5.10.1
+        version: 5.10.1
       next:
-        specifier: ^16.2.9
-        version: 16.2.10(@babel/core@7.29.7)(@playwright/test@1.61.1)(@types/node@25.9.5)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+        specifier: ^16.2.11
+        version: 16.2.11(@babel/core@7.29.7)(@playwright/test@1.61.1)(@types/node@25.9.5)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       next-auth:
-        specifier: ^4.24.13
-        version: 4.24.14(next@16.2.10(@babel/core@7.29.7)(@playwright/test@1.61.1)(@types/node@25.9.5)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+        specifier: ^4.24.15
+        version: 4.24.15(next@16.2.11(@babel/core@7.29.7)(@playwright/test@1.61.1)(@types/node@25.9.5)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       next-themes:
         specifier: ^0.4.6
         version: 0.4.6(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
-      node-fetch:
-        specifier: ^3.3.2
-        version: 3.3.2
       postgres:
         specifier: ^3.4.7
         version: 3.4.9
@@ -94,24 +82,12 @@ importers:
       react-dom:
         specifier: ^19.2.7
         version: 19.2.7(react@19.2.7)
-      react-icons:
-        specifier: ^5.5.0
-        version: 5.7.0(react@19.2.7)
-      rss-parser:
-        specifier: ^3.13.0
-        version: 3.13.0
       sanitize-html:
         specifier: ^2.17.5
         version: 2.17.6
-      swiper:
-        specifier: ^12.0.3
-        version: 12.2.0
       xml2js:
         specifier: ^0.6.2
         version: 0.6.2
-      zustand:
-        specifier: ^5.0.9
-        version: 5.0.14(@types/react@19.2.17)(react@19.2.7)(use-sync-external-store@1.6.0(react@19.2.7))
     devDependencies:
       '@eslint/css':
         specifier: ^0.14.1
@@ -137,18 +113,12 @@ importers:
       '@types/node':
         specifier: ^25.0.2
         version: 25.9.5
-      '@types/node-fetch':
-        specifier: ^2.6.13
-        version: 2.6.13
       '@types/react':
         specifier: ^19.2.17
         version: 19.2.17
       '@types/react-dom':
         specifier: ^19.2.3
         version: 19.2.3(@types/react@19.2.17)
-      '@types/react-icons':
-        specifier: ^3.0.0
-        version: 3.0.0(react@19.2.7)
       '@typescript-eslint/eslint-plugin':
         specifier: ^8.50.0
         version: 8.64.0(@typescript-eslint/parser@8.64.0(eslint@9.39.5(jiti@2.7.0))(typescript@5.9.3))(eslint@9.39.5(jiti@2.7.0))(typescript@5.9.3)
@@ -206,14 +176,6 @@ packages:
   '@alloc/quick-lru@5.2.0':
     resolution: {integrity: sha1-e/aLIMCjUPk2kV/K4G9Y4yAHzjA=, tarball: https://ms-feed-12.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/@alloc/quick-lru/-/quick-lru-5.2.0.tgz}
     engines: {node: '>=10'}
-
-  '@azure/msal-browser@4.30.0':
-    resolution: {integrity: sha1-MPuveuJtmrdnGqvKPUH5xS0qOTc=, tarball: https://ms-feed-12.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/@azure/msal-browser/-/msal-browser-4.30.0.tgz}
-    engines: {node: '>=0.8.0'}
-
-  '@azure/msal-common@15.17.0':
-    resolution: {integrity: sha1-rjwDN4yFJkKxyaMDOA6UXCuJfwI=, tarball: https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/@azure/msal-common/-/msal-common-15.17.0.tgz}
-    engines: {node: '>=0.8.0'}
 
   '@babel/code-frame@7.29.7':
     resolution: {integrity: sha1-8vu/6ofESiFZDsUVt3iywm2IZuc=, tarball: https://ms-feed-12.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/@babel/code-frame/-/code-frame-7.29.7.tgz}
@@ -794,10 +756,10 @@ packages:
     resolution: {integrity: sha1-OAzMjyQS6iLR2XLff47iOjucdGc=, tarball: https://ms-feed-12.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/@emnapi/core/-/core-1.10.0.tgz}
 
   '@emnapi/runtime@1.10.0':
-    resolution: {integrity: sha1-SyYMDTU0IE6YxhELjbGph9JuyHw=, tarball: https://ms-feed-2.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/@emnapi/runtime/-/runtime-1.10.0.tgz}
+    resolution: {integrity: sha1-SyYMDTU0IE6YxhELjbGph9JuyHw=, tarball: https://ms-feed-12.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/@emnapi/runtime/-/runtime-1.10.0.tgz}
 
   '@emnapi/runtime@1.11.2':
-    resolution: {integrity: sha1-6yLwTXb+v99Ph/2v9UyKU/a/Db0=, tarball: https://ms-feed-2.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/@emnapi/runtime/-/runtime-1.11.2.tgz}
+    resolution: {integrity: sha1-6yLwTXb+v99Ph/2v9UyKU/a/Db0=, tarball: https://ms-feed-12.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/@emnapi/runtime/-/runtime-1.11.2.tgz}
 
   '@emnapi/wasi-threads@1.2.1':
     resolution: {integrity: sha1-KP7SGhuhznl8RKBwq8lNQvOuhUg=, tarball: https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/@emnapi/wasi-threads/-/wasi-threads-1.2.1.tgz}
@@ -1030,29 +992,16 @@ packages:
       react: '>=16.8.0'
       react-dom: '>=16.8.0'
 
-  '@floating-ui/react@0.26.28':
-    resolution: {integrity: sha1-k/ROuusCQJMS6d+VB+g6q0qMDcc=, tarball: https://ms-feed-2.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/@floating-ui/react/-/react-0.26.28.tgz}
-    peerDependencies:
-      react: '>=16.8.0'
-      react-dom: '>=16.8.0'
-
   '@floating-ui/utils@0.2.12':
     resolution: {integrity: sha1-r+/nhZSfFqxM3R5pWTWjIVct1Wo=, tarball: https://ms-feed-2.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/@floating-ui/utils/-/utils-0.2.12.tgz}
-
-  '@headlessui/react@2.2.10':
-    resolution: {integrity: sha1-rWkliry57+onpLN+BujJyv05ymM=, tarball: https://ms-feed-12.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/@headlessui/react/-/react-2.2.10.tgz}
-    engines: {node: '>=10'}
-    peerDependencies:
-      react: ^18 || ^19 || ^19.0.0-rc
-      react-dom: ^18 || ^19 || ^19.0.0-rc
 
   '@heroicons/react@2.2.0':
     resolution: {integrity: sha1-DAUSSvUENKgAdzq+yNOvail9kEs=, tarball: https://ms-feed-2.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/@heroicons/react/-/react-2.2.0.tgz}
     peerDependencies:
       react: '>= 16 || ^19.0.0-rc'
 
-  '@hono/node-server@1.19.11':
-    resolution: {integrity: sha1-3EGfCCbdJQTp/IatKJ1WNqBETi8=, tarball: https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/@hono/node-server/-/node-server-1.19.11.tgz}
+  '@hono/node-server@1.19.15':
+    resolution: {integrity: sha1-IqGxGc01+72eVOFupHlYlHLxnbA=, tarball: https://ms-feed-2.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/@hono/node-server/-/node-server-1.19.15.tgz}
     engines: {node: '>=18.14.1'}
     peerDependencies:
       hono: ^4
@@ -1243,15 +1192,6 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@internationalized/date@3.12.2':
-    resolution: {integrity: sha1-CKZe3Sopd14iwWjdwCn7VL+bioU=, tarball: https://ms-feed-12.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/@internationalized/date/-/date-3.12.2.tgz}
-
-  '@internationalized/number@3.6.7':
-    resolution: {integrity: sha1-WgqPpBO1+GeaWdzzfip03FCLg3E=, tarball: https://ms-feed-12.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/@internationalized/number/-/number-3.6.7.tgz}
-
-  '@internationalized/string@3.2.9':
-    resolution: {integrity: sha1-DlA4XEEerBJ12RzetW3X+8I0mX8=, tarball: https://ms-feed-12.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/@internationalized/string/-/string-3.2.9.tgz}
-
   '@jridgewell/gen-mapping@0.3.13':
     resolution: {integrity: sha1-Y0Khn0Q0dRjJPkOxrGnes8Rlah8=, tarball: https://ms-feed-2.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/@jridgewell/gen-mapping/-/gen-mapping-0.3.13.tgz}
 
@@ -1271,92 +1211,72 @@ packages:
   '@kurkle/color@0.3.4':
     resolution: {integrity: sha1-TU/2d+FgkhT8ccWAEl3d3Yaryr8=, tarball: https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/@kurkle/color/-/color-0.3.4.tgz}
 
-  '@microsoft/agents-activity@1.6.1':
-    resolution: {integrity: sha1-8F3L45JE5jSb0DxibX1AA9KmOLo=, tarball: https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/@microsoft/agents-activity/-/agents-activity-1.6.1.tgz}
-    engines: {node: '>=20.0.0'}
-
-  '@microsoft/agents-copilotstudio-client@1.6.1':
-    resolution: {integrity: sha1-TGKob50snjDS7eqmiFzCr4oFDMw=, tarball: https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/@microsoft/agents-copilotstudio-client/-/agents-copilotstudio-client-1.6.1.tgz}
-    engines: {node: '>=20.0.0'}
-
-  '@microsoft/agents-telemetry@1.6.1':
-    resolution: {integrity: sha1-E/HOgpfb/cTd0Ij6bM1yMOucLqk=, tarball: https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/@microsoft/agents-telemetry/-/agents-telemetry-1.6.1.tgz}
-    engines: {node: '>=20.0.0'}
-    peerDependencies:
-      '@opentelemetry/api': '1'
-      '@opentelemetry/api-logs': '>=0.214.0 <1'
-    peerDependenciesMeta:
-      '@opentelemetry/api':
-        optional: true
-      '@opentelemetry/api-logs':
-        optional: true
-
   '@napi-rs/wasm-runtime@1.1.6':
     resolution: {integrity: sha1-7TOAbQ+b6Y3HbQw9T9hy/acBtdU=, tarball: https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/@napi-rs/wasm-runtime/-/wasm-runtime-1.1.6.tgz}
     peerDependencies:
       '@emnapi/core': ^1.7.1
       '@emnapi/runtime': ^1.7.1
 
-  '@next/env@16.2.10':
-    resolution: {integrity: sha1-DpRzpVd4BykuEdO/ngddO/A2hg8=, tarball: https://ms-feed-2.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/@next/env/-/env-16.2.10.tgz}
+  '@next/env@16.2.11':
+    resolution: {integrity: sha1-neoaIlqZsWNuWnFmI32x+Xm2xTI=, tarball: https://ms-feed-12.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/@next/env/-/env-16.2.11.tgz}
 
   '@next/eslint-plugin-next@16.2.10':
     resolution: {integrity: sha1-ax7NOTB8SOX8oydaMHtQhsxu70w=, tarball: https://ms-feed-2.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/@next/eslint-plugin-next/-/eslint-plugin-next-16.2.10.tgz}
 
-  '@next/swc-darwin-arm64@16.2.10':
-    resolution: {integrity: sha1-U+w8Zz3ev2JqNN7BqIOQbjteBfc=, tarball: https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/@next/swc-darwin-arm64/-/swc-darwin-arm64-16.2.10.tgz}
+  '@next/swc-darwin-arm64@16.2.11':
+    resolution: {integrity: sha1-3d63eV0yEyHSsvAegTso3yJ5Te8=, tarball: https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/@next/swc-darwin-arm64/-/swc-darwin-arm64-16.2.11.tgz}
     engines: {node: '>= 10'}
     cpu: [arm64]
     os: [darwin]
 
-  '@next/swc-darwin-x64@16.2.10':
-    resolution: {integrity: sha1-IGbg8BfkJVVglxD+43HYNliOzRQ=, tarball: https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/@next/swc-darwin-x64/-/swc-darwin-x64-16.2.10.tgz}
+  '@next/swc-darwin-x64@16.2.11':
+    resolution: {integrity: sha1-vfCk1rNqPOcsbJl4aOdtO8AgQ/s=, tarball: https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/@next/swc-darwin-x64/-/swc-darwin-x64-16.2.11.tgz}
     engines: {node: '>= 10'}
     cpu: [x64]
     os: [darwin]
 
-  '@next/swc-linux-arm64-gnu@16.2.10':
-    resolution: {integrity: sha1-VhT4P9d1ZLFy0mx6RqqoXxHndZ8=, tarball: https://ms-feed-12.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/@next/swc-linux-arm64-gnu/-/swc-linux-arm64-gnu-16.2.10.tgz}
+  '@next/swc-linux-arm64-gnu@16.2.11':
+    resolution: {integrity: sha1-4ZT3U0OuqmltxJRsKUB5CddZ0hQ=, tarball: https://ms-feed-12.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/@next/swc-linux-arm64-gnu/-/swc-linux-arm64-gnu-16.2.11.tgz}
     engines: {node: '>= 10'}
     cpu: [arm64]
     os: [linux]
     libc: [glibc]
 
-  '@next/swc-linux-arm64-musl@16.2.10':
-    resolution: {integrity: sha1-vb/RWKK78DIwvwUXsej4qQYxVWI=, tarball: https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/@next/swc-linux-arm64-musl/-/swc-linux-arm64-musl-16.2.10.tgz}
+  '@next/swc-linux-arm64-musl@16.2.11':
+    resolution: {integrity: sha1-HOd9jTDoVLTvQfqeJDEOQR4aD5Y=, tarball: https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/@next/swc-linux-arm64-musl/-/swc-linux-arm64-musl-16.2.11.tgz}
     engines: {node: '>= 10'}
     cpu: [arm64]
     os: [linux]
     libc: [musl]
 
-  '@next/swc-linux-x64-gnu@16.2.10':
-    resolution: {integrity: sha1-IfOGuymJNqf3pr6mgwt+23E7Utw=, tarball: https://ms-feed-2.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/@next/swc-linux-x64-gnu/-/swc-linux-x64-gnu-16.2.10.tgz}
+  '@next/swc-linux-x64-gnu@16.2.11':
+    resolution: {integrity: sha1-WTJOqQmiZUtXZ1z9a1+kP4HgVAU=, tarball: https://ms-feed-2.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/@next/swc-linux-x64-gnu/-/swc-linux-x64-gnu-16.2.11.tgz}
     engines: {node: '>= 10'}
     cpu: [x64]
     os: [linux]
     libc: [glibc]
 
-  '@next/swc-linux-x64-musl@16.2.10':
-    resolution: {integrity: sha1-BpxDYEv1TUbuuz0luR0wCNSZU5c=, tarball: https://ms-feed-2.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/@next/swc-linux-x64-musl/-/swc-linux-x64-musl-16.2.10.tgz}
+  '@next/swc-linux-x64-musl@16.2.11':
+    resolution: {integrity: sha1-ZIMi0pyVXTzNeDOUNvaV2lVl42Y=, tarball: https://ms-feed-2.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/@next/swc-linux-x64-musl/-/swc-linux-x64-musl-16.2.11.tgz}
     engines: {node: '>= 10'}
     cpu: [x64]
     os: [linux]
     libc: [musl]
 
-  '@next/swc-win32-arm64-msvc@16.2.10':
-    resolution: {integrity: sha1-trmRYrdgDxPlJHqi0fqkafyEdN0=, tarball: https://ms-feed-2.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/@next/swc-win32-arm64-msvc/-/swc-win32-arm64-msvc-16.2.10.tgz}
+  '@next/swc-win32-arm64-msvc@16.2.11':
+    resolution: {integrity: sha1-DH78oUwhl+g4brcbYnLiN6mpmsM=, tarball: https://ms-feed-2.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/@next/swc-win32-arm64-msvc/-/swc-win32-arm64-msvc-16.2.11.tgz}
     engines: {node: '>= 10'}
     cpu: [arm64]
     os: [win32]
 
-  '@next/swc-win32-x64-msvc@16.2.10':
-    resolution: {integrity: sha1-kBDawYbzzP9vHyIOXV/3RDkQ4DU=, tarball: https://ms-feed-2.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/@next/swc-win32-x64-msvc/-/swc-win32-x64-msvc-16.2.10.tgz}
+  '@next/swc-win32-x64-msvc@16.2.11':
+    resolution: {integrity: sha1-nctnsrK34Bto8zeVi2x3qXPTtGs=, tarball: https://ms-feed-2.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/@next/swc-win32-x64-msvc/-/swc-win32-x64-msvc-16.2.11.tgz}
     engines: {node: '>= 10'}
     cpu: [x64]
     os: [win32]
 
-  '@nodable/entities@2.2.0':
-    resolution: {integrity: sha1-odRamSsCJZGxwrA6d5Nck5N1tkI=, tarball: https://ms-feed-12.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/@nodable/entities/-/entities-2.2.0.tgz}
+  '@nodable/entities@3.0.0':
+    resolution: {integrity: sha1-aUcDvIZNMOrtVcLj3vANvWFJNnA=, tarball: https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/@nodable/entities/-/entities-3.0.0.tgz}
 
   '@nodelib/fs.scandir@2.1.5':
     resolution: {integrity: sha1-dhnC6yGyVIP20WdUi0z9WnSIw9U=, tarball: https://ms-feed-12.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/@nodelib/fs.scandir/-/fs.scandir-2.1.5.tgz}
@@ -1375,7 +1295,7 @@ packages:
     engines: {node: '>=12.4.0'}
 
   '@panva/hkdf@1.2.1':
-    resolution: {integrity: sha1-yw0RHvcAE29FgDSf8CJr8lyFPyM=, tarball: https://ms-feed-12.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/@panva/hkdf/-/hkdf-1.2.1.tgz}
+    resolution: {integrity: sha1-yw0RHvcAE29FgDSf8CJr8lyFPyM=, tarball: https://ms-feed-2.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/@panva/hkdf/-/hkdf-1.2.1.tgz}
 
   '@playwright/test@1.61.1':
     resolution: {integrity: sha1-SFaNwir3gZ5V+l6OO8ebfmo+ZnU=, tarball: https://ms-feed-2.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/@playwright/test/-/test-1.61.1.tgz}
@@ -1784,23 +1704,6 @@ packages:
   '@radix-ui/rect@1.1.2':
     resolution: {integrity: sha1-B2GoKvVcfjAtW1CerxyX6h/F/uo=, tarball: https://ms-feed-2.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/@radix-ui/rect/-/rect-1.1.2.tgz}
 
-  '@react-aria/focus@3.22.1':
-    resolution: {integrity: sha1-fnumoiUBNXKOto/6IeQi7CWhaAA=, tarball: https://ms-feed-2.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/@react-aria/focus/-/focus-3.22.1.tgz}
-    peerDependencies:
-      react: ^16.8.0 || ^17.0.0-rc.1 || ^18.0.0 || ^19.0.0-rc.1
-      react-dom: ^16.8.0 || ^17.0.0-rc.1 || ^18.0.0 || ^19.0.0-rc.1
-
-  '@react-aria/interactions@3.28.1':
-    resolution: {integrity: sha1-hSKUrmP2p9iu66Oh5zQ9qozYUHw=, tarball: https://ms-feed-2.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/@react-aria/interactions/-/interactions-3.28.1.tgz}
-    peerDependencies:
-      react: ^16.8.0 || ^17.0.0-rc.1 || ^18.0.0 || ^19.0.0-rc.1
-      react-dom: ^16.8.0 || ^17.0.0-rc.1 || ^18.0.0 || ^19.0.0-rc.1
-
-  '@react-types/shared@3.36.0':
-    resolution: {integrity: sha1-UucTxrro4ReWe/HRnYnbOlYhkDc=, tarball: https://ms-feed-12.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/@react-types/shared/-/shared-3.36.0.tgz}
-    peerDependencies:
-      react: ^16.8.0 || ^17.0.0-rc.1 || ^18.0.0 || ^19.0.0-rc.1
-
   '@rtsao/scc@1.1.0':
     resolution: {integrity: sha1-kn3S+um8M2FAOsLHoAwy3c6a1+g=, tarball: https://ms-feed-12.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/@rtsao/scc/-/scc-1.1.0.tgz}
 
@@ -1886,10 +1789,7 @@ packages:
     engines: {node: '>=14'}
 
   '@swc/helpers@0.5.15':
-    resolution: {integrity: sha1-ee+rNExYGez4OkPz+fgR/IS1Ftc=, tarball: https://ms-feed-2.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/@swc/helpers/-/helpers-0.5.15.tgz}
-
-  '@swc/helpers@0.5.23':
-    resolution: {integrity: sha1-GSh9DYbZYrERN2A5pQx5KQLJqGo=, tarball: https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/@swc/helpers/-/helpers-0.5.23.tgz}
+    resolution: {integrity: sha1-ee+rNExYGez4OkPz+fgR/IS1Ftc=, tarball: https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/@swc/helpers/-/helpers-0.5.15.tgz}
 
   '@tailwindcss/node@4.3.2':
     resolution: {integrity: sha1-K6VjsF/2YrkXLJZF14pe3Vn5brM=, tarball: https://ms-feed-12.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/@tailwindcss/node/-/node-4.3.2.tgz}
@@ -1996,15 +1896,6 @@ packages:
     peerDependencies:
       react: ^18 || ^19
 
-  '@tanstack/react-virtual@3.14.6':
-    resolution: {integrity: sha1-sCle8dhY42blHYNrTMSriMGbe8A=, tarball: https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/@tanstack/react-virtual/-/react-virtual-3.14.6.tgz}
-    peerDependencies:
-      react: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
-      react-dom: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
-
-  '@tanstack/virtual-core@3.17.4':
-    resolution: {integrity: sha1-JtEwf25UToQo4sAiYWzavaWe934=, tarball: https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/@tanstack/virtual-core/-/virtual-core-3.17.4.tgz}
-
   '@tybys/wasm-util@0.10.3':
     resolution: {integrity: sha1-AVy6np3UfOFNA9KoxdVHv7FpZl0=, tarball: https://ms-feed-2.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/@tybys/wasm-util/-/wasm-util-0.10.3.tgz}
 
@@ -2026,9 +1917,6 @@ packages:
   '@types/ms@2.1.0':
     resolution: {integrity: sha1-BSqmekjszEMJ1/AZG35BQ0uQu3g=, tarball: https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/@types/ms/-/ms-2.1.0.tgz}
 
-  '@types/node-fetch@2.6.13':
-    resolution: {integrity: sha1-4Mm3te29sbUM4ywSfoXogIctVu4=, tarball: https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/@types/node-fetch/-/node-fetch-2.6.13.tgz}
-
   '@types/node@14.18.63':
     resolution: {integrity: sha1-F4j6jag427X56plLg0J4IF22yis=, tarball: https://ms-feed-2.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/@types/node/-/node-14.18.63.tgz}
 
@@ -2042,10 +1930,6 @@ packages:
     resolution: {integrity: sha1-weMF0VpSo+UI1U3Kdw0gLLY6vyw=, tarball: https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/@types/react-dom/-/react-dom-19.2.3.tgz}
     peerDependencies:
       '@types/react': ^19.2.0
-
-  '@types/react-icons@3.0.0':
-    resolution: {integrity: sha1-J8ooI6at2IHQajcb//CTr8G5yCk=, tarball: https://ms-feed-2.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/@types/react-icons/-/react-icons-3.0.0.tgz}
-    deprecated: This is a stub types definition. react-icons provides its own type definitions, so you do not need this installed.
 
   '@types/react@19.2.17':
     resolution: {integrity: sha1-3MrDZbqg8XNOwnD/S1HIlGXo3H8=, tarball: https://ms-feed-2.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/@types/react/-/react-19.2.17.tgz}
@@ -2305,7 +2189,7 @@ packages:
     engines: {node: '>=8'}
 
   anynum@1.0.1:
-    resolution: {integrity: sha1-KqwA4I3603JsHUYuYNvC+DFlmkQ=, tarball: https://ms-feed-2.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/anynum/-/anynum-1.0.1.tgz}
+    resolution: {integrity: sha1-KqwA4I3603JsHUYuYNvC+DFlmkQ=, tarball: https://ms-feed-12.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/anynum/-/anynum-1.0.1.tgz}
 
   archiver-utils@2.1.0:
     resolution: {integrity: sha1-6KRg6UtpPD49oYKgmMpihbqSSeI=, tarball: https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/archiver-utils/-/archiver-utils-2.1.0.tgz}
@@ -2371,9 +2255,6 @@ packages:
 
   async@3.2.6:
     resolution: {integrity: sha1-Gwco4Ukp1RuFtEm38G4nwRReOM4=, tarball: https://ms-feed-2.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/async/-/async-3.2.6.tgz}
-
-  asynckit@0.4.0:
-    resolution: {integrity: sha1-x57Zf380y48robyXkLzDZkdLS3k=, tarball: https://ms-feed-12.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/asynckit/-/asynckit-0.4.0.tgz}
 
   autoprefixer@10.5.3:
     resolution: {integrity: sha1-zW9MYRzvmAVcmYtd6OaxdZ8CREc=, tarball: https://ms-feed-12.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/autoprefixer/-/autoprefixer-10.5.3.tgz}
@@ -2533,11 +2414,7 @@ packages:
     engines: {node: '>= 20.19.0'}
 
   client-only@0.0.1:
-    resolution: {integrity: sha1-OLul1APEGrFQv/ZKlchQE89zvKE=, tarball: https://ms-feed-2.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/client-only/-/client-only-0.0.1.tgz}
-
-  clsx@2.1.1:
-    resolution: {integrity: sha1-7tOXyf2L2IK/sY3qtxAgSaLzKZk=, tarball: https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/clsx/-/clsx-2.1.1.tgz}
-    engines: {node: '>=6'}
+    resolution: {integrity: sha1-OLul1APEGrFQv/ZKlchQE89zvKE=, tarball: https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/client-only/-/client-only-0.0.1.tgz}
 
   color-convert@2.0.1:
     resolution: {integrity: sha1-ctOmjVmMm9s68q0ehPIdiWq9TeM=, tarball: https://ms-feed-12.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/color-convert/-/color-convert-2.0.1.tgz}
@@ -2545,10 +2422,6 @@ packages:
 
   color-name@1.1.4:
     resolution: {integrity: sha1-wqCah6y95pVD3m9j+jmVyCbFNqI=, tarball: https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/color-name/-/color-name-1.1.4.tgz}
-
-  combined-stream@1.0.8:
-    resolution: {integrity: sha1-w9RaizT9cwYxoRCoolIGgrMdWn8=, tarball: https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/combined-stream/-/combined-stream-1.0.8.tgz}
-    engines: {node: '>= 0.8'}
 
   commander@7.2.0:
     resolution: {integrity: sha1-o2y1fQtQHOEI5NIFWaFQo5HZerc=, tarball: https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/commander/-/commander-7.2.0.tgz}
@@ -2568,7 +2441,7 @@ packages:
     resolution: {integrity: sha1-S1YPZJ/E6RjdCrdc9JYei8iC2Co=, tarball: https://ms-feed-12.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/convert-source-map/-/convert-source-map-2.0.0.tgz}
 
   cookie@0.7.2:
-    resolution: {integrity: sha1-VWNpxHKiupEPKXmJG1JrNDYjftc=, tarball: https://ms-feed-12.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/cookie/-/cookie-0.7.2.tgz}
+    resolution: {integrity: sha1-VWNpxHKiupEPKXmJG1JrNDYjftc=, tarball: https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/cookie/-/cookie-0.7.2.tgz}
     engines: {node: '>= 0.6'}
 
   core-js-compat@3.49.0:
@@ -2629,10 +2502,6 @@ packages:
   damerau-levenshtein@1.0.8:
     resolution: {integrity: sha1-tD0obMvTa8Wy9+1ByvLQq6H4puc=, tarball: https://ms-feed-2.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/damerau-levenshtein/-/damerau-levenshtein-1.0.8.tgz}
 
-  data-uri-to-buffer@4.0.1:
-    resolution: {integrity: sha1-2P6ysogeak9YwuCKz9Dig04mIi4=, tarball: https://ms-feed-2.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/data-uri-to-buffer/-/data-uri-to-buffer-4.0.1.tgz}
-    engines: {node: '>= 12'}
-
   data-view-buffer@1.0.2:
     resolution: {integrity: sha1-IRoDupXsr3eYqMcZjXlTYhH4hXA=, tarball: https://ms-feed-12.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/data-view-buffer/-/data-view-buffer-1.0.2.tgz}
     engines: {node: '>= 0.4'}
@@ -2692,10 +2561,6 @@ packages:
 
   defu@6.1.7:
     resolution: {integrity: sha1-clQ1Z8jp+X/xPOQCttvgmsWuTSM=, tarball: https://ms-feed-12.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/defu/-/defu-6.1.7.tgz}
-
-  delayed-stream@1.0.0:
-    resolution: {integrity: sha1-3zrhmayt+31ECqrgsp4icrJOxhk=, tarball: https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/delayed-stream/-/delayed-stream-1.0.0.tgz}
-    engines: {node: '>=0.4.0'}
 
   denque@2.1.0:
     resolution: {integrity: sha1-6T4aZWn7XmbxajwqKWRhfTSdarE=, tarball: https://ms-feed-12.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/denque/-/denque-2.1.0.tgz}
@@ -2784,9 +2649,6 @@ packages:
   enhanced-resolve@5.21.6:
     resolution: {integrity: sha1-qiB7Q89ljmqzugaJbtwAwTwxJ8Y=, tarball: https://ms-feed-2.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/enhanced-resolve/-/enhanced-resolve-5.21.6.tgz}
     engines: {node: '>=10.13.0'}
-
-  entities@2.2.0:
-    resolution: {integrity: sha1-CY3JDruD2N/6CJ1VJWs1HTTE2lU=, tarball: https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/entities/-/entities-2.2.0.tgz}
 
   entities@4.5.0:
     resolution: {integrity: sha1-XSaOpecRPsdMTQM7eepaNaSI+0g=, tarball: https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/entities/-/entities-4.5.0.tgz}
@@ -2980,14 +2842,6 @@ packages:
     resolution: {integrity: sha1-dNLrTeC42hKTcRkQ1Qd1ubcQ72Q=, tarball: https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/esutils/-/esutils-2.0.3.tgz}
     engines: {node: '>=0.10.0'}
 
-  eventsource-client@1.2.0:
-    resolution: {integrity: sha1-LApUfMe0LJcOnQ9yytEs7qpkaCs=, tarball: https://ms-feed-12.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/eventsource-client/-/eventsource-client-1.2.0.tgz}
-    engines: {node: '>=18.0.0'}
-
-  eventsource-parser@3.1.0:
-    resolution: {integrity: sha1-ThmOuRzTM9Co3cwDZQKzYYol9Ek=, tarball: https://ms-feed-2.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/eventsource-parser/-/eventsource-parser-3.1.0.tgz}
-    engines: {node: '>=18.0.0'}
-
   exceljs@4.4.0:
     resolution: {integrity: sha1-z7HLjcyCx2Cp/J+qnlLa2rZrAVY=, tarball: https://ms-feed-12.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/exceljs/-/exceljs-4.4.0.tgz}
     engines: {node: '>=8.3.0'}
@@ -3016,14 +2870,14 @@ packages:
   fast-levenshtein@2.0.6:
     resolution: {integrity: sha1-PYpcZog6FqMMqGQ+hR8Zuqd5eRc=, tarball: https://ms-feed-12.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/fast-levenshtein/-/fast-levenshtein-2.0.6.tgz}
 
-  fast-uri@3.1.3:
-    resolution: {integrity: sha1-9pWkDwBqulBWMVc6ACHdshGUrRE=, tarball: https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/fast-uri/-/fast-uri-3.1.3.tgz}
+  fast-uri@3.1.4:
+    resolution: {integrity: sha1-Oz2vnOaPQflW3wtQUTLAz86ex68=, tarball: https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/fast-uri/-/fast-uri-3.1.4.tgz}
 
   fast-xml-builder@1.3.0:
-    resolution: {integrity: sha1-vISYBHlv5Hv5FQIt2Tmw/DC6RV0=, tarball: https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/fast-xml-builder/-/fast-xml-builder-1.3.0.tgz}
+    resolution: {integrity: sha1-vISYBHlv5Hv5FQIt2Tmw/DC6RV0=, tarball: https://ms-feed-12.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/fast-xml-builder/-/fast-xml-builder-1.3.0.tgz}
 
-  fast-xml-parser@5.10.0:
-    resolution: {integrity: sha1-jQir/k1sUenFtR9Be5lIWNvttNc=, tarball: https://ms-feed-2.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/fast-xml-parser/-/fast-xml-parser-5.10.0.tgz}
+  fast-xml-parser@5.10.1:
+    resolution: {integrity: sha1-GTE/fJOGxH+kod5SdUe3PtLPzt4=, tarball: https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/fast-xml-parser/-/fast-xml-parser-5.10.1.tgz}
     hasBin: true
 
   fastq@1.20.1:
@@ -3040,10 +2894,6 @@ packages:
     peerDependenciesMeta:
       picomatch:
         optional: true
-
-  fetch-blob@3.2.0:
-    resolution: {integrity: sha1-8JuNS71Frcbwwgt+eH55PjCdzOk=, tarball: https://ms-feed-12.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/fetch-blob/-/fetch-blob-3.2.0.tgz}
-    engines: {node: ^12.20 || >= 14.13}
 
   file-entry-cache@8.0.0:
     resolution: {integrity: sha1-d4e93PETG/+5JjbGlFe7wO3W2B8=, tarball: https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/file-entry-cache/-/file-entry-cache-8.0.0.tgz}
@@ -3072,17 +2922,9 @@ packages:
     resolution: {integrity: sha1-Mujp7Rtoo0l777msK2rfkqY4V28=, tarball: https://ms-feed-12.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/foreground-child/-/foreground-child-3.3.1.tgz}
     engines: {node: '>=14'}
 
-  form-data@4.0.6:
-    resolution: {integrity: sha1-KOhk4beG2+u2jbH0UvljUnhmWCc=, tarball: https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/form-data/-/form-data-4.0.6.tgz}
-    engines: {node: '>= 6'}
-
   format@0.2.2:
     resolution: {integrity: sha1-1hcBB+nv3E7TDJ3DkBbflCtctYs=, tarball: https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/format/-/format-0.2.2.tgz}
     engines: {node: '>=0.4.x'}
-
-  formdata-polyfill@4.0.10:
-    resolution: {integrity: sha1-JIB8McnUAuACqz2McgFEzriEhCM=, tarball: https://ms-feed-12.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/formdata-polyfill/-/formdata-polyfill-4.0.10.tgz}
-    engines: {node: '>=12.20.0'}
 
   fraction.js@5.3.4:
     resolution: {integrity: sha1-jA/MapkIJi307Rl0J73u9WPgaZo=, tarball: https://ms-feed-12.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/fraction.js/-/fraction.js-5.3.4.tgz}
@@ -3388,7 +3230,7 @@ packages:
     engines: {node: '>= 0.4'}
 
   is-unsafe@2.0.0:
-    resolution: {integrity: sha1-wNzk4GdCZi3eJjYBYOQU6kh9ouk=, tarball: https://ms-feed-12.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/is-unsafe/-/is-unsafe-2.0.0.tgz}
+    resolution: {integrity: sha1-wNzk4GdCZi3eJjYBYOQU6kh9ouk=, tarball: https://ms-feed-2.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/is-unsafe/-/is-unsafe-2.0.0.tgz}
 
   is-weakmap@2.0.2:
     resolution: {integrity: sha1-v3JhXWSd/l9pkHnFS4PkfRrhnP0=, tarball: https://ms-feed-2.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/is-weakmap/-/is-weakmap-2.0.2.tgz}
@@ -3640,7 +3482,7 @@ packages:
     resolution: {integrity: sha1-HaJ+ZxAnGUdpXa9oSOhH8B2EuSA=, tarball: https://ms-feed-2.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/lru-cache/-/lru-cache-5.1.1.tgz}
 
   lru-cache@6.0.0:
-    resolution: {integrity: sha1-bW/mVw69lqr5D8rR2vo7JWbbOpQ=, tarball: https://ms-feed-2.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/lru-cache/-/lru-cache-6.0.0.tgz}
+    resolution: {integrity: sha1-bW/mVw69lqr5D8rR2vo7JWbbOpQ=, tarball: https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/lru-cache/-/lru-cache-6.0.0.tgz}
     engines: {node: '>=10'}
 
   lru.min@1.1.4:
@@ -3797,14 +3639,6 @@ packages:
     resolution: {integrity: sha1-1m+hjzpHB2eJMgubGvMr2G2fogI=, tarball: https://ms-feed-2.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/micromatch/-/micromatch-4.0.8.tgz}
     engines: {node: '>=8.6'}
 
-  mime-db@1.52.0:
-    resolution: {integrity: sha1-u6vNwChZ9JhzAchW4zh85exDv3A=, tarball: https://ms-feed-2.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/mime-db/-/mime-db-1.52.0.tgz}
-    engines: {node: '>= 0.6'}
-
-  mime-types@2.1.35:
-    resolution: {integrity: sha1-OBqHG2KnNEUGYK497uRIE/cNlZo=, tarball: https://ms-feed-2.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/mime-types/-/mime-types-2.1.35.tgz}
-    engines: {node: '>= 0.6'}
-
   minimatch@10.2.5:
     resolution: {integrity: sha1-vUhoegvjjtKWE5kQVgD4MglYYdE=, tarball: https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/minimatch/-/minimatch-10.2.5.tgz}
     engines: {node: 18 || 20 || >=22}
@@ -3851,8 +3685,8 @@ packages:
   natural-compare@1.4.0:
     resolution: {integrity: sha1-Sr6/7tdUHywnrPspvbvRXI1bpPc=, tarball: https://ms-feed-2.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/natural-compare/-/natural-compare-1.4.0.tgz}
 
-  next-auth@4.24.14:
-    resolution: {integrity: sha1-wUkW4hX49K7yNY5pS9FMQCEhObI=, tarball: https://ms-feed-2.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/next-auth/-/next-auth-4.24.14.tgz}
+  next-auth@4.24.15:
+    resolution: {integrity: sha1-ATc7aCAPcNXCjfIJWSXC8nrcWt4=, tarball: https://ms-feed-12.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/next-auth/-/next-auth-4.24.15.tgz}
     peerDependencies:
       '@auth/core': 0.34.3
       next: ^12.2.5 || ^13 || ^14 || ^15 || ^16
@@ -3871,8 +3705,8 @@ packages:
       react: ^16.8 || ^17 || ^18 || ^19 || ^19.0.0-rc
       react-dom: ^16.8 || ^17 || ^18 || ^19 || ^19.0.0-rc
 
-  next@16.2.10:
-    resolution: {integrity: sha1-VNqo0RsbcUazfcQJREjgfrDf+Is=, tarball: https://ms-feed-12.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/next/-/next-16.2.10.tgz}
+  next@16.2.11:
+    resolution: {integrity: sha1-bFaLplotGd9hacktuWSeNizn9ek=, tarball: https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/next/-/next-16.2.11.tgz}
     engines: {node: '>=20.9.0'}
     hasBin: true
     peerDependencies:
@@ -3895,18 +3729,9 @@ packages:
   no-case@3.0.4:
     resolution: {integrity: sha1-02H9XJgA9VhVGoNp/A3NRmK2Ek0=, tarball: https://ms-feed-12.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/no-case/-/no-case-3.0.4.tgz}
 
-  node-domexception@1.0.0:
-    resolution: {integrity: sha1-aIjbRqH3HAt2s/dVUBa2P+ZHZuU=, tarball: https://ms-feed-2.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/node-domexception/-/node-domexception-1.0.0.tgz}
-    engines: {node: '>=10.5.0'}
-    deprecated: Use your platform's native DOMException instead
-
   node-exports-info@1.6.2:
     resolution: {integrity: sha1-JDoxBWd9Z4HNJuanI1D9kopctG8=, tarball: https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/node-exports-info/-/node-exports-info-1.6.2.tgz}
     engines: {node: '>= 0.4'}
-
-  node-fetch@3.3.2:
-    resolution: {integrity: sha1-0eiJus33M7T/OyskPrehKGagt4s=, tarball: https://ms-feed-12.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/node-fetch/-/node-fetch-3.3.2.tgz}
-    engines: {node: ^12.20.0 || ^14.13.1 || >=16.0.0}
 
   node-releases@2.0.51:
     resolution: {integrity: sha1-zcCEM1d/WzKtAWlEgXJuIu61Su8=, tarball: https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/node-releases/-/node-releases-2.0.51.tgz}
@@ -3920,14 +3745,14 @@ packages:
     resolution: {integrity: sha1-yeq0KO/842zWuSySS9sADvHx7R0=, tarball: https://ms-feed-2.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/nth-check/-/nth-check-2.1.1.tgz}
 
   oauth@0.9.15:
-    resolution: {integrity: sha1-vR/vr2hslrdUda7VGWQS/2DPucE=, tarball: https://ms-feed-2.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/oauth/-/oauth-0.9.15.tgz}
+    resolution: {integrity: sha1-vR/vr2hslrdUda7VGWQS/2DPucE=, tarball: https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/oauth/-/oauth-0.9.15.tgz}
 
   object-assign@4.1.1:
     resolution: {integrity: sha1-IQmtx5ZYh8/AXLvUQsrIv7s2CGM=, tarball: https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/object-assign/-/object-assign-4.1.1.tgz}
     engines: {node: '>=0.10.0'}
 
   object-hash@2.2.0:
-    resolution: {integrity: sha1-WtUYWB7vxEO9djRyuP8unCwNVKU=, tarball: https://ms-feed-2.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/object-hash/-/object-hash-2.2.0.tgz}
+    resolution: {integrity: sha1-WtUYWB7vxEO9djRyuP8unCwNVKU=, tarball: https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/object-hash/-/object-hash-2.2.0.tgz}
     engines: {node: '>= 6'}
 
   object-inspect@1.13.4:
@@ -3962,14 +3787,14 @@ packages:
     resolution: {integrity: sha1-YLEejP9iyp3uiNE3R6W6oUX1kAs=, tarball: https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/ohash/-/ohash-2.0.11.tgz}
 
   oidc-token-hash@5.2.0:
-    resolution: {integrity: sha1-voqIhcfiR40hpnThWvox8bzEph8=, tarball: https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/oidc-token-hash/-/oidc-token-hash-5.2.0.tgz}
+    resolution: {integrity: sha1-voqIhcfiR40hpnThWvox8bzEph8=, tarball: https://ms-feed-12.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/oidc-token-hash/-/oidc-token-hash-5.2.0.tgz}
     engines: {node: ^10.13.0 || >=12.0.0}
 
   once@1.4.0:
     resolution: {integrity: sha1-WDsap3WWHUsROsF9nFC6753Xa9E=, tarball: https://ms-feed-12.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/once/-/once-1.4.0.tgz}
 
   openid-client@5.7.1:
-    resolution: {integrity: sha1-NMrOhio+ZHLtfQqGFu9zt/uFqcM=, tarball: https://ms-feed-12.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/openid-client/-/openid-client-5.7.1.tgz}
+    resolution: {integrity: sha1-NMrOhio+ZHLtfQqGFu9zt/uFqcM=, tarball: https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/openid-client/-/openid-client-5.7.1.tgz}
 
   optionator@0.9.4:
     resolution: {integrity: sha1-fqHBpdkddk+yghOciP4R4YKjpzQ=, tarball: https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/optionator/-/optionator-0.9.4.tgz}
@@ -4009,7 +3834,7 @@ packages:
     engines: {node: '>=8'}
 
   path-expression-matcher@1.6.2:
-    resolution: {integrity: sha1-VnxzwHGX6dzvJOkO3NxXEFZZkWg=, tarball: https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/path-expression-matcher/-/path-expression-matcher-1.6.2.tgz}
+    resolution: {integrity: sha1-VnxzwHGX6dzvJOkO3NxXEFZZkWg=, tarball: https://ms-feed-12.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/path-expression-matcher/-/path-expression-matcher-1.6.2.tgz}
     engines: {node: '>=14.0.0'}
 
   path-is-absolute@1.0.1:
@@ -4198,21 +4023,10 @@ packages:
   rc9@3.0.1:
     resolution: {integrity: sha1-OJXlg0orXC2Pt22T6AL7y8JXm8c=, tarball: https://ms-feed-12.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/rc9/-/rc9-3.0.1.tgz}
 
-  react-aria@3.50.0:
-    resolution: {integrity: sha1-dcsALI/5S+O8GvtvcXs3xtBUgRk=, tarball: https://ms-feed-12.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/react-aria/-/react-aria-3.50.0.tgz}
-    peerDependencies:
-      react: ^16.8.0 || ^17.0.0-rc.1 || ^18.0.0 || ^19.0.0-rc.1
-      react-dom: ^16.8.0 || ^17.0.0-rc.1 || ^18.0.0 || ^19.0.0-rc.1
-
   react-dom@19.2.7:
     resolution: {integrity: sha1-BFDcmundv/du8ZZAHNi4x/tGbMw=, tarball: https://ms-feed-2.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/react-dom/-/react-dom-19.2.7.tgz}
     peerDependencies:
       react: ^19.2.7
-
-  react-icons@5.7.0:
-    resolution: {integrity: sha1-iWnbAJaP/fxX/cLsndHtiONbPek=, tarball: https://ms-feed-2.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/react-icons/-/react-icons-5.7.0.tgz}
-    peerDependencies:
-      react: '*'
 
   react-is@16.13.1:
     resolution: {integrity: sha1-eJcppNw23imZ3BVt1sHZwYzqVqQ=, tarball: https://ms-feed-2.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/react-is/-/react-is-16.13.1.tgz}
@@ -4236,11 +4050,6 @@ packages:
     peerDependenciesMeta:
       '@types/react':
         optional: true
-
-  react-stately@3.48.0:
-    resolution: {integrity: sha1-gLZY2Rogs1+YAxAjAiaKR3uoGeQ=, tarball: https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/react-stately/-/react-stately-3.48.0.tgz}
-    peerDependencies:
-      react: ^16.8.0 || ^17.0.0-rc.1 || ^18.0.0 || ^19.0.0-rc.1
 
   react-style-singleton@2.2.3:
     resolution: {integrity: sha1-QmVgi+aaTXDP4wR/LGyIssOs44g=, tarball: https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/react-style-singleton/-/react-style-singleton-2.2.3.tgz}
@@ -4338,14 +4147,8 @@ packages:
     engines: {node: 20 || >=22}
     hasBin: true
 
-  rss-parser@3.13.0:
-    resolution: {integrity: sha1-8fg7CoUWa4MQ7FMdpvuqU/8PUPA=, tarball: https://ms-feed-12.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/rss-parser/-/rss-parser-3.13.0.tgz}
-
   run-parallel@1.2.0:
     resolution: {integrity: sha1-ZtE2jae9+SHrnZW9GpIp5/IaQ+4=, tarball: https://ms-feed-12.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/run-parallel/-/run-parallel-1.2.0.tgz}
-
-  rxjs@7.8.2:
-    resolution: {integrity: sha1-lVvEc+2K8RoAKivlIHG/R1Y4YHs=, tarball: https://ms-feed-12.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/rxjs/-/rxjs-7.8.2.tgz}
 
   safe-array-concat@1.1.4:
     resolution: {integrity: sha1-pUzJthpX8ztCq608vdo6KzjMVxk=, tarball: https://ms-feed-12.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/safe-array-concat/-/safe-array-concat-1.1.4.tgz}
@@ -4513,10 +4316,10 @@ packages:
     engines: {node: '>=8'}
 
   strnum@2.4.1:
-    resolution: {integrity: sha1-hUF/aDETut6g/n4XInZ2+In/flg=, tarball: https://ms-feed-2.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/strnum/-/strnum-2.4.1.tgz}
+    resolution: {integrity: sha1-hUF/aDETut6g/n4XInZ2+In/flg=, tarball: https://ms-feed-12.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/strnum/-/strnum-2.4.1.tgz}
 
   styled-jsx@5.1.6:
-    resolution: {integrity: sha1-g7kMB35saoD39eh4HQ8xGy/kFJk=, tarball: https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/styled-jsx/-/styled-jsx-5.1.6.tgz}
+    resolution: {integrity: sha1-g7kMB35saoD39eh4HQ8xGy/kFJk=, tarball: https://ms-feed-12.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/styled-jsx/-/styled-jsx-5.1.6.tgz}
     engines: {node: '>= 12.0.0'}
     peerDependencies:
       '@babel/core': '*'
@@ -4543,13 +4346,6 @@ packages:
     resolution: {integrity: sha1-/SqhD/WFs70rg842AvVYK8Bxi7U=, tarball: https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/svgo/-/svgo-3.3.4.tgz}
     engines: {node: '>=14.0.0'}
     hasBin: true
-
-  swiper@12.2.0:
-    resolution: {integrity: sha1-9tqohkZavRu8Qr4vLOGCfNA8keo=, tarball: https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/swiper/-/swiper-12.2.0.tgz}
-    engines: {node: '>= 4.7.0'}
-
-  tabbable@6.5.0:
-    resolution: {integrity: sha1-plEBOFpP1svVgLdUbaAXDzB7U10=, tarball: https://ms-feed-2.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/tabbable/-/tabbable-6.5.0.tgz}
 
   tailwindcss@4.3.2:
     resolution: {integrity: sha1-QI7mfXZ6D+97F0Z0u5xc4TalrOE=, tarball: https://ms-feed-12.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/tailwindcss/-/tailwindcss-4.3.2.tgz}
@@ -4587,7 +4383,7 @@ packages:
     resolution: {integrity: sha1-UpnsYF5VsauyPsk57xXtr0gwcNQ=, tarball: https://ms-feed-2.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/tsconfig-paths/-/tsconfig-paths-3.15.0.tgz}
 
   tslib@2.8.1:
-    resolution: {integrity: sha1-YS7+TtI11Wfoq6Xypfq3AoCt6D8=, tarball: https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/tslib/-/tslib-2.8.1.tgz}
+    resolution: {integrity: sha1-YS7+TtI11Wfoq6Xypfq3AoCt6D8=, tarball: https://ms-feed-12.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/tslib/-/tslib-2.8.1.tgz}
 
   type-check@0.4.0:
     resolution: {integrity: sha1-B7ggO/pwVsBlcFDjzNLDdzC6uPE=, tarball: https://ms-feed-2.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/type-check/-/type-check-0.4.0.tgz}
@@ -4691,11 +4487,6 @@ packages:
       '@types/react':
         optional: true
 
-  use-sync-external-store@1.6.0:
-    resolution: {integrity: sha1-sXS/plyytSZzLZ8qwKQIAnh28y0=, tarball: https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/use-sync-external-store/-/use-sync-external-store-1.6.0.tgz}
-    peerDependencies:
-      react: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
-
   util-deprecate@1.0.2:
     resolution: {integrity: sha1-RQ1Nyfpw3nMnYvvS1KKJgUGaDM8=, tarball: https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/util-deprecate/-/util-deprecate-1.0.2.tgz}
 
@@ -4703,22 +4494,13 @@ packages:
     resolution: {integrity: sha1-9tgdLhxl0Adi5eKbFsXS2ZXiCK0=, tarball: https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/uuid/-/uuid-11.1.1.tgz}
     hasBin: true
 
-  uuid@8.3.2:
-    resolution: {integrity: sha1-gNW1ztJxu5r2xEXyGhoExgbO++I=, tarball: https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/uuid/-/uuid-8.3.2.tgz}
-    deprecated: uuid@10 and below is no longer supported.  For ESM codebases, update to uuid@latest.  For CommonJS codebases, use uuid@11 (but be aware this version will likely be deprecated in 2028).
-    hasBin: true
-
-  valibot@1.2.0:
-    resolution: {integrity: sha1-j8cg2eQIK6FuMKkUBko5YZsvHW8=, tarball: https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/valibot/-/valibot-1.2.0.tgz}
+  valibot@1.4.2:
+    resolution: {integrity: sha1-2oV3gRh/Fwrq9EmNRj0lAoYVsNY=, tarball: https://ms-feed-12.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/valibot/-/valibot-1.4.2.tgz}
     peerDependencies:
       typescript: '>=5'
     peerDependenciesMeta:
       typescript:
         optional: true
-
-  web-streams-polyfill@3.3.3:
-    resolution: {integrity: sha1-IHO5Gi/bH7+9QB594KyfghTOy0s=, tarball: https://ms-feed-12.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/web-streams-polyfill/-/web-streams-polyfill-3.3.3.tgz}
-    engines: {node: '>= 8'}
 
   which-boxed-primitive@1.1.1:
     resolution: {integrity: sha1-127Cfff6Fl8Y1YCDdKX+I8KbF24=, tarball: https://ms-feed-12.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/which-boxed-primitive/-/which-boxed-primitive-1.1.1.tgz}
@@ -4752,10 +4534,6 @@ packages:
     resolution: {integrity: sha1-RsHhi/4oWEeZgt0qzPNNFudJ7aI=, tarball: https://ms-feed-12.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/xml-naming/-/xml-naming-0.3.0.tgz}
     engines: {node: '>=16.0.0'}
 
-  xml2js@0.5.0:
-    resolution: {integrity: sha1-2UQGMfuy7YACA/rRBvJyT2LEk7c=, tarball: https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/xml2js/-/xml2js-0.5.0.tgz}
-    engines: {node: '>=4.0.0'}
-
   xml2js@0.6.2:
     resolution: {integrity: sha1-3QtjAIOqCcFh4lpNCQHisqkptJk=, tarball: https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/xml2js/-/xml2js-0.6.2.tgz}
     engines: {node: '>=4.0.0'}
@@ -4772,10 +4550,10 @@ packages:
     engines: {node: '>=0.4'}
 
   yallist@3.1.1:
-    resolution: {integrity: sha1-27fa+b/YusmrRev2ArjLrQ1dCP0=, tarball: https://ms-feed-2.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/yallist/-/yallist-3.1.1.tgz}
+    resolution: {integrity: sha1-27fa+b/YusmrRev2ArjLrQ1dCP0=, tarball: https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/yallist/-/yallist-3.1.1.tgz}
 
   yallist@4.0.0:
-    resolution: {integrity: sha1-m7knkNnA7/7GO+c1GeEaNQGaOnI=, tarball: https://ms-feed-2.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/yallist/-/yallist-4.0.0.tgz}
+    resolution: {integrity: sha1-m7knkNnA7/7GO+c1GeEaNQGaOnI=, tarball: https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/yallist/-/yallist-4.0.0.tgz}
 
   yocto-queue@0.1.0:
     resolution: {integrity: sha1-ApTrPe4FAo0x7hpfosVWpqrxChs=, tarball: https://ms-feed-12.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/yocto-queue/-/yocto-queue-0.1.0.tgz}
@@ -4794,29 +4572,8 @@ packages:
     peerDependencies:
       zod: ^3.25.0 || ^4.0.0
 
-  zod@3.25.75:
-    resolution: {integrity: sha1-j/m+L7vLOBqSNvn3Soh5yincxQQ=, tarball: https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/zod/-/zod-3.25.75.tgz}
-
   zod@4.4.3:
     resolution: {integrity: sha1-toDxcohdGLvr8hqDTqJeVaG781Y=, tarball: https://ms-feed-2.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/zod/-/zod-4.4.3.tgz}
-
-  zustand@5.0.14:
-    resolution: {integrity: sha1-GCFsJPy5gM82iY+cV1IOZ7H3eFU=, tarball: https://ms-feed-12.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/zustand/-/zustand-5.0.14.tgz}
-    engines: {node: '>=12.20.0'}
-    peerDependencies:
-      '@types/react': '>=18.0.0'
-      immer: '>=9.0.6'
-      react: '>=18.0.0'
-      use-sync-external-store: '>=1.2.0'
-    peerDependenciesMeta:
-      '@types/react':
-        optional: true
-      immer:
-        optional: true
-      react:
-        optional: true
-      use-sync-external-store:
-        optional: true
 
   zwitch@2.0.4:
     resolution: {integrity: sha1-yCfUsKy3b8PmhaTG7CkC1RBw6dc=, tarball: https://ms-feed-2.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/zwitch/-/zwitch-2.0.4.tgz}
@@ -4824,12 +4581,6 @@ packages:
 snapshots:
 
   '@alloc/quick-lru@5.2.0': {}
-
-  '@azure/msal-browser@4.30.0':
-    dependencies:
-      '@azure/msal-common': 15.17.0
-
-  '@azure/msal-common@15.17.0': {}
 
   '@babel/code-frame@7.29.7':
     dependencies:
@@ -5793,31 +5544,13 @@ snapshots:
       react: 19.2.7
       react-dom: 19.2.7(react@19.2.7)
 
-  '@floating-ui/react@0.26.28(react-dom@19.2.7(react@19.2.7))(react@19.2.7)':
-    dependencies:
-      '@floating-ui/react-dom': 2.1.9(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
-      '@floating-ui/utils': 0.2.12
-      react: 19.2.7
-      react-dom: 19.2.7(react@19.2.7)
-      tabbable: 6.5.0
-
   '@floating-ui/utils@0.2.12': {}
-
-  '@headlessui/react@2.2.10(react-dom@19.2.7(react@19.2.7))(react@19.2.7)':
-    dependencies:
-      '@floating-ui/react': 0.26.28(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
-      '@react-aria/focus': 3.22.1(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
-      '@react-aria/interactions': 3.28.1(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
-      '@tanstack/react-virtual': 3.14.6(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
-      react: 19.2.7
-      react-dom: 19.2.7(react@19.2.7)
-      use-sync-external-store: 1.6.0(react@19.2.7)
 
   '@heroicons/react@2.2.0(react@19.2.7)':
     dependencies:
       react: 19.2.7
 
-  '@hono/node-server@1.19.11(hono@4.12.30)':
+  '@hono/node-server@1.19.15(hono@4.12.30)':
     dependencies:
       hono: 4.12.30
 
@@ -5945,18 +5678,6 @@ snapshots:
   '@img/sharp-win32-x64@0.35.3':
     optional: true
 
-  '@internationalized/date@3.12.2':
-    dependencies:
-      '@swc/helpers': 0.5.23
-
-  '@internationalized/number@3.6.7':
-    dependencies:
-      '@swc/helpers': 0.5.23
-
-  '@internationalized/string@3.2.9':
-    dependencies:
-      '@swc/helpers': 0.5.23
-
   '@jridgewell/gen-mapping@0.3.13':
     dependencies:
       '@jridgewell/sourcemap-codec': 1.5.5
@@ -5978,27 +5699,6 @@ snapshots:
 
   '@kurkle/color@0.3.4': {}
 
-  '@microsoft/agents-activity@1.6.1':
-    dependencies:
-      zod: 3.25.75
-
-  '@microsoft/agents-copilotstudio-client@1.6.1':
-    dependencies:
-      '@microsoft/agents-activity': 1.6.1
-      '@microsoft/agents-telemetry': 1.6.1
-      eventsource-client: 1.2.0
-      rxjs: 7.8.2
-    transitivePeerDependencies:
-      - '@opentelemetry/api'
-      - '@opentelemetry/api-logs'
-      - supports-color
-
-  '@microsoft/agents-telemetry@1.6.1':
-    dependencies:
-      debug: 4.4.3
-    transitivePeerDependencies:
-      - supports-color
-
   '@napi-rs/wasm-runtime@1.1.6(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)':
     dependencies:
       '@emnapi/core': 1.10.0
@@ -6006,37 +5706,37 @@ snapshots:
       '@tybys/wasm-util': 0.10.3
     optional: true
 
-  '@next/env@16.2.10': {}
+  '@next/env@16.2.11': {}
 
   '@next/eslint-plugin-next@16.2.10':
     dependencies:
       fast-glob: 3.3.1
 
-  '@next/swc-darwin-arm64@16.2.10':
+  '@next/swc-darwin-arm64@16.2.11':
     optional: true
 
-  '@next/swc-darwin-x64@16.2.10':
+  '@next/swc-darwin-x64@16.2.11':
     optional: true
 
-  '@next/swc-linux-arm64-gnu@16.2.10':
+  '@next/swc-linux-arm64-gnu@16.2.11':
     optional: true
 
-  '@next/swc-linux-arm64-musl@16.2.10':
+  '@next/swc-linux-arm64-musl@16.2.11':
     optional: true
 
-  '@next/swc-linux-x64-gnu@16.2.10':
+  '@next/swc-linux-x64-gnu@16.2.11':
     optional: true
 
-  '@next/swc-linux-x64-musl@16.2.10':
+  '@next/swc-linux-x64-musl@16.2.11':
     optional: true
 
-  '@next/swc-win32-arm64-msvc@16.2.10':
+  '@next/swc-win32-arm64-msvc@16.2.11':
     optional: true
 
-  '@next/swc-win32-x64-msvc@16.2.10':
+  '@next/swc-win32-x64-msvc@16.2.11':
     optional: true
 
-  '@nodable/entities@2.2.0': {}
+  '@nodable/entities@3.0.0': {}
 
   '@nodelib/fs.scandir@2.1.5':
     dependencies:
@@ -6096,7 +5796,7 @@ snapshots:
       '@electric-sql/pglite': 0.4.1
       '@electric-sql/pglite-socket': 0.1.1(@electric-sql/pglite@0.4.1)
       '@electric-sql/pglite-tools': 0.3.1(@electric-sql/pglite@0.4.1)
-      '@hono/node-server': 1.19.11(hono@4.12.30)
+      '@hono/node-server': 1.19.15(hono@4.12.30)
       '@prisma/get-platform': 7.2.0
       '@prisma/query-plan-executor': 7.2.0
       '@prisma/streams-local': 0.1.2
@@ -6108,7 +5808,7 @@ snapshots:
       proper-lockfile: 4.1.2
       remeda: 2.33.4
       std-env: 3.10.0
-      valibot: 1.2.0(typescript@5.9.3)
+      valibot: 1.4.2(typescript@5.9.3)
       zeptomatch: 2.1.0
     transitivePeerDependencies:
       - typescript
@@ -6449,25 +6149,6 @@ snapshots:
 
   '@radix-ui/rect@1.1.2': {}
 
-  '@react-aria/focus@3.22.1(react-dom@19.2.7(react@19.2.7))(react@19.2.7)':
-    dependencies:
-      '@swc/helpers': 0.5.23
-      react: 19.2.7
-      react-aria: 3.50.0(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
-      react-dom: 19.2.7(react@19.2.7)
-
-  '@react-aria/interactions@3.28.1(react-dom@19.2.7(react@19.2.7))(react@19.2.7)':
-    dependencies:
-      '@react-types/shared': 3.36.0(react@19.2.7)
-      '@swc/helpers': 0.5.23
-      react: 19.2.7
-      react-aria: 3.50.0(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
-      react-dom: 19.2.7(react@19.2.7)
-
-  '@react-types/shared@3.36.0(react@19.2.7)':
-    dependencies:
-      react: 19.2.7
-
   '@rtsao/scc@1.1.0': {}
 
   '@standard-schema/spec@1.1.0': {}
@@ -6569,10 +6250,6 @@ snapshots:
     dependencies:
       tslib: 2.8.1
 
-  '@swc/helpers@0.5.23':
-    dependencies:
-      tslib: 2.8.1
-
   '@tailwindcss/node@4.3.2':
     dependencies:
       '@jridgewell/remapping': 2.3.5
@@ -6654,14 +6331,6 @@ snapshots:
       '@tanstack/query-core': 5.101.2
       react: 19.2.7
 
-  '@tanstack/react-virtual@3.14.6(react-dom@19.2.7(react@19.2.7))(react@19.2.7)':
-    dependencies:
-      '@tanstack/virtual-core': 3.17.4
-      react: 19.2.7
-      react-dom: 19.2.7(react@19.2.7)
-
-  '@tanstack/virtual-core@3.17.4': {}
-
   '@tybys/wasm-util@0.10.3':
     dependencies:
       tslib: 2.8.1
@@ -6683,11 +6352,6 @@ snapshots:
 
   '@types/ms@2.1.0': {}
 
-  '@types/node-fetch@2.6.13':
-    dependencies:
-      '@types/node': 25.9.5
-      form-data: 4.0.6
-
   '@types/node@14.18.63': {}
 
   '@types/node@25.9.5':
@@ -6703,12 +6367,6 @@ snapshots:
   '@types/react-dom@19.2.3(@types/react@19.2.17)':
     dependencies:
       '@types/react': 19.2.17
-
-  '@types/react-icons@3.0.0(react@19.2.7)':
-    dependencies:
-      react-icons: 5.7.0(react@19.2.7)
-    transitivePeerDependencies:
-      - react
 
   '@types/react@19.2.17':
     dependencies:
@@ -6881,14 +6539,14 @@ snapshots:
   '@unrs/resolver-binding-win32-x64-msvc@1.12.2':
     optional: true
 
-  '@vercel/analytics@1.6.1(next@16.2.10(@babel/core@7.29.7)(@playwright/test@1.61.1)(@types/node@25.9.5)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(react@19.2.7)':
+  '@vercel/analytics@1.6.1(next@16.2.11(@babel/core@7.29.7)(@playwright/test@1.61.1)(@types/node@25.9.5)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(react@19.2.7)':
     optionalDependencies:
-      next: 16.2.10(@babel/core@7.29.7)(@playwright/test@1.61.1)(@types/node@25.9.5)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+      next: 16.2.11(@babel/core@7.29.7)(@playwright/test@1.61.1)(@types/node@25.9.5)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       react: 19.2.7
 
-  '@vercel/speed-insights@1.3.1(next@16.2.10(@babel/core@7.29.7)(@playwright/test@1.61.1)(@types/node@25.9.5)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(react@19.2.7)':
+  '@vercel/speed-insights@1.3.1(next@16.2.11(@babel/core@7.29.7)(@playwright/test@1.61.1)(@types/node@25.9.5)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(react@19.2.7)':
     optionalDependencies:
-      next: 16.2.10(@babel/core@7.29.7)(@playwright/test@1.61.1)(@types/node@25.9.5)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+      next: 16.2.11(@babel/core@7.29.7)(@playwright/test@1.61.1)(@types/node@25.9.5)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       react: 19.2.7
 
   acorn-jsx@5.3.2(acorn@8.17.0):
@@ -6907,7 +6565,7 @@ snapshots:
   ajv@8.20.0:
     dependencies:
       fast-deep-equal: 3.1.3
-      fast-uri: 3.1.3
+      fast-uri: 3.1.4
       json-schema-traverse: 1.0.0
       require-from-string: 2.0.2
 
@@ -7033,8 +6691,6 @@ snapshots:
   async-function@1.0.0: {}
 
   async@3.2.6: {}
-
-  asynckit@0.4.0: {}
 
   autoprefixer@10.5.3(postcss@8.5.19):
     dependencies:
@@ -7203,17 +6859,11 @@ snapshots:
 
   client-only@0.0.1: {}
 
-  clsx@2.1.1: {}
-
   color-convert@2.0.1:
     dependencies:
       color-name: 1.1.4
 
   color-name@1.1.4: {}
-
-  combined-stream@1.0.8:
-    dependencies:
-      delayed-stream: 1.0.0
 
   commander@7.2.0: {}
 
@@ -7290,8 +6940,6 @@ snapshots:
 
   damerau-levenshtein@1.0.8: {}
 
-  data-uri-to-buffer@4.0.1: {}
-
   data-view-buffer@1.0.2:
     dependencies:
       call-bound: 1.0.4
@@ -7345,8 +6993,6 @@ snapshots:
       object-keys: 1.1.1
 
   defu@6.1.7: {}
-
-  delayed-stream@1.0.0: {}
 
   denque@2.1.0: {}
 
@@ -7438,8 +7084,6 @@ snapshots:
     dependencies:
       graceful-fs: 4.2.11
       tapable: 2.3.3
-
-  entities@2.2.0: {}
 
   entities@4.5.0: {}
 
@@ -7804,12 +7448,6 @@ snapshots:
 
   esutils@2.0.3: {}
 
-  eventsource-client@1.2.0:
-    dependencies:
-      eventsource-parser: 3.1.0
-
-  eventsource-parser@3.1.0: {}
-
   exceljs@4.4.0:
     dependencies:
       archiver: 5.3.2
@@ -7847,16 +7485,16 @@ snapshots:
 
   fast-levenshtein@2.0.6: {}
 
-  fast-uri@3.1.3: {}
+  fast-uri@3.1.4: {}
 
   fast-xml-builder@1.3.0:
     dependencies:
       path-expression-matcher: 1.6.2
       xml-naming: 0.3.0
 
-  fast-xml-parser@5.10.0:
+  fast-xml-parser@5.10.1:
     dependencies:
-      '@nodable/entities': 2.2.0
+      '@nodable/entities': 3.0.0
       fast-xml-builder: 1.3.0
       is-unsafe: 2.0.0
       path-expression-matcher: 1.6.2
@@ -7874,11 +7512,6 @@ snapshots:
   fdir@6.5.0(picomatch@4.0.5):
     optionalDependencies:
       picomatch: 4.0.5
-
-  fetch-blob@3.2.0:
-    dependencies:
-      node-domexception: 1.0.0
-      web-streams-polyfill: 3.3.3
 
   file-entry-cache@8.0.0:
     dependencies:
@@ -7909,19 +7542,7 @@ snapshots:
       cross-spawn: 7.0.6
       signal-exit: 4.1.0
 
-  form-data@4.0.6:
-    dependencies:
-      asynckit: 0.4.0
-      combined-stream: 1.0.8
-      es-set-tostringtag: 2.1.0
-      hasown: 2.0.4
-      mime-types: 2.1.35
-
   format@0.2.2: {}
-
-  formdata-polyfill@4.0.10:
-    dependencies:
-      fetch-blob: 3.2.0
 
   fraction.js@5.3.4: {}
 
@@ -8770,12 +8391,6 @@ snapshots:
       braces: 3.0.3
       picomatch: 2.3.2
 
-  mime-db@1.52.0: {}
-
-  mime-types@2.1.35:
-    dependencies:
-      mime-db: 1.52.0
-
   minimatch@10.2.5:
     dependencies:
       brace-expansion: 5.0.7
@@ -8820,29 +8435,29 @@ snapshots:
 
   natural-compare@1.4.0: {}
 
-  next-auth@4.24.14(next@16.2.10(@babel/core@7.29.7)(@playwright/test@1.61.1)(@types/node@25.9.5)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(react-dom@19.2.7(react@19.2.7))(react@19.2.7):
+  next-auth@4.24.15(next@16.2.11(@babel/core@7.29.7)(@playwright/test@1.61.1)(@types/node@25.9.5)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(react-dom@19.2.7(react@19.2.7))(react@19.2.7):
     dependencies:
       '@babel/runtime': 7.29.7
       '@panva/hkdf': 1.2.1
       cookie: 0.7.2
       jose: 4.15.9
-      next: 16.2.10(@babel/core@7.29.7)(@playwright/test@1.61.1)(@types/node@25.9.5)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+      next: 16.2.11(@babel/core@7.29.7)(@playwright/test@1.61.1)(@types/node@25.9.5)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       oauth: 0.9.15
       openid-client: 5.7.1
       preact: 10.29.7(preact-render-to-string@5.2.6)
       preact-render-to-string: 5.2.6(preact@10.29.7)
       react: 19.2.7
       react-dom: 19.2.7(react@19.2.7)
-      uuid: 8.3.2
+      uuid: 11.1.1
 
   next-themes@0.4.6(react-dom@19.2.7(react@19.2.7))(react@19.2.7):
     dependencies:
       react: 19.2.7
       react-dom: 19.2.7(react@19.2.7)
 
-  next@16.2.10(@babel/core@7.29.7)(@playwright/test@1.61.1)(@types/node@25.9.5)(react-dom@19.2.7(react@19.2.7))(react@19.2.7):
+  next@16.2.11(@babel/core@7.29.7)(@playwright/test@1.61.1)(@types/node@25.9.5)(react-dom@19.2.7(react@19.2.7))(react@19.2.7):
     dependencies:
-      '@next/env': 16.2.10
+      '@next/env': 16.2.11
       '@swc/helpers': 0.5.15
       baseline-browser-mapping: 2.10.43
       caniuse-lite: 1.0.30001805
@@ -8851,14 +8466,14 @@ snapshots:
       react-dom: 19.2.7(react@19.2.7)
       styled-jsx: 5.1.6(@babel/core@7.29.7)(react@19.2.7)
     optionalDependencies:
-      '@next/swc-darwin-arm64': 16.2.10
-      '@next/swc-darwin-x64': 16.2.10
-      '@next/swc-linux-arm64-gnu': 16.2.10
-      '@next/swc-linux-arm64-musl': 16.2.10
-      '@next/swc-linux-x64-gnu': 16.2.10
-      '@next/swc-linux-x64-musl': 16.2.10
-      '@next/swc-win32-arm64-msvc': 16.2.10
-      '@next/swc-win32-x64-msvc': 16.2.10
+      '@next/swc-darwin-arm64': 16.2.11
+      '@next/swc-darwin-x64': 16.2.11
+      '@next/swc-linux-arm64-gnu': 16.2.11
+      '@next/swc-linux-arm64-musl': 16.2.11
+      '@next/swc-linux-x64-gnu': 16.2.11
+      '@next/swc-linux-x64-musl': 16.2.11
+      '@next/swc-win32-arm64-msvc': 16.2.11
+      '@next/swc-win32-x64-msvc': 16.2.11
       '@playwright/test': 1.61.1
       sharp: 0.35.3(@types/node@25.9.5)
     transitivePeerDependencies:
@@ -8871,20 +8486,12 @@ snapshots:
       lower-case: 2.0.2
       tslib: 2.8.1
 
-  node-domexception@1.0.0: {}
-
   node-exports-info@1.6.2:
     dependencies:
       array.prototype.flatmap: 1.3.3
       es-errors: 1.3.0
       object.entries: 1.1.9
       semver: 6.3.1
-
-  node-fetch@3.3.2:
-    dependencies:
-      data-uri-to-buffer: 4.0.1
-      fetch-blob: 3.2.0
-      formdata-polyfill: 4.0.10
 
   node-releases@2.0.51: {}
 
@@ -9159,28 +8766,10 @@ snapshots:
       defu: 6.1.7
       destr: 2.0.5
 
-  react-aria@3.50.0(react-dom@19.2.7(react@19.2.7))(react@19.2.7):
-    dependencies:
-      '@internationalized/date': 3.12.2
-      '@internationalized/number': 3.6.7
-      '@internationalized/string': 3.2.9
-      '@react-types/shared': 3.36.0(react@19.2.7)
-      '@swc/helpers': 0.5.23
-      aria-hidden: 1.2.6
-      clsx: 2.1.1
-      react: 19.2.7
-      react-dom: 19.2.7(react@19.2.7)
-      react-stately: 3.48.0(react@19.2.7)
-      use-sync-external-store: 1.6.0(react@19.2.7)
-
   react-dom@19.2.7(react@19.2.7):
     dependencies:
       react: 19.2.7
       scheduler: 0.27.0
-
-  react-icons@5.7.0(react@19.2.7):
-    dependencies:
-      react: 19.2.7
 
   react-is@16.13.1: {}
 
@@ -9202,16 +8791,6 @@ snapshots:
       use-sidecar: 1.1.3(@types/react@19.2.17)(react@19.2.7)
     optionalDependencies:
       '@types/react': 19.2.17
-
-  react-stately@3.48.0(react@19.2.7):
-    dependencies:
-      '@internationalized/date': 3.12.2
-      '@internationalized/number': 3.6.7
-      '@internationalized/string': 3.2.9
-      '@react-types/shared': 3.36.0(react@19.2.7)
-      '@swc/helpers': 0.5.23
-      react: 19.2.7
-      use-sync-external-store: 1.6.0(react@19.2.7)
 
   react-style-singleton@2.2.3(@types/react@19.2.17)(react@19.2.7):
     dependencies:
@@ -9323,18 +8902,9 @@ snapshots:
       glob: 13.0.6
       package-json-from-dist: 1.0.1
 
-  rss-parser@3.13.0:
-    dependencies:
-      entities: 2.2.0
-      xml2js: 0.5.0
-
   run-parallel@1.2.0:
     dependencies:
       queue-microtask: 1.2.3
-
-  rxjs@7.8.2:
-    dependencies:
-      tslib: 2.8.1
 
   safe-array-concat@1.1.4:
     dependencies:
@@ -9592,10 +9162,6 @@ snapshots:
       picocolors: 1.1.1
       sax: 1.6.0
 
-  swiper@12.2.0: {}
-
-  tabbable@6.5.0: {}
-
   tailwindcss@4.3.2: {}
 
   tapable@2.3.3: {}
@@ -9788,21 +9354,13 @@ snapshots:
     optionalDependencies:
       '@types/react': 19.2.17
 
-  use-sync-external-store@1.6.0(react@19.2.7):
-    dependencies:
-      react: 19.2.7
-
   util-deprecate@1.0.2: {}
 
   uuid@11.1.1: {}
 
-  uuid@8.3.2: {}
-
-  valibot@1.2.0(typescript@5.9.3):
+  valibot@1.4.2(typescript@5.9.3):
     optionalDependencies:
       typescript: 5.9.3
-
-  web-streams-polyfill@3.3.3: {}
 
   which-boxed-primitive@1.1.1:
     dependencies:
@@ -9855,11 +9413,6 @@ snapshots:
 
   xml-naming@0.3.0: {}
 
-  xml2js@0.5.0:
-    dependencies:
-      sax: 1.6.0
-      xmlbuilder: 11.0.1
-
   xml2js@0.6.2:
     dependencies:
       sax: 1.6.0
@@ -9892,14 +9445,6 @@ snapshots:
     dependencies:
       zod: 4.4.3
 
-  zod@3.25.75: {}
-
   zod@4.4.3: {}
-
-  zustand@5.0.14(@types/react@19.2.17)(react@19.2.7)(use-sync-external-store@1.6.0(react@19.2.7)):
-    optionalDependencies:
-      '@types/react': 19.2.17
-      react: 19.2.7
-      use-sync-external-store: 1.6.0(react@19.2.7)
 
   zwitch@2.0.4: {}

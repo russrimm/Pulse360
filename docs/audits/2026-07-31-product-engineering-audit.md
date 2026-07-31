@@ -1,8 +1,8 @@
 # Pulse 360 Product and Engineering Audit
 
-**Audit date:** July 31, 2026  
-**Repository:** `russrimm/Pulse360`  
-**Branch:** `russrimm-pulse360-deep-audit`  
+**Audit date:** July 31, 2026
+**Repository:** `russrimm/Pulse360`
+**Branch:** `russrimm-pulse360-deep-audit`
 **Baseline:** `4d594a71ab58134f64c472cb995b3c8043187126`
 
 ## Executive summary

@@ -1,23 +1,29 @@
 import { NextResponse } from 'next/server';
 import { getMessages } from '@/lib/api.server';
+import { getMessageCenterAccess } from '@/lib/message-center-auth';
 
-// This site is intentionally public/anonymous. Message Center data is fetched
-// with app-only Graph credentials (AZURE_CLIENT_ID / AZURE_CLIENT_SECRET /
-// AZURE_TENANT_ID) and served to unauthenticated visitors by design, so this
-// route does not gate on a user session.
 export async function GET() {
+  const headers = {
+    'Cache-Control': 'private, no-store, max-age=0',
+    Vary: 'Cookie',
+  };
+
+  const access = await getMessageCenterAccess();
+  if (access === 'unconfigured') {
+    return NextResponse.json(
+      { error: 'Message Center access is not configured' },
+      { status: 503, headers }
+    );
+  }
+  if (access === 'authentication-required') {
+    return NextResponse.json({ error: 'Authentication required' }, { status: 401, headers });
+  }
+
   try {
     const messages = await getMessages();
-    return NextResponse.json(messages, {
-      headers: {
-        'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=300',
-      },
-    });
+    return NextResponse.json(messages, { headers });
   } catch (error) {
     console.error('Error in /api/messages:', error);
-    return NextResponse.json(
-      { error: 'Upstream service unavailable' },
-      { status: 500 },
-    );
+    return NextResponse.json({ error: 'Upstream service unavailable' }, { status: 503, headers });
   }
 }

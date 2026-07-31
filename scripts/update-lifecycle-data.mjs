@@ -49,7 +49,10 @@ function cellToString(value) {
   if (value instanceof Date) return value.toISOString().slice(0, 10);
   if (typeof value === 'object') {
     if ('richText' in value && Array.isArray(value.richText)) {
-      return value.richText.map(r => r.text).join('').trim();
+      return value.richText
+        .map(r => r.text)
+        .join('')
+        .trim();
     }
     if ('text' in value) return String(value.text).trim();
     if ('result' in value) return cellToString(value.result);
@@ -79,7 +82,7 @@ function cellToISO(value) {
   if (typeof value === 'string' && value.trim()) {
     const d = new Date(value);
     if (!isNaN(d.getTime())) return d.toISOString().slice(0, 10);
-    return value;
+    return null;
   }
   return null;
 }
@@ -112,12 +115,12 @@ async function fetchAndParseLifecycle() {
 
   // Convert to array-of-arrays (0-indexed)
   const raw = [];
-  worksheet.eachRow({ includeEmpty: false }, (row) => {
+  worksheet.eachRow({ includeEmpty: false }, row => {
     raw.push(row.values.slice(1));
   });
 
   // Find the header row
-  let headerIdx = 0;
+  let headerIdx = -1;
   for (let i = 0; i < Math.min(10, raw.length); i++) {
     const row = raw[i];
     if (
@@ -131,6 +134,10 @@ async function fetchAndParseLifecycle() {
     }
   }
 
+  if (headerIdx < 0) {
+    throw new Error('Could not find a lifecycle worksheet header row');
+  }
+
   const headers = raw[headerIdx].map(h => cellToString(h).toLowerCase());
 
   const colIdx = candidates => {
@@ -141,13 +148,29 @@ async function fetchAndParseLifecycle() {
     return -1;
   };
 
-  const iProduct = colIdx(['product name', 'listingname', 'listing name', 'product']);
-  const iVersion = colIdx(['version', 'edition', 'release']);
-  const iCategory = colIdx(['category', 'type', 'family', 'azurefeature', 'azure feature']);
+  const iProduct = colIdx([
+    'product listing name',
+    'product name',
+    'listingname',
+    'listing name',
+    'product',
+  ]);
+  const iEdition = colIdx(['edition']);
+  const iRelease = colIdx(['release', 'version']);
+  const iCategory = colIdx(['azure feature', 'azurefeature', 'category', 'type', 'family']);
+  const iSupportPolicy = colIdx(['support policy', 'supportpolicy']);
   const iStart = colIdx(['start date', 'general availability', 'launch date']);
-  const iEOS = colIdx(['end of support', 'mainstream end', 'support end', 'enddate', 'end date']);
-  const iExtended = colIdx(['extended', 'extended end']);
-  const iRetirement = colIdx(['retirement', 'retired']);
+  const iMainStream = colIdx(['mainstream end date', 'mainstream end']);
+  const iExtended = colIdx(['extended end date', 'extended end', 'extended']);
+  const iRetirement = colIdx(['retirement date', 'retirement', 'retired']);
+  const iReleaseStart = colIdx(['release start date', 'release start']);
+  const iReleaseEnd = colIdx(['release end date', 'release end']);
+  const iDocsUrl = colIdx(['docsurl', 'docs url', 'documentation url', 'url']);
+  const iEOS = colIdx(['end of support', 'support end', 'enddate', 'end date']);
+
+  if (iProduct < 0) {
+    throw new Error('Lifecycle worksheet is missing the product column');
+  }
 
   const rows = [];
 
@@ -158,12 +181,18 @@ async function fetchAndParseLifecycle() {
 
     rows.push({
       product,
-      version: iVersion >= 0 ? cellToString(row[iVersion]) : '',
+      edition: iEdition >= 0 ? cellToString(row[iEdition]) : '',
+      release: iRelease >= 0 ? cellToString(row[iRelease]) : '',
       category: iCategory >= 0 ? cellToString(row[iCategory]) : '',
+      supportPolicy: iSupportPolicy >= 0 ? cellToString(row[iSupportPolicy]) : '',
       startDate: iStart >= 0 ? cellToISO(row[iStart]) : null,
-      endOfSupportDate: iEOS >= 0 ? cellToISO(row[iEOS]) : null,
+      mainStreamEndDate: iMainStream >= 0 ? cellToISO(row[iMainStream]) : null,
       extendedEndDate: iExtended >= 0 ? cellToISO(row[iExtended]) : null,
       retirementDate: iRetirement >= 0 ? cellToISO(row[iRetirement]) : null,
+      releaseStartDate: iReleaseStart >= 0 ? cellToISO(row[iReleaseStart]) : null,
+      releaseEndDate: iReleaseEnd >= 0 ? cellToISO(row[iReleaseEnd]) : null,
+      docsUrl: iDocsUrl >= 0 ? cellToString(row[iDocsUrl]) : '',
+      endOfSupportDate: iEOS >= 0 ? cellToISO(row[iEOS]) : null,
     });
   }
 
@@ -189,7 +218,7 @@ async function main() {
 
     // Write to file
     const output = {
-      version: 1,
+      version: 2,
       fetchedAt: new Date().toISOString(),
       sourceUrl,
       rows,

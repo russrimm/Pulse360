@@ -1,11 +1,12 @@
 import { NextResponse } from 'next/server';
 import { readFileSync } from 'fs';
 import { join } from 'path';
-import ExcelJS from 'exceljs';
+import type ExcelJS from 'exceljs';
 
 const LEARN_EXPORT_PAGE = 'https://learn.microsoft.com/en-us/lifecycle/products/export/';
 // Cache TTL: 24 hours (in seconds)
 const CACHE_TTL = 60 * 60 * 24;
+const PERSISTED_DATA_STALE_MS = 8 * 24 * 60 * 60 * 1000;
 // Path to persistent data file
 const DATA_FILE = join(process.cwd(), 'public', 'data', 'lifecycle.json');
 
@@ -31,6 +32,7 @@ interface LegacyLifecycleRow {
   product: string;
   edition?: string;
   release?: string;
+  version?: string;
   category: string;
   supportPolicy?: string;
   startDate: string | null;
@@ -47,7 +49,7 @@ function normalizeLifecycleRow(row: LegacyLifecycleRow): LifecycleRow {
   return {
     product: row.product,
     edition: row.edition ?? '',
-    release: row.release ?? '',
+    release: row.release ?? row.version ?? '',
     category: row.category,
     supportPolicy: row.supportPolicy ?? '',
     startDate: row.startDate,
@@ -84,7 +86,10 @@ function cellToString(value: CellVal): string {
   if (value instanceof Date) return value.toISOString().slice(0, 10);
   if (typeof value === 'object') {
     if ('richText' in value && Array.isArray(value.richText)) {
-      return (value.richText as Array<{ text: string }>).map(r => r.text).join('').trim();
+      return (value.richText as Array<{ text: string }>)
+        .map(r => r.text)
+        .join('')
+        .trim();
     }
     if ('text' in value) return String((value as { text: unknown }).text).trim();
     if ('result' in value) return cellToString((value as { result: CellVal }).result);
@@ -111,7 +116,7 @@ function cellToISO(value: CellVal): string | null {
   if (typeof value === 'string' && value.trim()) {
     const d = new Date(value);
     if (!isNaN(d.getTime())) return d.toISOString().slice(0, 10);
-    return value;
+    return null;
   }
   return null;
 }
@@ -125,7 +130,8 @@ async function fetchAndParseLifecycle(): Promise<{ rows: LifecycleRow[]; sourceU
   if (!xlsxRes.ok) throw new Error(`Failed to download lifecycle XLSX: ${xlsxRes.status}`);
 
   const buffer = await xlsxRes.arrayBuffer();
-  const workbook = new ExcelJS.Workbook();
+  const { default: ExcelJSRuntime } = await import('exceljs');
+  const workbook = new ExcelJSRuntime.Workbook();
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   await workbook.xlsx.load(Buffer.from(buffer) as any);
 
@@ -134,22 +140,28 @@ async function fetchAndParseLifecycle(): Promise<{ rows: LifecycleRow[]; sourceU
 
   // Convert to array-of-arrays (0-indexed) to detect the header row dynamically
   const raw: CellVal[][] = [];
-  worksheet.eachRow({ includeEmpty: false }, (row) => {
+  worksheet.eachRow({ includeEmpty: false }, row => {
     // ExcelJS row.values is 1-indexed (index 0 is undefined), slice to 0-indexed
     raw.push((row.values as CellVal[]).slice(1));
   });
 
   // Find the header row (first row containing 'Product', 'ListingName', or similar)
-  let headerIdx = 0;
+  let headerIdx = -1;
   for (let i = 0; i < Math.min(10, raw.length); i++) {
     const row = raw[i];
-    if (row.some(c => {
-      const v = cellToString(c).toLowerCase();
-      return v.includes('product') || v.includes('listingname') || v.includes('listing name');
-    })) {
+    if (
+      row.some(c => {
+        const v = cellToString(c).toLowerCase();
+        return v.includes('product') || v.includes('listingname') || v.includes('listing name');
+      })
+    ) {
       headerIdx = i;
       break;
     }
+  }
+
+  if (headerIdx < 0) {
+    throw new Error('Could not find a lifecycle worksheet header row');
   }
 
   const headers = raw[headerIdx].map(h => cellToString(h).toLowerCase());
@@ -162,9 +174,15 @@ async function fetchAndParseLifecycle(): Promise<{ rows: LifecycleRow[]; sourceU
     return -1;
   };
 
-  const iProduct = colIdx(['product listing name', 'product name', 'listingname', 'listing name', 'product']);
+  const iProduct = colIdx([
+    'product listing name',
+    'product name',
+    'listingname',
+    'listing name',
+    'product',
+  ]);
   const iEdition = colIdx(['edition']);
-  const iRelease = colIdx(['release']);
+  const iRelease = colIdx(['release', 'version']);
   const iCategory = colIdx(['azure feature', 'azurefeature', 'category', 'type', 'family']);
   const iSupportPolicy = colIdx(['support policy', 'supportpolicy']);
   const iStart = colIdx(['start date', 'general availability', 'launch date']);
@@ -176,6 +194,9 @@ async function fetchAndParseLifecycle(): Promise<{ rows: LifecycleRow[]; sourceU
   const iDocsUrl = colIdx(['docsurl', 'docs url', 'documentation url', 'url']);
   const iEOS = colIdx(['end of support', 'support end', 'enddate', 'end date']);
 
+  if (iProduct < 0) {
+    throw new Error('Lifecycle worksheet is missing the product column');
+  }
   const rows: LifecycleRow[] = [];
 
   for (let i = headerIdx + 1; i < raw.length; i++) {
@@ -207,7 +228,6 @@ export async function GET() {
   try {
     const now = Date.now();
 
-    // Return in-memory cache if still fresh
     if (cachedData && now - cachedData.fetchedAt < CACHE_TTL * 1000) {
       return NextResponse.json({
         rows: cachedData.rows,
@@ -215,24 +235,31 @@ export async function GET() {
         cachedAt: new Date(cachedData.fetchedAt).toISOString(),
         fromCache: true,
         source: 'memory',
+        isStale: now - cachedData.fetchedAt > PERSISTED_DATA_STALE_MS,
       });
     }
 
-    // Try to load from persistent file
     try {
       const fileContent = readFileSync(DATA_FILE, 'utf-8');
       const data = JSON.parse(fileContent);
 
       if (data.rows && Array.isArray(data.rows)) {
-        const hasReleaseField = data.rows.length === 0 || data.rows.some((row: LegacyLifecycleRow) => 'release' in row);
+        const hasReleaseField =
+          data.rows.length === 0 ||
+          data.rows.some((row: LegacyLifecycleRow) => 'release' in row || 'version' in row);
         if (!hasReleaseField) {
           throw new Error('Lifecycle cache uses legacy schema without release field');
+        }
+
+        const fetchedAt = new Date(data.fetchedAt).getTime();
+        if (!Number.isFinite(fetchedAt)) {
+          throw new Error('Lifecycle cache has an invalid fetchedAt timestamp');
         }
 
         const normalizedRows = (data.rows as LegacyLifecycleRow[]).map(normalizeLifecycleRow);
         cachedData = {
           rows: normalizedRows,
-          fetchedAt: new Date(data.fetchedAt).getTime(),
+          fetchedAt,
           sourceUrl: data.sourceUrl,
         };
 
@@ -242,14 +269,13 @@ export async function GET() {
           cachedAt: data.fetchedAt,
           fromCache: true,
           source: 'file',
+          isStale: now - fetchedAt > PERSISTED_DATA_STALE_MS,
         });
       }
     } catch (fileError) {
-      // File doesn't exist or is invalid, fall back to fetching
       console.warn('Could not read lifecycle data file, fetching fresh data:', fileError);
     }
 
-    // Fall back to fetching fresh data if file doesn't exist or is invalid
     const { rows, sourceUrl } = await fetchAndParseLifecycle();
     cachedData = { rows, fetchedAt: now, sourceUrl };
 
@@ -259,9 +285,13 @@ export async function GET() {
       cachedAt: new Date(now).toISOString(),
       fromCache: false,
       source: 'live-fetch',
+      isStale: false,
     });
-  } catch (e: unknown) {
-    const message = e instanceof Error ? e.message : 'Unknown error';
-    return NextResponse.json({ error: message }, { status: 500 });
+  } catch (error: unknown) {
+    console.error('Lifecycle API failed:', error);
+    return NextResponse.json(
+      { error: 'Lifecycle data is temporarily unavailable' },
+      { status: 503 }
+    );
   }
 }

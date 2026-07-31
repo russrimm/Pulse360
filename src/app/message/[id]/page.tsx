@@ -1,12 +1,16 @@
-import { getMessage } from '@/lib/api.server';
-import { MessageDetail } from '@/components/MessageDetail';
-import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import { cache } from 'react';
-import { buildDetailMetadata, buildMissingDetailMetadata } from '@/lib/detailMetadata';
+import { notFound, redirect } from 'next/navigation';
+import { MessageDetail } from '@/components/MessageDetail';
+import { getMessage } from '@/lib/api.server';
+import { getMessageCenterAccess } from '@/lib/message-center-auth';
 
-// Enable ISR for this page - revalidate every 24 hours
-export const revalidate = 86400;
+export const dynamic = 'force-dynamic';
+
+export const metadata: Metadata = {
+  title: 'Message Center Update',
+  robots: { index: false, follow: false },
+};
 
 interface MessagePageProps {
   params: Promise<{ id: string }>;
@@ -14,25 +18,16 @@ interface MessagePageProps {
 
 const getCachedMessage = cache(getMessage);
 
-export async function generateMetadata({ params }: MessagePageProps): Promise<Metadata> {
-  const { id } = await params;
-  const message = await getCachedMessage(id);
-  if (!message) return buildMissingDetailMetadata('Message');
-
-  return buildDetailMetadata({
-    title: message.title,
-    description: message.summary || message.content,
-    canonicalPath: `/message/${id}`,
-  });
-}
-
 export default async function MessagePage({ params }: MessagePageProps) {
   const { id } = await params;
-  const message = await getCachedMessage(id);
-
-  if (!message) {
-    return notFound();
+  const access = await getMessageCenterAccess();
+  if (access === 'unconfigured') notFound();
+  if (access === 'authentication-required') {
+    redirect(`/api/auth/signin?callbackUrl=${encodeURIComponent(`/message/${id}`)}`);
   }
+
+  const message = await getCachedMessage(id);
+  if (!message) notFound();
 
   return <MessageDetail message={message} />;
 }

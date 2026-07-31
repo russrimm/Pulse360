@@ -13,32 +13,37 @@ import AzureADProvider from 'next-auth/providers/azure-ad';
  * Required env vars for the sign-in flow:
  *   - AUTH_AZURE_AD_CLIENT_ID
  *   - AUTH_AZURE_AD_CLIENT_SECRET
- *   - AUTH_AZURE_AD_TENANT_ID   (defaults to 'common')
+ *   - AUTH_AZURE_AD_TENANT_ID   (required; tenant data must not use 'common')
  *   - NEXTAUTH_SECRET           (used to sign JWT session cookies)
  *   - NEXTAUTH_URL              (public base URL in production)
  *
- * When these are unset, next-auth is left unconfigured and API routes that
- * call `requireSession()` will fail closed.
+ * When these are unset, next-auth is left unconfigured and production Message
+ * Center routes fail closed unless MESSAGE_CENTER_PUBLIC=true is explicit.
  */
 
 const clientId = process.env.AUTH_AZURE_AD_CLIENT_ID;
 const clientSecret = process.env.AUTH_AZURE_AD_CLIENT_SECRET;
-const tenantId = process.env.AUTH_AZURE_AD_TENANT_ID ?? 'common';
+const tenantId = process.env.AUTH_AZURE_AD_TENANT_ID;
+const nextAuthSecret = process.env.NEXTAUTH_SECRET;
 
-export const isAuthConfigured = Boolean(
-  clientId && clientSecret && process.env.NEXTAUTH_SECRET,
-);
+export const isAuthConfigured = Boolean(clientId && clientSecret && tenantId && nextAuthSecret);
+
+function createProviders(): NextAuthOptions['providers'] {
+  if (!clientId || !clientSecret || !tenantId || !nextAuthSecret) {
+    return [];
+  }
+
+  return [
+    AzureADProvider({
+      clientId,
+      clientSecret,
+      tenantId,
+    }),
+  ];
+}
 
 export const authOptions: NextAuthOptions = {
-  providers: isAuthConfigured
-    ? [
-        AzureADProvider({
-          clientId: clientId!,
-          clientSecret: clientSecret!,
-          tenantId,
-        }),
-      ]
-    : [],
+  providers: createProviders(),
   session: { strategy: 'jwt' },
-  secret: process.env.NEXTAUTH_SECRET,
+  secret: nextAuthSecret,
 };

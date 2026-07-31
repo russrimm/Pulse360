@@ -1,19 +1,39 @@
 import type { Metadata } from 'next';
+import { redirect } from 'next/navigation';
 import { HomeContent } from '@/components/HomeContent';
+import { FilterProvider } from '@/components/FilterContext';
 import { getMessages, getMessageSyncMetadata } from '@/lib/api.server';
+import { getMessageCenterAccess } from '@/lib/message-center-auth';
 
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: 'Microsoft 365 Message Center | Pulse 360',
-  description: 'Search Microsoft 365 service announcements published from the configured tenant.',
+  title: 'Microsoft 365 Message Center',
+  description: 'Tenant-specific Microsoft 365 service updates and changes.',
+  robots: { index: false, follow: false },
 };
 
 export default async function MessageCenterPage() {
-  const messages = await getMessages();
-  const { lastSyncAt, isStale } = await getMessageSyncMetadata();
-  const formattedSyncTime = lastSyncAt
-    ? `${new Date(lastSyncAt).toLocaleString('en-US', {
+  const access = await getMessageCenterAccess();
+  if (access === 'unconfigured') {
+    return (
+      <section className="mx-auto max-w-2xl px-4 py-16 text-center" role="alert">
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+          Message Center unavailable
+        </h1>
+        <p className="mt-3 text-gray-600 dark:text-gray-400">
+          Configure tenant sign-in before exposing Message Center data in production.
+        </p>
+      </section>
+    );
+  }
+  if (access === 'authentication-required') {
+    redirect('/api/auth/signin?callbackUrl=%2Fmessage-center');
+  }
+
+  const [messages, syncMetadata] = await Promise.all([getMessages(), getMessageSyncMetadata()]);
+  const formattedSyncTime = syncMetadata.lastSyncAt
+    ? `${new Date(syncMetadata.lastSyncAt).toLocaleString('en-US', {
         dateStyle: 'medium',
         timeStyle: 'short',
         timeZone: 'UTC',
@@ -30,13 +50,17 @@ export default async function MessageCenterPage() {
           <p className="text-gray-600 dark:text-gray-400 mb-2">
             Stay informed about Microsoft 365 service updates and changes
           </p>
-          <p className={`text-xs ${isStale ? 'text-amber-600 dark:text-amber-400' : 'text-gray-500 dark:text-gray-400'}`}>
+          <p
+            className={`text-xs ${syncMetadata.isStale ? 'text-amber-600 dark:text-amber-400' : 'text-gray-500 dark:text-gray-400'}`}
+          >
             Source: Microsoft Graph Message Center for the configured tenant. Last successful sync:{' '}
-            <time dateTime={lastSyncAt ?? undefined}>{formattedSyncTime}</time>
-            {isStale ? ' — data may be stale.' : ''}
+            <time dateTime={syncMetadata.lastSyncAt ?? undefined}>{formattedSyncTime}</time>
+            {syncMetadata.isStale ? ' - data may be stale.' : ''}
           </p>
         </div>
-        <HomeContent messages={messages} />
+        <FilterProvider>
+          <HomeContent messages={messages} />
+        </FilterProvider>
       </div>
     </div>
   );

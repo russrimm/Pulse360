@@ -1,6 +1,22 @@
 import { XMLParser } from 'fast-xml-parser';
 import { ProductNews } from './types';
 import { getFeedItemId, getFeedTimestamp } from './feed/normalize';
+import { COPILOT_STUDIO_RELEASE_URL, COPILOT_STUDIO_RELEASE_WAVE_LABEL } from '@/lib/feed/sources';
+
+interface RssItem {
+  guid?: string | { '#text'?: string };
+  title: string;
+  link: string;
+  description: string;
+  pubDate: string;
+  author?: string;
+  'dc:creator'?: string;
+  category: string | string[];
+}
+function normalizeFeedDate(value: string): string {
+  const timestamp = getFeedTimestamp(value);
+  return timestamp ? new Date(timestamp).toISOString() : '';
+}
 
 export async function getPowerAppsNews(): Promise<ProductNews[]> {
   try {
@@ -20,7 +36,7 @@ export async function getPowerAppsNews(): Promise<ProductNews[]> {
     const result = parser.parse(xmlText);
     const items = result.rss.channel.item;
 
-    const news: ProductNews[] = items.map((item: any) => ({
+    const news: ProductNews[] = items.map((item: RssItem) => ({
       id: getFeedItemId(item.guid, item.link),
       title: item.title,
       link: item.link,
@@ -30,10 +46,8 @@ export async function getPowerAppsNews(): Promise<ProductNews[]> {
       categories: Array.isArray(item.category) ? item.category : [item.category].filter(Boolean),
     }));
 
-    return news.sort(
-      (a, b) => getFeedTimestamp(b.publishDate) - getFeedTimestamp(a.publishDate)
-    );
-  } catch (error) {
+    return news.sort((a, b) => getFeedTimestamp(b.publishDate) - getFeedTimestamp(a.publishDate));
+  } catch {
     return [];
   }
 }
@@ -56,7 +70,7 @@ export async function getPowerPlatformNews(): Promise<ProductNews[]> {
     const result = parser.parse(xmlText);
     const items = result.rss.channel.item;
 
-    const news: ProductNews[] = items.map((item: any) => ({
+    const news: ProductNews[] = items.map((item: RssItem) => ({
       id: getFeedItemId(item.guid, item.link),
       title: item.title,
       link: item.link,
@@ -66,10 +80,8 @@ export async function getPowerPlatformNews(): Promise<ProductNews[]> {
       categories: Array.isArray(item.category) ? item.category : [item.category].filter(Boolean),
     }));
 
-    return news.sort(
-      (a, b) => getFeedTimestamp(b.publishDate) - getFeedTimestamp(a.publishDate)
-    );
-  } catch (error) {
+    return news.sort((a, b) => getFeedTimestamp(b.publishDate) - getFeedTimestamp(a.publishDate));
+  } catch {
     return [];
   }
 }
@@ -96,7 +108,7 @@ export async function getPowerAutomateNews(): Promise<ProductNews[]> {
     }
 
     return result.rss.channel.item
-      .map((item: any) => ({
+      .map((item: RssItem) => ({
         id: getFeedItemId(item.guid, item.link),
         title: item.title,
         description: item.description,
@@ -109,7 +121,7 @@ export async function getPowerAutomateNews(): Promise<ProductNews[]> {
         (a: ProductNews, b: ProductNews) =>
           getFeedTimestamp(b.publishDate) - getFeedTimestamp(a.publishDate)
       );
-  } catch (error) {
+  } catch {
     return [];
   }
 }
@@ -136,7 +148,7 @@ export async function getPowerBINews(): Promise<ProductNews[]> {
     }
 
     return result.rss.channel.item
-      .map((item: any) => ({
+      .map((item: RssItem) => ({
         id: getFeedItemId(item.guid, item.link),
         title: item.title,
         description: item.description,
@@ -149,7 +161,7 @@ export async function getPowerBINews(): Promise<ProductNews[]> {
         (a: ProductNews, b: ProductNews) =>
           getFeedTimestamp(b.publishDate) - getFeedTimestamp(a.publishDate)
       );
-  } catch (error) {
+  } catch {
     return [];
   }
 }
@@ -188,8 +200,7 @@ export async function getCopilotStudioNews(): Promise<ProductNews[]> {
 
           // Extract feature name and link
           let feature = featureCell.replace(/<[^>]*>/g, '').trim();
-          let link =
-            'https://learn.microsoft.com/en-us/power-platform/release-plan/2024wave2/microsoft-copilot-studio/planned-features';
+          let link = COPILOT_STUDIO_RELEASE_URL;
 
           // Try to find a link in the feature cell
           const linkMatch = featureCell.match(/<a[^>]*href="([^"]*)"[^>]*>([^<]*)<\/a>/);
@@ -205,20 +216,20 @@ export async function getCopilotStudioNews(): Promise<ProductNews[]> {
           }
 
           features.push({
-            id: `feature-${features.length + 1}`,
+            id: `${link}#${feature.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`,
             title: feature,
             description: `Enabled for: ${enabledFor}\nPublic Preview: ${publicPreview}\nGeneral Availability: ${generalAvailability}`,
             link: link,
-            publishDate: new Date().toISOString(), // Use current date since these are planned features
-            author: '', // Remove author information
-            categories: ['Release Plan', '2024 Wave 2'],
+            publishDate: '',
+            author: '',
+            categories: ['Release Plan', COPILOT_STUDIO_RELEASE_WAVE_LABEL],
           });
         }
       }
     }
 
     return features;
-  } catch (error) {
+  } catch {
     return [];
   }
 }
@@ -241,7 +252,7 @@ export async function getLearnBlogNews(): Promise<ProductNews[]> {
     const result = parser.parse(xmlText);
     const items = result.rss.channel.item;
 
-    const news: ProductNews[] = items.map((item: any) => ({
+    const news: ProductNews[] = items.map((item: RssItem) => ({
       id: getFeedItemId(item.guid, item.link),
       title: item.title,
       link: item.link,
@@ -251,102 +262,90 @@ export async function getLearnBlogNews(): Promise<ProductNews[]> {
       categories: Array.isArray(item.category) ? item.category : [item.category].filter(Boolean),
     }));
 
-    return news.sort(
-      (a, b) => getFeedTimestamp(b.publishDate) - getFeedTimestamp(a.publishDate)
-    );
-  } catch (error) {
+    return news.sort((a, b) => getFeedTimestamp(b.publishDate) - getFeedTimestamp(a.publishDate));
+  } catch {
     return [];
   }
 }
 
 export async function getMicrosoftNews(): Promise<ProductNews[]> {
-  try {
-    const response = await fetch('/api/microsoft-news');
-    if (!response.ok) {
-      throw new Error('Failed to fetch Microsoft Blog news');
-    }
-
-    const xml = await response.text();
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(xml, 'text/xml');
-    const items = doc.querySelectorAll('item');
-
-    const news: ProductNews[] = Array.from(items).map(item => {
-      const title = item.querySelector('title')?.textContent || '';
-      const link = item.querySelector('link')?.textContent || '';
-      const description = item.querySelector('description')?.textContent || '';
-      const pubDate = item.querySelector('pubDate')?.textContent || '';
-      const author = item.getElementsByTagName('dc:creator')[0]?.textContent?.trim() || '';
-      const categories = Array.from(item.querySelectorAll('category')).map(
-        cat => cat.textContent || ''
-      );
-      const publishDate = new Date(pubDate).toISOString();
-
-      return {
-        id: `${link}-${publishDate}`,
-        title,
-        link,
-        description,
-        publishDate,
-        author,
-        categories,
-      };
-    });
-
-    // Filter to only posts from the past 12 months
-    const twelveMonthsAgo = new Date();
-    twelveMonthsAgo.setMonth(twelveMonthsAgo.getMonth() - 12);
-    const filteredNews = news.filter(n => {
-      const date = new Date(n.publishDate);
-      return date >= twelveMonthsAgo;
-    });
-
-    return filteredNews.sort(
-      (a, b) => getFeedTimestamp(b.publishDate) - getFeedTimestamp(a.publishDate)
-    );
-  } catch (error) {
-    throw error;
+  const response = await fetch('/api/microsoft-news');
+  if (!response.ok) {
+    throw new Error('Failed to fetch Microsoft Blog news');
   }
+
+  const xml = await response.text();
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(xml, 'text/xml');
+  const items = doc.querySelectorAll('item');
+
+  const news: ProductNews[] = Array.from(items).map(item => {
+    const title = item.querySelector('title')?.textContent || '';
+    const link = item.querySelector('link')?.textContent || '';
+    const description = item.querySelector('description')?.textContent || '';
+    const pubDate = item.querySelector('pubDate')?.textContent || '';
+    const author = item.getElementsByTagName('dc:creator')[0]?.textContent?.trim() || '';
+    const categories = Array.from(item.querySelectorAll('category')).map(
+      cat => cat.textContent || ''
+    );
+    const publishDate = normalizeFeedDate(pubDate);
+
+    return {
+      id: `${link}-${publishDate}`,
+      title,
+      link,
+      description,
+      publishDate,
+      author,
+      categories,
+    };
+  });
+
+  // Filter to only posts from the past 12 months
+  const twelveMonthsAgo = new Date();
+  twelveMonthsAgo.setMonth(twelveMonthsAgo.getMonth() - 12);
+  const filteredNews = news.filter(n => {
+    const date = new Date(n.publishDate);
+    return date >= twelveMonthsAgo;
+  });
+
+  return filteredNews.sort(
+    (a, b) => getFeedTimestamp(b.publishDate) - getFeedTimestamp(a.publishDate)
+  );
 }
 
 export async function getTechCommunityNews(): Promise<ProductNews[]> {
-  try {
-    const response = await fetch('/api/tech-community-news');
-    if (!response.ok) {
-      throw new Error('Failed to fetch Tech Community news');
-    }
-    const xmlText = await response.text();
-    const parser = new DOMParser();
-    const xmlDoc = parser.parseFromString(xmlText, 'text/xml');
-    const items = xmlDoc.getElementsByTagName('item');
-
-    const news: ProductNews[] = Array.from(items).map(item => {
-      const title = item.getElementsByTagName('title')[0]?.textContent || '';
-      const link = item.getElementsByTagName('link')[0]?.textContent || '';
-      const description = item.getElementsByTagName('description')[0]?.textContent || '';
-      const pubDate = item.getElementsByTagName('pubDate')[0]?.textContent || '';
-      const author = item.getElementsByTagName('dc:creator')[0]?.textContent || '';
-      const categories = Array.from(item.getElementsByTagName('category')).map(
-        cat => cat.textContent || ''
-      );
-
-      return {
-        id: `${link}-${pubDate}`,
-        title,
-        link,
-        description,
-        publishDate: new Date(pubDate).toISOString(),
-        author,
-        categories,
-      };
-    });
-
-    return news.sort(
-      (a, b) => getFeedTimestamp(b.publishDate) - getFeedTimestamp(a.publishDate)
-    );
-  } catch (error) {
-    throw error;
+  const response = await fetch('/api/tech-community-news');
+  if (!response.ok) {
+    throw new Error('Failed to fetch Tech Community news');
   }
+  const xmlText = await response.text();
+  const parser = new DOMParser();
+  const xmlDoc = parser.parseFromString(xmlText, 'text/xml');
+  const items = xmlDoc.getElementsByTagName('item');
+
+  const news: ProductNews[] = Array.from(items).map(item => {
+    const title = item.getElementsByTagName('title')[0]?.textContent || '';
+    const link = item.getElementsByTagName('link')[0]?.textContent || '';
+    const description = item.getElementsByTagName('description')[0]?.textContent || '';
+    const pubDate = item.getElementsByTagName('pubDate')[0]?.textContent || '';
+    const author = item.getElementsByTagName('dc:creator')[0]?.textContent || '';
+    const categories = Array.from(item.getElementsByTagName('category')).map(
+      cat => cat.textContent || ''
+    );
+
+    return {
+      id: `${link}-${pubDate}`,
+      title,
+      link,
+      description,
+      publishDate: normalizeFeedDate(pubDate),
+      author,
+      categories,
+    };
+  });
+
+  return news.sort((a, b) => getFeedTimestamp(b.publishDate) - getFeedTimestamp(a.publishDate));
 }
 
 export async function getCopilotNews(): Promise<ProductNews[]> {
@@ -367,7 +366,7 @@ export async function getCopilotNews(): Promise<ProductNews[]> {
     const result = parser.parse(xmlText);
     const items = result.rss.channel.item;
 
-    const news: ProductNews[] = items.map((item: any) => ({
+    const news: ProductNews[] = items.map((item: RssItem) => ({
       id: getFeedItemId(item.guid, item.link),
       title: item.title,
       link: item.link,
@@ -377,10 +376,8 @@ export async function getCopilotNews(): Promise<ProductNews[]> {
       categories: Array.isArray(item.category) ? item.category : [item.category].filter(Boolean),
     }));
 
-    return news.sort(
-      (a, b) => getFeedTimestamp(b.publishDate) - getFeedTimestamp(a.publishDate)
-    );
-  } catch (error) {
+    return news.sort((a, b) => getFeedTimestamp(b.publishDate) - getFeedTimestamp(a.publishDate));
+  } catch {
     return [];
   }
 }
@@ -406,7 +403,7 @@ export async function getSemanticKernelNews(): Promise<ProductNews[]> {
     });
     const result = parser.parse(xmlText);
     const items = result.rss.channel.item;
-    const news: ProductNews[] = items.map((item: any) => ({
+    const news: ProductNews[] = items.map((item: RssItem) => ({
       id: getFeedItemId(item.guid, item.link),
       title: item.title,
       link: item.link,
@@ -415,10 +412,8 @@ export async function getSemanticKernelNews(): Promise<ProductNews[]> {
       author: item['dc:creator'] || '',
       categories: Array.isArray(item.category) ? item.category : [item.category].filter(Boolean),
     }));
-    return news.sort(
-      (a, b) => getFeedTimestamp(b.publishDate) - getFeedTimestamp(a.publishDate)
-    );
-  } catch (error) {
+    return news.sort((a, b) => getFeedTimestamp(b.publishDate) - getFeedTimestamp(a.publishDate));
+  } catch {
     return [];
   }
 }
@@ -438,7 +433,7 @@ export async function getAzureAIFoundryNews(): Promise<ProductNews[]> {
     });
     const result = parser.parse(xmlText);
     const items = result.rss.channel.item;
-    const news: ProductNews[] = items.map((item: any) => ({
+    const news: ProductNews[] = items.map((item: RssItem) => ({
       id: getFeedItemId(item.guid, item.link),
       title: item.title,
       link: item.link,
@@ -447,10 +442,8 @@ export async function getAzureAIFoundryNews(): Promise<ProductNews[]> {
       author: item['dc:creator'] || '',
       categories: Array.isArray(item.category) ? item.category : [item.category].filter(Boolean),
     }));
-    return news.sort(
-      (a, b) => getFeedTimestamp(b.publishDate) - getFeedTimestamp(a.publishDate)
-    );
-  } catch (error) {
+    return news.sort((a, b) => getFeedTimestamp(b.publishDate) - getFeedTimestamp(a.publishDate));
+  } catch {
     return [];
   }
 }

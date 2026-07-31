@@ -18,11 +18,7 @@
     "dotfiles:bootstrap:all": "node scripts/bootstrap-dotfiles.mjs --all-repos --scan-root .."
   },
   "dependencies": {
-    "@azure/msal-browser": "^4.27.0",
-    "@headlessui/react": "^2.2.9",
     "@heroicons/react": "^2.2.0",
-    "@microsoft/agents-activity": "^1.1.1",
-    "@microsoft/agents-copilotstudio-client": "^1.1.1",
     "@prisma/adapter-pg": "7.9.0-dev.25",
     "@prisma/client": "^7.1.0",
     "@prisma/client-runtime-utils": "^7.1.0",
@@ -37,20 +33,15 @@
     "baseline-browser-mapping": "^2.10.38",
     "date-fns": "^4.1.0",
     "exceljs": "^4.4.0",
-    "fast-xml-parser": "^5.3.3",
-    "next": "^16.2.9",
-    "next-auth": "^4.24.13",
+    "fast-xml-parser": "^5.10.1",
+    "next": "^16.2.11",
+    "next-auth": "^4.24.15",
     "next-themes": "^0.4.6",
-    "node-fetch": "^3.3.2",
     "postgres": "^3.4.7",
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
-    "react-icons": "^5.5.0",
-    "rss-parser": "^3.13.0",
     "sanitize-html": "^2.17.5",
-    "swiper": "^12.0.3",
-    "xml2js": "^0.6.2",
-    "zustand": "^5.0.9"
+    "xml2js": "^0.6.2"
   },
   "devDependencies": {
     "@eslint/css": "^0.14.1",
@@ -61,10 +52,8 @@
     "@svgr/webpack": "^8.1.0",
     "@tailwindcss/typography": "^0.5.19",
     "@types/node": "^25.0.2",
-    "@types/node-fetch": "^2.6.13",
     "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3",
-    "@types/react-icons": "^3.0.0",
     "@typescript-eslint/eslint-plugin": "^8.50.0",
     "@typescript-eslint/parser": "^8.50.0",
     "autoprefixer": "^10.4.23",
@@ -86,9 +75,12 @@
   "packageManager": "pnpm@10.34.5",
   "pnpm": {
     "overrides": {
+      "@hono/node-server": "^1.19.13",
       "exceljs>uuid": "^11.1.1",
+      "fast-uri": "^3.1.4",
       "postcss": "$postcss",
-      "sharp": "$sharp"
+      "sharp": "$sharp",
+      "valibot": "^1.4.2"
     },
     "onlyBuiltDependencies": [
       "@prisma/client",
