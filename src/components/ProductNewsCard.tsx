@@ -2,8 +2,8 @@
 
 import { ProductNews } from '@/lib/types';
 import type { ReactNode } from 'react';
-import { useEffect, useState } from 'react';
 import { getFeedTimestamp } from '@/lib/feed/normalize';
+import { normalizeFeedText } from '@/lib/feed/text';
 
 interface ProductNewsCardProps {
   news: ProductNews;
@@ -12,43 +12,37 @@ interface ProductNewsCardProps {
 
 // Helper to get author slug for Microsoft News
 function getAuthorSlug(author: string) {
-  if (!author) return ''
-  return author.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')
+  if (!author) return '';
+  return author
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/(^-|-$)/g, '');
 }
 
 function AuthorWithTitle({ author }: { author: string }) {
-  const slug = getAuthorSlug(author)
-  const authorUrl = `https://blogs.microsoft.com/blog/author/${slug}/`
+  const slug = getAuthorSlug(author);
+  const authorUrl = `https://blogs.microsoft.com/blog/author/${slug}/`;
   return (
     <p className="text-xs text-gray-500 dark:text-gray-400 mb-2 text-center">
       Published by{' '}
-      <a href={authorUrl} target="_blank" rel="noopener noreferrer" className="underline hover:text-primary-700">
+      <a
+        href={authorUrl}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="underline hover:text-primary-700"
+      >
         {author}
       </a>
     </p>
-  )
+  );
 }
 
 export function ProductNewsCard({ news }: ProductNewsCardProps) {
-  const [decodedTitle, setDecodedTitle] = useState(news.title);
-  const [decodedDescription, setDecodedDescription] = useState(news.description);
-  const [decodedAuthor, setDecodedAuthor] = useState(news.author);
-
-  useEffect(() => {
-    const decodeHtmlEntities = (text: string) => {
-      const textarea = document.createElement('textarea');
-      textarea.innerHTML = text;
-      return textarea.value;
-    };
-
-    const safeTitle = typeof news.title === 'string' ? news.title : '';
-    const safeDescription = typeof news.description === 'string' ? news.description : '';
-    const safeAuthor = typeof news.author === 'string' ? news.author : '';
-
-    setDecodedTitle(decodeHtmlEntities(safeTitle));
-    setDecodedDescription(decodeHtmlEntities(safeDescription.replace(/<[^>]*>/g, '')));
-    setDecodedAuthor(decodeHtmlEntities(safeAuthor));
-  }, [news]);
+  const decodedTitle = normalizeFeedText(typeof news.title === 'string' ? news.title : '');
+  const decodedDescription = normalizeFeedText(
+    typeof news.description === 'string' ? news.description : ''
+  );
+  const decodedAuthor = normalizeFeedText(typeof news.author === 'string' ? news.author : '');
 
   const publishTimestamp = getFeedTimestamp(news.publishDate);
   const formattedPublishDate = publishTimestamp
@@ -67,11 +61,17 @@ export function ProductNewsCard({ news }: ProductNewsCardProps) {
           onClick={() => window.open(news.link, '_blank', 'noopener,noreferrer')}
           tabIndex={0}
           role="button"
-          onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') window.open(news.link, '_blank', 'noopener,noreferrer') }}
+          onKeyDown={e => {
+            if (e.key === 'Enter' || e.key === ' ')
+              window.open(news.link, '_blank', 'noopener,noreferrer');
+          }}
           aria-label={`Open news: ${decodedTitle}`}
         >
           <div className="flex-1 w-full min-w-0">
-            <h3 className="w-full overflow-hidden text-lg font-bold text-gray-900 dark:text-white group-hover:text-primary-600 dark:group-hover:text-primary-400 mb-2 text-center" style={{ wordBreak: 'normal', overflowWrap: 'anywhere' }}>
+            <h3
+              className="w-full overflow-hidden text-lg font-bold text-gray-900 dark:text-white group-hover:text-primary-600 dark:group-hover:text-primary-400 mb-2 text-center"
+              style={{ wordBreak: 'normal', overflowWrap: 'anywhere' }}
+            >
               {decodedTitle}
             </h3>
             <time
@@ -80,7 +80,7 @@ export function ProductNewsCard({ news }: ProductNewsCardProps) {
             >
               {formattedPublishDate}
             </time>
-            {news.author && <AuthorWithTitle author={news.author} />}
+            {decodedAuthor && <AuthorWithTitle author={decodedAuthor} />}
             <p className="text-base text-gray-700 dark:text-gray-300 line-clamp-3 text-center mt-2">
               {decodedDescription}
             </p>
@@ -101,4 +101,4 @@ export function ProductNewsCard({ news }: ProductNewsCardProps) {
       </div>
     </div>
   );
-} 
+}

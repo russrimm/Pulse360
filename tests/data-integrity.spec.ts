@@ -1,10 +1,12 @@
 import { expect, test } from '@playwright/test';
-import { getFeedItemId, getFeedTimestamp } from '../src/lib/feed/normalize';
+import { decodeHtmlEntities, getFeedItemId, getFeedTimestamp } from '../src/lib/feed/normalize';
 import { isAllowedImageHost, isSsrfHost } from '../src/lib/imageProxySecurity';
 import { getLifecycleExpiryStatus, parseLifecycleDate } from '../src/lib/lifecycle';
 import { getMsrcImpact, getMsrcSeverity } from '../src/lib/msrc';
 import { matchesMessageSearch } from '../src/lib/messageSearch';
 import { getFabricRoadmaps, parseFabricRoadmapPayload } from '../src/lib/fabricApi';
+import { buildDetailMetadata, buildMissingDetailMetadata } from '../src/lib/detailMetadata';
+import { normalizeFeedText } from '../src/lib/feed/text';
 
 test.describe('MSRC CVRF normalization', () => {
   const threats = [
@@ -42,8 +44,8 @@ test.describe('lifecycle date normalization', () => {
           extendedEndDate: null,
           retirementDate: '2026-07-31',
         },
-        now,
-      ),
+        now
+      )
     ).toBe('expiring-soon');
   });
 });
@@ -52,13 +54,43 @@ test.describe('feed identity and dates', () => {
   test('preserves both plain and attributed RSS guid values', () => {
     expect(getFeedItemId('stable-id', 'https://example.com/item')).toBe('stable-id');
     expect(getFeedItemId({ '#text': 'attributed-id' }, 'https://example.com/item')).toBe(
-      'attributed-id',
+      'attributed-id'
     );
   });
 
   test('sorts malformed feed dates as oldest instead of producing NaN', () => {
     expect(getFeedTimestamp('not-a-date')).toBe(0);
     expect(getFeedTimestamp('2026-07-31T00:00:00Z')).toBeGreaterThan(0);
+  });
+
+  test('decodes named, decimal, and hexadecimal feed entities without a DOM effect', () => {
+    expect(decodeHtmlEntities('R&amp;D &#8212; &#x1F680;')).toBe('R&D — 🚀');
+    expect(normalizeFeedText('<p>AI &mdash; caf&eacute; &amp; cloud</p>')).toBe(
+      'AI — café & cloud'
+    );
+  });
+});
+
+test.describe('detail metadata', () => {
+  test('creates canonical, social, and HTML-free metadata with bounded descriptions', () => {
+    const metadata = buildDetailMetadata({
+      title: 'Update &amp; rollout',
+      description: `<p>${'A'.repeat(170)}</p>`,
+      canonicalPath: '/message/MC123',
+    });
+
+    expect(metadata.title).toBe('Update & rollout | Pulse 360');
+    expect(metadata.description).not.toContain('<p>');
+    expect(String(metadata.description)).toHaveLength(160);
+    expect(metadata.alternates).toEqual({ canonical: '/message/MC123' });
+    expect(metadata.openGraph).toMatchObject({ type: 'article', url: '/message/MC123' });
+  });
+
+  test('marks missing detail metadata as non-indexable', () => {
+    expect(buildMissingDetailMetadata('Message')).toMatchObject({
+      title: 'Message not found | Pulse 360',
+      robots: { index: false, follow: false },
+    });
   });
 });
 
@@ -119,7 +151,7 @@ test.describe('Fabric roadmap payload resilience', () => {
 
   test('still rejects payloads that are not a roadmap response', () => {
     expect(() => parseFabricRoadmapPayload('{"message":"upstream error"}')).toThrow(
-      'Fabric roadmap returned an invalid response',
+      'Fabric roadmap returned an invalid response'
     );
   });
 
@@ -135,7 +167,7 @@ test.describe('Fabric roadmap payload resilience', () => {
       }
       return new Response(
         '{"results":[{"ReleaseItemID":"1","FeatureName":"Available","FeatureDescription":"","ReleaseDate":"2026-07","ReleaseType":"Preview","ReleaseStatus":"In development","ProductName":"Fabric"}]}',
-        { status: 200 },
+        { status: 200 }
       );
     };
 

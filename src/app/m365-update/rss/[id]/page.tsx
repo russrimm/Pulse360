@@ -4,15 +4,31 @@ import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { format } from 'date-fns';
 import { ProductBadge } from '@/components/ProductBadge';
+import type { Metadata } from 'next';
+import { cache } from 'react';
+import { buildDetailMetadata, buildMissingDetailMetadata } from '@/lib/detailMetadata';
 
-interface PageProps {
-  params: { id: string };
-  searchParams?: { [key: string]: string | string[] | undefined };
+interface M365RssUpdatePageProps {
+  params: Promise<{ id: string }>;
 }
 
-export default async function M365UpdatePage({ params }: { params: Promise<{ id: string }> }) {
+const getCachedM365Update = cache(getM365Update);
+
+export async function generateMetadata({ params }: M365RssUpdatePageProps): Promise<Metadata> {
   const { id } = await params;
-  const update = await getM365Update(id);
+  const update = await getCachedM365Update(id);
+  if (!update) return buildMissingDetailMetadata('Microsoft 365 update');
+
+  return buildDetailMetadata({
+    title: update.title,
+    description: update.content,
+    canonicalPath: `/m365-update/${id}`,
+  });
+}
+
+export default async function M365UpdatePage({ params }: M365RssUpdatePageProps) {
+  const { id } = await params;
+  const update = await getCachedM365Update(id);
 
   if (!update) {
     notFound();
@@ -29,7 +45,12 @@ export default async function M365UpdatePage({ params }: { params: Promise<{ id:
             className="inline-flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M10 19l-7-7m0 0l7-7m-7 7h18"
+              />
             </svg>
             Back to Microsoft 365 Updates
           </Link>
@@ -56,9 +77,9 @@ export default async function M365UpdatePage({ params }: { params: Promise<{ id:
 
             {/* Content */}
             <div className="prose dark:prose-invert max-w-none">
-              <div 
+              <div
                 className="text-gray-700 dark:text-gray-200"
-                dangerouslySetInnerHTML={{ __html: safeContent }} 
+                dangerouslySetInnerHTML={{ __html: safeContent }}
               />
             </div>
 
@@ -73,9 +94,11 @@ export default async function M365UpdatePage({ params }: { params: Promise<{ id:
             {/* Services */}
             {update.service && update.service.length > 0 && (
               <div className="mt-8 pt-6 border-t border-gray-200 dark:border-gray-700">
-                <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Affected Services</h2>
+                <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+                  Affected Services
+                </h2>
                 <div className="flex flex-wrap gap-2">
-                  {update.service.map((service) => (
+                  {update.service.map(service => (
                     <span
                       key={service}
                       className="inline-flex items-center px-2 py-1 rounded-lg text-sm font-medium bg-gray-50 text-gray-700 dark:bg-gray-700/50 dark:text-gray-300 border border-gray-200 dark:border-gray-600"
@@ -89,11 +112,15 @@ export default async function M365UpdatePage({ params }: { params: Promise<{ id:
 
             {/* Dates */}
             <div className="mt-8 pt-6 border-t border-gray-200 dark:border-gray-700">
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Availability</h2>
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+                Availability
+              </h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {update.generalAvailabilityDate && (
                   <div>
-                    <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300">General Availability</h3>
+                    <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                      General Availability
+                    </h3>
                     <p className="text-sm text-gray-600 dark:text-gray-400">
                       {format(new Date(update.generalAvailabilityDate), 'MMMM d, yyyy')}
                     </p>
@@ -101,7 +128,9 @@ export default async function M365UpdatePage({ params }: { params: Promise<{ id:
                 )}
                 {update.previewAvailabilityDate && (
                   <div>
-                    <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300">Preview</h3>
+                    <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                      Preview
+                    </h3>
                     <p className="text-sm text-gray-600 dark:text-gray-400">
                       {format(new Date(update.previewAvailabilityDate), 'MMMM d, yyyy')}
                     </p>
@@ -115,7 +144,7 @@ export default async function M365UpdatePage({ params }: { params: Promise<{ id:
               <div className="mt-8 pt-6 border-t border-gray-200 dark:border-gray-700">
                 <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Tags</h2>
                 <div className="flex flex-wrap gap-2">
-                  {update.tags.map((tag) => (
+                  {update.tags.map(tag => (
                     <span
                       key={tag}
                       className="inline-flex items-center px-2 py-1 rounded-lg text-sm font-medium bg-gray-50 text-gray-700 dark:bg-gray-700/50 dark:text-gray-300 border border-gray-200 dark:border-gray-600"
@@ -131,4 +160,4 @@ export default async function M365UpdatePage({ params }: { params: Promise<{ id:
       </div>
     </div>
   );
-} 
+}
