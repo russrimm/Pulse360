@@ -144,7 +144,7 @@ Below are screenshots of every major page in both **dark** and **light** mode.
 | Sanitization        | `isomorphic-dompurify` (server-rendered HTML from feeds)                                                |
 | Telemetry           | Optional analytics and performance monitoring integrations                                              |
 | Tests               | **Playwright 1.57** (Chromium, Firefox, WebKit)                                                         |
-| Hosting target      | Azure Static Web Apps (Node 22.12+ or 24.0+ with Next.js 16)                                            |
+| Hosting target      | Vercel (Node 22.12+ or 24.0+ with Next.js 16)                                                           |
 
 **Engines:** Node `^22.12.0 || ^24.0.0`, pnpm `>=9.0.0`.
 
@@ -495,13 +495,13 @@ Pulse 360 uses Postgres via Prisma to **cache Microsoft Graph Message Center upd
    pnpm exec prisma migrate deploy
    ```
 
-5. In the Azure portal, add `DATABASE_URL` under the Static Web App's **Environment variables**, using the same connection string. The `build` script already runs `prisma generate && prisma migrate deploy` so new migrations reach production automatically on each deploy.
+5. In Vercel, add `DATABASE_URL` under the project's **Environment Variables**, using the same connection string. The `build` script already runs `prisma generate && prisma migrate deploy` so new migrations reach production automatically on each deploy.
 
 #### Notes
 
 - Prisma 7 requires `prisma.config.ts` at the repo root (already committed). The datasource URL is read from `DATABASE_URL` there — do **not** re-add `url` to `schema.prisma`.
 - The generated client is **not** committed (`/src/generated/prisma` is in `.gitignore`); `pnpm install` runs `prisma generate` automatically via the `postinstall` hook.
-- Any Postgres-compatible provider works (Neon, Supabase, Azure Database for PostgreSQL, local Postgres in Docker). SQLite is not supported on Azure Static Web Apps because its managed filesystem is not durable application storage.
+- Any Postgres-compatible provider works (Neon, Supabase, Azure Database for PostgreSQL, local Postgres in Docker). SQLite is not suitable for production serverless deployments because their filesystems are not durable application storage.
 - Optional: `pnpm exec prisma studio` opens a GUI to browse the cached rows.
 
 ---
@@ -635,17 +635,16 @@ The ESLint config covers TypeScript, React, Next.js, JSON, CSS, and Markdown fil
 
 ## Deployment
 
-Pulse 360° is hosted on **Azure Static Web Apps** and can also run on other Azure services that support Node 20.19+ or 22.12+ and Next.js 16.
+Pulse 360° is hosted on **Vercel** and can also run on other services that support Node 22.12+ or 24.0+ and Next.js 16.
 
-**Azure Static Web Apps (recommended):**
+**Vercel (production):**
 
-1. Create an Azure Static Web App and connect it to this GitHub repository.
-2. Use the **Next.js** build preset with `/` as the app location and `.next` as the output location.
-3. Add environment variables in the Azure portal:
+1. Import this GitHub repository into Vercel. Vercel detects the Next.js application and uses `pnpm build`.
+2. Add environment variables in the Vercel project:
    - `AZURE_CLIENT_ID`, `AZURE_TENANT_ID`, `AZURE_CLIENT_SECRET` (or `AZURE_API_URL` pointing at your APIM endpoint in APIM mode)
    - `DATABASE_URL` — required for `/message-center` (see [Database (Prisma)](#database-prisma))
    - Interactive Entra and NextAuth variables listed above (recommended); otherwise Message Center remains unavailable unless explicitly made public
-4. Add the deployment token to the repository as `AZURE_STATIC_WEB_APPS_API_TOKEN_PURPLE_RIVER_045B0790F`, then run the included Azure Static Web Apps workflow. The `build` script generates the Prisma client, applies configured migrations, and builds the app.
+3. Deploy the project. The `build` script generates the Prisma client, applies configured migrations, and builds the app.
 
 **Self-host:**
 
@@ -657,14 +656,9 @@ pnpm start   # serves on port 3000
 
 Put it behind a reverse proxy (Caddy / nginx / CloudFront) with HTTPS terminated upstream. Set `NODE_ENV=production`.
 
-**Azure Static Web Apps npm-vs-pnpm note:**
-
-The Azure Static Web Apps workflow at `.github/workflows/azure-static-web-apps-purple-river-045b0790f.yml` sets `app_build_command: "npm run build"` even though the project's `packageManager` is `pnpm@10.34.5`. This is intentional: SWA's Oryx builder doesn't invoke pnpm reliably, so the workflow uses npm (which reads the committed `package-lock.json`) for the cloud build. Local development, contributor tooling, and the `update-lifecycle-data.yml` workflow all continue to use pnpm.
-
 **Notes:**
 
 - The site never persists Graph tokens — each request acquires a fresh access token via the client credentials flow.
-- If Azure Static Web Apps hosting limits clip the largest Graph pages, move the affected route to Azure App Service or Azure Container Apps for greater runtime control.
 - `next.config.js` whitelists images from `devblogs.microsoft.com` and `winblogs.thesourcemediaassets.com`. Add hosts here if you embed images from new sources.
 
 ---
@@ -689,7 +683,7 @@ If you find a security issue, please email the maintainer (see [Contact](#contac
 You're in dev mode without Graph creds. Either set them in `.env.local` and restart, or set `NODE_ENV=production` if you intentionally want the app to boot with the Message Center disabled.
 
 **`/message-center` is empty in production.**
-The Graph token request failed silently. Check the Azure Static Web Apps logs. Common causes:
+The Graph token request failed silently. Check the Vercel logs. Common causes:
 
 - `AZURE_CLIENT_SECRET` expired — generate a new one in Entra and update the env var.
 - Admin consent for `ServiceMessage.Read.All` was never granted.

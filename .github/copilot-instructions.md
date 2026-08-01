@@ -38,7 +38,7 @@ pnpm exec playwright test --project=chromium     # Single browser
 - **Auth**: `next-auth` v4 (route at `src/app/api/auth/[...nextauth]/route.ts`, helpers in `src/lib/auth.ts`)
 - **Feeds & parsing**: `rss-parser`, `fast-xml-parser`, `xml2js`
 - **Analytics**: Optional analytics and performance monitoring integrations
-- **Deployment**: Azure Static Web Apps (CI/CD in `.github/workflows/azure-static-web-apps-*.yml`); scheduled workflows `sync-message-center.yml` and `update-lifecycle-data.yml` also live there
+- **Deployment**: Vercel (configuration and active cron in `vercel.json`); scheduled workflows `sync-message-center.yml` and `update-lifecycle-data.yml` also live in `.github/workflows`
 
 ### Data Flow
 
