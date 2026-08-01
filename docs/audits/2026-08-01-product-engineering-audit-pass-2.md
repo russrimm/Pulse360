@@ -112,6 +112,14 @@ opaque `@odata.nextLink` supplied by Graph.
 - Initial author-page work is now exactly **one** `/api/microsoft-news-authors` request and
   **one** `/api/author-feed` request. The prior call path performed two of each. A browser
   regression test asserts the new 4-to-2 request reduction in Chromium, Firefox, and WebKit.
+
+### Contributor portability
+
+- Replaced 315 pre-existing Azure DevOps `ms-feed-12` tarball prefixes in `pnpm-lock.yaml`
+  with `https://registry.npmjs.org/`. The rewrite changed only the registry prefixes; package
+  paths and integrity hashes were preserved.
+- `pnpm install --frozen-lockfile --registry=https://registry.npmjs.org/` passed after the
+  rewrite, removing the external-contributor dependency on an internal Microsoft mirror.
 - Author metadata fan-out now fetches each author's title and recent-feed status in parallel,
   is cached, is timeout-bounded, and returns explicit upstream failures.
 
@@ -164,7 +172,7 @@ opaque `@odata.nextLink` supplied by Graph.
 | ESLint                      | Passed with 0 errors and 99 warnings (9 fewer warnings than baseline)                                                                                                                     |
 | Clean production build      | Passed; 57 static pages; 71.85 seconds; `.next` 69,838,538 bytes                                                                                                                          |
 | Production dependency audit | Unchanged: 2 high `brace-expansion` advisories through `exceljs`, 1 moderate `@hono/node-server` advisory through Prisma tooling                                                          |
-| Package mirror references   | `package-lock.json` is absent. `pnpm-lock.yaml` contains 315 `ms-feed-12` tarball references and 0 `packagefeedproxy` references.                                                         |
+| Package mirror references   | `package-lock.json` is absent. `pnpm-lock.yaml` contains 0 `ms-feed-12`, 0 `packagefeedproxy`, and 315 public `registry.npmjs.org` tarball references; frozen public-registry install passed. |
 | Node 24 check               | Prisma generation/native dependencies and build passed; no deprecated Node API usage was found in application source; pending-deprecation script run emitted no warning                   |
 | Production smoke            | `/` and `/home` 200; `/api/messages` 503 with private/no-store and `Vary: Cookie`; cron 503; missing RSS URL and malformed MSRC month ID 400                                              |
 
@@ -196,9 +204,6 @@ as a stable regression without repeated CI samples.
 4. Add a database-backed sync lease if operators expect multiple independent schedulers or
    long-running concurrent syncs. Timestamp guards now protect row state, but a lease would
    also avoid duplicate Graph traffic.
-5. Regenerate `pnpm-lock.yaml` against `https://registry.npmjs.org` in a dedicated dependency
-   change. The current lockfile contains 315 pre-existing `ms-feed-12` mirror tarball URLs,
-   which creates an avoidable external-contributor and build-portability dependency.
 
 ### P2
 
