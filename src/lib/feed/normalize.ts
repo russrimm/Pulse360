@@ -2,6 +2,11 @@ interface FeedGuidObject {
   '#text'?: unknown;
 }
 
+export function normalizeFeedItems<T>(items: T | T[] | null | undefined): T[] {
+  if (items == null) return [];
+  return Array.isArray(items) ? items : [items];
+}
+
 export function getFeedItemId(guid: unknown, link: string): string {
   if (typeof guid === 'string' && guid.trim()) return guid.trim();
 

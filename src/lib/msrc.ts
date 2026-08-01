@@ -15,12 +15,12 @@ export function getMsrcFieldValue(field: MsrcField | string | null | undefined):
 
 export function getMsrcImpact(threats: MsrcThreat[] | undefined): string {
   if (!Array.isArray(threats)) return '';
-  const impactThreat = threats.find(threat => threat.Type === 0);
+  const impactThreat = threats.find(threat => threat.Type === 0 || threat.Type === '0');
   return getMsrcFieldValue(impactThreat?.Description);
 }
 
 export function getMsrcSeverity(threats: MsrcThreat[] | undefined): string {
   if (!Array.isArray(threats)) return '';
-  const severityThreat = threats.find(threat => threat.Type === 3);
+  const severityThreat = threats.find(threat => threat.Type === 3 || threat.Type === '3');
   return getMsrcFieldValue(severityThreat?.Description);
 }

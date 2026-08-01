@@ -5,10 +5,12 @@ import type { MessageCenterUpdate } from '@/generated/prisma';
 import { XMLParser } from 'fast-xml-parser';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
+import { parseGraphDate } from './graph';
 
 // Base URL without version path — supports both /v1.0 and /beta
 const RAW_AZURE_API_URL = process.env.AZURE_API_URL?.trim();
 const DIRECT_GRAPH_BASE_URL = 'https://graph.microsoft.com';
+const GRAPH_REQUEST_TIMEOUT_MS = 15_000;
 
 function normalizeApiBaseUrl(url?: string): string {
   const value = url || DIRECT_GRAPH_BASE_URL;
@@ -276,6 +278,7 @@ async function fetchAllMessagesFromGraph(): Promise<GraphApiMessage[]> {
       headers,
       // Persistence is our cache now; skip Next's fetch cache.
       cache: 'no-store',
+      signal: AbortSignal.timeout(GRAPH_REQUEST_TIMEOUT_MS),
     });
 
     if (!response.ok) {
@@ -377,6 +380,7 @@ async function fetchMessageFromGraph(id: string): Promise<GraphApiMessage | null
   let response = await fetch(graphUrl(requestPath, 'v1.0', requestBaseUrl), {
     headers,
     cache: 'no-store',
+    signal: AbortSignal.timeout(GRAPH_REQUEST_TIMEOUT_MS),
   });
 
   if (isApimMode && hasLocalCredentials && response.status === 401) {
@@ -388,6 +392,7 @@ async function fetchMessageFromGraph(id: string): Promise<GraphApiMessage | null
       response = await fetch(graphUrl(requestPath, 'v1.0', requestBaseUrl), {
         headers,
         cache: 'no-store',
+        signal: AbortSignal.timeout(GRAPH_REQUEST_TIMEOUT_MS),
       });
     } else {
       throw new Error(`Failed to fetch message: ${response.status} ${response.statusText}`);
@@ -455,6 +460,7 @@ async function ensureMessagesSynced(): Promise<void> {
 
 export async function syncMessagesFromGraph(): Promise<void> {
   const prisma = getPrisma();
+  const syncStartedAt = new Date();
   const [graphMessages, activeMessageCount] = await Promise.all([
     fetchAllMessagesFromGraph(),
     prisma.messageCenterUpdate.count({ where: { status: 'active' } }),
@@ -473,16 +479,26 @@ export async function syncMessagesFromGraph(): Promise<void> {
   const CHUNK = 50;
   for (let i = 0; i < graphMessages.length; i += CHUNK) {
     const chunk = graphMessages.slice(i, i + CHUNK);
-    await prisma.$transaction(
-      chunk.map(m => {
+    await prisma.$transaction([
+      prisma.messageCenterUpdate.createMany({
+        data: chunk.map(m => {
+          const status = deriveStatus(m, 'active');
+          return graphMessageToDbInput(m, status, syncStartedAt);
+        }),
+        skipDuplicates: true,
+      }),
+      ...chunk.map(m => {
         const status = deriveStatus(m, 'active');
-        return prisma.messageCenterUpdate.upsert({
-          where: { id: m.id },
-          create: graphMessageToDbInput(m, status),
-          update: graphMessageToDbUpdate(m, status),
+        return prisma.messageCenterUpdate.updateMany({
+          where: {
+            id: m.id,
+            lastSeenAt: { lt: syncStartedAt },
+            OR: [{ archivedAt: null }, { archivedAt: { lte: syncStartedAt } }],
+          },
+          data: graphMessageToDbUpdate(m, status, syncStartedAt),
         });
-      })
-    );
+      }),
+    ]);
   }
 
   // Mark any previously-active rows that Graph no longer returns.
@@ -490,6 +506,7 @@ export async function syncMessagesFromGraph(): Promise<void> {
     where: {
       status: 'active',
       id: { notIn: Array.from(seenIds) },
+      lastSeenAt: { lt: syncStartedAt },
     },
     select: { id: true, actionRequiredByDateTime: true },
   });
@@ -497,8 +514,12 @@ export async function syncMessagesFromGraph(): Promise<void> {
   if (stale.length > 0) {
     await prisma.$transaction(
       stale.map(row =>
-        prisma.messageCenterUpdate.update({
-          where: { id: row.id },
+        prisma.messageCenterUpdate.updateMany({
+          where: {
+            id: row.id,
+            status: 'active',
+            lastSeenAt: { lt: syncStartedAt },
+          },
           data: {
             status: isPastDate(row.actionRequiredByDateTime) ? 'expired' : 'archived',
             archivedAt: now,
@@ -534,7 +555,7 @@ function isPastDate(value: string | Date | null | undefined): boolean {
   return !Number.isNaN(d.getTime()) && d.getTime() < Date.now();
 }
 
-function graphMessageToDbInput(m: GraphApiMessage, status: MessageStatus) {
+function graphMessageToDbInput(m: GraphApiMessage, status: MessageStatus, firstSeenAt?: Date) {
   return {
     id: m.id,
     title: m.title,
@@ -545,19 +566,22 @@ function graphMessageToDbInput(m: GraphApiMessage, status: MessageStatus) {
     details: (m.details ?? []) as unknown as object,
     isMajorChange: m.isMajorChange || false,
     severity: m.severity ?? null,
-    actionRequiredByDateTime: m.actionRequiredByDateTime
-      ? new Date(m.actionRequiredByDateTime)
-      : null,
-    published: m.startDateTime ? new Date(m.startDateTime) : null,
-    lastUpdated: m.lastModifiedDateTime ? new Date(m.lastModifiedDateTime) : null,
+    actionRequiredByDateTime: parseGraphDate(m.actionRequiredByDateTime),
+    published: parseGraphDate(m.startDateTime),
+    lastUpdated: parseGraphDate(m.lastModifiedDateTime),
     status,
+    ...(firstSeenAt ? { firstSeenAt, lastSeenAt: firstSeenAt } : {}),
   };
 }
 
-function graphMessageToDbUpdate(m: GraphApiMessage, status: MessageStatus) {
+function graphMessageToDbUpdate(
+  m: GraphApiMessage,
+  status: MessageStatus,
+  lastSeenAt = new Date()
+) {
   return {
     ...graphMessageToDbInput(m, status),
-    lastSeenAt: new Date(),
+    lastSeenAt,
     // If the message reappears in Graph, clear any archive marker.
     archivedAt: null,
   };

@@ -1,6 +1,6 @@
 import { XMLParser } from 'fast-xml-parser';
 import { ProductNews } from './types';
-import { getFeedItemId, getFeedTimestamp } from './feed/normalize';
+import { getFeedItemId, getFeedTimestamp, normalizeFeedItems } from './feed/normalize';
 import { COPILOT_STUDIO_RELEASE_URL, COPILOT_STUDIO_RELEASE_WAVE_LABEL } from '@/lib/feed/sources';
 
 interface RssItem {
@@ -13,6 +13,35 @@ interface RssItem {
   'dc:creator'?: string;
   category: string | string[];
 }
+
+export interface MicrosoftNewsAuthor {
+  name: string;
+  title: string;
+  slug: string;
+}
+
+export async function getMicrosoftNewsAuthors(): Promise<MicrosoftNewsAuthor[]> {
+  const response = await fetch('/api/microsoft-news-authors');
+  if (!response.ok) {
+    throw new Error('Failed to fetch Microsoft News authors');
+  }
+
+  const authors: unknown = await response.json();
+  if (!Array.isArray(authors)) {
+    throw new Error('Microsoft News authors returned an invalid response');
+  }
+
+  return authors.filter((author): author is MicrosoftNewsAuthor => {
+    if (!author || typeof author !== 'object') return false;
+    const candidate = author as Record<string, unknown>;
+    return (
+      typeof candidate.name === 'string' &&
+      typeof candidate.title === 'string' &&
+      typeof candidate.slug === 'string'
+    );
+  });
+}
+
 function normalizeFeedDate(value: string): string {
   const timestamp = getFeedTimestamp(value);
   return timestamp ? new Date(timestamp).toISOString() : '';
@@ -34,7 +63,7 @@ export async function getPowerAppsNews(): Promise<ProductNews[]> {
       attributeNamePrefix: '@_',
     });
     const result = parser.parse(xmlText);
-    const items = result.rss.channel.item;
+    const items = normalizeFeedItems<RssItem>(result.rss?.channel?.item);
 
     const news: ProductNews[] = items.map((item: RssItem) => ({
       id: getFeedItemId(item.guid, item.link),
@@ -68,7 +97,7 @@ export async function getPowerPlatformNews(): Promise<ProductNews[]> {
       attributeNamePrefix: '@_',
     });
     const result = parser.parse(xmlText);
-    const items = result.rss.channel.item;
+    const items = normalizeFeedItems<RssItem>(result.rss?.channel?.item);
 
     const news: ProductNews[] = items.map((item: RssItem) => ({
       id: getFeedItemId(item.guid, item.link),
@@ -107,7 +136,7 @@ export async function getPowerAutomateNews(): Promise<ProductNews[]> {
       return [];
     }
 
-    return result.rss.channel.item
+    return normalizeFeedItems<RssItem>(result.rss.channel.item)
       .map((item: RssItem) => ({
         id: getFeedItemId(item.guid, item.link),
         title: item.title,
@@ -147,7 +176,7 @@ export async function getPowerBINews(): Promise<ProductNews[]> {
       return [];
     }
 
-    return result.rss.channel.item
+    return normalizeFeedItems<RssItem>(result.rss.channel.item)
       .map((item: RssItem) => ({
         id: getFeedItemId(item.guid, item.link),
         title: item.title,
@@ -250,7 +279,7 @@ export async function getLearnBlogNews(): Promise<ProductNews[]> {
       attributeNamePrefix: '@_',
     });
     const result = parser.parse(xmlText);
-    const items = result.rss.channel.item;
+    const items = normalizeFeedItems<RssItem>(result.rss?.channel?.item);
 
     const news: ProductNews[] = items.map((item: RssItem) => ({
       id: getFeedItemId(item.guid, item.link),
@@ -364,7 +393,7 @@ export async function getCopilotNews(): Promise<ProductNews[]> {
       attributeNamePrefix: '@_',
     });
     const result = parser.parse(xmlText);
-    const items = result.rss.channel.item;
+    const items = normalizeFeedItems<RssItem>(result.rss?.channel?.item);
 
     const news: ProductNews[] = items.map((item: RssItem) => ({
       id: getFeedItemId(item.guid, item.link),
@@ -402,7 +431,7 @@ export async function getSemanticKernelNews(): Promise<ProductNews[]> {
       attributeNamePrefix: '@_',
     });
     const result = parser.parse(xmlText);
-    const items = result.rss.channel.item;
+    const items = normalizeFeedItems<RssItem>(result.rss?.channel?.item);
     const news: ProductNews[] = items.map((item: RssItem) => ({
       id: getFeedItemId(item.guid, item.link),
       title: item.title,
@@ -432,7 +461,7 @@ export async function getAzureAIFoundryNews(): Promise<ProductNews[]> {
       attributeNamePrefix: '@_',
     });
     const result = parser.parse(xmlText);
-    const items = result.rss.channel.item;
+    const items = normalizeFeedItems<RssItem>(result.rss?.channel?.item);
     const news: ProductNews[] = items.map((item: RssItem) => ({
       id: getFeedItemId(item.guid, item.link),
       title: item.title,

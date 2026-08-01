@@ -1,12 +1,12 @@
 'use client';
 
-import { format } from 'date-fns';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useState, useEffect } from 'react';
 import { LoadingSpinner } from './LoadingSpinner';
 import { releasePlanServiceIcons } from '@/lib/releasePlanIcons';
 import { SafeHtml } from '@/components/SafeHtml';
+import { formatCalendarDate } from '@/lib/date';
 
 interface ReleasePlan {
   id: string;
@@ -58,7 +58,12 @@ export function ReleasePlanDetail({ plan }: ReleasePlanDetailProps) {
               className="inline-flex items-center px-3 py-2 text-sm font-medium text-primary-600 hover:text-primary-500 dark:text-primary-400 dark:hover:text-primary-300 transition-colors bg-white/50 dark:bg-gray-800/50 rounded-lg hover:bg-white/80 dark:hover:bg-gray-800/80"
             >
               <svg className="mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M10 19l-7-7m0 0l7-7m-7 7h18"
+                />
               </svg>
               Back to release plans
             </Link>
@@ -81,9 +86,9 @@ export function ReleasePlanDetail({ plan }: ReleasePlanDetailProps) {
                     <div className="space-y-4">
                       {/* Services */}
                       <div className="flex flex-wrap gap-2">
-                        {plan.service.map((service) => {
-                          const iconPath = service.startsWith('Microsoft 365') 
-                            ? '/icons/m365.svg' 
+                        {plan.service.map(service => {
+                          const iconPath = service.startsWith('Microsoft 365')
+                            ? '/icons/m365.svg'
                             : serviceIcons[service];
                           return (
                             <span
@@ -108,9 +113,11 @@ export function ReleasePlanDetail({ plan }: ReleasePlanDetailProps) {
                       {/* Tags and Enabled For */}
                       {plan.tags.length > 0 && (
                         <div>
-                          <h3 className="text-base font-medium text-primary-600 dark:text-primary-400 mb-2">Investment Area</h3>
+                          <h3 className="text-base font-medium text-primary-600 dark:text-primary-400 mb-2">
+                            Investment Area
+                          </h3>
                           <div className="flex flex-wrap gap-1.5">
-                            {plan.tags.map((tag) => (
+                            {plan.tags.map(tag => (
                               <span
                                 key={tag}
                                 className="inline-flex items-center px-2 py-1 rounded-lg text-base font-medium bg-primary-50 text-primary-700 dark:bg-primary-900/50 dark:text-primary-300"
@@ -123,7 +130,9 @@ export function ReleasePlanDetail({ plan }: ReleasePlanDetailProps) {
                       )}
                       {plan.enabledFor && (
                         <div className="mt-2">
-                          <h3 className="text-base font-medium text-primary-600 dark:text-primary-400 mb-2">Enabled For</h3>
+                          <h3 className="text-base font-medium text-primary-600 dark:text-primary-400 mb-2">
+                            Enabled For
+                          </h3>
                           <span className="inline-flex items-center px-2 py-1 rounded-lg text-base font-medium bg-green-50 text-green-700 dark:bg-green-900/50 dark:text-green-300">
                             {plan.enabledFor}
                           </span>
@@ -135,18 +144,28 @@ export function ReleasePlanDetail({ plan }: ReleasePlanDetailProps) {
                     <div className="space-y-4">
                       {/* Dates */}
                       <div>
-                        <h3 className="text-base font-medium text-primary-600 dark:text-primary-400 mb-2">Timeline</h3>
+                        <h3 className="text-base font-medium text-primary-600 dark:text-primary-400 mb-2">
+                          Timeline
+                        </h3>
                         <div className="space-y-2">
                           {plan.publicPreviewDate && (
                             <div className="flex items-center gap-2">
-                              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Public Preview:</span>
-                              <span className="text-sm text-gray-600 dark:text-gray-400">{format(new Date(plan.publicPreviewDate), 'MMM d, yyyy')}</span>
+                              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                                Public Preview:
+                              </span>
+                              <span className="text-sm text-gray-600 dark:text-gray-400">
+                                {formatCalendarDate(plan.publicPreviewDate)}
+                              </span>
                             </div>
                           )}
                           {plan.gaDate && (
                             <div className="flex items-center gap-2">
-                              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">General Availability:</span>
-                              <span className="text-sm text-gray-600 dark:text-gray-400">{format(new Date(plan.gaDate), 'MMM d, yyyy')}</span>
+                              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                                General Availability:
+                              </span>
+                              <span className="text-sm text-gray-600 dark:text-gray-400">
+                                {formatCalendarDate(plan.gaDate)}
+                              </span>
                             </div>
                           )}
                         </div>
@@ -154,18 +173,28 @@ export function ReleasePlanDetail({ plan }: ReleasePlanDetailProps) {
 
                       {/* Release Waves */}
                       <div>
-                        <h3 className="text-base font-medium text-primary-600 dark:text-primary-400 mb-2">Release Waves</h3>
+                        <h3 className="text-base font-medium text-primary-600 dark:text-primary-400 mb-2">
+                          Release Waves
+                        </h3>
                         <div className="space-y-2">
                           {plan.publicPreviewWave && (
                             <div className="flex items-center gap-2">
-                              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Public Preview:</span>
-                              <span className="text-sm text-gray-600 dark:text-gray-400">{plan.publicPreviewWave}</span>
+                              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                                Public Preview:
+                              </span>
+                              <span className="text-sm text-gray-600 dark:text-gray-400">
+                                {plan.publicPreviewWave}
+                              </span>
                             </div>
                           )}
                           {plan.gaWave && (
                             <div className="flex items-center gap-2">
-                              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">General Availability:</span>
-                              <span className="text-sm text-gray-600 dark:text-gray-400">{plan.gaWave}</span>
+                              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                                General Availability:
+                              </span>
+                              <span className="text-sm text-gray-600 dark:text-gray-400">
+                                {plan.gaWave}
+                              </span>
                             </div>
                           )}
                         </div>
@@ -179,12 +208,13 @@ export function ReleasePlanDetail({ plan }: ReleasePlanDetailProps) {
                       <div className="flex items-center justify-between text-[11px] text-gray-500 dark:text-gray-400 mb-4">
                         <div className="flex items-center gap-1.5">
                           <span className="font-medium">Published</span>
-                          <span>{format(new Date(plan.published), 'MMM d, yyyy')}</span>
+                          <span>{formatCalendarDate(plan.published)}</span>
                         </div>
-                        {format(new Date(plan.published), 'MMM d, yyyy') !== format(new Date(plan.lastUpdated), 'MMM d, yyyy') && (
+                        {formatCalendarDate(plan.published) !==
+                          formatCalendarDate(plan.lastUpdated) && (
                           <div className="flex items-center gap-1.5">
                             <span className="font-medium">Updated</span>
-                            <span>{format(new Date(plan.lastUpdated), 'MMM d, yyyy')}</span>
+                            <span>{formatCalendarDate(plan.lastUpdated)}</span>
                           </div>
                         )}
                       </div>
@@ -197,14 +227,24 @@ export function ReleasePlanDetail({ plan }: ReleasePlanDetailProps) {
               <div className="space-y-6">
                 {/* Business Value */}
                 <div className="bg-white/70 dark:bg-gray-700/70 backdrop-blur-sm rounded-xl p-4 sm:p-6 border border-gray-200 dark:border-gray-600">
-                  <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-4">Business Value</h2>
-                  <SafeHtml html={plan.businessValue} className="prose dark:prose-invert max-w-none" />
+                  <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-4">
+                    Business Value
+                  </h2>
+                  <SafeHtml
+                    html={plan.businessValue}
+                    className="prose dark:prose-invert max-w-none"
+                  />
                 </div>
 
                 {/* Feature Details */}
                 <div className="bg-white/70 dark:bg-gray-700/70 backdrop-blur-sm rounded-xl p-4 sm:p-6 border border-gray-200 dark:border-gray-600">
-                  <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-4">Feature Details</h2>
-                  <SafeHtml html={plan.content} className="mt-4 prose dark:prose-invert prose-sm max-w-none text-current" />
+                  <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-4">
+                    Feature Details
+                  </h2>
+                  <SafeHtml
+                    html={plan.content}
+                    className="mt-4 prose dark:prose-invert prose-sm max-w-none text-current"
+                  />
                 </div>
               </div>
             </div>
@@ -213,4 +253,4 @@ export function ReleasePlanDetail({ plan }: ReleasePlanDetailProps) {
       </div>
     </div>
   );
-} 
+}

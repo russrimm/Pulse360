@@ -2,18 +2,13 @@
  * tests/feed-pages.spec.ts
  *
  * WI-05 – E2E sanity: Azure/M365/Release-Plan/Message-Center feed pages.
- * Requires a running dev server at http://localhost:3000.
- *
- * Tests are skipped automatically when the server is unreachable (acceptable
- * in CI environments without live credentials); the unit suite
- * (tests/sanitize.spec.ts) is the authoritative M0 gate.
+ * Playwright starts the configured local server unless PLAYWRIGHT_BASE_URL
+ * points to an existing deployment.
  *
  * Run: npx playwright test tests/feed-pages.spec.ts
  */
 
 import { test, expect, type APIRequestContext } from '@playwright/test';
-
-const BASE_URL = 'http://localhost:3000';
 
 // ────────────────────────────────────────────────────────────────────────────
 // Server-availability guard
@@ -23,7 +18,7 @@ let serverAvailable = false;
 
 async function probeServer(request: APIRequestContext): Promise<boolean> {
   try {
-    const res = await request.get(BASE_URL, { timeout: 8_000 });
+    const res = await request.get('/', { timeout: 8_000 });
     return res.status() < 500;
   } catch {
     return false;
@@ -34,8 +29,7 @@ test.beforeAll(async ({ request }) => {
   serverAvailable = await probeServer(request);
   if (!serverAvailable) {
     console.warn(
-      '[feed-pages] Dev server not reachable at http://localhost:3000 — ' +
-      'all E2E tests will be skipped. Start `npm run dev` to run them.',
+      '[feed-pages] Configured test server is not reachable; all E2E tests will be skipped.',
     );
   }
 });
@@ -54,7 +48,7 @@ async function assertFeedPageSafe(
   page: import('@playwright/test').Page,
   path: string,
 ): Promise<void> {
-  const res = await page.goto(`${BASE_URL}${path}`, {
+  const res = await page.goto(path, {
     waitUntil: 'domcontentloaded',
     timeout: 30_000,
   });
@@ -116,22 +110,26 @@ async function assertFeedPageSafe(
 test.describe('Feed pages – XSS safety + fidelity (E2E)', () => {
 
   test('azure-updates listing page responds and is safe', async ({ page }) => {
-    test.skip(!serverAvailable, 'Dev server not running at localhost:3000');
+    test.skip(!serverAvailable, 'Configured test server is unavailable');
     await assertFeedPageSafe(page, '/azure-updates');
   });
 
   test('m365-updates listing page responds and is safe', async ({ page }) => {
-    test.skip(!serverAvailable, 'Dev server not running at localhost:3000');
+    test.skip(!serverAvailable, 'Configured test server is unavailable');
     await assertFeedPageSafe(page, '/m365-updates');
   });
 
   test('release-plans listing page responds and is safe', async ({ page }) => {
-    test.skip(!serverAvailable, 'Dev server not running at localhost:3000');
+    test.skip(!serverAvailable, 'Configured test server is unavailable');
     await assertFeedPageSafe(page, '/release-plans');
   });
 
   test('message-center listing page responds and is safe', async ({ page }) => {
-    test.skip(!serverAvailable, 'Dev server not running at localhost:3000');
+    test.skip(!serverAvailable, 'Configured test server is unavailable');
+    test.skip(
+      !process.env.PLAYWRIGHT_BASE_URL,
+      'Message Center requires a test deployment with tenant access configured'
+    );
     await assertFeedPageSafe(page, '/message-center');
   });
 

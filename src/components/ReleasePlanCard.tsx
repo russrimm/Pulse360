@@ -1,9 +1,9 @@
 'use client';
 
-import { format } from 'date-fns';
 import { SafeHtml } from '@/components/SafeHtml';
 import Link from 'next/link';
 import Image from 'next/image';
+import { formatCalendarDate } from '@/lib/date';
 
 interface ReleasePlan {
   id: string;
@@ -79,13 +79,17 @@ const serviceIcons: Record<string, string> = {
   'Microsoft Viva': '/icons/viva.svg',
   'Microsoft Purview': '/icons/purview.svg',
   'Microsoft Defender XDR': '/icons/defender.svg',
-  'Windows': '/icons/Windows.svg',
+  Windows: '/icons/Windows.svg',
   'Azure Databricks': '/icons/databricks.svg',
   'Microsoft Copilot Studio': '/icons/CopilotStudio_scalable.svg',
-  'AI Builder': '/icons/AIBuilder_scalable.svg'
+  'AI Builder': '/icons/AIBuilder_scalable.svg',
 };
 
-export const ReleasePlanCard: React.FC<ReleasePlanCardProps> = ({ plan, onClick, drillthroughBasePath = '/release-plan' }) => {
+export const ReleasePlanCard: React.FC<ReleasePlanCardProps> = ({
+  plan,
+  onClick,
+  drillthroughBasePath = '/release-plan',
+}) => {
   const handleClick = () => {
     onClick(plan.id);
   };
@@ -95,8 +99,10 @@ export const ReleasePlanCard: React.FC<ReleasePlanCardProps> = ({ plan, onClick,
 
   // Map service names to their display names
   const getDisplayName = (service: string) => {
-    if (service === 'Microsoft Power Platform governance and administration' || 
-        service === 'Power Platform Governance and Administration') {
+    if (
+      service === 'Microsoft Power Platform governance and administration' ||
+      service === 'Power Platform Governance and Administration'
+    ) {
       return 'Power Platform Governance and Administration';
     }
     return service;
@@ -104,47 +110,51 @@ export const ReleasePlanCard: React.FC<ReleasePlanCardProps> = ({ plan, onClick,
 
   return (
     <Link href={`${drillthroughBasePath}/${plan.id}`}>
-      <div 
+      <div
         className="group bg-white/80 dark:bg-gray-800/50 backdrop-blur-sm rounded-xl shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-200 dark:border-gray-700/50 hover:border-primary-200 dark:hover:border-primary-800 hover:-translate-y-1 h-full cursor-pointer flex flex-col"
         onClick={handleClick}
       >
         <div className="flex flex-col">
           <div className="flex flex-col w-full bg-gradient-to-b from-gray-50 to-transparent dark:from-gray-900/50 dark:to-transparent py-3 px-4 gap-1">
             <div className="flex flex-wrap gap-2 justify-start w-full">
-              {plan.tags.filter(tag => {
-                const tagLower = tag.toLowerCase()
-                return tagLower.includes('new feature') || tagLower.includes('update')
-              }).map(tag => (
-                <span
-                  key={tag}
-                  className="inline-flex items-center px-3 py-1.5 rounded-xl text-sm font-medium bg-emerald-50 text-emerald-700 dark:bg-emerald-900/20 dark:text-emerald-200 border border-emerald-200/30 dark:border-emerald-700/20 min-w-[120px] justify-center"
-                >
-                  {tag}
-                </span>
-              ))}
+              {plan.tags
+                .filter(tag => {
+                  const tagLower = tag.toLowerCase();
+                  return tagLower.includes('new feature') || tagLower.includes('update');
+                })
+                .map(tag => (
+                  <span
+                    key={tag}
+                    className="inline-flex items-center px-3 py-1.5 rounded-xl text-sm font-medium bg-emerald-50 text-emerald-700 dark:bg-emerald-900/20 dark:text-emerald-200 border border-emerald-200/30 dark:border-emerald-700/20 min-w-[120px] justify-center"
+                  >
+                    {tag}
+                  </span>
+                ))}
             </div>
             <div className="flex flex-wrap gap-2 justify-end w-full">
-              {plan.tags.filter(tag => {
-                const tagLower = tag.toLowerCase()
-                return tagLower.includes('user impact') || tagLower.includes('admin impact')
-              }).map(tag => (
-                <span
-                  key={tag}
-                  className={`inline-flex items-center px-3 py-1.5 rounded-xl text-sm font-medium ${tag.toLowerCase().includes('user impact') ? 'bg-yellow-50 text-yellow-700 dark:bg-yellow-900/20 dark:text-yellow-200 border border-yellow-200/30 dark:border-yellow-700/20' : 'bg-orange-50 text-orange-700 dark:bg-orange-900/20 dark:text-orange-200 border border-orange-200/30 dark:border-orange-700/20'} min-w-[120px] justify-center`}
-                >
-                  {tag}
-                </span>
-              ))}
+              {plan.tags
+                .filter(tag => {
+                  const tagLower = tag.toLowerCase();
+                  return tagLower.includes('user impact') || tagLower.includes('admin impact');
+                })
+                .map(tag => (
+                  <span
+                    key={tag}
+                    className={`inline-flex items-center px-3 py-1.5 rounded-xl text-sm font-medium ${tag.toLowerCase().includes('user impact') ? 'bg-yellow-50 text-yellow-700 dark:bg-yellow-900/20 dark:text-yellow-200 border border-yellow-200/30 dark:border-yellow-700/20' : 'bg-orange-50 text-orange-700 dark:bg-orange-900/20 dark:text-orange-200 border border-orange-200/30 dark:border-orange-700/20'} min-w-[120px] justify-center`}
+                  >
+                    {tag}
+                  </span>
+                ))}
             </div>
           </div>
           <div className="flex items-center justify-center text-[10px] text-gray-500 dark:text-gray-400 gap-1.5 py-1.5">
             <span className="font-medium">Published</span>
-            <span>{format(new Date(plan.published), 'MMM d, yyyy')}</span>
-            {format(new Date(plan.published), 'MMM d, yyyy') !== format(new Date(plan.lastUpdated), 'MMM d, yyyy') && (
+            <span>{formatCalendarDate(plan.published)}</span>
+            {formatCalendarDate(plan.published) !== formatCalendarDate(plan.lastUpdated) && (
               <>
                 <span>•</span>
                 <span className="font-medium">Updated</span>
-                <span>{format(new Date(plan.lastUpdated), 'MMM d, yyyy')}</span>
+                <span>{formatCalendarDate(plan.lastUpdated)}</span>
               </>
             )}
           </div>
@@ -152,14 +162,19 @@ export const ReleasePlanCard: React.FC<ReleasePlanCardProps> = ({ plan, onClick,
         <div className="p-6 pt-4 flex flex-col flex-grow">
           <div className="flex flex-col flex-grow justify-start">
             <div className="flex items-center gap-2 mb-1">
-              <h3 className="text-base font-medium text-gray-900 dark:text-white group-hover:text-primary-700 dark:group-hover:text-primary-400 transition-colors tracking-tight text-center">{plan.title}</h3>
+              <h3 className="text-base font-medium text-gray-900 dark:text-white group-hover:text-primary-700 dark:group-hover:text-primary-400 transition-colors tracking-tight text-center">
+                {plan.title}
+              </h3>
             </div>
             <div className="mt-2 text-sm text-gray-600 dark:text-gray-400">
-              <SafeHtml html={plan.businessValue} className="line-clamp-3 prose dark:prose-invert prose-sm max-w-none" />
+              <SafeHtml
+                html={plan.businessValue}
+                className="line-clamp-3 prose dark:prose-invert prose-sm max-w-none"
+              />
             </div>
           </div>
         </div>
       </div>
     </Link>
   );
-}; 
+};

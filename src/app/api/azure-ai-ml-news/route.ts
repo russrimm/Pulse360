@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { XMLParser } from 'fast-xml-parser';
-import { fetchMicrosoftFeed } from '@/lib/feed/upstream';
+import { fetchMicrosoftFeed, readMicrosoftFeedBody } from '@/lib/feed/upstream';
 
 const FEED_URL = 'https://azure.microsoft.com/en-us/blog/category/ai-machine-learning/feed/';
 interface AzureFeedItem {
@@ -49,7 +49,7 @@ export async function GET() {
     const response = await fetchMicrosoftFeed(FEED_URL);
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
 
-    const xml = await response.text();
+    const xml = await readMicrosoftFeedBody(response);
     const parser = new XMLParser({
       ignoreAttributes: false,
       attributeNamePrefix: '@_',

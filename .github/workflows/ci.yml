@@ -26,9 +26,11 @@ jobs:
         with:
           node-version: 24
           cache: pnpm
+      - name: Check lockfile provenance
+        run: node scripts/check-lockfile.mjs
       - run: pnpm install --frozen-lockfile
       - run: pnpm exec prisma generate
       - run: pnpm lint
       - run: pnpm type-check
-      - run: pnpm exec playwright test tests/sanitize.spec.ts tests/data-integrity.spec.ts --project=chromium
+      - run: pnpm exec playwright test tests/sanitize.spec.ts tests/data-integrity.spec.ts tests/message-center-access.spec.ts --project=chromium
       - run: pnpm build

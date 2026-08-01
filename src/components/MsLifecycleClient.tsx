@@ -119,29 +119,21 @@ function isExpiringWithin(row: LifecycleRow, months: ExpirationWindow, today: Da
 
 function formatDate(value: string | null): string {
   if (!value) return '—';
-  const date = new Date(value);
-  if (isNaN(date.getTime())) return value;
+  const date = parseLifecycleDate(value);
+  if (!date) return value;
   return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
 }
 
 function getMonthsRemaining(value: string): string | null {
-  const endDate = new Date(value);
-  if (isNaN(endDate.getTime())) return null;
+  const endDate = parseLifecycleDate(value);
+  if (!endDate) return null;
 
   const today = new Date();
-  const todayUtc = Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate());
-  const endDateUtc = Date.UTC(
-    endDate.getUTCFullYear(),
-    endDate.getUTCMonth(),
-    endDate.getUTCDate()
-  );
-
-  if (endDateUtc < todayUtc) return 'Out of Support';
+  today.setHours(0, 0, 0, 0);
+  if (endDate < today) return 'Out of Support';
 
   const monthsRemaining =
-    (endDate.getUTCFullYear() - today.getUTCFullYear()) * 12 +
-    endDate.getUTCMonth() -
-    today.getUTCMonth();
+    (endDate.getFullYear() - today.getFullYear()) * 12 + endDate.getMonth() - today.getMonth();
 
   if (monthsRemaining === 0) return 'Less than 1 month';
   return `${monthsRemaining} month${monthsRemaining === 1 ? '' : 's'}`;

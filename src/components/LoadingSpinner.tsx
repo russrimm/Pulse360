@@ -5,7 +5,7 @@ export function LoadingSpinner() {
       role="status"
       aria-live="polite"
     >
-      <span className="sr-only">Loading?</span>
+      <span className="sr-only">Loading...</span>
       <div className="relative">
         <div className="w-16 h-16 border-4 border-primary-200 dark:border-primary-800 rounded-full animate-spin motion-reduce:animate-none border-t-primary-600 dark:border-t-primary-400"></div>
         <div className="absolute inset-0 flex items-center justify-center">
