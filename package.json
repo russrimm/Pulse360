@@ -9,6 +9,7 @@
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "type-check": "tsc --noEmit",
+    "check:lockfile": "node scripts/check-lockfile.mjs",
     "clean": "rimraf .next",
     "format": "prettier --write .",
     "dotfiles:sync": "node scripts/sync-dotfiles.mjs",
