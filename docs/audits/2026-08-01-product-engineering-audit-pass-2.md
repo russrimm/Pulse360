@@ -144,7 +144,10 @@ opaque `@odata.nextLink` supplied by Graph.
   cross-browser runs.
 - Removed the scaffold test that tested `playwright.dev` instead of Pulse360.
 - Removed `.github/workflows/quality.yml`; `.github/workflows/ci.yml` was a strict superset,
-  so both workflows performed the same quality job on every change.
+  so both workflows performed the same quality job on every change. The retained workflow
+  preserves frozen install, Prisma generation, type-check, sanitizer tests, and build on pushes
+  to `main` and pull requests; it broadens pull-request branch coverage and adds lint plus
+  data-integrity tests.
 
 ## Measurements and validation
 
@@ -164,22 +167,22 @@ opaque `@odata.nextLink` supplied by Graph.
 
 | Check                       | Result                                                                                                                                                                                    |
 | --------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Deterministic Chromium      | 34 passed                                                                                                                                                                                 |
-| Full product Playwright     | 126 passed, 0 skipped, 0 failed across Chromium, Firefox, and WebKit after freezing the lifecycle fixture clock                                                                           |
+| Deterministic Chromium      | 36 passed                                                                                                                                                                                 |
+| Full product Playwright     | 129 passed, 3 expected Message Center skips, 0 failed across Chromium, Firefox, and WebKit after freezing the lifecycle fixture clock                                                     |
 | Author request regression   | 3 passed across Chromium, Firefox, and WebKit; one metadata request and one feed request per engine                                                                                       |
 | CI negative control         | Deliberately inverted one sanitizer and one singleton-feed assertion; the exact CI Playwright command failed both tests after all retries. Reverting the controls restored 34/34 passing. |
 | TypeScript                  | Passed                                                                                                                                                                                    |
 | ESLint                      | Passed with 0 errors and 99 warnings (9 fewer warnings than baseline)                                                                                                                     |
-| Clean production build      | Passed; 57 static pages; 71.85 seconds; `.next` 69,838,538 bytes                                                                                                                          |
+| Clean production build      | Passed; 57 static pages; 47.87 seconds; `.next` 69,841,327 bytes                                                                                                                          |
 | Production dependency audit | Unchanged: 2 high `brace-expansion` advisories through `exceljs`, 1 moderate `@hono/node-server` advisory through Prisma tooling                                                          |
 | Package mirror references   | `package-lock.json` is absent. `pnpm-lock.yaml` contains 0 `ms-feed-12`, 0 `packagefeedproxy`, and 315 public `registry.npmjs.org` tarball references; frozen public-registry install passed. |
 | Node 24 check               | Prisma generation/native dependencies and build passed; no deprecated Node API usage was found in application source; pending-deprecation script run emitted no warning                   |
 | Production smoke            | `/` and `/home` 200; `/api/messages` 503 with private/no-store and `Vary: Cookie`; cron 503; missing RSS URL and malformed MSRC month ID 400                                              |
 
-The clean build was 5.29 seconds slower (+7.9%) and 1,980,983 bytes larger (+2.9%) than
-baseline. Page count remained 57. Repeated test builds can grow `.next/cache` substantially,
-so both figures above were captured after `pnpm clean`; the timing delta should not be treated
-as a stable regression without repeated CI samples.
+The final clean build was 18.69 seconds faster (-28.1%) and 1,983,772 bytes larger (+2.9%)
+than baseline. Page count remained 57. Repeated test builds can grow `.next/cache`
+substantially, so both figures above were captured after `pnpm clean`; the timing delta should
+not be treated as a stable improvement without repeated CI samples.
 
 ## Remaining recommendations
 
