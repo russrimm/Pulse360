@@ -145,17 +145,18 @@ opaque `@odata.nextLink` supplied by Graph.
 
 ### Final
 
-| Check                       | Result                                                                                                                                                                  |
-| --------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Deterministic Chromium      | 34 passed                                                                                                                                                               |
-| Full product Playwright     | 120 passed, 3 skipped, 0 failed across Chromium, Firefox, and WebKit; skips are the tenant-configured Message Center page                                               |
-| Author request regression   | 3 passed across Chromium, Firefox, and WebKit; one metadata request and one feed request per engine                                                                     |
-| TypeScript                  | Passed                                                                                                                                                                  |
-| ESLint                      | Passed with 0 errors and 99 warnings (9 fewer warnings than baseline)                                                                                                   |
-| Clean production build      | Passed; 57 static pages; 71.85 seconds; `.next` 69,838,538 bytes                                                                                                        |
-| Production dependency audit | Unchanged: 2 high `brace-expansion` advisories through `exceljs`, 1 moderate `@hono/node-server` advisory through Prisma tooling                                        |
-| Node 24 check               | Prisma generation/native dependencies and build passed; no deprecated Node API usage was found in application source; pending-deprecation script run emitted no warning |
-| Production smoke            | `/` and `/home` 200; `/api/messages` 503 with private/no-store and `Vary: Cookie`; cron 503; missing RSS URL and malformed MSRC month ID 400                            |
+| Check                       | Result                                                                                                                                                                                    |
+| --------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Deterministic Chromium      | 34 passed                                                                                                                                                                                 |
+| Full product Playwright     | 120 passed, 3 skipped, 0 failed across Chromium, Firefox, and WebKit; skips are the tenant-configured Message Center page                                                                 |
+| Author request regression   | 3 passed across Chromium, Firefox, and WebKit; one metadata request and one feed request per engine                                                                                       |
+| CI negative control         | Deliberately inverted one sanitizer and one singleton-feed assertion; the exact CI Playwright command failed both tests after all retries. Reverting the controls restored 34/34 passing. |
+| TypeScript                  | Passed                                                                                                                                                                                    |
+| ESLint                      | Passed with 0 errors and 99 warnings (9 fewer warnings than baseline)                                                                                                                     |
+| Clean production build      | Passed; 57 static pages; 71.85 seconds; `.next` 69,838,538 bytes                                                                                                                          |
+| Production dependency audit | Unchanged: 2 high `brace-expansion` advisories through `exceljs`, 1 moderate `@hono/node-server` advisory through Prisma tooling                                                          |
+| Node 24 check               | Prisma generation/native dependencies and build passed; no deprecated Node API usage was found in application source; pending-deprecation script run emitted no warning                   |
+| Production smoke            | `/` and `/home` 200; `/api/messages` 503 with private/no-store and `Vary: Cookie`; cron 503; missing RSS URL and malformed MSRC month ID 400                                              |
 
 The clean build was 5.29 seconds slower (+7.9%) and 1,980,983 bytes larger (+2.9%) than
 baseline. Page count remained 57. Repeated test builds can grow `.next/cache` substantially,
