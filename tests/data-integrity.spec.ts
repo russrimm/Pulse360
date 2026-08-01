@@ -18,31 +18,33 @@ import { formatCalendarDate, parseCalendarDate } from '../src/lib/date';
 import { resolveMessageCenterAccess } from '../src/lib/message-center-access';
 
 test.describe('Message Center access policy', () => {
-  test('fails closed in development when authentication is unconfigured', () => {
-    const previousNodeEnv = Object.getOwnPropertyDescriptor(process.env, 'NODE_ENV');
-    Object.defineProperty(process.env, 'NODE_ENV', {
-      configurable: true,
-      enumerable: true,
-      value: 'development',
-      writable: true,
-    });
+  for (const nodeEnv of ['production', 'development'] as const) {
+    test(`fails closed in ${nodeEnv} when authentication is unconfigured`, () => {
+      const previousNodeEnv = Object.getOwnPropertyDescriptor(process.env, 'NODE_ENV');
+      Object.defineProperty(process.env, 'NODE_ENV', {
+        configurable: true,
+        enumerable: true,
+        value: nodeEnv,
+        writable: true,
+      });
 
-    try {
-      expect(
-        resolveMessageCenterAccess({
-          isPublic: false,
-          isAuthConfigured: false,
-          hasAuthenticatedUser: false,
-        }),
-      ).toBe('unconfigured');
-    } finally {
-      if (previousNodeEnv) {
-        Object.defineProperty(process.env, 'NODE_ENV', previousNodeEnv);
-      } else {
-        Reflect.deleteProperty(process.env, 'NODE_ENV');
+      try {
+        expect(
+          resolveMessageCenterAccess({
+            isPublic: false,
+            isAuthConfigured: false,
+            hasAuthenticatedUser: false,
+          }),
+        ).toBe('unconfigured');
+      } finally {
+        if (previousNodeEnv) {
+          Object.defineProperty(process.env, 'NODE_ENV', previousNodeEnv);
+        } else {
+          Reflect.deleteProperty(process.env, 'NODE_ENV');
+        }
       }
-    }
-  });
+    });
+  }
 
   test('allows only explicit publication or an authenticated user', () => {
     expect(
