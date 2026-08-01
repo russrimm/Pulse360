@@ -144,9 +144,9 @@ Below are screenshots of every major page in both **dark** and **light** mode.
 | Sanitization        | `isomorphic-dompurify` (server-rendered HTML from feeds)                                                |
 | Telemetry           | Optional analytics and performance monitoring integrations                                              |
 | Tests               | **Playwright 1.57** (Chromium, Firefox, WebKit)                                                         |
-| Hosting target      | Azure Static Web Apps (Node 20.19+ or 22.12+ with Next.js 16)                                           |
+| Hosting target      | Azure Static Web Apps (Node 22.12+ or 24.0+ with Next.js 16)                                            |
 
-**Engines:** Node `^20.19.0 || ^22.12.0`, pnpm `>=9.0.0`.
+**Engines:** Node `^22.12.0 || ^24.0.0`, pnpm `>=9.0.0`.
 
 ---
 
