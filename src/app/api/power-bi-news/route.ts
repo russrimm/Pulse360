@@ -1,5 +1,9 @@
 import { NextResponse } from 'next/server';
-import { FEED_RESPONSE_HEADERS, fetchMicrosoftFeed } from '@/lib/feed/upstream';
+import {
+  FEED_RESPONSE_HEADERS,
+  fetchMicrosoftFeed,
+  readMicrosoftFeedBody,
+} from '@/lib/feed/upstream';
 
 const FEED_URL =
   'https://community.fabric.microsoft.com/oxcrx34285/rss/board?board.id=fbc_pbiupdatesblog';
@@ -17,7 +21,7 @@ export async function GET() {
       return NextResponse.json({ error: 'Power BI feed unavailable' }, { status: 502 });
     }
 
-    const xmlText = await response.text();
+    const xmlText = await readMicrosoftFeedBody(response);
     return new NextResponse(xmlText, {
       headers: FEED_RESPONSE_HEADERS,
     });

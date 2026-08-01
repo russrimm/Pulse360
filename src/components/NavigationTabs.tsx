@@ -26,10 +26,10 @@ export function NavigationTabs() {
   const [open365, setOpen365] = useState(false);
   const [openMSRC, setOpenMSRC] = useState(false);
 
-  const handleOpenChange365 = useCallback((nextOpen: boolean) => setOpen365(nextOpen), [])
-  const handleMenuItemClick365 = useCallback(() => setOpen365(false), [])
-  const handleOpenChangeMSRC = useCallback((nextOpen: boolean) => setOpenMSRC(nextOpen), [])
-  const handleMenuItemClickMSRC = useCallback(() => setOpenMSRC(false), [])
+  const handleOpenChange365 = useCallback((nextOpen: boolean) => setOpen365(nextOpen), []);
+  const handleMenuItemClick365 = useCallback(() => setOpen365(false), []);
+  const handleOpenChangeMSRC = useCallback((nextOpen: boolean) => setOpenMSRC(nextOpen), []);
+  const handleMenuItemClickMSRC = useCallback(() => setOpenMSRC(false), []);
 
   const MICROSOFT_365_LINKS = [
     {
@@ -37,7 +37,12 @@ export function NavigationTabs() {
       href: '/message-center',
       icon: (
         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+          />
         </svg>
       ),
     },
@@ -45,7 +50,13 @@ export function NavigationTabs() {
       name: 'Microsoft 365 Release Plans',
       href: '/release-plans/m365',
       icon: (
-        <Image src="/icons/m365.svg" alt="Microsoft 365 Updates" width={20} height={20} className="w-5 h-5" />
+        <Image
+          src="/icons/m365.svg"
+          alt="Microsoft 365 Updates"
+          width={20}
+          height={20}
+          className="w-5 h-5"
+        />
       ),
     },
   ];
@@ -54,7 +65,15 @@ export function NavigationTabs() {
     {
       name: 'Microsoft Security Response Center Vulnerability Updates',
       href: '/msrc',
-      icon: <Image src="/icons/defender.svg" alt="MSRC Updates" width={20} height={20} className="w-5 h-5" />,
+      icon: (
+        <Image
+          src="/icons/defender.svg"
+          alt="MSRC Updates"
+          width={20}
+          height={20}
+          className="w-5 h-5"
+        />
+      ),
     },
   ];
 
@@ -64,14 +83,26 @@ export function NavigationTabs() {
       name: 'Azure',
       href: '/release-plans/azure',
       icon: (
-        <Image src="/icons/Azure.svg" alt="Azure Updates" width={20} height={20} className="w-5 h-5" />
+        <Image
+          src="/icons/Azure.svg"
+          alt="Azure Updates"
+          width={20}
+          height={20}
+          className="w-5 h-5"
+        />
       ),
     },
     {
       name: 'Microsoft 365',
       href: '/release-plans/m365',
       icon: (
-        <Image src="/icons/m365.svg" alt="Microsoft 365" width={20} height={20} className="w-5 h-5" />
+        <Image
+          src="/icons/m365.svg"
+          alt="Microsoft 365"
+          width={20}
+          height={20}
+          className="w-5 h-5"
+        />
       ),
     },
     ...PRODUCTS.map(p => ({
@@ -94,12 +125,28 @@ export function NavigationTabs() {
     {
       name: 'M365 Message Center',
       href: '/message-center',
-      icon: <Image src="/icons/m365.svg" alt="M365 Message Center" width={20} height={20} className="w-5 h-5" />,
+      icon: (
+        <Image
+          src="/icons/m365.svg"
+          alt="M365 Message Center"
+          width={20}
+          height={20}
+          className="w-5 h-5"
+        />
+      ),
     },
     {
       name: 'Release Plans',
       href: '/release-plans',
-      icon: <Image src="/icons/planner.svg" alt="Release Plans" width={20} height={20} className="w-5 h-5" />, // Planner icon
+      icon: (
+        <Image
+          src="/icons/planner.svg"
+          alt="Release Plans"
+          width={20}
+          height={20}
+          className="w-5 h-5"
+        />
+      ), // Planner icon
       dropdown: true,
     },
     // Microsoft 365 Popover will be rendered here
@@ -108,7 +155,12 @@ export function NavigationTabs() {
       href: '/product-news',
       icon: (
         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"
+          />
         </svg>
       ),
     },
@@ -116,7 +168,13 @@ export function NavigationTabs() {
       name: 'Microsoft Security',
       href: '/msrc',
       icon: (
-        <Image src="/icons/defender.svg" alt="Security Updates" width={20} height={20} className="w-5 h-5" />
+        <Image
+          src="/icons/defender.svg"
+          alt="Security Updates"
+          width={20}
+          height={20}
+          className="w-5 h-5"
+        />
       ),
       dropdown: true,
     },
@@ -125,7 +183,12 @@ export function NavigationTabs() {
       href: '/ms-lifecycle',
       icon: (
         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+          />
         </svg>
       ),
     },
@@ -137,13 +200,15 @@ export function NavigationTabs() {
         <div className="flex flex-col md:flex-row flex-wrap justify-center gap-1.5 py-2 sm:gap-2">
           {tabs.map((tab, idx) => {
             // Highlight Product News tab for any /product-news subpath
-            const isActive = tab.name === 'Product News'
-              ? pathname === tab.href || pathname.startsWith('/product-news/')
-              : pathname === tab.href;
+            const isActive =
+              tab.name === 'Product News'
+                ? pathname === tab.href || pathname.startsWith('/product-news/')
+                : pathname === tab.href;
             if (tab.name === 'Release Planner') return null;
             if (tab.name === 'Release Plans') {
               // Active if on the hub or any nested release-plans path
-              const isActive = pathname === '/release-plans' || pathname.startsWith('/release-plans/');
+              const isActive =
+                pathname === '/release-plans' || pathname.startsWith('/release-plans/');
               return (
                 <Popover.Root key={tab.href}>
                   <Popover.Trigger asChild>
@@ -152,14 +217,26 @@ export function NavigationTabs() {
                         ${isActive ? 'bg-primary-50 text-primary-700 dark:bg-primary-900/50 dark:text-primary-300' : 'text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200'}`}
                       aria-label="Release Plans"
                     >
-                      <span className={`transition-transform duration-200 ${isActive ? 'text-primary-600 dark:text-primary-400' : 'text-gray-500 dark:text-gray-400 group-hover:text-primary-600 dark:group-hover:text-primary-400'}`}>{tab.icon && tab.icon}</span>
+                      <span
+                        className={`transition-transform duration-200 ${isActive ? 'text-primary-600 dark:text-primary-400' : 'text-gray-500 dark:text-gray-400 group-hover:text-primary-600 dark:group-hover:text-primary-400'}`}
+                      >
+                        {tab.icon && tab.icon}
+                      </span>
                       <span className="text-center w-full md:w-auto">{tab.name}</span>
                       <ChevronDownIcon className="w-4 h-4" />
-                      <span className="absolute bottom-0 left-0 w-full h-0.5 bg-primary-600 dark:bg-primary-400 rounded-full" />
+                      {isActive && (
+                        <span
+                          aria-hidden="true"
+                          className="absolute bottom-0 left-0 w-full h-0.5 bg-primary-600 dark:bg-primary-400 rounded-full"
+                        />
+                      )}
                     </button>
                   </Popover.Trigger>
                   <Popover.Portal>
-                    <Popover.Content sideOffset={8} className="z-50 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl shadow-2xl p-2 min-w-[220px] flex flex-col gap-1 animate-fade-in">
+                    <Popover.Content
+                      sideOffset={8}
+                      className="z-50 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl shadow-2xl p-2 min-w-[220px] flex flex-col gap-1 animate-fade-in"
+                    >
                       {RELEASE_PLANS_LINKS.map(link => (
                         <Link
                           key={link.href}
@@ -177,7 +254,10 @@ export function NavigationTabs() {
               );
             }
             if (tab.name === 'Microsoft Security') {
-              const isActive = MSRC_LINKS.some(link => pathname === link.href) || pathname === '/security' || pathname.startsWith('/security/');
+              const isActive =
+                MSRC_LINKS.some(link => pathname === link.href) ||
+                pathname === '/security' ||
+                pathname.startsWith('/security/');
               return (
                 <Popover.Root key={tab.href} open={openMSRC} onOpenChange={handleOpenChangeMSRC}>
                   <Popover.Trigger asChild>
@@ -186,14 +266,26 @@ export function NavigationTabs() {
                         ${isActive ? 'bg-primary-50 text-primary-700 dark:bg-primary-900/50 dark:text-primary-300' : 'text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200'}`}
                       aria-label="Microsoft Security"
                     >
-                      <span className={`transition-transform duration-200 ${isActive ? 'text-primary-600 dark:text-primary-400' : 'text-gray-500 dark:text-gray-400 group-hover:text-primary-600 dark:group-hover:text-primary-400'}`}>{tab.icon}</span>
+                      <span
+                        className={`transition-transform duration-200 ${isActive ? 'text-primary-600 dark:text-primary-400' : 'text-gray-500 dark:text-gray-400 group-hover:text-primary-600 dark:group-hover:text-primary-400'}`}
+                      >
+                        {tab.icon}
+                      </span>
                       <span className="text-center w-full md:w-auto">{tab.name}</span>
                       <ChevronDownIcon className="w-4 h-4" />
-                      <span className="absolute bottom-0 left-0 w-full h-0.5 bg-primary-600 dark:bg-primary-400 rounded-full" />
+                      {isActive && (
+                        <span
+                          aria-hidden="true"
+                          className="absolute bottom-0 left-0 w-full h-0.5 bg-primary-600 dark:bg-primary-400 rounded-full"
+                        />
+                      )}
                     </button>
                   </Popover.Trigger>
                   <Popover.Portal>
-                    <Popover.Content sideOffset={8} className="z-50 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl shadow-2xl p-2 min-w-[220px] flex flex-col gap-1 animate-fade-in">
+                    <Popover.Content
+                      sideOffset={8}
+                      className="z-50 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl shadow-2xl p-2 min-w-[220px] flex flex-col gap-1 animate-fade-in"
+                    >
                       {MSRC_LINKS.map(link => (
                         <Link
                           key={link.href}
@@ -203,7 +295,9 @@ export function NavigationTabs() {
                           onClick={handleMenuItemClickMSRC}
                         >
                           {link.icon}
-                          <span className="whitespace-normal break-words text-left block w-full">{link.name}</span>
+                          <span className="whitespace-normal break-words text-left block w-full">
+                            {link.name}
+                          </span>
                         </Link>
                       ))}
                     </Popover.Content>
@@ -215,20 +309,30 @@ export function NavigationTabs() {
               <React.Fragment key={tab.href}>
                 <Link
                   href={tab.href}
+                  aria-current={pathname === tab.href ? 'page' : undefined}
                   className={`flex flex-col items-center justify-center md:flex-row md:items-center gap-1 md:gap-2 px-3 py-2 text-sm font-medium rounded-lg transition-colors relative w-full md:w-auto text-center
-                    ${isActive
-                      ? 'bg-primary-50 text-primary-700 dark:bg-primary-900/50 dark:text-primary-300'
-                      : 'text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200'
+                    ${
+                      isActive
+                        ? 'bg-primary-50 text-primary-700 dark:bg-primary-900/50 dark:text-primary-300'
+                        : 'text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200'
                     }`}
                 >
-                  <span className={`transition-transform duration-200 ${isActive ? 'text-primary-600 dark:text-primary-400' : 'text-gray-500 dark:text-gray-400 group-hover:text-primary-600 dark:group-hover:text-primary-400'}`}>{tab.icon && tab.icon}</span>
+                  <span
+                    className={`transition-transform duration-200 ${isActive ? 'text-primary-600 dark:text-primary-400' : 'text-gray-500 dark:text-gray-400 group-hover:text-primary-600 dark:group-hover:text-primary-400'}`}
+                  >
+                    {tab.icon && tab.icon}
+                  </span>
                   <span className="text-center w-full md:w-auto">{tab.name}</span>
-                  <span className="absolute bottom-0 left-0 w-full h-0.5 bg-primary-600 dark:bg-primary-400 rounded-full" />
+                  {isActive && (
+                    <span
+                      aria-hidden="true"
+                      className="absolute bottom-0 left-0 w-full h-0.5 bg-primary-600 dark:bg-primary-400 rounded-full"
+                    />
+                  )}
                 </Link>
-                {tab.name === 'Azure' && (
+                {tab.name === 'Azure' &&
                   // Remove Azure as a top-level tab (now under Release Planners)
-                  null
-                )}
+                  null}
               </React.Fragment>
             );
           })}
@@ -236,4 +340,4 @@ export function NavigationTabs() {
       </div>
     </div>
   );
-} 
+}

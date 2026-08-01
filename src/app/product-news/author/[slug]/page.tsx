@@ -1,82 +1,60 @@
-"use client"
+'use client';
 
-import { useEffect, useState } from 'react'
-import { useParams } from 'next/navigation'
-import { ProductNewsCard } from '@/components/ProductNewsCard'
-import { ProductNewsLayout } from '@/components/ProductNewsLayout'
+import { useParams } from 'next/navigation';
+import { useQuery } from '@tanstack/react-query';
+import { ProductNewsCard } from '@/components/ProductNewsCard';
+import { ProductNewsLayout } from '@/components/ProductNewsLayout';
+import { getMicrosoftNewsAuthors } from '@/lib/api.client';
+import { getFeedTimestamp } from '@/lib/feed/normalize';
+import type { ProductNews } from '@/lib/types';
 
 function slugToName(slug: string) {
-  return slug.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase())
+  return slug.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
 }
 
 export default function AuthorNewsPage() {
-  const params = useParams<{ slug: string }>()
-  const slug = params?.slug
-  const [news, setNews] = useState<any[]>([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
-  const [authorTitle, setAuthorTitle] = useState<string | null>(null)
-  const [authorName, setAuthorName] = useState<string | null>(null)
+  const params = useParams<{ slug: string }>();
+  const slug = params?.slug;
+  const authorFeed = useQuery({
+    queryKey: ['microsoftNewsAuthorFeed', slug],
+    queryFn: () => fetchAuthorFeed(slug),
+    enabled: Boolean(slug),
+  });
+  const authors = useQuery({
+    queryKey: ['microsoftNewsAuthors'],
+    queryFn: getMicrosoftNewsAuthors,
+  });
+  const author = authors.data?.find(candidate => candidate.slug === slug);
+  const authorName = author?.name ?? slugToName(slug || '');
+  const authorTitle = author?.title;
+  const news = (authorFeed.data ?? []).map(item => ({ ...item, author: authorName }));
 
-  useEffect(() => {
-    if (!slug) return
-    async function fetchAuthorFeed() {
-      setLoading(true)
-      setError(null)
-      try {
-        const res = await fetch(`/api/author-feed?slug=${slug}`)
-        const xml = await res.text()
-        const parser = new window.DOMParser()
-        const doc = parser.parseFromString(xml, 'text/xml')
-        const items = doc.querySelectorAll('item')
-        const posts = Array.from(items).map(item => ({
-          id: item.querySelector('guid')?.textContent,
-          title: item.querySelector('title')?.textContent,
-          link: item.querySelector('link')?.textContent,
-          description: item.querySelector('description')?.textContent,
-          publishDate: new Date(item.querySelector('pubDate')?.textContent || '').toISOString(),
-          author: authorName || slugToName(slug),
-          categories: Array.from(item.querySelectorAll('category')).map(cat => cat.textContent || ''),
-        }))
-        // Filter to only posts from the past 12 months
-        const twelveMonthsAgo = new Date()
-        twelveMonthsAgo.setMonth(twelveMonthsAgo.getMonth() - 12)
-        const filteredPosts = posts.filter(p => new Date(p.publishDate) >= twelveMonthsAgo)
-        setNews(filteredPosts)
-      } catch (err) {
-        setError('Failed to load author posts.')
-      } finally {
-        setLoading(false)
-      }
-    }
-    fetchAuthorFeed()
-  }, [slug, authorName])
-
-  useEffect(() => {
-    if (!slug) return
-    async function fetchTitle() {
-      try {
-        const res = await fetch('/api/microsoft-news-authors')
-        const authors = await res.json()
-        const authorObj = authors.find((a: any) => a.slug === slug)
-        setAuthorTitle(authorObj?.title || null)
-        setAuthorName(authorObj?.name || null)
-      } catch {}
-    }
-    fetchTitle()
-  }, [slug])
-
-  const titleText = authorTitle ? `Posts by ${authorName || slugToName(slug || '')} - ${authorTitle}` : `Posts by ${authorName || slugToName(slug || '')}`
+  const titleText = authorTitle
+    ? `Posts by ${authorName} - ${authorTitle}`
+    : `Posts by ${authorName}`;
 
   return (
     <ProductNewsLayout
-      title={<span className="text-sm md:text-base font-semibold whitespace-normal break-words">{titleText}</span>}
+      title={
+        <span className="text-sm md:text-base font-semibold whitespace-normal break-words">
+          {titleText}
+        </span>
+      }
       icon="/icons/Windows.svg"
     >
-      {loading ? (
-        <div>Loading...</div>
-      ) : error ? (
-        <div>{error}</div>
+      {authorFeed.isLoading ? (
+        <div role="status" aria-live="polite">
+          Loading author posts...
+        </div>
+      ) : authorFeed.isError ? (
+        <div role="alert">
+          <p>Failed to load author posts.</p>
+          <button type="button" onClick={() => authorFeed.refetch()}>
+            Try again
+          </button>
+        </div>
+      ) : news.length === 0 ? (
+        <p role="status">No recent posts were found for this author.</p>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {news.map(item => (
@@ -85,5 +63,38 @@ export default function AuthorNewsPage() {
         </div>
       )}
     </ProductNewsLayout>
-  )
-} 
+  );
+}
+
+async function fetchAuthorFeed(slug: string | undefined): Promise<ProductNews[]> {
+  if (!slug) return [];
+
+  const response = await fetch(`/api/author-feed?slug=${encodeURIComponent(slug)}`);
+  if (!response.ok) {
+    throw new Error('Microsoft author feed unavailable');
+  }
+
+  const xml = await response.text();
+  const doc = new DOMParser().parseFromString(xml, 'text/xml');
+  const twelveMonthsAgo = new Date();
+  twelveMonthsAgo.setMonth(twelveMonthsAgo.getMonth() - 12);
+
+  return Array.from(doc.querySelectorAll('item'))
+    .map(item => {
+      const link = item.querySelector('link')?.textContent?.trim() || '';
+      const publishDate = item.querySelector('pubDate')?.textContent?.trim() || '';
+      const timestamp = getFeedTimestamp(publishDate);
+      return {
+        id: item.querySelector('guid')?.textContent?.trim() || link,
+        title: item.querySelector('title')?.textContent?.trim() || '',
+        link,
+        description: item.querySelector('description')?.textContent || '',
+        publishDate: timestamp ? new Date(timestamp).toISOString() : '',
+        author: slugToName(slug),
+        categories: Array.from(item.querySelectorAll('category')).map(
+          category => category.textContent || ''
+        ),
+      };
+    })
+    .filter(post => getFeedTimestamp(post.publishDate) >= twelveMonthsAgo.getTime());
+}

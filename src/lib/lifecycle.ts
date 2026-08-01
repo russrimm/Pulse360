@@ -10,21 +10,12 @@ export type LifecycleExpiryStatus = 'expired' | 'expiring-soon' | 'active' | 'un
 const EXPIRING_SOON_DAYS = 180;
 
 export function parseLifecycleDate(value: string): Date | null {
-  const dateOnlyMatch = value.match(/^(\d{4})-(\d{2})-(\d{2})$/);
-  const date = dateOnlyMatch
-    ? new Date(
-        Number(dateOnlyMatch[1]),
-        Number(dateOnlyMatch[2]) - 1,
-        Number(dateOnlyMatch[3]),
-      )
-    : new Date(value);
-
-  return Number.isNaN(date.getTime()) ? null : date;
+  return parseCalendarDate(value);
 }
 
 export function getLifecycleExpiryStatus(
   row: LifecycleDateFields,
-  now = new Date(),
+  now = new Date()
 ): LifecycleExpiryStatus {
   const today = new Date(now);
   today.setHours(0, 0, 0, 0);
@@ -47,3 +38,4 @@ export function getLifecycleExpiryStatus(
   const expiringSoonMs = EXPIRING_SOON_DAYS * 24 * 60 * 60 * 1000;
   return latestTimestamp - today.getTime() <= expiringSoonMs ? 'expiring-soon' : 'active';
 }
+import { parseCalendarDate } from './date';

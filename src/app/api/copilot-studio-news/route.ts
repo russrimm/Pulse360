@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { COPILOT_STUDIO_RELEASE_URL } from '@/lib/feed/sources';
+import { readMicrosoftFeedBody } from '@/lib/feed/upstream';
 
 export async function GET() {
   try {
@@ -25,7 +26,7 @@ export async function GET() {
       );
     }
 
-    const html = await response.text();
+    const html = await readMicrosoftFeedBody(response);
     return new NextResponse(html, {
       headers: {
         'Content-Type': 'text/html; charset=utf-8',

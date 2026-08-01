@@ -1,4 +1,6 @@
 import 'server-only';
+import { NextResponse } from 'next/server';
+import { readBoundedResponseText } from './response';
 
 export const FEED_RESPONSE_HEADERS = {
   'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=1800',
@@ -16,5 +18,20 @@ export async function fetchMicrosoftFeed(url: string, revalidateSeconds = 3600):
     next: { revalidate: revalidateSeconds },
     redirect: 'follow',
     signal: AbortSignal.timeout(15_000),
+  });
+}
+
+export async function readMicrosoftFeedBody(response: Response): Promise<string> {
+  return readBoundedResponseText(response);
+}
+
+export async function proxyMicrosoftFeed(url: string): Promise<NextResponse> {
+  const response = await fetchMicrosoftFeed(url);
+  if (!response.ok) {
+    throw new Error(`Microsoft feed returned HTTP ${response.status}`);
+  }
+
+  return new NextResponse(await readMicrosoftFeedBody(response), {
+    headers: FEED_RESPONSE_HEADERS,
   });
 }

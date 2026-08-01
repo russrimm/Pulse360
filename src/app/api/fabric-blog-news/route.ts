@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { parseStringPromise } from 'xml2js';
-import { fetchMicrosoftFeed } from '@/lib/feed/upstream';
+import { fetchMicrosoftFeed, readMicrosoftFeedBody } from '@/lib/feed/upstream';
 
 const FEED_URL =
   'https://community.fabric.microsoft.com/oxcrx34285/rss/board?board.id=fbc_fabricupdatesblogs';
@@ -37,7 +37,7 @@ export async function GET() {
       return NextResponse.json({ error: 'Failed to fetch feed' }, { status: 502 });
     }
 
-    const xml = await response.text();
+    const xml = await readMicrosoftFeedBody(response);
     const parsed = (await parseStringPromise(xml, { explicitArray: false })) as FabricFeedDocument;
     const items = parsed.rss?.channel?.item;
     const news = items ? (Array.isArray(items) ? items : [items]) : [];
