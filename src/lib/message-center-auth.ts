@@ -2,18 +2,26 @@ import 'server-only';
 
 import { getServerSession } from 'next-auth';
 import { authOptions, isAuthConfigured } from '@/lib/auth';
-
-export type MessageCenterAccess = 'allowed' | 'authentication-required' | 'unconfigured';
+import {
+  resolveMessageCenterAccess,
+  type MessageCenterAccess,
+} from '@/lib/message-center-access';
 
 export async function getMessageCenterAccess(): Promise<MessageCenterAccess> {
-  if (process.env.MESSAGE_CENTER_PUBLIC === 'true') {
-    return 'allowed';
-  }
+  const isPublic = process.env.MESSAGE_CENTER_PUBLIC === 'true';
 
-  if (!isAuthConfigured) {
-    return process.env.NODE_ENV === 'production' ? 'unconfigured' : 'allowed';
+  if (isPublic || !isAuthConfigured) {
+    return resolveMessageCenterAccess({
+      isPublic,
+      isAuthConfigured,
+      hasAuthenticatedUser: false,
+    });
   }
 
   const session = await getServerSession(authOptions);
-  return session?.user ? 'allowed' : 'authentication-required';
+  return resolveMessageCenterAccess({
+    isPublic,
+    isAuthConfigured,
+    hasAuthenticatedUser: Boolean(session?.user),
+  });
 }

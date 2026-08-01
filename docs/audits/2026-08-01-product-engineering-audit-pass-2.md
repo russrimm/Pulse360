@@ -9,12 +9,12 @@ This pass reviewed the work merged by audit pass 1, the Node 24 upgrade, every A
 and the related feed, Message Center, lifecycle, Product News, navigation, test, and build
 workflows.
 
-No API route anonymously exposes tenant data under the default production configuration.
-`/api/messages` fails closed when authentication is unconfigured, requires a NextAuth
-session when authentication is configured, and becomes public only through the explicit
-`MESSAGE_CENTER_PUBLIC=true` override. That override publishes tenant-scoped Microsoft 365
-Message Center communications and remains an owner policy decision; this audit did not
-change it.
+No API route anonymously exposes tenant data under the default configuration.
+`/api/messages` fails closed in every environment when authentication is unconfigured,
+requires a NextAuth session when authentication is configured, and becomes public only
+through the explicit `MESSAGE_CENTER_PUBLIC=true` override. That override publishes
+tenant-scoped Microsoft 365 Message Center communications and remains an owner policy
+decision; this audit did not change its scope.
 
 The main implemented changes harden all sibling feed routes, prevent malformed Microsoft
 payloads from dropping data or aborting database batches, make overlapping Message Center
@@ -34,7 +34,7 @@ opaque `@odata.nextLink` supplied by Graph.
 | Route                         | Production access                                                                             | Returned data                                                                                                                             | Anonymous tenant exposure                                                                                                     |
 | ----------------------------- | --------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
 | `/api/auth/[...nextauth]`     | Anonymous authentication protocol endpoints                                                   | NextAuth sign-in, callback, session, and provider responses                                                                               | No Message Center rows; standard authentication metadata only                                                                 |
-| `/api/messages`               | NextAuth session; 503 when auth is unconfigured; explicit `MESSAGE_CENTER_PUBLIC=true` bypass | Persisted Graph Message Center titles, HTML bodies, services, tags, dates, severity, details, and archive state for the configured tenant | **No by default. Yes when the owner explicitly enables public mode.** Responses are `private, no-store` and vary on `Cookie`. |
+| `/api/messages`               | NextAuth session; 503 in every environment when auth is unconfigured; explicit `MESSAGE_CENTER_PUBLIC=true` bypass | Persisted Graph Message Center titles, HTML bodies, services, tags, dates, severity, details, and archive state for the configured tenant | **No by default. Yes when the owner explicitly enables public mode.** Responses are `private, no-store` and vary on `Cookie`. |
 | `/api/cron/sync-messages`     | Constant-time bearer comparison against `CRON_SECRET`; 503 when missing in production         | Sync success flag and duration; initiates tenant Graph synchronization                                                                    | No data rows. Unauthorized callers cannot trigger Graph work under production defaults.                                       |
 | `/api/author-feed`            | Anonymous                                                                                     | Public `blogs.microsoft.com` author RSS for a validated slug                                                                              | None                                                                                                                          |
 | `/api/azure-ai-foundry-news`  | Anonymous                                                                                     | Public Microsoft Foundry developer-blog RSS                                                                                               | None                                                                                                                          |
@@ -58,8 +58,17 @@ opaque `@odata.nextLink` supplied by Graph.
 
 ### Tenant boundary conclusions
 
-- Production defaults are fail-closed. Smoke validation without authentication configuration
-  returned 503 from both `/api/messages` and `/api/cron/sync-messages`.
+- Message Center is fail-closed in every environment. The original gate allowed access whenever
+  authentication was unconfigured and `NODE_ENV` was not exactly `production`, which created a
+  silent bypass for a nonstandard staging/container deployment and for local development with
+  tenant credentials. The documented paths (`next start`, Azure Static Web Apps, and the
+  self-hosting instructions) use production builds, so the deployed branch was not found to be
+  reachable through a standard project deployment. It was nevertheless an unsafe
+  environment-dependent default and was removed. Local anonymous use now requires the existing
+  explicit `MESSAGE_CENTER_PUBLIC=true` opt-in. A regression test pins fail-closed behavior while
+  `NODE_ENV=development`.
+- Smoke validation without authentication configuration returned 503 from both `/api/messages`
+  and `/api/cron/sync-messages`.
 - Anonymous Message Center access is possible only when the operator sets
   `MESSAGE_CENTER_PUBLIC=true`. Because Graph returns tenant-scoped communications, the owner
   must treat that setting as publication approval, not a convenience flag.
