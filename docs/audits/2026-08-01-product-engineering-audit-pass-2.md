@@ -148,13 +148,14 @@ opaque `@odata.nextLink` supplied by Graph.
 | Check                       | Result                                                                                                                                                                                    |
 | --------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Deterministic Chromium      | 34 passed                                                                                                                                                                                 |
-| Full product Playwright     | 120 passed, 3 skipped, 0 failed across Chromium, Firefox, and WebKit; skips are the tenant-configured Message Center page                                                                 |
+| Full product Playwright     | 126 passed, 0 skipped, 0 failed across Chromium, Firefox, and WebKit after freezing the lifecycle fixture clock                                                                           |
 | Author request regression   | 3 passed across Chromium, Firefox, and WebKit; one metadata request and one feed request per engine                                                                                       |
 | CI negative control         | Deliberately inverted one sanitizer and one singleton-feed assertion; the exact CI Playwright command failed both tests after all retries. Reverting the controls restored 34/34 passing. |
 | TypeScript                  | Passed                                                                                                                                                                                    |
 | ESLint                      | Passed with 0 errors and 99 warnings (9 fewer warnings than baseline)                                                                                                                     |
 | Clean production build      | Passed; 57 static pages; 71.85 seconds; `.next` 69,838,538 bytes                                                                                                                          |
 | Production dependency audit | Unchanged: 2 high `brace-expansion` advisories through `exceljs`, 1 moderate `@hono/node-server` advisory through Prisma tooling                                                          |
+| Package mirror references   | `package-lock.json` is absent. `pnpm-lock.yaml` contains 315 `ms-feed-12` tarball references and 0 `packagefeedproxy` references.                                                         |
 | Node 24 check               | Prisma generation/native dependencies and build passed; no deprecated Node API usage was found in application source; pending-deprecation script run emitted no warning                   |
 | Production smoke            | `/` and `/home` 200; `/api/messages` 503 with private/no-store and `Vary: Cookie`; cron 503; missing RSS URL and malformed MSRC month ID 400                                              |
 
@@ -186,6 +187,9 @@ as a stable regression without repeated CI samples.
 4. Add a database-backed sync lease if operators expect multiple independent schedulers or
    long-running concurrent syncs. Timestamp guards now protect row state, but a lease would
    also avoid duplicate Graph traffic.
+5. Regenerate `pnpm-lock.yaml` against `https://registry.npmjs.org` in a dedicated dependency
+   change. The current lockfile contains 315 pre-existing `ms-feed-12` mirror tarball URLs,
+   which creates an avoidable external-contributor and build-portability dependency.
 
 ### P2
 

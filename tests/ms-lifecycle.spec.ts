@@ -15,6 +15,7 @@ const lifecycleRow = {
 };
 
 test('switches between Microsoft and Azure lifecycle views', async ({ page }) => {
+  await page.clock.setFixedTime(new Date('2026-07-22T12:00:00Z'));
   await page.route('**/api/mslifecycle', route =>
     route.fulfill({
       contentType: 'application/json',
