@@ -1,9 +1,11 @@
 'use client';
 
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useEffect, useMemo, useState, ReactNode } from 'react';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { buildMessageFilterParams, parseMessageFilters } from '@/lib/messageFilterUrl';
+import type { DateFilterType } from '@/lib/messageFilterUrl';
 
 export type FilterType = null | 'product' | 'tags' | 'severity' | 'area' | 'date';
-export type DateFilterType = 'all' | 'last30' | 'last14' | 'last7' | 'custom';
 
 interface FilterContextValue {
   openFilter: FilterType;
@@ -18,17 +20,54 @@ interface FilterContextValue {
   setCustomDateRange: (range: { from: string; to: string }) => void;
   showMajorChangesOnly: boolean;
   setShowMajorChangesOnly: (show: boolean) => void;
+  searchQuery: string;
+  setSearchQuery: (query: string) => void;
 }
 
 const FilterContext = createContext<FilterContextValue | undefined>(undefined);
 
 export function FilterProvider({ children }: { children: ReactNode }) {
+  const pathname = usePathname();
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const initialFilters = useMemo(
+    () => parseMessageFilters(new URLSearchParams(searchParams.toString())),
+    [searchParams]
+  );
   const [openFilter, setOpenFilter] = useState<FilterType>(null);
-  const [selectedTags, setSelectedTags] = useState<string[]>([]);
-  const [selectedServices, setSelectedServices] = useState<string[]>([]);
-  const [selectedDateFilter, setSelectedDateFilter] = useState<DateFilterType>('all');
-  const [customDateRange, setCustomDateRange] = useState<{ from: string; to: string }>({ from: '', to: '' });
-  const [showMajorChangesOnly, setShowMajorChangesOnly] = useState(false);
+  const [selectedTags, setSelectedTags] = useState(initialFilters.selectedTags);
+  const [selectedServices, setSelectedServices] = useState(initialFilters.selectedServices);
+  const [selectedDateFilter, setSelectedDateFilter] = useState(initialFilters.selectedDateFilter);
+  const [customDateRange, setCustomDateRange] = useState(initialFilters.customDateRange);
+  const [showMajorChangesOnly, setShowMajorChangesOnly] = useState(
+    initialFilters.showMajorChangesOnly
+  );
+  const [searchQuery, setSearchQuery] = useState(initialFilters.searchQuery);
+
+  useEffect(() => {
+    const nextParams = buildMessageFilterParams(new URLSearchParams(searchParams.toString()), {
+      searchQuery,
+      selectedTags,
+      selectedServices,
+      selectedDateFilter,
+      customDateRange,
+      showMajorChangesOnly,
+    });
+    const nextQuery = nextParams.toString();
+    if (nextQuery === searchParams.toString()) return;
+
+    router.replace(nextQuery ? `${pathname}?${nextQuery}` : pathname, { scroll: false });
+  }, [
+    customDateRange,
+    pathname,
+    router,
+    searchParams,
+    searchQuery,
+    selectedDateFilter,
+    selectedServices,
+    selectedTags,
+    showMajorChangesOnly,
+  ]);
 
   return (
     <FilterContext.Provider
@@ -45,6 +84,8 @@ export function FilterProvider({ children }: { children: ReactNode }) {
         setCustomDateRange,
         showMajorChangesOnly,
         setShowMajorChangesOnly,
+        searchQuery,
+        setSearchQuery,
       }}
     >
       {children}
