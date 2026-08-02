@@ -32,14 +32,6 @@ export default function HomePage() {
     },
   ];
 
-  // Central set of hero cards that use an image instead of a visible heading
-  const HERO_CARD_PATHS = new Set([
-    '/message-center',
-    '/release-plans',
-    '/product-news',
-    '/security',
-  ]);
-
   // Map for card images to eliminate repeated conditional blocks
   const heroImages: Record<string, { src: string; alt: string; priority?: boolean }> = {
     '/message-center': {
