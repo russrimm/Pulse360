@@ -1,7 +1,7 @@
 'use client';
 
 import React, { createContext, useContext, useEffect, useMemo, useState, ReactNode } from 'react';
-import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { usePathname, useSearchParams } from 'next/navigation';
 import { buildMessageFilterParams, parseMessageFilters } from '@/lib/messageFilterUrl';
 import type { DateFilterType } from '@/lib/messageFilterUrl';
 
@@ -28,7 +28,6 @@ const FilterContext = createContext<FilterContextValue | undefined>(undefined);
 
 export function FilterProvider({ children }: { children: ReactNode }) {
   const pathname = usePathname();
-  const router = useRouter();
   const searchParams = useSearchParams();
   const initialFilters = useMemo(
     () => parseMessageFilters(new URLSearchParams(searchParams.toString())),
@@ -56,11 +55,10 @@ export function FilterProvider({ children }: { children: ReactNode }) {
     const nextQuery = nextParams.toString();
     if (nextQuery === searchParams.toString()) return;
 
-    router.replace(nextQuery ? `${pathname}?${nextQuery}` : pathname, { scroll: false });
+    window.history.replaceState(null, '', nextQuery ? `${pathname}?${nextQuery}` : pathname);
   }, [
     customDateRange,
     pathname,
-    router,
     searchParams,
     searchQuery,
     selectedDateFilter,

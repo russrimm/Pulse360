@@ -54,6 +54,10 @@ const isDev = process.env.NODE_ENV === 'development';
 // In APIM mode, no local credentials required; otherwise check env vars
 const hasRequiredEnvVars = isApimMode || hasLocalCredentials;
 
+export function isMessageCenterSyncConfigured(): boolean {
+  return Boolean(process.env.DATABASE_URL && hasRequiredEnvVars);
+}
+
 /** Build a Graph API URL with version. Defaults to v1.0. */
 function graphUrl(
   path: string,
