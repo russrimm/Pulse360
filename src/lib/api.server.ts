@@ -1,7 +1,7 @@
 import 'server-only';
 import { M365Update, Message, MessageStatus } from './types';
 import { getPrisma } from './prisma';
-import type { MessageCenterUpdate } from '@/generated/prisma';
+import type { MessageCenterUpdate, Prisma } from '@/generated/prisma';
 import { XMLParser } from 'fast-xml-parser';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
@@ -205,9 +205,28 @@ interface GraphApiResponse {
   value: GraphApiMessage[];
 }
 
+const messageListSelect = {
+  id: true,
+  title: true,
+  service: true,
+  tags: true,
+  content: true,
+  summary: true,
+  isMajorChange: true,
+  severity: true,
+  published: true,
+  lastUpdated: true,
+  status: true,
+  firstSeenAt: true,
+  lastSeenAt: true,
+} satisfies Prisma.MessageCenterUpdateSelect;
+
+type MessageListRow = Prisma.MessageCenterUpdateGetPayload<{ select: typeof messageListSelect }>;
+
 export async function getMessages(): Promise<Message[]> {
   const prisma = getPrisma();
   const rows = await prisma.messageCenterUpdate.findMany({
+    select: messageListSelect,
     orderBy: { lastUpdated: 'desc' },
   });
 
@@ -219,13 +238,14 @@ export async function getMessages(): Promise<Message[]> {
   if (rows.length === 0) {
     await ensureMessagesSynced();
     const rehydrated = await prisma.messageCenterUpdate.findMany({
+      select: messageListSelect,
       orderBy: { lastUpdated: 'desc' },
     });
-    return rehydrated.map(rowToMessage);
+    return rehydrated.map(rowToListMessage);
   }
 
   void ensureMessagesSynced().catch(() => undefined);
-  return rows.map(rowToMessage);
+  return rows.map(rowToListMessage);
 }
 
 export async function getMessageSyncMetadata(): Promise<{
@@ -603,6 +623,23 @@ function rowToMessage(row: MessageCenterUpdate): Message {
     severity: row.severity ?? '',
     status: (row.status as MessageStatus) ?? 'active',
     archivedAt: row.archivedAt?.toISOString(),
+  };
+}
+
+function rowToListMessage(row: MessageListRow): Message {
+  return {
+    id: row.id,
+    title: row.title,
+    service: row.service,
+    lastUpdated: (row.lastUpdated ?? row.lastSeenAt).toISOString(),
+    published: (row.published ?? row.firstSeenAt).toISOString(),
+    tags: row.tags,
+    content: row.content,
+    summary: row.summary,
+    details: [],
+    isMajorChange: row.isMajorChange,
+    severity: row.severity ?? '',
+    status: (row.status as MessageStatus) ?? 'active',
   };
 }
 
@@ -1000,7 +1037,7 @@ export async function getM365Update(id: string): Promise<M365Update | null> {
     const response = await fetch(
       `https://www.microsoft.com/releasecommunications/api/v2/m365/rss/${id}`,
       {
-        cache: 'no-store',
+        next: { revalidate: 3600 },
       }
     );
 
