@@ -16,6 +16,10 @@ import { parseGraphDate } from '../src/lib/graph';
 import { readBoundedResponseText } from '../src/lib/feed/response';
 import { formatCalendarDate, parseCalendarDate } from '../src/lib/date';
 import { resolveMessageCenterAccess } from '../src/lib/message-center-access';
+import {
+  buildMessageFilterParams,
+  parseMessageFilters,
+} from '../src/lib/messageFilterUrl';
 
 test.describe('Message Center access policy', () => {
   for (const nodeEnv of ['production', 'development'] as const) {
@@ -260,6 +264,42 @@ test.describe('Message Center search', () => {
     expect(matchesMessageSearch(message, 'meeting policy')).toBe(true);
     expect(matchesMessageSearch(message, 'before rollout')).toBe(true);
     expect(matchesMessageSearch(message, 'unrelated')).toBe(false);
+  });
+});
+
+test.describe('Message Center filter URLs', () => {
+  test('validates incoming filters and preserves supported values', () => {
+    const filters = parseMessageFilters(
+      new URLSearchParams(
+        'q=teams&services=Microsoft+Teams,Power+BI&tags=Admin+impact&date=custom&from=2026-08-01&to=invalid&major=1'
+      )
+    );
+
+    expect(filters).toMatchObject({
+      searchQuery: 'teams',
+      selectedServices: ['Microsoft Teams', 'Power BI'],
+      selectedTags: ['Admin impact'],
+      selectedDateFilter: 'custom',
+      customDateRange: { from: '2026-08-01', to: '' },
+      showMajorChangesOnly: true,
+    });
+  });
+
+  test('updates filter keys without discarding unrelated query parameters', () => {
+    const params = buildMessageFilterParams(new URLSearchParams('source=email&date=invalid'), {
+      searchQuery: 'retirement',
+      selectedServices: ['Microsoft 365'],
+      selectedTags: [],
+      selectedDateFilter: 'last30',
+      customDateRange: { from: '', to: '' },
+      showMajorChangesOnly: false,
+    });
+
+    expect(params.get('source')).toBe('email');
+    expect(params.get('q')).toBe('retirement');
+    expect(params.get('services')).toBe('Microsoft 365');
+    expect(params.get('date')).toBe('last30');
+    expect(params.has('major')).toBe(false);
   });
 });
 

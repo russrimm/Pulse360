@@ -7,13 +7,15 @@ on:
   workflow_dispatch: # Allow manual trigger
 
 jobs:
-  update-lifecycle:
+  generate-lifecycle:
     runs-on: ubuntu-latest
     name: Fetch and Update Lifecycle Data
     permissions:
-      contents: write
+      contents: read
     steps:
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
 
       - name: Set up pnpm
         uses: pnpm/action-setup@v4
@@ -30,20 +32,34 @@ jobs:
       - name: Fetch and parse lifecycle data
         run: node scripts/update-lifecycle-data.mjs
 
-      - name: Check for changes
-        id: changes
+      - name: Upload generated lifecycle data
+        uses: actions/upload-artifact@v4
+        with:
+          name: lifecycle-data
+          path: public/data/lifecycle.json
+          if-no-files-found: error
+
+  publish-lifecycle:
+    needs: generate-lifecycle
+    runs-on: ubuntu-latest
+    name: Publish Lifecycle Data
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download generated lifecycle data
+        uses: actions/download-artifact@v4
+        with:
+          name: lifecycle-data
+          path: public/data
+      - name: Commit and push if changed
         run: |
           if git diff --exit-code public/data/lifecycle.json > /dev/null 2>&1; then
-            echo "changed=false" >> $GITHUB_OUTPUT
-          else
-            echo "changed=true" >> $GITHUB_OUTPUT
+            echo "Lifecycle data is already current."
+            exit 0
           fi
-
-      - name: Commit and push if changed
-        if: steps.changes.outputs.changed == 'true'
-        run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add public/data/lifecycle.json
-          git commit -m 'chore: update Microsoft lifecycle data'
+          git commit --no-verify -m 'chore: update Microsoft lifecycle data'
           git push

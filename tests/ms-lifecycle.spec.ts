@@ -237,3 +237,35 @@ test('filters Microsoft products by lifecycle dates within future month windows'
     page.getByRole('cell', { name: 'Beyond Window Product', exact: true })
   ).not.toBeVisible();
 });
+
+test('bounds rendered rows and exports the filtered lifecycle view', async ({ page }) => {
+  await page.clock.setFixedTime(new Date('2026-08-02T12:00:00Z'));
+  await page.route('**/api/mslifecycle', route =>
+    route.fulfill({
+      contentType: 'application/json',
+      body: JSON.stringify({
+        rows: Array.from({ length: 125 }, (_, index) => ({
+          ...lifecycleRow,
+          product: `Product ${String(index + 1).padStart(3, '0')}`,
+          category: '',
+        })),
+        sourceUrl: 'https://example.com/lifecycle.xlsx',
+        cachedAt: '2026-08-02T12:00:00.000Z',
+        fromCache: true,
+      }),
+    })
+  );
+
+  await page.goto('/ms-lifecycle');
+  await expect(page.locator('tbody tr')).toHaveCount(100);
+  await expect(page.getByRole('cell', { name: 'Product 125', exact: true })).not.toBeVisible();
+
+  const downloadPromise = page.waitForEvent('download');
+  await page.getByRole('button', { name: 'Export CSV' }).click();
+  const download = await downloadPromise;
+  expect(download.suggestedFilename()).toBe('pulse360-lifecycle-2026-08-02.csv');
+
+  await page.getByRole('button', { name: 'Load 25 more' }).click();
+  await expect(page.locator('tbody tr')).toHaveCount(125);
+  await expect(page.getByRole('cell', { name: 'Product 125', exact: true })).toBeVisible();
+});

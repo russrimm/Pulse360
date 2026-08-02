@@ -1,11 +1,15 @@
 import { notFound } from 'next/navigation'
 import { ReleasePlanDetail } from '@/components/ReleasePlanDetail'
 import { getFabricRoadmaps } from '@/lib/fabricApi'
+import type { Metadata } from 'next'
+import { cache } from 'react'
+import { buildDetailMetadata, buildMissingDetailMetadata } from '@/lib/detailMetadata'
 
-export default async function FabricRoadmapDetailPage({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params;
-  // Fetch all productIds used in fabric-roadmap
-  const productIds = [
+interface FabricRoadmapDetailPageProps {
+  params: Promise<{ id: string }>
+}
+
+const productIds = [
     '796a0af7-2dc7-ee11-9079-000d3a3419a8', // Fabric
     'a731518f-36ca-ee11-9079-000d3a341a60', // Data Engineering
     'a821f83f-dbd6-ee11-9079-000d3a310f67', // Data Factory
@@ -16,10 +20,30 @@ export default async function FabricRoadmapDetailPage({ params }: { params: Prom
     'c6da6b3b-ded6-ee11-9079-000d3a310f67', // Fabric Developer Experiences
     '58cb90aa-4203-ef11-a1fd-000d3a36eea4', // Real-Time Intelligence
     '347da228-ea54-ef11-a317-0022480a694f', // SQL Database
-  ]
+]
 
-  // Fetch all plans from all productIds
-  const { items: allPlans, failedProductIds } = await getFabricRoadmaps(productIds)
+const getCachedFabricRoadmaps = cache(() => getFabricRoadmaps(productIds))
+
+export async function generateMetadata({
+  params,
+}: FabricRoadmapDetailPageProps): Promise<Metadata> {
+  const { id } = await params
+  const { items } = await getCachedFabricRoadmaps()
+  const plan = items.find(item => item.ReleaseItemID === id)
+  if (!plan) return buildMissingDetailMetadata('Fabric roadmap item')
+
+  return buildDetailMetadata({
+    title: plan.FeatureName,
+    description: plan.FeatureDescription,
+    canonicalPath: `/fabric-roadmap/${id}`,
+  })
+}
+
+export default async function FabricRoadmapDetailPage({
+  params,
+}: FabricRoadmapDetailPageProps) {
+  const { id } = await params
+  const { items: allPlans, failedProductIds } = await getCachedFabricRoadmaps()
 
   const plan = allPlans.find(p => p.ReleaseItemID === id)
   if (!plan && failedProductIds.length > 0) {

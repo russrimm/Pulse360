@@ -9,6 +9,9 @@ on:
     - cron: '*/15 * * * *'
   workflow_dispatch: # allow manual trigger from the Actions tab
 
+permissions:
+  contents: read
+
 concurrency:
   group: sync-message-center
   cancel-in-progress: false

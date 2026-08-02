@@ -27,7 +27,7 @@ jobs:
           node-version: 24
           cache: pnpm
       - name: Check lockfile provenance
-        run: node scripts/check-lockfile.mjs
+        run: pnpm check:lockfile
       - run: pnpm install --frozen-lockfile
       - run: pnpm exec prisma generate
       - run: pnpm lint

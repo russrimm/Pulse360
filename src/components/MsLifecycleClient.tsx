@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useDeferredValue, useEffect, useMemo, useState } from 'react';
 import * as Popover from '@radix-ui/react-popover';
 import { addMonths } from 'date-fns';
 import { getLifecycleExpiryStatus, parseLifecycleDate } from '@/lib/lifecycle';
@@ -104,6 +104,13 @@ const AZURE_FEATURE_COLUMN_OPTIONS: ColumnOption[] = [
 
 const EXPIRATION_WINDOW_OPTIONS: ExpirationWindow[] = [3, 6, 9, 12];
 const EXPIRATION_DATE_FIELDS = ['mainStreamEndDate', 'extendedEndDate', 'retirementDate'] as const;
+const INITIAL_VISIBLE_ROWS = 100;
+const LOAD_MORE_ROWS = 100;
+
+function escapeCsvValue(value: string | null): string {
+  const text = value ?? '';
+  return /[",\r\n]/.test(text) ? `"${text.replaceAll('"', '""')}"` : text;
+}
 
 function isExpiringWithin(row: LifecycleRow, months: ExpirationWindow, today: Date): boolean {
   const cutoff = addMonths(today, months);
@@ -178,6 +185,7 @@ function LifecycleGrid({
   showExpirationFilter = false,
 }: LifecycleGridProps) {
   const [search, setSearch] = useState('');
+  const deferredSearch = useDeferredValue(search);
   const [dropdownFilter, setDropdownFilter] = useState('All');
   const [expirationWindow, setExpirationWindow] = useState<ExpirationWindow | 'All'>('All');
   const [sortField, setSortField] = useState<SortField>('product');
@@ -185,6 +193,7 @@ function LifecycleGrid({
   const [visibleColumns, setVisibleColumns] = useState<ColumnId[]>(
     columnOptions.map(column => column.id)
   );
+  const [visibleRowCount, setVisibleRowCount] = useState(INITIAL_VISIBLE_ROWS);
 
   useEffect(() => {
     setVisibleColumns(columnOptions.map(column => column.id));
@@ -200,7 +209,7 @@ function LifecycleGrid({
   }, [rows, dropdownFilterField]);
 
   const filtered = useMemo(() => {
-    const query = search.toLowerCase();
+    const query = deferredSearch.trim().toLowerCase();
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
@@ -238,11 +247,21 @@ function LifecycleGrid({
         if (va > vb) return sortDir === 'asc' ? 1 : -1;
         return 0;
       });
-  }, [rows, search, dropdownFilter, dropdownFilterField, expirationWindow, sortField, sortDir]);
+  }, [
+    rows,
+    deferredSearch,
+    dropdownFilter,
+    dropdownFilterField,
+    expirationWindow,
+    sortField,
+    sortDir,
+  ]);
+  const visibleRows = filtered.slice(0, visibleRowCount);
 
   const isVisible = (columnId: ColumnId) => visibleColumns.includes(columnId);
 
   function handleSort(field: SortField) {
+    setVisibleRowCount(INITIAL_VISIBLE_ROWS);
     if (field === sortField) {
       setSortDir(current => (current === 'asc' ? 'desc' : 'asc'));
     } else {
@@ -284,6 +303,22 @@ function LifecycleGrid({
     });
   }
 
+  function exportCsv() {
+    const columns = columnOptions.filter(column => visibleColumns.includes(column.id));
+    const csv = [
+      columns.map(column => escapeCsvValue(column.label)).join(','),
+      ...filtered.map(row => columns.map(column => escapeCsvValue(row[column.id])).join(',')),
+    ].join('\r\n');
+    const blobUrl = URL.createObjectURL(
+      new Blob([`\uFEFF${csv}`], { type: 'text/csv;charset=utf-8' })
+    );
+    const link = document.createElement('a');
+    link.href = blobUrl;
+    link.download = `pulse360-lifecycle-${new Date().toISOString().slice(0, 10)}.csv`;
+    link.click();
+    URL.revokeObjectURL(blobUrl);
+  }
+
   return (
     <section className="mb-10 flex min-h-0 flex-col md:mb-0 md:h-full">
       {title && (
@@ -294,14 +329,20 @@ function LifecycleGrid({
         <input
           type="search"
           value={search}
-          onChange={event => setSearch(event.target.value)}
+          onChange={event => {
+            setSearch(event.target.value);
+            setVisibleRowCount(INITIAL_VISIBLE_ROWS);
+          }}
           placeholder={searchPlaceholder}
           className="flex-1 px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
         />
         <select
           aria-label={`Filter by ${dropdownFilterLabel}`}
           value={dropdownFilter}
-          onChange={event => setDropdownFilter(event.target.value)}
+          onChange={event => {
+            setDropdownFilter(event.target.value);
+            setVisibleRowCount(INITIAL_VISIBLE_ROWS);
+          }}
           className="px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
         >
           {dropdownFilterOptions.map(value => (
@@ -317,6 +358,7 @@ function LifecycleGrid({
             onChange={event => {
               const value = event.target.value;
               setExpirationWindow(value === 'All' ? 'All' : (Number(value) as ExpirationWindow));
+              setVisibleRowCount(INITIAL_VISIBLE_ROWS);
             }}
             className="px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
           >
@@ -328,6 +370,14 @@ function LifecycleGrid({
             ))}
           </select>
         )}
+        <button
+          type="button"
+          onClick={exportCsv}
+          disabled={filtered.length === 0}
+          className="inline-flex items-center justify-center rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700"
+        >
+          Export CSV
+        </button>
         <Popover.Root>
           <Popover.Trigger asChild>
             <button
@@ -518,7 +568,7 @@ function LifecycleGrid({
                 </td>
               </tr>
             ) : (
-              filtered.map((row, index) => {
+              visibleRows.map((row, index) => {
                 const status = getLifecycleExpiryStatus(row);
                 return (
                   <tr
@@ -614,6 +664,17 @@ function LifecycleGrid({
           </tbody>
         </table>
       </div>
+      {visibleRows.length < filtered.length ? (
+        <div className="mt-3 flex justify-center">
+          <button
+            type="button"
+            onClick={() => setVisibleRowCount(count => count + LOAD_MORE_ROWS)}
+            className="rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700"
+          >
+            Load {Math.min(LOAD_MORE_ROWS, filtered.length - visibleRows.length)} more
+          </button>
+        </div>
+      ) : null}
     </section>
   );
 }

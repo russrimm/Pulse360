@@ -20,10 +20,6 @@ export function MessageList({ messages: messagesProp }: MessageListProps) {
   const [page, setPage] = useState(1);
   const observerRef = useRef<IntersectionObserver | null>(null);
   const loadMoreRef = useRef<HTMLDivElement>(null);
-  const [searchQuery, setSearchQuery] = useState('');
-  const deferredSearchQuery = useDeferredValue(searchQuery.trim().toLowerCase());
-  const isSearchPending = searchQuery.trim().toLowerCase() !== deferredSearchQuery;
-
   // Shared filter state
   const {
     selectedTags,
@@ -38,7 +34,11 @@ export function MessageList({ messages: messagesProp }: MessageListProps) {
     setCustomDateRange,
     showMajorChangesOnly,
     setShowMajorChangesOnly,
+    searchQuery,
+    setSearchQuery,
   } = useFilterContext();
+  const deferredSearchQuery = useDeferredValue(searchQuery.trim().toLowerCase());
+  const isSearchPending = searchQuery.trim().toLowerCase() !== deferredSearchQuery;
 
   // Filter and sort messages
   const filteredMessages = useMemo(() => {

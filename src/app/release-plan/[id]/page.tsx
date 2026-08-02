@@ -1,10 +1,12 @@
 import { getReleasePlans } from '@/lib/api.server';
 import { ReleasePlanDetail } from '@/components/ReleasePlanDetail';
 import { notFound } from 'next/navigation';
+import type { Metadata } from 'next';
+import { cache } from 'react';
+import { buildDetailMetadata, buildMissingDetailMetadata } from '@/lib/detailMetadata';
 
-interface PageProps {
-  params: { id: string };
-  searchParams?: { [key: string]: string | string[] | undefined };
+interface ReleasePlanPageProps {
+  params: Promise<{ id: string }>;
 }
 
 interface ReleasePlan {
@@ -25,9 +27,23 @@ interface ReleasePlan {
   service: string[];
 }
 
-export default async function ReleasePlanPage({ params }: { params: Promise<{ id: string }> }) {
+const getCachedReleasePlans = cache(getReleasePlans);
+
+export async function generateMetadata({ params }: ReleasePlanPageProps): Promise<Metadata> {
   const { id } = await params;
-  const releasePlans = await getReleasePlans();
+  const plan = (await getCachedReleasePlans()).find((item: ReleasePlan) => item.id === id);
+  if (!plan) return buildMissingDetailMetadata('Release plan');
+
+  return buildDetailMetadata({
+    title: plan.title,
+    description: plan.content || plan.businessValue,
+    canonicalPath: `/release-plan/${id}`,
+  });
+}
+
+export default async function ReleasePlanPage({ params }: ReleasePlanPageProps) {
+  const { id } = await params;
+  const releasePlans = await getCachedReleasePlans();
   const plan = releasePlans.find((p: ReleasePlan) => p.id === id);
 
   if (!plan) {
