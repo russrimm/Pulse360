@@ -258,13 +258,10 @@ function LifecycleGrid({
   ]);
   const visibleRows = filtered.slice(0, visibleRowCount);
 
-  useEffect(() => {
-    setVisibleRowCount(INITIAL_VISIBLE_ROWS);
-  }, [deferredSearch, dropdownFilter, expirationWindow, sortField, sortDir]);
-
   const isVisible = (columnId: ColumnId) => visibleColumns.includes(columnId);
 
   function handleSort(field: SortField) {
+    setVisibleRowCount(INITIAL_VISIBLE_ROWS);
     if (field === sortField) {
       setSortDir(current => (current === 'asc' ? 'desc' : 'asc'));
     } else {
@@ -332,14 +329,20 @@ function LifecycleGrid({
         <input
           type="search"
           value={search}
-          onChange={event => setSearch(event.target.value)}
+          onChange={event => {
+            setSearch(event.target.value);
+            setVisibleRowCount(INITIAL_VISIBLE_ROWS);
+          }}
           placeholder={searchPlaceholder}
           className="flex-1 px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
         />
         <select
           aria-label={`Filter by ${dropdownFilterLabel}`}
           value={dropdownFilter}
-          onChange={event => setDropdownFilter(event.target.value)}
+          onChange={event => {
+            setDropdownFilter(event.target.value);
+            setVisibleRowCount(INITIAL_VISIBLE_ROWS);
+          }}
           className="px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
         >
           {dropdownFilterOptions.map(value => (
@@ -355,6 +358,7 @@ function LifecycleGrid({
             onChange={event => {
               const value = event.target.value;
               setExpirationWindow(value === 'All' ? 'All' : (Number(value) as ExpirationWindow));
+              setVisibleRowCount(INITIAL_VISIBLE_ROWS);
             }}
             className="px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
           >
