@@ -107,6 +107,11 @@ const EXPIRATION_DATE_FIELDS = ['mainStreamEndDate', 'extendedEndDate', 'retirem
 const INITIAL_VISIBLE_ROWS = 100;
 const LOAD_MORE_ROWS = 100;
 
+function escapeCsvValue(value: string | null): string {
+  const text = value ?? '';
+  return /[",\r\n]/.test(text) ? `"${text.replaceAll('"', '""')}"` : text;
+}
+
 function isExpiringWithin(row: LifecycleRow, months: ExpirationWindow, today: Date): boolean {
   const cutoff = addMonths(today, months);
 
@@ -301,6 +306,22 @@ function LifecycleGrid({
     });
   }
 
+  function exportCsv() {
+    const columns = columnOptions.filter(column => visibleColumns.includes(column.id));
+    const csv = [
+      columns.map(column => escapeCsvValue(column.label)).join(','),
+      ...filtered.map(row => columns.map(column => escapeCsvValue(row[column.id])).join(',')),
+    ].join('\r\n');
+    const blobUrl = URL.createObjectURL(
+      new Blob([`\uFEFF${csv}`], { type: 'text/csv;charset=utf-8' })
+    );
+    const link = document.createElement('a');
+    link.href = blobUrl;
+    link.download = `pulse360-lifecycle-${new Date().toISOString().slice(0, 10)}.csv`;
+    link.click();
+    URL.revokeObjectURL(blobUrl);
+  }
+
   return (
     <section className="mb-10 flex min-h-0 flex-col md:mb-0 md:h-full">
       {title && (
@@ -345,6 +366,14 @@ function LifecycleGrid({
             ))}
           </select>
         )}
+        <button
+          type="button"
+          onClick={exportCsv}
+          disabled={filtered.length === 0}
+          className="inline-flex items-center justify-center rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700"
+        >
+          Export CSV
+        </button>
         <Popover.Root>
           <Popover.Trigger asChild>
             <button
