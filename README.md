@@ -6,7 +6,7 @@
 
 Live site: **<https://www.mspulse360.app>**
 
-Built with the Next.js 16 App Router, React 19, TypeScript, Tailwind CSS 4, and Radix UI. Server Components do the heavy lifting; client components add interactivity. Azure is the default hosting platform.
+Built with the Next.js 16 App Router, React 19, TypeScript, Tailwind CSS 4, and Radix UI. Server Components do the heavy lifting; client components add interactivity. Vercel is the production hosting target.
 
 ---
 
@@ -138,10 +138,10 @@ Below are screenshots of every major page in both **dark** and **light** mode.
 | Components          | **Radix UI** primitives (Accordion, Popover, Icons) + Headless UI + Heroicons                           |
 | State / data        | **React Query 5** for client cache, **Zustand 5** for filter state, React Server Components for fetches |
 | Database (optional) | **Prisma 7** → **PostgreSQL** (generated client lives in `src/generated/prisma`)                        |
-| Auth (optional)     | **NextAuth 4** + **@azure/msal-browser 4** (scaffolded; see [Configuration](#configuration))            |
+| Auth (optional)     | **NextAuth 4** with Microsoft Entra ID (see [Configuration](#configuration))                            |
 | Microsoft Graph     | App-only client credentials flow (no user sign-in required for Message Center)                          |
 | Feed parsing        | `fast-xml-parser`, `xml2js`, `rss-parser`                                                               |
-| Sanitization        | `isomorphic-dompurify` (server-rendered HTML from feeds)                                                |
+| Sanitization        | `sanitize-html` with a shared feed allowlist                                                            |
 | Telemetry           | Optional analytics and performance monitoring integrations                                              |
 | Tests               | **Playwright 1.57** (Chromium, Firefox, WebKit)                                                         |
 | Hosting target      | Vercel (Node 22.12+ or 24.0+ with Next.js 16)                                                           |
@@ -201,7 +201,7 @@ Key design choices:
 | `learn.microsoft.com` (HTML table scrape)                                                                                                                                                                                     | Copilot Studio release plan       | Public                                    | 1 h                   |
 | `learn.microsoft.com/en-us/lifecycle/products/export/`                                                                                                                                                                        | Microsoft product lifecycle dates | Public                                    | daily                 |
 
-If an upstream is down, list endpoints return `200` with an empty array so the UI degrades gracefully — never a 5xx visible to the user.
+If an upstream is down, feed pages show an actionable retry or unavailable state. Proxy routes use `502` or `503` when callers need to distinguish an upstream failure from an empty feed.
 
 ---
 
@@ -258,7 +258,7 @@ If an upstream is down, list endpoints return `200` with an empty array so the U
 
 ## Quick start
 
-Prereqs: **Node 20.19+ (or 22.12+)**, **pnpm 9+** (enable with `corepack enable` or `npm i -g pnpm`), **Git**. Node 22 is recommended for local development (see `.nvmrc`). Postgres only if you intend to use the Prisma models (most features don't need it).
+Prereqs: **Node 22.12+ or 24**, **pnpm 9+** (enable with `corepack enable`), and **Git**. Postgres is only required for Message Center persistence.
 
 ```bash
 git clone https://github.com/russrimm/Pulse360.git
@@ -476,7 +476,7 @@ You should now be able to start the app and load `/message-center` with live ten
 
 Pulse 360 uses Postgres via Prisma to **cache Microsoft Graph Message Center updates**. Microsoft's live Graph feed drops messages once they are archived or expired; the cache preserves them so they remain viewable in the UI with an **Archived** or **Expired** badge.
 
-**On-demand refresh (TTL 1h):** the first request after the TTL elapses fetches from Graph, upserts every row, and reconciles rows missing from the response — marking them `archived` (with `archivedAt`) or `expired` (when `actionRequiredByDateTime` is past). Nothing is ever hard-deleted.
+**Refresh:** GitHub Actions syncs every 15 minutes, Vercel Cron provides a daily backstop, and requests trigger a non-blocking stale-data safety refresh. Syncs upsert every row and reconcile missing rows as `archived` or `expired`; nothing is hard-deleted.
 
 #### Neon quickstart (recommended — free tier, scales to zero)
 
@@ -500,7 +500,7 @@ Pulse 360 uses Postgres via Prisma to **cache Microsoft Graph Message Center upd
 #### Notes
 
 - Prisma 7 requires `prisma.config.ts` at the repo root (already committed). The datasource URL is read from `DATABASE_URL` there — do **not** re-add `url` to `schema.prisma`.
-- The generated client is **not** committed (`/src/generated/prisma` is in `.gitignore`); `pnpm install` runs `prisma generate` automatically via the `postinstall` hook.
+- The generated client is **not** committed (`/src/generated/prisma` is in `.gitignore`); `pnpm build` and CI run `prisma generate`.
 - Any Postgres-compatible provider works (Neon, Supabase, Azure Database for PostgreSQL, local Postgres in Docker). SQLite is not suitable for production serverless deployments because their filesystems are not durable application storage.
 - Optional: `pnpm exec prisma studio` opens a GUI to browse the cached rows.
 
@@ -511,14 +511,14 @@ Pulse 360 uses Postgres via Prisma to **cache Microsoft Graph Message Center upd
 | Command               | What it does                                          |
 | --------------------- | ----------------------------------------------------- |
 | `pnpm dev`            | Start Next.js with Turbopack on port 3000             |
-| `pnpm build`          | Production build (runs `next build`)                  |
+| `pnpm build`          | Generate Prisma, apply configured migrations, and build |
 | `pnpm start`          | Serve the production build                            |
 | `pnpm clean`          | Delete `.next/`                                       |
 | `pnpm lint`           | ESLint over the whole repo                            |
 | `pnpm lint:fix`       | ESLint with autofix                                   |
 | `pnpm type-check`     | `tsc --noEmit` (no emit, types only)                  |
 | `pnpm format`         | Prettier over the whole repo                          |
-| `npx playwright test` | Run Playwright tests across Chromium, Firefox, WebKit |
+| `pnpm exec playwright test` | Run Playwright tests across Chromium, Firefox, WebKit |
 
 ---
 
@@ -572,11 +572,15 @@ Pulse 360 uses Postgres via Prisma to **cache Microsoft Graph Message Center upd
 
 ### API routes
 
-All under `/api/*`. None are mutating; every handler is `GET`.
+All routes are under `/api/*`. The protected sync endpoint performs the only mutation.
 
 | Route                                                                                                | Upstream / behavior                                                                                              |
 | ---------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
-| `/api/messages`                                                                                      | Wraps `getMessages()` → Microsoft Graph; returns 500 on upstream failure                                         |
+| `/api/messages`                                                                                      | Authenticated Message Center list; returns `503` when configuration or upstream data is unavailable              |
+| `/api/health`                                                                                        | Uncached application readiness and Message Center sync status                                                    |
+| `/api/cron/sync-messages`                                                                            | Bearer-protected Message Center synchronization                                                                  |
+| `/api/image-proxy?url=https://...`                                                                   | Allowlisted Microsoft image proxy; rejects redirects, non-images, SVG, and oversized responses                  |
+| `/api/mslifecycle`                                                                                   | Cached Microsoft Lifecycle data with stale-data fallback                                                         |
 | `/api/msrc?monthId=YYYY-Mmm`                                                                         | Proxies MSRC CVRF months list or a specific month; validates `monthId` strictly                                  |
 | `/api/proxy-rss?url=https://...`                                                                     | Allowlisted RSS proxy (microsoft.com hosts only); rejects non-https, unknown hosts, and follows manual redirects |
 | `/api/azure-ai-foundry-news`                                                                         | DevBlogs RSS for Azure AI Foundry                                                                                |
@@ -590,14 +594,15 @@ All under `/api/*`. None are mutating; every handler is `GET`.
 | `/api/power-apps-news`, `/api/power-automate-news`, `/api/power-bi-news`, `/api/power-platform-news` | Per-product blog RSS                                                                                             |
 | `/api/semantic-kernel-news`                                                                          | Semantic Kernel feed                                                                                             |
 | `/api/tech-community-news`                                                                           | Tech Community feed                                                                                              |
-| `/api/auth/[...nextauth]`                                                                            | NextAuth catch-all (scaffolded; add `route.ts` if you wire up user sign-in)                                      |
+| `/api/auth/[...nextauth]`                                                                            | NextAuth Microsoft Entra ID sign-in routes                                                                       |
 
 ---
 
 ## Using the site
 
 - **Global search.** Every list page has a search bar. Matching is case- and whitespace-insensitive against title, product name, and (where applicable) message ID.
-- **Filters.** Product, Area, Date, and Major Changes filters live above each list. Active filters pulse red so it's obvious when results are scoped. Click **Clear** to reset.
+- **Filters.** Product, Area, Date, and Major Changes filters live above each list. Message Center filters are reflected in the URL so filtered views can be bookmarked and shared.
+- **Lifecycle export.** The Microsoft Lifecycle page exports the current filtered rows and visible columns as CSV.
 - **Drill-through.** Every card is fully clickable. Detail pages preserve the product tab and impact context.
 - **MSRC month picker.** `/msrc` exposes a dropdown of every month MSRC has published a CVRF report for. Pick a month → the page re-fetches the per-month CVE bundle. Each CVE expands to show product, max severity, KB article links, downloads, weakness (CWE), and revision history.
 - **Theme.** Use the toggle in the top-right to switch light / dark / system.
@@ -607,16 +612,16 @@ All under `/api/*`. None are mutating; every handler is `GET`.
 
 ## Testing
 
-Playwright is configured for three browser projects (Chromium, Firefox, WebKit) and runs tests in parallel.
+Playwright is configured for Chromium, Firefox, and WebKit. It starts a managed production server locally and a development server in CI.
 
 ```bash
-npx playwright install      # one-time browser binaries
-npx playwright test         # all browsers, all tests
-npx playwright test --ui    # interactive mode
-npx playwright show-report  # last HTML report
+pnpm exec playwright install      # one-time browser binaries
+pnpm exec playwright test         # all browsers, all tests
+pnpm exec playwright test --ui    # interactive mode
+pnpm exec playwright show-report  # last HTML report
 ```
 
-Specs live in `tests/`. The starter `tests/example.spec.ts` is a placeholder — add real coverage as features stabilize. The Playwright config does **not** auto-start `next dev`; either run `pnpm dev` first, or uncomment the `webServer` block in `playwright.config.ts`.
+Specs live in `tests/`; the Playwright `webServer` configuration starts the app automatically unless `PLAYWRIGHT_BASE_URL` points to an existing server.
 
 ---
 
@@ -669,9 +674,9 @@ Put it behind a reverse proxy (Caddy / nginx / CloudFront) with HTTPS terminated
 - **`.env*` is gitignored** by a broad rule that catches typos like `..env`. Always use a placeholder template (never real values) and never commit secrets. If you suspect a secret was committed, rotate the Entra client secret immediately.
 - **RSS proxy is allowlisted.** `/api/proxy-rss` only fetches HTTPS URLs whose hostname is in a fixed `*.microsoft.com` set. Redirects are read manually (`redirect: 'manual'`) to prevent the proxy from being used to reach arbitrary hosts.
 - **MSRC input is validated.** `/api/msrc?monthId=...` rejects anything not matching `^\d{4}-[A-Za-z]{3}$` before forwarding to MSRC, preventing path injection.
-- **HTML from feeds is sanitized** with `isomorphic-dompurify` before render to mitigate stored XSS from upstream feeds.
-- **CSP for SVG images.** `next.config.js` enables inline SVG (`dangerouslyAllowSVG: true`) but pairs it with a strict CSP (`script-src 'none'; sandbox;`) and `Content-Disposition: attachment` to neutralize active content.
-- **Console silencing in production** prevents accidental disclosure of upstream payloads via host log aggregation.
+- **HTML from feeds is sanitized** with `sanitize-html` before rendering to mitigate stored XSS from upstream feeds.
+- **Remote SVG is blocked.** The Next.js image loader and `/api/image-proxy` reject remote SVG content; local reviewed icons remain available.
+- **Dependency provenance is enforced.** CI rejects internal package-feed URLs and weak SHA-1 lockfile integrity metadata.
 
 If you find a security issue, please email the maintainer (see [Contact](#contact)) rather than opening a public issue.
 
@@ -692,17 +697,17 @@ The Graph token request failed silently. Check the Vercel logs. Common causes:
 **MSRC page shows "Failed to fetch CVEs for month".**
 The MSRC API occasionally rate-limits or 502s. Refresh; the route surfaces the upstream status.
 
-**Product News page is empty.**
-The upstream RSS feed may be temporarily down. Each handler returns 200 with an empty array on failure rather than crashing — refresh later, or check the route directly (e.g. `curl http://localhost:3000/api/fabric-blog-news`).
+**Product News page is empty or unavailable.**
+The upstream RSS feed may be temporarily down. Retry from the page, or inspect the route status directly (for example, `curl -i http://localhost:3000/api/fabric-blog-news`).
 
 **Hydration mismatch warnings.**
 The `<html>` element is rendered with `className="dark"` server-side but the theme provider may switch it client-side. `suppressHydrationWarning` is set on both `<html>` and `<body>` in `src/app/layout.tsx`; if you see new warnings, check that any new client component reading `theme` is wrapped in a `useEffect` mount guard.
 
 **Prisma "Cannot find module '../generated/prisma'".**
-Run `npx prisma generate`. The generated client is gitignored.
+Run `pnpm exec prisma generate`. The generated client is gitignored.
 
 **Playwright fails with "browserType.launch: Executable doesn't exist".**
-Run `npx playwright install` once to download browser binaries.
+Run `pnpm exec playwright install` once to download browser binaries.
 
 ---
 

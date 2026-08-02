@@ -5,22 +5,33 @@ import { format } from 'date-fns';
 import Link from 'next/link';
 import Image from 'next/image';
 import { getProductIcon } from '@/lib/getProductIcon';
+import type { Metadata } from 'next';
+import { cache } from 'react';
+import { buildDetailMetadata, buildMissingDetailMetadata } from '@/lib/detailMetadata';
 
 export const revalidate = 3600; // Revalidate every hour
 
-export const metadata = {
-  title: 'Azure Update | Microsoft 365 Message Center',
-  description: 'View detailed information about Azure updates and changes.',
-};
-
-interface PageProps {
-  params: { id: string };
-  searchParams: { [key: string]: string | string[] | undefined };
+interface AzureUpdatePageProps {
+  params: Promise<{ id: string }>;
 }
 
-export default async function AzureUpdatePage({ params }: { params: Promise<{ id: string }> }) {
+const getCachedAzureUpdates = cache(getAzureUpdates);
+
+export async function generateMetadata({ params }: AzureUpdatePageProps): Promise<Metadata> {
   const { id } = await params;
-  const updates = await getAzureUpdates();
+  const update = (await getCachedAzureUpdates()).find(item => item.id === id);
+  if (!update) return buildMissingDetailMetadata('Azure update');
+
+  return buildDetailMetadata({
+    title: update.title,
+    description: update.description,
+    canonicalPath: `/azure-update/${id}`,
+  });
+}
+
+export default async function AzureUpdatePage({ params }: AzureUpdatePageProps) {
+  const { id } = await params;
+  const updates = await getCachedAzureUpdates();
   const update = updates.find(u => u.id === id);
 
   if (!update) {
