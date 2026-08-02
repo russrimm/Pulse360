@@ -268,38 +268,38 @@ test.describe('Message Center search', () => {
 });
 
 test.describe('Message Center filter URLs', () => {
-    test('validates incoming filters and preserves supported values', () => {
-      const filters = parseMessageFilters(
-        new URLSearchParams(
-          'q=teams&services=Microsoft+Teams,Power+BI&tags=Admin+impact&date=custom&from=2026-08-01&to=invalid&major=1'
-        )
-      );
+  test('validates incoming filters and preserves supported values', () => {
+    const filters = parseMessageFilters(
+      new URLSearchParams(
+        'q=teams&services=Microsoft+Teams,Power+BI&tags=Admin+impact&date=custom&from=2026-08-01&to=invalid&major=1'
+      )
+    );
 
-      expect(filters).toMatchObject({
-        searchQuery: 'teams',
-        selectedServices: ['Microsoft Teams', 'Power BI'],
-        selectedTags: ['Admin impact'],
-        selectedDateFilter: 'custom',
-        customDateRange: { from: '2026-08-01', to: '' },
-        showMajorChangesOnly: true,
+    expect(filters).toMatchObject({
+      searchQuery: 'teams',
+      selectedServices: ['Microsoft Teams', 'Power BI'],
+      selectedTags: ['Admin impact'],
+      selectedDateFilter: 'custom',
+      customDateRange: { from: '2026-08-01', to: '' },
+      showMajorChangesOnly: true,
+    });
+  });
+
+  test('updates filter keys without discarding unrelated query parameters', () => {
+    const params = buildMessageFilterParams(new URLSearchParams('source=email&date=invalid'), {
+      searchQuery: 'retirement',
+      selectedServices: ['Microsoft 365'],
+      selectedTags: [],
+      selectedDateFilter: 'last30',
+      customDateRange: { from: '', to: '' },
+      showMajorChangesOnly: false,
     });
 
-    test('updates filter keys without discarding unrelated query parameters', () => {
-      const params = buildMessageFilterParams(new URLSearchParams('source=email&date=invalid'), {
-        searchQuery: 'retirement',
-        selectedServices: ['Microsoft 365'],
-        selectedTags: [],
-        selectedDateFilter: 'last30',
-        customDateRange: { from: '', to: '' },
-        showMajorChangesOnly: false,
-      });
-
-      expect(params.get('source')).toBe('email');
-      expect(params.get('q')).toBe('retirement');
-      expect(params.get('services')).toBe('Microsoft 365');
-      expect(params.get('date')).toBe('last30');
-      expect(params.has('major')).toBe(false);
-    });
+    expect(params.get('source')).toBe('email');
+    expect(params.get('q')).toBe('retirement');
+    expect(params.get('services')).toBe('Microsoft 365');
+    expect(params.get('date')).toBe('last30');
+    expect(params.has('major')).toBe(false);
   });
 });
 
