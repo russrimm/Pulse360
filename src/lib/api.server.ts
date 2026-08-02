@@ -51,20 +51,6 @@ const isApimMode = Boolean(RAW_AZURE_API_URL) && !isGraphMicrosoftHost(GRAPH_BAS
 
 const isDev = process.env.NODE_ENV === 'development';
 
-if (
-  !isApimMode &&
-  process.env.NODE_ENV === 'development' &&
-  (!API_KEY || !TENANT_ID || !CLIENT_ID)
-) {
-  const missing: string[] = [];
-  if (!API_KEY) missing.push('AZURE_CLIENT_SECRET');
-  if (!TENANT_ID) missing.push('AZURE_TENANT_ID');
-  if (!CLIENT_ID) missing.push('AZURE_CLIENT_ID');
-  throw new Error(
-    `Missing required environment variables: ${missing.join(', ')}. Please check your .env.local file.`
-  );
-}
-
 // In APIM mode, no local credentials required; otherwise check env vars
 const hasRequiredEnvVars = isApimMode || hasLocalCredentials;
 

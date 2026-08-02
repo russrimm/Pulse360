@@ -684,8 +684,8 @@ If you find a security issue, please email the maintainer (see [Contact](#contac
 
 ## Troubleshooting
 
-**"Missing required environment variables: AZURE_CLIENT_ID, ..." at dev start.**
-You're in dev mode without Graph creds. Set them in `.env.local` and restart. RSS-driven pages remain available without Graph credentials; Message Center remains disabled.
+**Message Center is unavailable in local development.**
+Set the Graph, Postgres, and authentication variables in `.env.local`, then restart. RSS-driven pages and `/api/health` remain available without Graph credentials.
 
 **`/message-center` is empty in production.**
 The Graph token request failed silently. Check the Vercel logs. Common causes:
