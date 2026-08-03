@@ -49,7 +49,7 @@ export function ReleasePlanDetail({ plan }: ReleasePlanDetailProps) {
   }
 
   return (
-    <div className="min-h-screen bg-gray-900 dark:bg-black">
+    <div className="min-h-screen bg-white dark:bg-black">
       <div className="relative px-3 sm:px-6 lg:px-8 pt-0 pb-2 sm:py-4">
         <div className="max-w-7xl mx-auto">
           <div className="mb-0.5 sm:mb-3">
