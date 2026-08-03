@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
+import { InformationCircleIcon } from '@heroicons/react/24/outline';
 import { HomeContent } from '@/components/HomeContent';
 import { FilterProvider } from '@/components/FilterContext';
 import { getMessages, getMessageSyncMetadata } from '@/lib/api.server';
@@ -57,6 +58,16 @@ export default async function MessageCenterPage() {
             Source: Microsoft Graph Message Center for the configured tenant. Last successful sync:{' '}
             <time dateTime={syncMetadata.lastSyncAt ?? undefined}>{formattedSyncTime}</time>
             {syncMetadata.isStale ? ' - data may be stale.' : ''}
+          </p>
+        </div>
+        <div
+          role="note"
+          className="mb-8 flex items-start gap-3 rounded-lg border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-900 dark:border-blue-900/50 dark:bg-blue-950/40 dark:text-blue-200"
+        >
+          <InformationCircleIcon className="mt-0.5 h-5 w-5 flex-shrink-0" aria-hidden="true" />
+          <p>
+            Message Center posts vary by tenant; always use your tenant&apos;s Message Center as the
+            source of truth.
           </p>
         </div>
         <FilterProvider>
