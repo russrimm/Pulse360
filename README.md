@@ -270,7 +270,7 @@ pnpm dev
 
 Open <http://localhost:3000>. The root path redirects to `/home`.
 
-> **No env vars?** RSS-driven pages still work. Message Center requires Postgres and Graph configuration and fails closed until tenant sign-in is configured or anonymous publication is explicitly enabled with `MESSAGE_CENTER_PUBLIC=true`.
+> **No env vars?** RSS-driven pages still work. Message Center requires Postgres and Graph configuration. It is served openly when no interactive sign-in provider is configured; configure tenant sign-in to gate it, or set `MESSAGE_CENTER_PUBLIC=false` to block it outright.
 
 ## Reusable dotfiles
 
@@ -452,7 +452,7 @@ AZURE_CLIENT_SECRET=replace_with_real_secret_value
 | Variable                                                                                                               | Purpose                                                                                                                                                                                   |
 | ---------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `NEXTAUTH_URL`, `NEXTAUTH_SECRET`, `AUTH_AZURE_AD_CLIENT_ID`, `AUTH_AZURE_AD_CLIENT_SECRET`, `AUTH_AZURE_AD_TENANT_ID` | Recommended for production. Enables single-tenant sign-in and protects Message Center list/detail routes. Use an interactive app registration separate from the Graph daemon credentials. |
-| `MESSAGE_CENTER_PUBLIC`                                                                                                | Optional. Set to `true` only when tenant-specific Message Center communications are intentionally public; Message Center otherwise fails closed when sign-in is unconfigured.              |
+| `MESSAGE_CENTER_PUBLIC`                                                                                                | Optional override. `true` allows anonymous access even when sign-in is configured. `false` blocks anonymous access (routes fail closed when sign-in is unconfigured). Unset defers to whether sign-in is configured.              |
 
 ### Creating the Microsoft Entra app registration
 
@@ -468,7 +468,7 @@ The Message Center calls Microsoft Graph with the **application** permission `Se
 
 For production, create a second, single-tenant Entra app registration for interactive sign-in. Add the web redirect URI `${NEXTAUTH_URL}/api/auth/callback/azure-ad`, then set `AUTH_AZURE_AD_CLIENT_ID`, `AUTH_AZURE_AD_CLIENT_SECRET`, `AUTH_AZURE_AD_TENANT_ID`, `NEXTAUTH_URL`, and `NEXTAUTH_SECRET`. Do not reuse the app-only Graph secret.
 
-Message Center contains tenant-specific administrator communications. Its routes fail closed in every environment if neither interactive sign-in nor the explicit `MESSAGE_CENTER_PUBLIC=true` override is configured. Local development that intentionally publishes this data must opt in with the same variable.
+Message Center contains tenant-specific administrator communications. When interactive sign-in is not configured there is no way for a caller to authenticate, so the routes are served openly. To restrict them, either configure the interactive Entra app registration above (anonymous callers are then redirected to sign in) or set `MESSAGE_CENTER_PUBLIC=false` to fail closed. Setting `MESSAGE_CENTER_PUBLIC=true` keeps the routes anonymous even after sign-in is configured.
 
 You should now be able to start the app and load `/message-center` with live tenant messages.
 

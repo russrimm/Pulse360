@@ -23,7 +23,7 @@ import {
 
 test.describe('Message Center access policy', () => {
   for (const nodeEnv of ['production', 'development'] as const) {
-    test(`fails closed in ${nodeEnv} when authentication is unconfigured`, () => {
+    test(`fails closed in ${nodeEnv} when anonymous access is explicitly disabled`, () => {
       const previousNodeEnv = Object.getOwnPropertyDescriptor(process.env, 'NODE_ENV');
       Object.defineProperty(process.env, 'NODE_ENV', {
         configurable: true,
@@ -35,7 +35,7 @@ test.describe('Message Center access policy', () => {
       try {
         expect(
           resolveMessageCenterAccess({
-            isPublic: false,
+            publicMode: 'disabled',
             isAuthConfigured: false,
             hasAuthenticatedUser: false,
           }),
@@ -53,21 +53,21 @@ test.describe('Message Center access policy', () => {
   test('allows only explicit publication or an authenticated user', () => {
     expect(
       resolveMessageCenterAccess({
-        isPublic: true,
+        publicMode: 'enabled',
         isAuthConfigured: false,
         hasAuthenticatedUser: false,
       }),
     ).toBe('allowed');
     expect(
       resolveMessageCenterAccess({
-        isPublic: false,
+        publicMode: 'unset',
         isAuthConfigured: true,
         hasAuthenticatedUser: false,
       }),
     ).toBe('authentication-required');
     expect(
       resolveMessageCenterAccess({
-        isPublic: false,
+        publicMode: 'unset',
         isAuthConfigured: true,
         hasAuthenticatedUser: true,
       }),
