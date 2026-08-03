@@ -3,16 +3,17 @@ import 'server-only';
 import { getServerSession } from 'next-auth';
 import { authOptions, isAuthConfigured } from '@/lib/auth';
 import {
+  parseMessageCenterPublicMode,
   resolveMessageCenterAccess,
   type MessageCenterAccess,
 } from '@/lib/message-center-access';
 
 export async function getMessageCenterAccess(): Promise<MessageCenterAccess> {
-  const isPublic = process.env.MESSAGE_CENTER_PUBLIC === 'true';
+  const publicMode = parseMessageCenterPublicMode(process.env.MESSAGE_CENTER_PUBLIC);
 
-  if (isPublic || !isAuthConfigured) {
+  if (publicMode === 'enabled' || !isAuthConfigured) {
     return resolveMessageCenterAccess({
-      isPublic,
+      publicMode,
       isAuthConfigured,
       hasAuthenticatedUser: false,
     });
@@ -20,7 +21,7 @@ export async function getMessageCenterAccess(): Promise<MessageCenterAccess> {
 
   const session = await getServerSession(authOptions);
   return resolveMessageCenterAccess({
-    isPublic,
+    publicMode,
     isAuthConfigured,
     hasAuthenticatedUser: Boolean(session?.user),
   });

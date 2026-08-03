@@ -22,7 +22,8 @@ export default async function MessageCenterPage() {
           Message Center unavailable
         </h1>
         <p className="mt-3 text-gray-600 dark:text-gray-400">
-          Configure tenant sign-in before exposing Message Center data in production.
+          Anonymous access is disabled by MESSAGE_CENTER_PUBLIC=false. Configure tenant sign-in or
+          remove the override to view Message Center data.
         </p>
       </section>
     );
