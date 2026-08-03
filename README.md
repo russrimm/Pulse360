@@ -8,6 +8,10 @@ Live site: **<https://www.mspulse360.app>**
 
 Built with the Next.js 16 App Router, React 19, TypeScript, Tailwind CSS 4, and Radix UI. Server Components do the heavy lifting; client components add interactivity. Vercel is the production hosting target.
 
+[![Pulse 360° home page](public/screenshots/home-dark.png)](https://www.mspulse360.app)
+
+_The Pulse 360° landing dashboard. More captures in [Screenshots](#screenshots)._
+
 ---
 
 ## Table of Contents
@@ -30,6 +34,7 @@ Built with the Next.js 16 App Router, React 19, TypeScript, Tailwind CSS 4, and 
   - [API routes](#api-routes)
 - [Using the site](#using-the-site)
 - [Testing](#testing)
+- [Regenerating screenshots](#regenerating-screenshots)
 - [Linting, formatting, and type checks](#linting-formatting-and-type-checks)
 - [Deployment](#deployment)
 - [Security notes](#security-notes)
@@ -57,73 +62,127 @@ Every list is sorted newest-first, every card is keyboard-navigable, and every p
 
 ## Screenshots
 
-Below are screenshots of every major page in both **dark** and **light** mode.
+Every image below is a live capture of Pulse 360° taken with `pnpm screenshots` (see
+[Regenerating screenshots](#regenerating-screenshots)). They live in `public/screenshots/`, so the
+same files back both this README and the in-app [About page](https://www.mspulse360.app/about) tour.
 
 ### Home
 
-| Dark                                           | Light                                            |
-| ---------------------------------------------- | ------------------------------------------------ |
-| ![Home – Dark](docs/screenshots/home-dark.png) | ![Home – Light](docs/screenshots/home-light.png) |
+| Dark                                                    | Light                                                     |
+| ------------------------------------------------------- | ---------------------------------------------------------- |
+| ![Home – Dark](public/screenshots/home-dark.png) | ![Home – Light](public/screenshots/home-light.png) |
 
-### Message Center
+### Microsoft 365 Message Center
 
-| Dark                                                               | Light                                                                |
-| ------------------------------------------------------------------ | -------------------------------------------------------------------- |
-| ![Message Center – Dark](docs/screenshots/message-center-dark.png) | ![Message Center – Light](docs/screenshots/message-center-light.png) |
+`/message-center` — live tenant messages from Microsoft Graph.
 
-### MSRC Security Updates
+| Dark                                                                        | Light                                                                         |
+| ---------------------------------------------------------------------------- | ------------------------------------------------------------------------------ |
+| ![Message Center – Dark](public/screenshots/message-center-dark.png) | ![Message Center – Light](public/screenshots/message-center-light.png) |
 
-| Dark                                           | Light                                            |
-| ---------------------------------------------- | ------------------------------------------------ |
-| ![MSRC – Dark](docs/screenshots/msrc-dark.png) | ![MSRC – Light](docs/screenshots/msrc-light.png) |
+### Release Plans hub
 
-### Release Plans
+`/release-plans` — entry point for the four release planners.
 
-| Dark                                                             | Light                                                              |
-| ---------------------------------------------------------------- | ------------------------------------------------------------------ |
-| ![Release Plans – Dark](docs/screenshots/release-plans-dark.png) | ![Release Plans – Light](docs/screenshots/release-plans-light.png) |
+| Dark                                                                      | Light                                                                       |
+| --------------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
+| ![Release Plans – Dark](public/screenshots/release-plans-dark.png) | ![Release Plans – Light](public/screenshots/release-plans-light.png) |
 
-### Fabric Roadmap
+### Microsoft 365 release plans
 
-| Dark                                                               | Light                                                                |
-| ------------------------------------------------------------------ | -------------------------------------------------------------------- |
-| ![Fabric Roadmap – Dark](docs/screenshots/fabric-roadmap-dark.png) | ![Fabric Roadmap – Light](docs/screenshots/fabric-roadmap-light.png) |
+`/release-plans/m365`
+
+| Dark                                                                                  | Light                                                                                   |
+| --------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
+| ![Microsoft 365 release plans – Dark](public/screenshots/release-plans-m365-dark.png) | ![Microsoft 365 release plans – Light](public/screenshots/release-plans-m365-light.png) |
+
+### Azure release plans
+
+`/release-plans/azure`
+
+| Dark                                                                            | Light                                                                             |
+| --------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
+| ![Azure release plans – Dark](public/screenshots/release-plans-azure-dark.png) | ![Azure release plans – Light](public/screenshots/release-plans-azure-light.png) |
+
+### Microsoft Fabric release plans
+
+`/release-plans/fabric`
+
+| Dark                                                                              | Light                                                                               |
+| ----------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------- |
+| ![Fabric release plans – Dark](public/screenshots/release-plans-fabric-dark.png) | ![Fabric release plans – Light](public/screenshots/release-plans-fabric-light.png) |
+
+### Dynamics 365 &amp; Power Platform roadmap
+
+`/release-plans/dynamics-power`
+
+| Dark                                                                                                | Light                                                                                                 |
+| ----------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| ![Dynamics &amp; Power Platform – Dark](public/screenshots/release-plans-dynamics-power-dark.png) | ![Dynamics &amp; Power Platform – Light](public/screenshots/release-plans-dynamics-power-light.png) |
+
+### Combined roadmap
+
+`/release-plans/roadmap` — single-column variant of the Dynamics 365 &amp; Power Platform roadmap, reachable from plan detail pages.
+
+| Dark                                                                                | Light                                                                                 |
+| ------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------- |
+| ![Combined roadmap – Dark](public/screenshots/release-plans-roadmap-dark.png) | ![Combined roadmap – Light](public/screenshots/release-plans-roadmap-light.png) |
+
+### Fabric &amp; Power Platform roadmap
+
+`/fabric-roadmap` — grouped by product area, collapsible, with drill-through detail pages.
+
+| Dark                                                                        | Light                                                                         |
+| ---------------------------------------------------------------------------- | ------------------------------------------------------------------------------ |
+| ![Fabric Roadmap – Dark](public/screenshots/fabric-roadmap-dark.png) | ![Fabric Roadmap – Light](public/screenshots/fabric-roadmap-light.png) |
 
 ### Product News
 
-| Dark                                                           | Light                                                            |
-| -------------------------------------------------------------- | ---------------------------------------------------------------- |
-| ![Product News – Dark](docs/screenshots/product-news-dark.png) | ![Product News – Light](docs/screenshots/product-news-light.png) |
+`/product-news`
 
-### M365 Updates
+| Dark                                                                    | Light                                                                     |
+| ------------------------------------------------------------------------ | --------------------------------------------------------------------------- |
+| ![Product News – Dark](public/screenshots/product-news-dark.png) | ![Product News – Light](public/screenshots/product-news-light.png) |
 
-| Dark                                                           | Light                                                            |
-| -------------------------------------------------------------- | ---------------------------------------------------------------- |
-| ![M365 Updates – Dark](docs/screenshots/m365-updates-dark.png) | ![M365 Updates – Light](docs/screenshots/m365-updates-light.png) |
+### MSRC security updates
 
-### Azure Updates
+`/msrc`
 
-| Dark                                                             | Light                                                              |
+| Dark                                                    | Light                                                     |
+| ------------------------------------------------------- | ---------------------------------------------------------- |
+| ![MSRC – Dark](public/screenshots/msrc-dark.png) | ![MSRC – Light](public/screenshots/msrc-light.png) |
+
+### Security &amp; advisories
+
+`/security`
+
+| Dark                                                            | Light                                                             |
 | ---------------------------------------------------------------- | ------------------------------------------------------------------ |
-| ![Azure Updates – Dark](docs/screenshots/azure-updates-dark.png) | ![Azure Updates – Light](docs/screenshots/azure-updates-light.png) |
+| ![Security – Dark](public/screenshots/security-dark.png) | ![Security – Light](public/screenshots/security-light.png) |
 
-### Microsoft Product Lifecycle
+### Microsoft product lifecycle
 
-| Dark                                                           | Light                                                            |
-| -------------------------------------------------------------- | ---------------------------------------------------------------- |
-| ![MS Lifecycle – Dark](docs/screenshots/ms-lifecycle-dark.png) | ![MS Lifecycle – Light](docs/screenshots/ms-lifecycle-light.png) |
+`/ms-lifecycle`
 
-### Security
+| Dark                                                                    | Light                                                                     |
+| ------------------------------------------------------------------------ | --------------------------------------------------------------------------- |
+| ![MS Lifecycle – Dark](public/screenshots/ms-lifecycle-dark.png) | ![MS Lifecycle – Light](public/screenshots/ms-lifecycle-light.png) |
 
-| Dark                                                   | Light                                                    |
-| ------------------------------------------------------ | -------------------------------------------------------- |
-| ![Security – Dark](docs/screenshots/security-dark.png) | ![Security – Light](docs/screenshots/security-light.png) |
+### Detail drill-through
+
+`/m365-update/[id]` — representative of every detail page (message, release plan, roadmap item, Azure update).
+
+| Dark                                                                                | Light                                                                                 |
+| ------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------- |
+| ![M365 update detail – Dark](public/screenshots/m365-update-detail-dark.png) | ![M365 update detail – Light](public/screenshots/m365-update-detail-light.png) |
 
 ### About
 
-| Dark                                             | Light                                              |
-| ------------------------------------------------ | -------------------------------------------------- |
-| ![About – Dark](docs/screenshots/about-dark.png) | ![About – Light](docs/screenshots/about-light.png) |
+`/about` — the in-app overview, including the same visual tour.
+
+| Dark                                                      | Light                                                       |
+| ---------------------------------------------------------- | ------------------------------------------------------------ |
+| ![About – Dark](public/screenshots/about-dark.png) | ![About – Light](public/screenshots/about-light.png) |
 
 ---
 
@@ -213,7 +272,8 @@ If an upstream is down, feed pages show an actionable retry or unavailable state
 │   └── schema.prisma            # User / Preference / PublishedListing models
 ├── public/                      # Static assets (icons, images)
 │   ├── icons/azure/             # 1,000+ official Azure SVG icons by category
-│   └── images/
+│   ├── images/
+│   └── screenshots/             # Doc captures used by the README and /about tour
 ├── src/
 │   ├── app/                     # Next.js App Router
 │   │   ├── layout.tsx           # Theme provider, nav, error boundary, RQ provider
@@ -222,18 +282,17 @@ If an upstream is down, feed pages show an actionable retry or unavailable state
 │   │   ├── about/
 │   │   ├── message-center/      # M365 Message Center list
 │   │   ├── message/[id]/        # Message detail
-│   │   ├── m365-updates/        # M365 update feed
+│   │   ├── m365-updates/        # Legacy path → redirects to /release-plans/m365
 │   │   ├── m365-update/[id]/    # M365 update detail
-│   │   ├── azure-updates/       # Azure update feed
+│   │   ├── azure-updates/       # Legacy path → redirects to /release-plans/azure
 │   │   ├── azure-update/[id]/   # Azure update detail
 │   │   ├── fabric-roadmap/      # Fabric + Power Platform roadmap
 │   │   ├── release-plans/       # Hub + /azure, /m365, /fabric, /dynamics-power, /roadmap
 │   │   ├── release-plan/[id]/   # Release plan detail
-│   │   ├── msrc/                # MSRC vulnerabilities (+ /blog subroute)
+│   │   ├── msrc/                # MSRC vulnerabilities
 │   │   ├── security/            # Security overview
 │   │   ├── product-news/        # Aggregated product news + 15+ subroutes
-│   │   ├── map/, test-map/      # Experimental visualizations
-│   │   ├── powerplatd365/       # Power Platform / D365 release plans landing
+│   │   ├── powerplatd365/       # Legacy path → redirects to /release-plans
 │   │   └── api/                 # 20+ route handlers (see below)
 │   ├── components/              # Cards, filters, lists, nav, theme toggle
 │   ├── lib/
@@ -533,9 +592,9 @@ Pulse 360 uses Postgres via Prisma to **cache Microsoft Graph Message Center upd
 | `/about`                         | About / contact                                                   |
 | `/message-center`                | M365 Message Center list (search, filter, badges, impact pills)   |
 | `/message/[id]`                  | Message detail                                                    |
-| `/m365-updates`                  | M365 update feed                                                  |
+| `/m365-updates`                  | Legacy path — redirects to `/release-plans/m365`                  |
 | `/m365-update/[id]`              | M365 update detail                                                |
-| `/azure-updates`                 | Azure update feed                                                 |
+| `/azure-updates`                 | Legacy path — redirects to `/release-plans/azure`                 |
 | `/azure-update/[id]`             | Azure update detail                                               |
 | `/fabric-roadmap`                | Fabric + Power Platform roadmap (grouped, collapsible)            |
 | `/fabric-roadmap/[id]`           | Roadmap item detail                                               |
@@ -547,7 +606,6 @@ Pulse 360 uses Postgres via Prisma to **cache Microsoft Graph Message Center upd
 | `/release-plans/roadmap`         | Combined roadmap view                                             |
 | `/release-plan/[id]`             | Release plan item detail                                          |
 | `/msrc`                          | MSRC CVE list with month picker                                   |
-| `/msrc/blog`                     | MSRC blog feed                                                    |
 | `/security`                      | Security overview                                                 |
 | `/product-news`                  | Aggregated product news hub                                       |
 | `/product-news/all-things-azure` | All Things Azure                                                  |
@@ -557,7 +615,6 @@ Pulse 360 uses Postgres via Prisma to **cache Microsoft Graph Message Center upd
 | `/product-news/copilot`          | Copilot news                                                      |
 | `/product-news/copilot-studio`   | Copilot Studio release plan                                       |
 | `/product-news/fabric-blog`      | Microsoft Fabric blog                                             |
-| `/product-news/learn-blog`       | Microsoft Learn blog                                              |
 | `/product-news/microsoft-news`   | Microsoft news                                                    |
 | `/product-news/power-automate`   | Power Automate blog                                               |
 | `/product-news/power-bi`         | Power BI blog                                                     |
@@ -566,9 +623,8 @@ Pulse 360 uses Postgres via Prisma to **cache Microsoft Graph Message Center upd
 | `/product-news/tech-community`   | Tech Community                                                    |
 | `/product-news/vscode`           | VS Code blog                                                      |
 | `/product-news/windows`          | Windows blog                                                      |
-| `/powerplatd365`                 | Power Platform / D365 landing                                     |
+| `/powerplatd365`                 | Legacy path — redirects to `/release-plans`                       |
 | `/ms-lifecycle`                  | Microsoft product lifecycle — end-of-support and retirement dates |
-| `/map`, `/test-map`              | Experimental map-based visualizations                             |
 
 ### API routes
 
@@ -603,7 +659,7 @@ All routes are under `/api/*`. The protected sync endpoint performs the only mut
 - **Global search.** Every list page has a search bar. Matching is case- and whitespace-insensitive against title, product name, and (where applicable) message ID.
 - **Filters.** Product, Area, Date, and Major Changes filters live above each list. Message Center filters are reflected in the URL so filtered views can be bookmarked and shared.
 - **Lifecycle export.** The Microsoft Lifecycle page exports the current filtered rows and visible columns as CSV.
-- **Drill-through.** Every card is fully clickable. Detail pages preserve the product tab and impact context.
+- **Drill-through.** Every card is fully clickable. Detail pages preserve the product tab and impact context — see the [detail drill-through screenshot](#detail-drill-through).
 - **MSRC month picker.** `/msrc` exposes a dropdown of every month MSRC has published a CVRF report for. Pick a month → the page re-fetches the per-month CVE bundle. Each CVE expands to show product, max severity, KB article links, downloads, weakness (CWE), and revision history.
 - **Theme.** Use the toggle in the top-right to switch light / dark / system.
 - **Keyboard nav.** Top-level nav, popovers, and cards are reachable by `Tab`. `Esc` closes popovers and modals.
@@ -635,6 +691,33 @@ pnpm format            # Prettier write
 ```
 
 The ESLint config covers TypeScript, React, Next.js, JSON, CSS, and Markdown files. A pre-commit hook is **not** wired up; add one (e.g. `husky` + `lint-staged`) if your workflow needs it.
+
+---
+
+## Regenerating screenshots
+
+Documentation screenshots are captured from a running instance of this app, never hand-edited, and
+stored once in `public/screenshots/` for both the README and the `/about` visual tour.
+
+```bash
+# Terminal 1 — serve a production build
+pnpm build
+pnpm start --hostname 127.0.0.1 --port 43128
+
+# Terminal 2 — capture everything in dark and light mode
+pnpm screenshots
+
+# ...or refresh a single page
+pnpm screenshots msrc ms-lifecycle
+```
+
+Point the script somewhere else with `SCREENSHOT_BASE_URL` (for example the deployed site). Each
+target is captured at 1280×800 in both themes and written as `<target>-dark.png` /
+`<target>-light.png`. Target names are listed in `scripts/capture-screenshots.mjs`.
+
+`message-center` is marked optional because it needs Microsoft Graph credentials and a database; it
+is skipped rather than replaced with an error page when those are missing. Run the capture from an
+environment with tenant credentials to refresh it.
 
 ---
 

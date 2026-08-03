@@ -11,6 +11,7 @@
     "type-check": "tsc --noEmit",
     "check:lockfile": "node scripts/check-lockfile.mjs && node --test tests/lockfile-provenance.test.mjs",
     "clean": "rimraf .next",
+    "screenshots": "node scripts/capture-screenshots.mjs",
     "format": "prettier --write .",
     "dotfiles:sync": "node scripts/sync-dotfiles.mjs",
     "dotfiles:check": "node scripts/sync-dotfiles.mjs --dry-run",
