@@ -122,7 +122,7 @@ same files back both this README and the in-app [About page](https://www.mspulse
 
 ### Combined roadmap
 
-`/release-plans/roadmap`
+`/release-plans/roadmap` — single-column variant of the Dynamics 365 &amp; Power Platform roadmap, reachable from plan detail pages.
 
 | Dark                                                                                | Light                                                                                 |
 | ------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------- |
