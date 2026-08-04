@@ -53,9 +53,13 @@ export default async function MessageCenterPage() {
           </p>
           <p className="text-xs text-amber-600 dark:text-amber-400">
             Source: Microsoft Graph Message Center for the configured tenant. Message Center posts
-            vary by tenant; always use your tenant&apos;s Message Center as the source of truth. Last
-            successful sync:{' '}
-            <time dateTime={syncMetadata.lastSyncAt ?? undefined}>{formattedSyncTime}</time>
+            vary by tenant; always use your tenant&apos;s Message Center as the source of truth.
+          </p>
+          <p className="text-xs text-amber-600 dark:text-amber-400">
+            Last successful sync:{' '}
+            <time className="whitespace-nowrap" dateTime={syncMetadata.lastSyncAt ?? undefined}>
+              {formattedSyncTime}
+            </time>
             {syncMetadata.isStale ? ' - data may be stale.' : ''}
           </p>
         </div>
