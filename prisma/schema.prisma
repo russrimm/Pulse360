@@ -13,41 +13,6 @@ datasource db {
   provider = "postgresql"
 }
 
-model User {
-  id         String   @id @default(uuid())
-  email      String   @unique
-  password   String   // hashed!
-  firstName  String
-  lastName   String
-  company    String
-  preferences Preference[]
-}
-
-model Preference {
-  id     String @id @default(uuid())
-  user   User   @relation(fields: [userId], references: [id])
-  userId String
-  key    String
-  value  String
-}
-
-model PublishedListing {
-  id               String   @id @default(uuid())
-  product          String
-  edition          String
-  release          String?
-  supportPolicy    String?
-  startDate        Int?
-  mainstreamDate   Int?
-  extendedEndDate  Int?
-  retirementDate   Int?
-  releaseStartDate Int?
-  releaseEndDate   Int?
-  docsUrl          String?
-
-  @@unique([product, edition, release])
-}
-
 /// Cached copy of a Microsoft 365 Message Center message. Graph drops
 /// archived/expired messages from its live feed, so we persist everything
 /// here and mark rows that disappear from Graph as "archived" instead of
