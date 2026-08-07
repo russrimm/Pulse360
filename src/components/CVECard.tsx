@@ -8,7 +8,7 @@ interface Vulnerability {
   ID: string;
   Title?: any;
   Description?: any;
-  CVE?: string[];
+  CVE?: string | string[];
   ProductStatuses?: any[];
   Threats?: any[];
   Remediations?: any[];
