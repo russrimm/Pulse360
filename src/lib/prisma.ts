@@ -15,7 +15,15 @@ function createPrismaClient(): PrismaClient {
       'DATABASE_URL is not set. Configure a Postgres connection string (e.g. a Neon connection string) before importing the Prisma client.'
     );
   }
-  const adapter = new PrismaPg({ connectionString });
+  const adapter = new PrismaPg({
+    connectionString,
+    // Serverless invocations are short-lived; a small pool that recycles
+    // connections quickly avoids handing out sockets Neon already dropped
+    // when the compute scaled to zero.
+    max: 5,
+    connectionTimeoutMillis: 10_000,
+    idleTimeoutMillis: 10_000,
+  });
   return new PrismaClient({
     adapter,
     log: process.env.NODE_ENV === 'development' ? ['warn', 'error'] : ['error'],

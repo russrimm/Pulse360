@@ -32,7 +32,17 @@ export default async function MessageCenterPage() {
     redirect('/api/auth/signin?callbackUrl=%2Fmessage-center');
   }
 
-  const [messages, syncMetadata] = await Promise.all([getMessages(), getMessageSyncMetadata()]);
+  const [messagesResult, syncMetadata] = await Promise.all([
+    getMessages().then(
+      messages => ({ messages, hasError: false }),
+      (error: unknown) => {
+        console.error('Message Center list query failed:', error);
+        return { messages: [], hasError: true };
+      }
+    ),
+    getMessageSyncMetadata(),
+  ]);
+  const { messages, hasError } = messagesResult;
   const formattedSyncTime = syncMetadata.lastSyncAt
     ? `${new Date(syncMetadata.lastSyncAt).toLocaleString('en-US', {
         dateStyle: 'medium',
@@ -63,6 +73,15 @@ export default async function MessageCenterPage() {
             {syncMetadata.isStale ? ' - data may be stale.' : ''}
           </p>
         </div>
+        {hasError ? (
+          <div
+            className="mx-auto mb-8 max-w-2xl rounded-md border border-amber-300 bg-amber-50 px-4 py-3 text-center text-sm text-amber-800 dark:border-amber-700 dark:bg-amber-950/40 dark:text-amber-200"
+            role="alert"
+          >
+            Message Center data is temporarily unavailable while the database wakes up. Refresh in a
+            few seconds.
+          </div>
+        ) : null}
         <FilterProvider>
           <HomeContent messages={messages} />
         </FilterProvider>
