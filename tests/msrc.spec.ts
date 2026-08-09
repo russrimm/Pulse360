@@ -9,7 +9,7 @@
  * Run: npx playwright test tests/msrc.spec.ts
  */
 
-import { test, expect, type APIRequestContext } from '@playwright/test';
+import { test, expect, type APIRequestContext, type Locator } from '@playwright/test';
 
 // Vercel rejects function responses larger than 4.5 MB.
 const MAX_RESPONSE_BYTES = 4.5 * 1024 * 1024;
@@ -44,6 +44,20 @@ async function fetchRecentMonthIds(request: APIRequestContext, count: number): P
     )
     .slice(0, count)
     .map(month => month.ID);
+}
+
+/**
+ * Identity of the vulnerabilities currently rendered in the list.
+ *
+ * The rendered table markup is not a usable fingerprint: a Patch Tuesday month
+ * contains many near-duplicate product rows (repeated `azl3 kernel … on Azure
+ * Linux 3.0 / Azure / - / Moderate`), so two different CVEs can produce
+ * byte-identical table text. `data-cve` on the card root is the stable hook.
+ */
+async function renderedCveIds(section: Locator): Promise<string[]> {
+  return section
+    .getByTestId('cve-card')
+    .evaluateAll(cards => cards.map(card => card.getAttribute('data-cve') ?? ''));
 }
 
 test.beforeAll(async ({ request }) => {
@@ -171,12 +185,32 @@ test.describe('MSRC security updates', () => {
     await expect(updates.locator('table').first()).toBeVisible({ timeout: 90_000 });
     await expect(updates.getByRole('alert')).toHaveCount(0);
 
-    const firstPageContent = await updates.locator('table').first().textContent();
+    const firstPageIds = await renderedCveIds(updates);
+    expect(firstPageIds.length, 'page 1 must render at least one CVE card').toBeGreaterThan(0);
+    const firstPageIdSet = new Set(firstPageIds);
+
     await updates.getByRole('button', { name: 'Next' }).click();
     await expect(page).toHaveURL(/page=2/, { timeout: 60_000 });
+
+    // The list re-renders asynchronously after the URL changes, so poll until
+    // CVEs that were not on page 1 appear.
     await expect
-      .poll(async () => updates.locator('table').first().textContent(), { timeout: 90_000 })
-      .not.toBe(firstPageContent);
+      .poll(
+        async () => (await renderedCveIds(updates)).filter(id => !firstPageIdSet.has(id)).length,
+        {
+          timeout: 90_000,
+          message: 'page 2 should render CVEs that did not appear on page 1',
+        }
+      )
+      .toBeGreaterThan(0);
+
+    const secondPageIds = await renderedCveIds(updates);
+    expect(secondPageIds.length, 'page 2 must render at least one CVE card').toBeGreaterThan(0);
+    expect(
+      secondPageIds.filter(id => firstPageIdSet.has(id)),
+      'page 2 must not repeat any CVE from page 1'
+    ).toEqual([]);
+
     await expect(updates.getByRole('alert')).toHaveCount(0);
   });
 });
