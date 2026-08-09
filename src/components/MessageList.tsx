@@ -168,7 +168,7 @@ export function MessageList({ messages: messagesProp }: MessageListProps) {
             : `${filteredMessages.length} result${filteredMessages.length === 1 ? '' : 's'}`}
         </p>
       </div>{' '}
-      <div className="relative md:sticky md:top-28 z-40 backdrop-blur-md pt-0 pb-0 border-b border-gray-200/50 dark:border-gray-700/50 mt-6">
+      <div className="relative md:sticky md:top-[var(--app-header-h,7rem)] z-40 backdrop-blur-md pt-0 pb-0 border-b border-gray-200/50 dark:border-gray-700/50 mt-6">
         <div className="mb-2">
           <div className="flex flex-wrap items-center mb-2 gap-2">
             <h2 className="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center">
