@@ -5,8 +5,10 @@ const CVRF_URL = 'https://api.msrc.microsoft.com/cvrf/v3.0/cvrf/';
 const MONTH_ID_PATTERN = /^\d{4}-(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)$/;
 const REQUEST_TIMEOUT_MS = 30_000;
 
-export const DEFAULT_PAGE_SIZE = 25;
-export const MAX_PAGE_SIZE = 100;
+// Next.js only permits a fixed set of exports from a route module, so these stay
+// module-local. Keep tests/msrc.spec.ts in sync if the paging limits change.
+const DEFAULT_PAGE_SIZE = 25;
+const MAX_PAGE_SIZE = 100;
 
 // Only impact (0) and severity (3) threats are rendered; the rest are dropped to keep
 // the response well under the 4.5 MB serverless response limit.
