@@ -195,149 +195,129 @@ export function NavigationTabs() {
   ];
 
   return (
-    <div className="md:sticky md:top-16 z-40 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm border-b border-gray-200 dark:border-gray-700">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex flex-col md:flex-row flex-wrap justify-center gap-1.5 py-2 sm:gap-2">
-          {tabs.map((tab, idx) => {
-            // Highlight Product News tab for any /product-news subpath
+    <nav aria-label="Sections" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="flex flex-col md:flex-row flex-wrap justify-center gap-1.5 py-2 md:py-1.5 sm:gap-2">
+        {tabs.map((tab, idx) => {
+          // Highlight Product News tab for any /product-news subpath
+          const isActive =
+            tab.name === 'Product News'
+              ? pathname === tab.href || pathname.startsWith('/product-news/')
+              : pathname === tab.href;
+          if (tab.name === 'Release Planner') return null;
+          if (tab.name === 'Release Plans') {
+            // Active if on the hub or any nested release-plans path
             const isActive =
-              tab.name === 'Product News'
-                ? pathname === tab.href || pathname.startsWith('/product-news/')
-                : pathname === tab.href;
-            if (tab.name === 'Release Planner') return null;
-            if (tab.name === 'Release Plans') {
-              // Active if on the hub or any nested release-plans path
-              const isActive =
-                pathname === '/release-plans' || pathname.startsWith('/release-plans/');
-              return (
-                <Popover.Root key={tab.href}>
-                  <Popover.Trigger asChild>
-                    <button
-                      className={`flex flex-col items-center justify-center md:flex-row md:items-center gap-1 md:gap-2 px-3 py-2 text-sm font-medium rounded-lg transition-colors relative w-full md:w-auto text-center
-                        ${isActive ? 'bg-primary-50 text-primary-700 dark:bg-primary-900/50 dark:text-primary-300' : 'text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200'}`}
-                      aria-label="Release Plans"
-                    >
-                      <span
-                        className={`transition-transform duration-200 ${isActive ? 'text-primary-600 dark:text-primary-400' : 'text-gray-500 dark:text-gray-400 group-hover:text-primary-600 dark:group-hover:text-primary-400'}`}
-                      >
-                        {tab.icon && tab.icon}
-                      </span>
-                      <span className="text-center w-full md:w-auto">{tab.name}</span>
-                      <ChevronDownIcon className="w-4 h-4" />
-                      {isActive && (
-                        <span
-                          aria-hidden="true"
-                          className="absolute bottom-0 left-0 w-full h-0.5 bg-primary-600 dark:bg-primary-400 rounded-full"
-                        />
-                      )}
-                    </button>
-                  </Popover.Trigger>
-                  <Popover.Portal>
-                    <Popover.Content
-                      sideOffset={8}
-                      className="z-50 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl shadow-2xl p-2 min-w-[220px] flex flex-col gap-1 animate-fade-in"
-                    >
-                      {RELEASE_PLANS_LINKS.map(link => (
-                        <Link
-                          key={link.href}
-                          href={link.href}
-                          className={`flex items-center gap-3 px-4 py-3 rounded-lg font-medium text-base transition-colors duration-150 hover:bg-primary-50 dark:hover:bg-primary-900/30 focus:outline-none focus:bg-primary-100 dark:focus:bg-primary-800/40 ${link.href === pathname ? 'bg-primary-600 text-white pointer-events-none' : 'text-gray-900 dark:text-gray-100'}`}
-                          aria-current={link.href === pathname ? 'page' : undefined}
-                        >
-                          {link.icon}
-                          {link.name}
-                        </Link>
-                      ))}
-                    </Popover.Content>
-                  </Popover.Portal>
-                </Popover.Root>
-              );
-            }
-            if (tab.name === 'Microsoft Security') {
-              const isActive =
-                MSRC_LINKS.some(link => pathname === link.href) ||
-                pathname === '/security' ||
-                pathname.startsWith('/security/');
-              return (
-                <Popover.Root key={tab.href} open={openMSRC} onOpenChange={handleOpenChangeMSRC}>
-                  <Popover.Trigger asChild>
-                    <button
-                      className={`flex flex-col items-center justify-center md:flex-row md:items-center gap-1 md:gap-2 px-3 py-2 text-sm font-medium rounded-lg transition-colors relative w-full md:w-auto text-center
-                        ${isActive ? 'bg-primary-50 text-primary-700 dark:bg-primary-900/50 dark:text-primary-300' : 'text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200'}`}
-                      aria-label="Microsoft Security"
-                    >
-                      <span
-                        className={`transition-transform duration-200 ${isActive ? 'text-primary-600 dark:text-primary-400' : 'text-gray-500 dark:text-gray-400 group-hover:text-primary-600 dark:group-hover:text-primary-400'}`}
-                      >
-                        {tab.icon}
-                      </span>
-                      <span className="text-center w-full md:w-auto">{tab.name}</span>
-                      <ChevronDownIcon className="w-4 h-4" />
-                      {isActive && (
-                        <span
-                          aria-hidden="true"
-                          className="absolute bottom-0 left-0 w-full h-0.5 bg-primary-600 dark:bg-primary-400 rounded-full"
-                        />
-                      )}
-                    </button>
-                  </Popover.Trigger>
-                  <Popover.Portal>
-                    <Popover.Content
-                      sideOffset={8}
-                      className="z-50 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl shadow-2xl p-2 min-w-[220px] flex flex-col gap-1 animate-fade-in"
-                    >
-                      {MSRC_LINKS.map(link => (
-                        <Link
-                          key={link.href}
-                          href={link.href}
-                          className={`flex items-center gap-3 px-4 py-3 rounded-lg font-medium text-base transition-colors duration-150 hover:bg-primary-50 dark:hover:bg-primary-900/30 focus:outline-none focus:bg-primary-100 dark:focus:bg-primary-800/40 whitespace-normal break-words text-left ${link.href === pathname ? 'bg-primary-600 text-white pointer-events-none' : 'text-gray-900 dark:text-gray-100'}`}
-                          aria-current={link.href === pathname ? 'page' : undefined}
-                          onClick={handleMenuItemClickMSRC}
-                        >
-                          {link.icon}
-                          <span className="whitespace-normal break-words text-left block w-full">
-                            {link.name}
-                          </span>
-                        </Link>
-                      ))}
-                    </Popover.Content>
-                  </Popover.Portal>
-                </Popover.Root>
-              );
-            }
+              pathname === '/release-plans' || pathname.startsWith('/release-plans/');
             return (
-              <React.Fragment key={tab.href}>
-                <Link
-                  href={tab.href}
-                  aria-current={pathname === tab.href ? 'page' : undefined}
-                  className={`flex flex-col items-center justify-center md:flex-row md:items-center gap-1 md:gap-2 px-3 py-2 text-sm font-medium rounded-lg transition-colors relative w-full md:w-auto text-center
+              <Popover.Root key={tab.href}>
+                <Popover.Trigger asChild>
+                  <button
+                    className={`flex flex-col items-center justify-center md:flex-row md:items-center gap-1 md:gap-2 px-3 py-2 text-sm font-medium rounded-lg transition-colors w-full md:w-auto text-center focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500
+                        ${isActive ? 'bg-primary-50 text-primary-700 ring-1 ring-primary-200 dark:bg-primary-900/50 dark:text-primary-300 dark:ring-primary-800' : 'text-gray-600 hover:bg-gray-100/80 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-800/60 dark:hover:text-gray-200'}`}
+                    aria-label="Release Plans"
+                  >
+                    <span
+                      className={`transition-transform duration-200 ${isActive ? 'text-primary-600 dark:text-primary-400' : 'text-gray-500 dark:text-gray-400 group-hover:text-primary-600 dark:group-hover:text-primary-400'}`}
+                    >
+                      {tab.icon && tab.icon}
+                    </span>
+                    <span className="text-center w-full md:w-auto">{tab.name}</span>
+                    <ChevronDownIcon className="w-4 h-4" />
+                  </button>
+                </Popover.Trigger>
+                <Popover.Portal>
+                  <Popover.Content
+                    sideOffset={8}
+                    className="z-50 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl shadow-2xl p-2 min-w-[220px] flex flex-col gap-1 animate-fade-in"
+                  >
+                    {RELEASE_PLANS_LINKS.map(link => (
+                      <Link
+                        key={link.href}
+                        href={link.href}
+                        className={`flex items-center gap-3 px-4 py-3 rounded-lg font-medium text-base transition-colors duration-150 hover:bg-primary-50 dark:hover:bg-primary-900/30 focus:outline-none focus:bg-primary-100 dark:focus:bg-primary-800/40 ${link.href === pathname ? 'bg-primary-600 text-white pointer-events-none' : 'text-gray-900 dark:text-gray-100'}`}
+                        aria-current={link.href === pathname ? 'page' : undefined}
+                      >
+                        {link.icon}
+                        {link.name}
+                      </Link>
+                    ))}
+                  </Popover.Content>
+                </Popover.Portal>
+              </Popover.Root>
+            );
+          }
+          if (tab.name === 'Microsoft Security') {
+            const isActive =
+              MSRC_LINKS.some(link => pathname === link.href) ||
+              pathname === '/security' ||
+              pathname.startsWith('/security/');
+            return (
+              <Popover.Root key={tab.href} open={openMSRC} onOpenChange={handleOpenChangeMSRC}>
+                <Popover.Trigger asChild>
+                  <button
+                    className={`flex flex-col items-center justify-center md:flex-row md:items-center gap-1 md:gap-2 px-3 py-2 text-sm font-medium rounded-lg transition-colors w-full md:w-auto text-center focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500
+                        ${isActive ? 'bg-primary-50 text-primary-700 ring-1 ring-primary-200 dark:bg-primary-900/50 dark:text-primary-300 dark:ring-primary-800' : 'text-gray-600 hover:bg-gray-100/80 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-800/60 dark:hover:text-gray-200'}`}
+                    aria-label="Microsoft Security"
+                  >
+                    <span
+                      className={`transition-transform duration-200 ${isActive ? 'text-primary-600 dark:text-primary-400' : 'text-gray-500 dark:text-gray-400 group-hover:text-primary-600 dark:group-hover:text-primary-400'}`}
+                    >
+                      {tab.icon}
+                    </span>
+                    <span className="text-center w-full md:w-auto">{tab.name}</span>
+                    <ChevronDownIcon className="w-4 h-4" />
+                  </button>
+                </Popover.Trigger>
+                <Popover.Portal>
+                  <Popover.Content
+                    sideOffset={8}
+                    className="z-50 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl shadow-2xl p-2 min-w-[220px] flex flex-col gap-1 animate-fade-in"
+                  >
+                    {MSRC_LINKS.map(link => (
+                      <Link
+                        key={link.href}
+                        href={link.href}
+                        className={`flex items-center gap-3 px-4 py-3 rounded-lg font-medium text-base transition-colors duration-150 hover:bg-primary-50 dark:hover:bg-primary-900/30 focus:outline-none focus:bg-primary-100 dark:focus:bg-primary-800/40 whitespace-normal break-words text-left ${link.href === pathname ? 'bg-primary-600 text-white pointer-events-none' : 'text-gray-900 dark:text-gray-100'}`}
+                        aria-current={link.href === pathname ? 'page' : undefined}
+                        onClick={handleMenuItemClickMSRC}
+                      >
+                        {link.icon}
+                        <span className="whitespace-normal break-words text-left block w-full">
+                          {link.name}
+                        </span>
+                      </Link>
+                    ))}
+                  </Popover.Content>
+                </Popover.Portal>
+              </Popover.Root>
+            );
+          }
+          return (
+            <React.Fragment key={tab.href}>
+              <Link
+                href={tab.href}
+                aria-current={pathname === tab.href ? 'page' : undefined}
+                className={`flex flex-col items-center justify-center md:flex-row md:items-center gap-1 md:gap-2 px-3 py-2 text-sm font-medium rounded-lg transition-colors w-full md:w-auto text-center focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500
                     ${
                       isActive
-                        ? 'bg-primary-50 text-primary-700 dark:bg-primary-900/50 dark:text-primary-300'
-                        : 'text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200'
+                        ? 'bg-primary-50 text-primary-700 ring-1 ring-primary-200 dark:bg-primary-900/50 dark:text-primary-300 dark:ring-primary-800'
+                        : 'text-gray-600 hover:bg-gray-100/80 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-800/60 dark:hover:text-gray-200'
                     }`}
+              >
+                <span
+                  className={`transition-transform duration-200 ${isActive ? 'text-primary-600 dark:text-primary-400' : 'text-gray-500 dark:text-gray-400 group-hover:text-primary-600 dark:group-hover:text-primary-400'}`}
                 >
-                  <span
-                    className={`transition-transform duration-200 ${isActive ? 'text-primary-600 dark:text-primary-400' : 'text-gray-500 dark:text-gray-400 group-hover:text-primary-600 dark:group-hover:text-primary-400'}`}
-                  >
-                    {tab.icon && tab.icon}
-                  </span>
-                  <span className="text-center w-full md:w-auto">{tab.name}</span>
-                  {isActive && (
-                    <span
-                      aria-hidden="true"
-                      className="absolute bottom-0 left-0 w-full h-0.5 bg-primary-600 dark:bg-primary-400 rounded-full"
-                    />
-                  )}
-                </Link>
-                {tab.name === 'Azure' &&
-                  // Remove Azure as a top-level tab (now under Release Planners)
-                  null}
-              </React.Fragment>
-            );
-          })}
-        </div>
+                  {tab.icon && tab.icon}
+                </span>
+                <span className="text-center w-full md:w-auto">{tab.name}</span>
+              </Link>
+              {tab.name === 'Azure' &&
+                // Remove Azure as a top-level tab (now under Release Planners)
+                null}
+            </React.Fragment>
+          );
+        })}
       </div>
-    </div>
+    </nav>
   );
 }

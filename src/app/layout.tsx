@@ -1,8 +1,7 @@
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import { ThemeProvider } from 'next-themes';
-import Navbar from '@/components/Navbar';
-import { NavigationTabs } from '@/components/NavigationTabs';
+import { SiteHeader } from '@/components/SiteHeader';
 import { Analytics } from '@vercel/analytics/next';
 import { SafeSpeedInsights } from '@/components/SafeSpeedInsights';
 import './globals.css';
@@ -66,8 +65,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           disableTransitionOnChange
         >
           <div className="min-h-screen flex flex-col">
-            <Navbar />
-            <NavigationTabs />
+            <SiteHeader />
             <main id="main-content" className="flex-1 flex flex-col min-h-0">
               {children}
             </main>
