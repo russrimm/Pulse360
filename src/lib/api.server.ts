@@ -1,6 +1,7 @@
 import 'server-only';
 import { M365Update, Message, MessageStatus } from './types';
 import { getPrisma } from './prisma';
+import { withDbRetry } from './db-retry';
 import type { MessageCenterUpdate, Prisma } from '@/generated/prisma';
 import { XMLParser } from 'fast-xml-parser';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
@@ -10,7 +11,10 @@ import { parseGraphDate } from './graph';
 // Base URL without version path — supports both /v1.0 and /beta
 const RAW_AZURE_API_URL = process.env.AZURE_API_URL?.trim();
 const DIRECT_GRAPH_BASE_URL = 'https://graph.microsoft.com';
-const GRAPH_REQUEST_TIMEOUT_MS = 15_000;
+const GRAPH_REQUEST_TIMEOUT_MS = 25_000;
+// Whole-pagination budget. Keeps a slow Graph from blowing past the cron
+// route's maxDuration (60s) one 25s page at a time.
+const GRAPH_SYNC_BUDGET_MS = 45_000;
 
 function normalizeApiBaseUrl(url?: string): string {
   const value = url || DIRECT_GRAPH_BASE_URL;
@@ -215,10 +219,14 @@ type MessageListRow = Prisma.MessageCenterUpdateGetPayload<{ select: typeof mess
 
 export async function getMessages(): Promise<Message[]> {
   const prisma = getPrisma();
-  const rows = await prisma.messageCenterUpdate.findMany({
-    select: messageListSelect,
-    orderBy: { lastUpdated: 'desc' },
-  });
+  const rows = await withDbRetry(
+    () =>
+      prisma.messageCenterUpdate.findMany({
+        select: messageListSelect,
+        orderBy: { lastUpdated: 'desc' },
+      }),
+    'getMessages'
+  );
 
   // Vercel Cron (see vercel.json → /api/cron/sync-messages) is the baseline
   // sync path. On-demand sync here is a safety net:
@@ -227,10 +235,14 @@ export async function getMessages(): Promise<Message[]> {
   //     an empty screen before cron fires.
   if (rows.length === 0) {
     await ensureMessagesSynced();
-    const rehydrated = await prisma.messageCenterUpdate.findMany({
-      select: messageListSelect,
-      orderBy: { lastUpdated: 'desc' },
-    });
+    const rehydrated = await withDbRetry(
+      () =>
+        prisma.messageCenterUpdate.findMany({
+          select: messageListSelect,
+          orderBy: { lastUpdated: 'desc' },
+        }),
+      'getMessages(rehydrate)'
+    );
     return rehydrated.map(rowToListMessage);
   }
 
@@ -242,16 +254,77 @@ export async function getMessageSyncMetadata(): Promise<{
   lastSyncAt: string | null;
   isStale: boolean;
 }> {
-  const state = await getPrisma().syncState.findUnique({
-    where: { key: MESSAGE_CENTER_SYNC_KEY },
-    select: { lastSyncAt: true },
-  });
-  const lastSyncAt = state?.lastSyncAt ?? null;
+  let lastSyncAt: Date | null = null;
+
+  try {
+    const state = await withDbRetry(
+      () =>
+        getPrisma().syncState.findUnique({
+          where: { key: MESSAGE_CENTER_SYNC_KEY },
+          select: { lastSyncAt: true },
+        }),
+      'getMessageSyncMetadata'
+    );
+    lastSyncAt = state?.lastSyncAt ?? null;
+  } catch (error) {
+    // Metadata is a footnote on the page; never fail the render over it.
+    console.error('Sync metadata lookup failed:', error);
+  }
 
   return {
     lastSyncAt: lastSyncAt?.toISOString() ?? null,
     isStale: !lastSyncAt || Date.now() - lastSyncAt.getTime() > MESSAGE_CENTER_STALE_MS,
   };
+}
+
+function isAbortOrNetworkError(error: unknown): boolean {
+  if (!(error instanceof Error)) return false;
+  return (
+    error.name === 'TimeoutError' ||
+    error.name === 'AbortError' ||
+    error.name === 'TypeError' || // undici wraps connection resets as TypeError
+    /fetch failed|socket hang up|econnreset|etimedout/i.test(error.message)
+  );
+}
+
+/**
+ * Fetches one Graph page within the remaining sync budget, retrying once on a
+ * timeout or connection blip. Throws when the budget is exhausted so a slow
+ * Graph fails the sync outright instead of returning a truncated dataset.
+ */
+async function fetchGraphPage(
+  url: string,
+  headers: Record<string, string>,
+  deadline: number
+): Promise<Response> {
+  let lastError: unknown;
+
+  for (let attempt = 0; attempt < 2; attempt++) {
+    const remainingMs = deadline - Date.now();
+    if (remainingMs <= 0) {
+      throw new Error(
+        `Graph pagination exceeded the ${GRAPH_SYNC_BUDGET_MS}ms sync budget`,
+        lastError instanceof Error ? { cause: lastError } : undefined
+      );
+    }
+
+    try {
+      return await fetch(url, {
+        headers,
+        // Persistence is our cache now; skip Next's fetch cache.
+        cache: 'no-store',
+        signal: AbortSignal.timeout(Math.min(GRAPH_REQUEST_TIMEOUT_MS, remainingMs)),
+      });
+    } catch (error) {
+      lastError = error;
+      if (attempt === 1 || !isAbortOrNetworkError(error)) {
+        throw error;
+      }
+      console.warn('Graph page request failed; retrying once:', error);
+    }
+  }
+
+  throw lastError;
 }
 
 async function fetchAllMessagesFromGraph(): Promise<GraphApiMessage[]> {
@@ -280,16 +353,12 @@ async function fetchAllMessagesFromGraph(): Promise<GraphApiMessage[]> {
   let didFallbackToDirectGraph = false;
   const MAX_PAGES = 10;
   let nextLink: string | undefined = graphUrl(firstPagePath, 'v1.0', requestBaseUrl);
+  const deadline = Date.now() + GRAPH_SYNC_BUDGET_MS;
 
   let pageCount = 0;
   while (nextLink && pageCount < MAX_PAGES) {
     pageCount++;
-    const response = await fetch(nextLink, {
-      headers,
-      // Persistence is our cache now; skip Next's fetch cache.
-      cache: 'no-store',
-      signal: AbortSignal.timeout(GRAPH_REQUEST_TIMEOUT_MS),
-    });
+    const response = await fetchGraphPage(nextLink, headers, deadline);
 
     if (!response.ok) {
       const errorText = await response.text();
@@ -336,7 +405,17 @@ export async function getMessage(id: string): Promise<Message | null> {
   }
 
   // Try DB first — this is the common path and works even for archived rows.
-  const row = await getPrisma().messageCenterUpdate.findUnique({ where: { id } });
+  // A database outage must not 404/500 the page: fall through to Graph instead.
+  let row: MessageCenterUpdate | null = null;
+  try {
+    row = await withDbRetry(
+      () => getPrisma().messageCenterUpdate.findUnique({ where: { id } }),
+      `getMessage(${id})`
+    );
+  } catch (error) {
+    console.error(`Message lookup failed for ${id}; falling back to Graph:`, error);
+  }
+
   if (row) {
     // Background-refresh so archived/expired status stays current.
     void ensureMessagesSynced().catch(() => undefined);
@@ -444,9 +523,13 @@ async function ensureMessagesSynced(): Promise<void> {
 
   try {
     const prisma = getPrisma();
-    const state = await prisma.syncState.findUnique({
-      where: { key: MESSAGE_CENTER_SYNC_KEY },
-    });
+    const state = await withDbRetry(
+      () =>
+        prisma.syncState.findUnique({
+          where: { key: MESSAGE_CENTER_SYNC_KEY },
+        }),
+      'ensureMessagesSynced'
+    );
     const isFresh = state && Date.now() - state.lastSyncAt.getTime() < SYNC_TTL_MS;
     if (isFresh) {
       return;
@@ -473,7 +556,10 @@ export async function syncMessagesFromGraph(): Promise<void> {
   const syncStartedAt = new Date();
   const [graphMessages, activeMessageCount] = await Promise.all([
     fetchAllMessagesFromGraph(),
-    prisma.messageCenterUpdate.count({ where: { status: 'active' } }),
+    withDbRetry(
+      () => prisma.messageCenterUpdate.count({ where: { status: 'active' } }),
+      'syncMessagesFromGraph(count)'
+    ),
   ]);
 
   if (graphMessages.length === 0 && activeMessageCount > 0) {
@@ -489,70 +575,90 @@ export async function syncMessagesFromGraph(): Promise<void> {
   const CHUNK = 50;
   for (let i = 0; i < graphMessages.length; i += CHUNK) {
     const chunk = graphMessages.slice(i, i + CHUNK);
-    await prisma.$transaction([
-      prisma.messageCenterUpdate.createMany({
-        data: chunk.map(m => {
-          const status = deriveStatus(m, 'active');
-          return graphMessageToDbInput(m, status, syncStartedAt);
-        }),
-        skipDuplicates: true,
-      }),
-      ...chunk.map(m => {
-        const status = deriveStatus(m, 'active');
-        return prisma.messageCenterUpdate.updateMany({
-          where: {
-            id: m.id,
-            lastSeenAt: { lt: syncStartedAt },
-            OR: [{ archivedAt: null }, { archivedAt: { lte: syncStartedAt } }],
-          },
-          data: graphMessageToDbUpdate(m, status, syncStartedAt),
-        });
-      }),
-    ]);
+    await withDbRetry(
+      () =>
+        prisma.$transaction([
+          prisma.messageCenterUpdate.createMany({
+            data: chunk.map(m => {
+              const status = deriveStatus(m, 'active');
+              return graphMessageToDbInput(m, status, syncStartedAt);
+            }),
+            skipDuplicates: true,
+          }),
+          ...chunk.map(m => {
+            const status = deriveStatus(m, 'active');
+            return prisma.messageCenterUpdate.updateMany({
+              where: {
+                id: m.id,
+                lastSeenAt: { lt: syncStartedAt },
+                OR: [{ archivedAt: null }, { archivedAt: { lte: syncStartedAt } }],
+              },
+              data: graphMessageToDbUpdate(m, status, syncStartedAt),
+            });
+          }),
+        ]),
+      `syncMessagesFromGraph(upsert chunk ${i / CHUNK})`
+    );
   }
 
   // Mark any previously-active rows that Graph no longer returns.
-  const stale = await prisma.messageCenterUpdate.findMany({
-    where: {
-      status: 'active',
-      id: { notIn: Array.from(seenIds) },
-      lastSeenAt: { lt: syncStartedAt },
-    },
-    select: { id: true, actionRequiredByDateTime: true },
-  });
+  const stale = await withDbRetry(
+    () =>
+      prisma.messageCenterUpdate.findMany({
+        where: {
+          status: 'active',
+          id: { notIn: Array.from(seenIds) },
+          lastSeenAt: { lt: syncStartedAt },
+        },
+        select: { id: true, actionRequiredByDateTime: true },
+      }),
+    'syncMessagesFromGraph(stale)'
+  );
 
   if (stale.length > 0) {
-    await prisma.$transaction(
-      stale.map(row =>
-        prisma.messageCenterUpdate.updateMany({
-          where: {
-            id: row.id,
-            status: 'active',
-            lastSeenAt: { lt: syncStartedAt },
-          },
-          data: {
-            status: isPastDate(row.actionRequiredByDateTime) ? 'expired' : 'archived',
-            archivedAt: now,
-          },
-        })
-      )
+    await withDbRetry(
+      () =>
+        prisma.$transaction(
+          stale.map(row =>
+            prisma.messageCenterUpdate.updateMany({
+              where: {
+                id: row.id,
+                status: 'active',
+                lastSeenAt: { lt: syncStartedAt },
+              },
+              data: {
+                status: isPastDate(row.actionRequiredByDateTime) ? 'expired' : 'archived',
+                archivedAt: now,
+              },
+            })
+          )
+        ),
+      'syncMessagesFromGraph(archive)'
     );
   }
 
   // Also flip still-in-Graph but past-due rows to expired.
-  await prisma.messageCenterUpdate.updateMany({
-    where: {
-      status: 'active',
-      actionRequiredByDateTime: { lt: now },
-    },
-    data: { status: 'expired' },
-  });
+  await withDbRetry(
+    () =>
+      prisma.messageCenterUpdate.updateMany({
+        where: {
+          status: 'active',
+          actionRequiredByDateTime: { lt: now },
+        },
+        data: { status: 'expired' },
+      }),
+    'syncMessagesFromGraph(expire)'
+  );
 
-  await prisma.syncState.upsert({
-    where: { key: MESSAGE_CENTER_SYNC_KEY },
-    create: { key: MESSAGE_CENTER_SYNC_KEY, lastSyncAt: now, lastError: null },
-    update: { lastSyncAt: now, lastError: null },
-  });
+  await withDbRetry(
+    () =>
+      prisma.syncState.upsert({
+        where: { key: MESSAGE_CENTER_SYNC_KEY },
+        create: { key: MESSAGE_CENTER_SYNC_KEY, lastSyncAt: now, lastError: null },
+        update: { lastSyncAt: now, lastError: null },
+      }),
+    'syncMessagesFromGraph(syncState)'
+  );
 }
 
 function deriveStatus(m: GraphApiMessage, defaultStatus: MessageStatus): MessageStatus {
