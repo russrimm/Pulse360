@@ -41,14 +41,22 @@ function getProductName(productId: string, productTree?: ProductTree): string {
 }
 
 export default function CVECard({ vuln, productTree }: CVECardProps) {
+  // Stable identity for the card. Rendered table text repeats across CVEs, so
+  // this is the only reliable way to tell two cards apart.
+  const cveIdentifier = Array.isArray(vuln.CVE) ? vuln.CVE.join(', ') : vuln.CVE || vuln.ID;
+
   // Always show detailed table for each CVE
   return (
-    <div className="bg-white/80 dark:bg-gray-800/50 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700/50 p-6 mb-4">
+    <div
+      data-testid="cve-card"
+      data-cve={cveIdentifier}
+      className="bg-white/80 dark:bg-gray-800/50 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700/50 p-6 mb-4"
+    >
         <div className="mb-2 text-xl font-bold text-gray-900 dark:text-white">
           {getFieldValue(vuln.Title)}
       </div>
         <div className="mb-2 text-xs text-gray-700 dark:text-gray-300">
-        {Array.isArray(vuln.CVE) ? vuln.CVE.join(', ') : vuln.CVE || vuln.ID}
+        {cveIdentifier}
       </div>
       <div className="w-full overflow-x-auto">
               <table className="min-w-full text-xs border border-gray-200 dark:border-gray-700 rounded-lg text-gray-900 dark:text-gray-100">
