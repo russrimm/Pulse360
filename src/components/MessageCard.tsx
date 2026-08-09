@@ -55,6 +55,10 @@ const normalizeService = (service: string): string => {
 export const MessageCard: React.FC<MessageCardProps> = ({ message }) => {
   // Deduplicate and normalize services
   const uniqueServices = Array.from(new Set(message.service.map(normalizeService)));
+  // Only reserve the banner strip when a banner is actually rendered, so ordinary
+  // cards start their content at the top instead of below empty space.
+  const hasTopBanner =
+    message.isMajorChange || message.status === 'archived' || message.status === 'expired';
 
   return (
     <Link
@@ -75,83 +79,85 @@ export const MessageCard: React.FC<MessageCardProps> = ({ message }) => {
             </span>
           </div>
         )}
-        {/* Major Change banner at the very top */}
-        <div className="min-h-[38px]">
-          {message.isMajorChange ? (
-            <div className="w-full bg-red-50 dark:bg-red-900/30 border-b border-red-200 dark:border-red-800 animate-pulse-subtle">
-              <div className="flex items-center justify-center py-1.5">
-                <span className="inline-flex items-center px-3 py-1 text-sm font-medium text-red-700 dark:text-red-300">
-                  <svg
-                    className="w-4 h-4 mr-1.5"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
-                    />
-                  </svg>
-                  Major Change
-                </span>
+        {/* Major Change / status banner at the very top */}
+        {hasTopBanner && (
+          <div className="min-h-[38px]">
+            {message.isMajorChange ? (
+              <div className="w-full bg-red-50 dark:bg-red-900/30 border-b border-red-200 dark:border-red-800 animate-pulse-subtle">
+                <div className="flex items-center justify-center py-1.5">
+                  <span className="inline-flex items-center px-3 py-1 text-sm font-medium text-red-700 dark:text-red-300">
+                    <svg
+                      className="w-4 h-4 mr-1.5"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+                      />
+                    </svg>
+                    Major Change
+                  </span>
+                </div>
               </div>
-            </div>
-          ) : message.status === 'archived' ? (
-            <div className="w-full bg-gray-100 dark:bg-gray-800 border-b border-gray-300 dark:border-gray-700">
-              <div className="flex items-center justify-center py-1.5">
-                <span
-                  className="inline-flex items-center px-3 py-1 text-sm font-medium text-gray-700 dark:text-gray-300"
-                  title="This message has been removed from Microsoft's live feed but is preserved here for reference."
-                >
-                  <svg
-                    className="w-4 h-4 mr-1.5"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
+            ) : message.status === 'archived' ? (
+              <div className="w-full bg-gray-100 dark:bg-gray-800 border-b border-gray-300 dark:border-gray-700">
+                <div className="flex items-center justify-center py-1.5">
+                  <span
+                    className="inline-flex items-center px-3 py-1 text-sm font-medium text-gray-700 dark:text-gray-300"
+                    title="This message has been removed from Microsoft's live feed but is preserved here for reference."
                   >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"
-                    />
-                  </svg>
-                  Archived
-                </span>
+                    <svg
+                      className="w-4 h-4 mr-1.5"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"
+                      />
+                    </svg>
+                    Archived
+                  </span>
+                </div>
               </div>
-            </div>
-          ) : message.status === 'expired' ? (
-            <div className="w-full bg-amber-50 dark:bg-amber-900/30 border-b border-amber-200 dark:border-amber-800">
-              <div className="flex items-center justify-center py-1.5">
-                <span
-                  className="inline-flex items-center px-3 py-1 text-sm font-medium text-amber-800 dark:text-amber-200"
-                  title="The action-required date on this message has passed."
-                >
-                  <svg
-                    className="w-4 h-4 mr-1.5"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
+            ) : message.status === 'expired' ? (
+              <div className="w-full bg-amber-50 dark:bg-amber-900/30 border-b border-amber-200 dark:border-amber-800">
+                <div className="flex items-center justify-center py-1.5">
+                  <span
+                    className="inline-flex items-center px-3 py-1 text-sm font-medium text-amber-800 dark:text-amber-200"
+                    title="The action-required date on this message has passed."
                   >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                    />
-                  </svg>
-                  Expired
-                </span>
+                    <svg
+                      className="w-4 h-4 mr-1.5"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                      />
+                    </svg>
+                    Expired
+                  </span>
+                </div>
               </div>
-            </div>
-          ) : (
-            <div className="h-[38px]" />
-          )}
-        </div>
+            ) : null}
+          </div>
+        )}
         {/* Message ID and service badges row (now just below banner) */}
-        <div className="w-full flex items-start justify-between relative px-4 pt-2 gap-2 min-w-0">
+        <div
+          className={`w-full flex items-start justify-between relative px-4 gap-2 min-w-0 ${hasTopBanner ? 'pt-2' : 'pt-3'}`}
+        >
           <div className="flex items-center gap-2 min-w-0 flex-wrap">
             <span className="text-xs font-semibold text-blue-700 dark:text-blue-300 break-all max-w-[120px]">
               {message.id}
