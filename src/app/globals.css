@@ -1,6 +1,202 @@
 @import 'tailwindcss';
 @config "../../tailwind.config.js";
 
+/* ---------------------------------------------------------------------------
+   Design tokens
+
+   Raw values live on :root / .dark. `@theme inline` maps them into Tailwind so
+   utilities such as `bg-surface`, `text-ink-muted`, or `border-line` resolve
+   the referenced variable at use-site, which is what makes a single class work
+   in both color schemes without a `dark:` counterpart.
+--------------------------------------------------------------------------- */
+:root {
+  /* Fallback until SiteHeader measures and publishes the real header height. */
+  --app-header-h: 6.5rem;
+
+  --c-canvas: #f6f8fb;
+  --c-surface: #ffffff;
+  --c-surface-raised: #ffffff;
+  --c-surface-sunken: #eef2f7;
+
+  --c-line: #e2e8f0;
+  --c-line-strong: #cbd5e1;
+
+  --c-ink: #0f172a;
+  --c-ink-muted: #475569;
+  --c-ink-subtle: #64748b;
+
+  --c-accent: #0284c7;
+  --c-accent-hover: #0369a1;
+  --c-accent-soft: #e0f2fe;
+  --c-accent-ink: #0369a1;
+
+  --c-critical: #dc2626;
+  --c-critical-soft: #fef2f2;
+  --c-critical-ink: #b91c1c;
+
+  --c-warn: #d97706;
+  --c-warn-soft: #fffbeb;
+  --c-warn-ink: #b45309;
+
+  --c-ok: #059669;
+  --c-ok-soft: #ecfdf5;
+  --c-ok-ink: #047857;
+
+  --c-info: #0284c7;
+  --c-info-soft: #f0f9ff;
+  --c-info-ink: #0369a1;
+
+  --c-muted: #64748b;
+  --c-muted-soft: #f1f5f9;
+  --c-muted-ink: #475569;
+}
+
+.dark {
+  --c-canvas: #0b0d10;
+  --c-surface: #14171c;
+  --c-surface-raised: #1a1e25;
+  --c-surface-sunken: #0f1216;
+
+  --c-line: #262b33;
+  --c-line-strong: #363c46;
+
+  --c-ink: #f8fafc;
+  --c-ink-muted: #a5adba;
+  --c-ink-subtle: #7d8595;
+
+  --c-accent: #38bdf8;
+  --c-accent-hover: #7dd3fc;
+  --c-accent-soft: #0c2a3d;
+  --c-accent-ink: #7dd3fc;
+
+  --c-critical: #f87171;
+  --c-critical-soft: #2a1416;
+  --c-critical-ink: #fca5a5;
+
+  --c-warn: #fbbf24;
+  --c-warn-soft: #2a1f0c;
+  --c-warn-ink: #fcd34d;
+
+  --c-ok: #34d399;
+  --c-ok-soft: #0c2419;
+  --c-ok-ink: #6ee7b7;
+
+  --c-info: #38bdf8;
+  --c-info-soft: #0c2233;
+  --c-info-ink: #7dd3fc;
+
+  --c-muted: #94a3b8;
+  --c-muted-soft: #1b1f26;
+  --c-muted-ink: #cbd5e1;
+}
+
+@theme inline {
+  --color-canvas: var(--c-canvas);
+  --color-surface: var(--c-surface);
+  --color-surface-raised: var(--c-surface-raised);
+  --color-surface-sunken: var(--c-surface-sunken);
+
+  --color-line: var(--c-line);
+  --color-line-strong: var(--c-line-strong);
+
+  --color-ink: var(--c-ink);
+  --color-ink-muted: var(--c-ink-muted);
+  --color-ink-subtle: var(--c-ink-subtle);
+
+  --color-accent: var(--c-accent);
+  --color-accent-hover: var(--c-accent-hover);
+  --color-accent-soft: var(--c-accent-soft);
+  --color-accent-ink: var(--c-accent-ink);
+
+  --color-critical: var(--c-critical);
+  --color-critical-soft: var(--c-critical-soft);
+  --color-critical-ink: var(--c-critical-ink);
+
+  --color-warn: var(--c-warn);
+  --color-warn-soft: var(--c-warn-soft);
+  --color-warn-ink: var(--c-warn-ink);
+
+  --color-ok: var(--c-ok);
+  --color-ok-soft: var(--c-ok-soft);
+  --color-ok-ink: var(--c-ok-ink);
+
+  --color-info: var(--c-info);
+  --color-info-soft: var(--c-info-soft);
+  --color-info-ink: var(--c-info-ink);
+
+  --color-muted: var(--c-muted);
+  --color-muted-soft: var(--c-muted-soft);
+  --color-muted-ink: var(--c-muted-ink);
+}
+
+/* ---------------------------------------------------------------------------
+   Type scale
+
+   Semantic steps so screens stop hand-picking text-xs / text-sm everywhere.
+   Meta text uses tabular figures because most of it is dates and counts.
+--------------------------------------------------------------------------- */
+.type-display {
+  font-size: 1.875rem;
+  line-height: 2.25rem;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+}
+.type-h1 {
+  font-size: 1.5rem;
+  line-height: 2rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+.type-h2 {
+  font-size: 1.25rem;
+  line-height: 1.75rem;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+}
+.type-h3 {
+  font-size: 1rem;
+  line-height: 1.5rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+.type-card-title {
+  font-size: 0.9375rem;
+  line-height: 1.4;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+.type-body {
+  font-size: 0.9375rem;
+  line-height: 1.6;
+}
+.type-body-sm {
+  font-size: 0.875rem;
+  line-height: 1.55;
+}
+.type-meta {
+  font-size: 0.75rem;
+  line-height: 1rem;
+  font-variant-numeric: tabular-nums;
+}
+.type-eyebrow {
+  font-size: 0.6875rem;
+  line-height: 1rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+@media (min-width: 640px) {
+  .type-display {
+    font-size: 2.25rem;
+    line-height: 2.5rem;
+  }
+  .type-h1 {
+    font-size: 1.875rem;
+    line-height: 2.25rem;
+  }
+}
+
 .prose {
   max-width: none;
 }

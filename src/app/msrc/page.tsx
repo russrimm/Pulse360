@@ -75,12 +75,19 @@ async function fetchCVEsForMonth(
 
 function LoadingState() {
   return (
-    <div
-      className="py-16 text-center text-gray-500 dark:text-gray-400"
-      role="status"
-      aria-live="polite"
-    >
-      Loading Microsoft security updates…
+    <div className="space-y-4" role="status" aria-live="polite">
+      <span className="sr-only">Loading Microsoft security updates…</span>
+      {[0, 1, 2].map(i => (
+        <div
+          key={i}
+          aria-hidden="true"
+          className="animate-pulse rounded-xl border border-line bg-surface p-4"
+        >
+          <div className="h-5 w-2/3 rounded bg-surface-sunken" />
+          <div className="mt-3 h-3 w-32 rounded bg-surface-sunken" />
+          <div className="mt-4 h-24 rounded bg-surface-sunken" />
+        </div>
+      ))}
     </div>
   );
 }
@@ -187,72 +194,77 @@ function SecurityUpdatesContent() {
   const isLoading = isLoadingMonths || isLoadingUpdates;
 
   return (
-    <section className="mx-auto max-w-4xl px-4 py-8" aria-labelledby="security-updates-heading">
-      <h1
-        id="security-updates-heading"
-        className="mb-3 text-center text-2xl font-bold text-gray-900 dark:text-white"
-      >
-        Microsoft Security Response Center Security Updates
-        {selectedMonth ? ` (${selectedMonth})` : ''}
-      </h1>
-      <p className="mb-6 text-center text-sm text-gray-600 dark:text-gray-400">
-        Source:{' '}
-        <a
-          href="https://msrc.microsoft.com/update-guide/"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-primary-700 underline hover:no-underline focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 dark:text-primary-400"
-        >
-          Microsoft Security Update Guide
-        </a>
-      </p>
-
-      <label
-        htmlFor="month"
-        className="mb-2 block text-center text-sm font-medium text-gray-700 dark:text-gray-300"
-      >
-        Update month
-      </label>
-      <select
-        id="month"
-        name="month"
-        value={selectedMonth ?? ''}
-        onChange={handleMonthChange}
-        disabled={isLoadingMonths || months.length === 0}
-        className="mx-auto mb-6 block w-full max-w-xs rounded-lg border border-gray-300 bg-white px-4 py-2 text-gray-900 shadow-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 disabled:cursor-not-allowed disabled:opacity-60 dark:border-gray-700 dark:bg-gray-900 dark:text-white"
-      >
-        {months.map(month => (
-          <option key={month.ID} value={month.ID}>
-            {month.DocumentTitle}
-          </option>
-        ))}
-      </select>
-
-      {releaseDate ? (
-        <p className="mb-2 text-center text-xs text-gray-500 dark:text-gray-400">
-          Release date: {formatDate(releaseDate)}
+    <section
+      className="mx-auto max-w-5xl px-4 py-8 sm:px-6"
+      aria-labelledby="security-updates-heading"
+    >
+      <header className="mb-6">
+        <p className="type-eyebrow text-accent">Security</p>
+        <h1 id="security-updates-heading" className="type-h1 mt-1 text-ink">
+          Microsoft Security Response Center Security Updates
+          {selectedMonth ? ` (${selectedMonth})` : ''}
+        </h1>
+        <p className="type-body-sm mt-2 text-ink-muted">
+          Source:{' '}
+          <a
+            href="https://msrc.microsoft.com/update-guide/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="rounded font-medium text-accent hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+          >
+            Microsoft Security Update Guide
+          </a>
         </p>
-      ) : null}
+      </header>
 
-      {totalVulnerabilities > 0 ? (
-        <p className="mb-6 text-center text-xs text-gray-500 dark:text-gray-400">
-          {totalVulnerabilities.toLocaleString()} vulnerabilities · page {page} of {totalPages}
-        </p>
-      ) : null}
+      <div className="sticky top-[var(--app-header-h,6.5rem)] z-30 -mx-4 mb-6 border-y border-line bg-surface/90 px-4 py-3 backdrop-blur sm:-mx-6 sm:px-6">
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+          <label htmlFor="month" className="type-body-sm font-medium text-ink">
+            Update month
+          </label>
+          <select
+            id="month"
+            name="month"
+            value={selectedMonth ?? ''}
+            onChange={handleMonthChange}
+            disabled={isLoadingMonths || months.length === 0}
+            className="type-body-sm min-w-0 flex-1 rounded-lg border border-line bg-surface px-3 py-1.5 text-ink shadow-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-accent disabled:cursor-not-allowed disabled:opacity-60 sm:max-w-xs sm:flex-none"
+          >
+            {months.map(month => (
+              <option key={month.ID} value={month.ID}>
+                {month.DocumentTitle}
+              </option>
+            ))}
+          </select>
+
+          <p className="type-meta ml-auto text-ink-subtle" aria-live="polite">
+            {totalVulnerabilities > 0
+              ? `${totalVulnerabilities.toLocaleString()} vulnerabilities · page ${page} of ${totalPages}`
+              : null}
+            {totalVulnerabilities > 0 && releaseDate ? ' · ' : null}
+            {releaseDate ? `Released ${formatDate(releaseDate)}` : null}
+          </p>
+        </div>
+      </div>
 
       {error ? (
-        <div className="py-12 text-center text-lg text-red-600 dark:text-red-400" role="alert">
-          {error}. Try again later or use the Microsoft Security Update Guide link above.
+        <div
+          className="rounded-xl border border-critical/30 bg-critical-soft px-4 py-10 text-center text-critical-ink"
+          role="alert"
+        >
+          <p className="type-body">
+            {error}. Try again later or use the Microsoft Security Update Guide link above.
+          </p>
         </div>
       ) : isLoading ? (
         <LoadingState />
       ) : !hasResults ? (
-        <p className="py-12 text-center text-gray-600 dark:text-gray-400" role="status">
+        <p className="type-body py-12 text-center text-ink-muted" role="status">
           No published vulnerabilities were returned for this month.
         </p>
       ) : (
         <>
-          <div className="space-y-8">
+          <div className="space-y-4">
             {vulnerabilities.map(vulnerability => (
               <CVECard key={vulnerability.ID} vuln={vulnerability} productTree={productTree} />
             ))}
@@ -266,18 +278,18 @@ function SecurityUpdatesContent() {
                 type="button"
                 onClick={() => handlePageChange(page - 1)}
                 disabled={page <= 1}
-                className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-700 dark:text-gray-200 dark:hover:bg-gray-800"
+                className="type-body-sm rounded-lg border border-line px-4 py-2 font-medium text-ink transition-colors hover:bg-surface-sunken hover:border-line-strong focus:outline-none focus-visible:ring-2 focus-visible:ring-accent disabled:cursor-not-allowed disabled:opacity-50"
               >
                 Previous
               </button>
-              <span className="text-sm text-gray-600 dark:text-gray-400" aria-live="polite">
+              <span className="type-body-sm text-ink-muted" aria-live="polite">
                 Page {page} of {totalPages}
               </span>
               <button
                 type="button"
                 onClick={() => handlePageChange(page + 1)}
                 disabled={page >= totalPages}
-                className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-700 dark:text-gray-200 dark:hover:bg-gray-800"
+                className="type-body-sm rounded-lg border border-line px-4 py-2 font-medium text-ink transition-colors hover:bg-surface-sunken hover:border-line-strong focus:outline-none focus-visible:ring-2 focus-visible:ring-accent disabled:cursor-not-allowed disabled:opacity-50"
               >
                 Next
               </button>

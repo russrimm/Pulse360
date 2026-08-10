@@ -1,8 +1,9 @@
 "use client";
-import React from 'react';
 import Image from 'next/image';
 import { getProductIcon } from '@/lib/getProductIcon';
 import { getMsrcFieldValue, getMsrcImpact, getMsrcSeverity } from '@/lib/msrc';
+import { SurfaceCard } from './SurfaceCard';
+import { StatusChip, type ChipTone } from './StatusChip';
 
 interface Vulnerability {
   ID: string;
@@ -40,37 +41,76 @@ function getProductName(productId: string, productTree?: ProductTree): string {
   return found ? found.Value : productId;
 }
 
+const SEVERITY_TONES: Record<string, ChipTone> = {
+  critical: 'critical',
+  important: 'warn',
+  moderate: 'info',
+  low: 'neutral',
+};
+
+function severityTone(severity: string): ChipTone {
+  return SEVERITY_TONES[severity.trim().toLowerCase()] ?? 'neutral';
+}
+
 export default function CVECard({ vuln, productTree }: CVECardProps) {
   // Stable identity for the card. Rendered table text repeats across CVEs, so
   // this is the only reliable way to tell two cards apart.
   const cveIdentifier = Array.isArray(vuln.CVE) ? vuln.CVE.join(', ') : vuln.CVE || vuln.ID;
+  const cardSeverity = getMsrcSeverity(vuln.Threats);
+  const cardImpact = getMsrcImpact(vuln.Threats);
+  const tone = severityTone(cardSeverity);
 
-  // Always show detailed table for each CVE
   return (
-    <div
+    <SurfaceCard
+      as="article"
+      accent={tone}
+      className="gap-3"
       data-testid="cve-card"
       data-cve={cveIdentifier}
-      className="bg-white/80 dark:bg-gray-800/50 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700/50 p-6 mb-4"
     >
-        <div className="mb-2 text-xl font-bold text-gray-900 dark:text-white">
+      <div className="flex flex-wrap items-start justify-between gap-x-4 gap-y-2">
+        <h3 className="type-h3 min-w-0 flex-1 text-ink [overflow-wrap:anywhere]">
           {getFieldValue(vuln.Title)}
+        </h3>
+        <div className="flex shrink-0 flex-wrap items-center gap-1.5">
+          {cardSeverity ? (
+            <StatusChip tone={tone} size="md" title="Maximum severity">
+              {cardSeverity}
+            </StatusChip>
+          ) : null}
+          {cardImpact ? (
+            <StatusChip tone="neutral" size="md" title="Impact">
+              {cardImpact}
+            </StatusChip>
+          ) : null}
+        </div>
       </div>
-        <div className="mb-2 text-xs text-gray-700 dark:text-gray-300">
-        {cveIdentifier}
-      </div>
-      <div className="w-full overflow-x-auto">
-              <table className="min-w-full text-xs border border-gray-200 dark:border-gray-700 rounded-lg text-gray-900 dark:text-gray-100">
-                <thead className="bg-gray-100 dark:bg-gray-900">
-                  <tr>
-                    <th className="px-2 py-2 text-left">Product</th>
-              <th className="px-2 py-2 text-left">Platform</th>
-                    <th className="px-2 py-2 text-left">Impact</th>
-                    <th className="px-2 py-2 text-left">Max Severity</th>
-                    <th className="px-2 py-2 text-left">Article</th>
-                    <th className="px-2 py-2 text-left">Download</th>
-                  </tr>
-                </thead>
-                <tbody>
+      <p className="type-meta font-medium text-ink-subtle">{cveIdentifier}</p>
+      <div className="-mr-4 -mb-4 mt-1 overflow-x-auto rounded-tl-lg border-t border-l border-line">
+        <table className="min-w-full text-left text-xs text-ink">
+          <thead className="bg-surface-sunken text-ink-muted">
+            <tr>
+              <th scope="col" className="px-3 py-2 font-semibold">
+                Product
+              </th>
+              <th scope="col" className="px-3 py-2 font-semibold">
+                Platform
+              </th>
+              <th scope="col" className="px-3 py-2 font-semibold">
+                Impact
+              </th>
+              <th scope="col" className="px-3 py-2 font-semibold">
+                Max Severity
+              </th>
+              <th scope="col" className="px-3 py-2 font-semibold">
+                Article
+              </th>
+              <th scope="col" className="px-3 py-2 font-semibold">
+                Download
+              </th>
+            </tr>
+          </thead>
+          <tbody>
             {Array.isArray(vuln.ProductStatuses) && vuln.ProductStatuses.length > 0 && vuln.ProductStatuses.map((status, idx) => {
                     const productIds = Array.isArray(status.ProductID) ? status.ProductID : [status.ProductID];
                     return productIds.map((pid: string, pidx: number) => {
@@ -139,18 +179,18 @@ export default function CVECard({ vuln, productTree }: CVECardProps) {
                   platform = productName.match(/ARM|x64|x86|Itanium|Server Core|Datacenter|Essentials|Standard|Pro|Enterprise|Education|LTSC|LTSB|IoT|Azure|Core/)?.[0] || '';
                 }
                       return (
-                        <tr key={pid + '-' + idx + '-' + pidx} className="border-t border-gray-200 dark:border-gray-700">
-                    <td className="px-2 py-2 whitespace-nowrap text-gray-900 dark:text-gray-100">
+                        <tr key={pid + '-' + idx + '-' + pidx} className="border-t border-line">
+                    <td className="px-3 py-2 text-ink">
                       {productIcon && productName.toLowerCase().includes('microsoft graph') && (
                         <Image src={productIcon} alt="" width={20} height={20} className="inline w-5 h-5 mr-1 align-text-bottom" />
                       )}
                       {productName}
                     </td>
-                    <td className="px-2 py-2 whitespace-nowrap text-gray-900 dark:text-gray-100">{platform || '-'}</td>
-                          <td className="px-2 py-2 whitespace-nowrap text-gray-900 dark:text-gray-100">{impact || '-'}</td>
-                          <td className="px-2 py-2 whitespace-nowrap text-gray-900 dark:text-gray-100">{severity || '-'}</td>
-                    <td className="px-2 py-2 whitespace-nowrap text-gray-900 dark:text-gray-100">{articleUrl ? (<a href={articleUrl} target="_blank" rel="noopener noreferrer" className="text-blue-600 underline">{articleLabel || 'KB Article'}</a>) : '-'}</td>
-                    <td className="px-2 py-2 whitespace-nowrap text-gray-900 dark:text-gray-100">{downloadUrl ? (<a href={downloadUrl} target="_blank" rel="noopener noreferrer" className="text-blue-600 underline">Security Update</a>) : '-'}</td>
+                    <td className="px-3 py-2 whitespace-nowrap text-ink-muted">{platform || '—'}</td>
+                          <td className="px-3 py-2 whitespace-nowrap text-ink-muted">{impact || '—'}</td>
+                          <td className="px-3 py-2 whitespace-nowrap">{severity ? <StatusChip tone={severityTone(severity)}>{severity}</StatusChip> : '—'}</td>
+                    <td className="px-3 py-2 whitespace-nowrap">{articleUrl ? (<a href={articleUrl} target="_blank" rel="noopener noreferrer" className="rounded text-accent hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-accent">{articleLabel || 'KB Article'}</a>) : <span className="text-ink-subtle">—</span>}</td>
+                    <td className="px-3 py-2 whitespace-nowrap">{downloadUrl ? (<a href={downloadUrl} target="_blank" rel="noopener noreferrer" className="rounded text-accent hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-accent">Security Update</a>) : <span className="text-ink-subtle">—</span>}</td>
                         </tr>
                       );
                     });
@@ -158,7 +198,6 @@ export default function CVECard({ vuln, productTree }: CVECardProps) {
                 </tbody>
               </table>
             </div>
-      {/* Optionally, add a collapsible section for all other details */}
-    </div>
+    </SurfaceCard>
   );
-} 
+}

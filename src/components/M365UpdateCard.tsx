@@ -4,6 +4,8 @@ import { format } from 'date-fns';
 import { SafeHtml } from '@/components/SafeHtml';
 import Link from 'next/link';
 import Image from 'next/image';
+import { SurfaceCard } from './SurfaceCard';
+import { StatusChip, type ChipTone } from './StatusChip';
 
 interface M365Update {
   id: string;
@@ -83,71 +85,85 @@ const serviceIcons: Record<string, string> = {
   'Microsoft Exchange': '/icons/exchange.svg',
 };
 
+const STATUS_TONES: Array<{ match: string; tone: ChipTone }> = [
+  { match: 'launched', tone: 'ok' },
+  { match: 'rolling out', tone: 'info' },
+  { match: 'in development', tone: 'accent' },
+  { match: 'cancelled', tone: 'critical' },
+];
+
+function statusTone(status: string): ChipTone {
+  const lower = status.toLowerCase();
+  return STATUS_TONES.find(entry => lower.includes(entry.match))?.tone ?? 'neutral';
+}
+
 export const M365UpdateCard: React.FC<M365UpdateCardProps> = ({ update, onClick }) => {
   // Deduplicate and normalize services
   const uniqueServices = Array.from(new Set(update.service));
+  const isUpdated =
+    format(new Date(update.published), 'yyyy-MM-dd') !==
+    format(new Date(update.lastUpdated), 'yyyy-MM-dd');
 
   return (
-    <Link href={`/m365-update/${update.id}`}>
-      <div 
-        className="group bg-white/80 dark:bg-gray-800/50 backdrop-blur-sm rounded-xl shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-200 dark:border-gray-700/50 hover:border-primary-200 dark:hover:border-primary-800 hover:-translate-y-1 h-full cursor-pointer flex flex-col"
-      >
-        <div className="flex flex-col flex-grow">
-          <div className="flex items-center justify-center w-full bg-gradient-to-b from-gray-50 to-transparent dark:from-gray-900/50 dark:to-transparent py-3 px-4">
-            <div className="flex flex-wrap gap-2 justify-center">
-              {uniqueServices.map((service) => {
-                const iconPath = serviceIcons[service];
-                return (
-                  <div
-                    key={service}
-                    className="inline-flex items-center px-3 py-1.5 rounded-xl text-sm font-medium bg-blue-50 text-blue-700 dark:bg-transparent dark:text-blue-300 border border-blue-200 dark:border-blue-800 min-w-[160px] justify-center"
-                  >
-                    {iconPath && (
-                      <Image
-                        src={iconPath}
-                        alt={service}
-                        width={16}
-                        height={16}
-                        className="mr-1.5 w-4 h-4"
-                      />
-                    )}
-                    <span className="truncate">{service}</span>
-                  </div>
-                );
-              })}
-            </div>
+    <Link href={`/m365-update/${update.id}`} className="group block h-full min-w-0">
+      <SurfaceCard interactive className="gap-2.5" onClick={() => onClick(update.id)}>
+        {update.status || update.generalAvailabilityDate ? (
+          <div className="flex flex-wrap items-center gap-1.5">
+            {update.status ? (
+              <StatusChip tone={statusTone(update.status)}>{update.status}</StatusChip>
+            ) : null}
+            {update.generalAvailabilityDate ? (
+              <StatusChip>
+                GA {format(new Date(update.generalAvailabilityDate), 'MMM yyyy')}
+              </StatusChip>
+            ) : null}
           </div>
-          <div className="flex items-center justify-center text-[10px] text-gray-500 dark:text-gray-400 gap-1.5 py-1.5">
-            <span className="font-medium">Published</span>
-            <span>{format(new Date(update.published), 'MMM d, yyyy')}</span>
-            {format(new Date(update.published), 'MMM d, yyyy') !== format(new Date(update.lastUpdated), 'MMM d, yyyy') && (
-              <>
-                <span>•</span>
-                <span className="font-medium">Updated</span>
-                <span>{format(new Date(update.lastUpdated), 'MMM d, yyyy')}</span>
-              </>
-            )}
+        ) : null}
+
+        <h3 className="type-card-title line-clamp-3 break-words text-ink transition-colors group-hover:text-accent">
+          {update.title}
+        </h3>
+
+        {uniqueServices.length > 0 ? (
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+            {uniqueServices.slice(0, 3).map(service => {
+              const iconPath = serviceIcons[service];
+              return (
+                <span
+                  key={service}
+                  title={service}
+                  className="type-meta inline-flex min-w-0 items-center gap-1 text-ink-muted"
+                >
+                  {iconPath ? (
+                    <Image
+                      src={iconPath}
+                      alt=""
+                      width={14}
+                      height={14}
+                      className="h-3.5 w-3.5 shrink-0"
+                    />
+                  ) : null}
+                  <span className="truncate">{service}</span>
+                </span>
+              );
+            })}
+            {uniqueServices.length > 3 ? (
+              <span className="type-meta text-ink-subtle">+{uniqueServices.length - 3} more</span>
+            ) : null}
           </div>
-          <div className="flex items-center justify-center text-[10px] text-gray-500 dark:text-gray-400 gap-2 pb-1">
-            {update.generalAvailabilityDate && (
-              <span><span className="font-medium">GA:</span> {format(new Date(update.generalAvailabilityDate), 'MMM d, yyyy')}</span>
-            )}
-            {update.status && (
-              <span><span className="font-medium">Status:</span> {update.status}</span>
-            )}
-          </div>
-          <div className="p-6 pt-4 flex flex-col flex-grow">
-            <div className="flex flex-col flex-grow">
-              <div className="flex items-center gap-2 mb-1">
-                <h3 className="w-full break-words whitespace-normal overflow-hidden text-base font-medium text-gray-900 dark:text-white group-hover:text-primary-700 dark:group-hover:text-primary-400 transition-colors tracking-tight text-center">{update.title}</h3>
-              </div>
-              <div className="mt-2 text-sm text-gray-600 dark:text-gray-400 flex-grow">
-                <SafeHtml html={update.content} className="max-w-none dark:prose-invert" />
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+        ) : null}
+
+        <SafeHtml
+          html={update.content}
+          className="type-body-sm prose prose-sm dark:prose-invert line-clamp-3 max-w-none text-ink-muted"
+        />
+
+        <p className="type-meta mt-auto pt-1 text-ink-subtle">
+          {isUpdated
+            ? `Updated ${format(new Date(update.lastUpdated), 'MMM d, yyyy')}`
+            : `Published ${format(new Date(update.published), 'MMM d, yyyy')}`}
+        </p>
+      </SurfaceCard>
     </Link>
   );
-}; 
+};

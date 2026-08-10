@@ -1,13 +1,17 @@
 'use client';
 
 import type { ReactNode } from 'react';
+import Image from 'next/image';
 import type { ProductNews } from '@/lib/types';
 import { getFeedTimestamp } from '@/lib/feed/normalize';
 import { normalizeFeedText } from '@/lib/feed/text';
+import { SurfaceCard } from './SurfaceCard';
+import { MetaRow } from './MetaRow';
 
 interface ProductNewsCardProps {
   news: ProductNews;
-  productIcon?: ReactNode;
+  /** Either an icon path (rendered as an image) or an already-rendered node. */
+  productIcon?: string | ReactNode;
 }
 
 const dateFormatter = new Intl.DateTimeFormat(undefined, {
@@ -25,23 +29,20 @@ function getAuthorSlug(author: string): string {
 
 function Author({ author }: { author: string }) {
   const slug = getAuthorSlug(author);
-  if (!slug) return null;
+  if (!slug) return <>{author}</>;
   return (
-    <p className="mb-2 text-center text-xs text-gray-500 dark:text-gray-400">
-      Published by{' '}
-      <a
-        href={`https://blogs.microsoft.com/blog/author/${slug}/`}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="underline hover:text-primary-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 dark:hover:text-primary-300"
-      >
-        {author}
-      </a>
-    </p>
+    <a
+      href={`https://blogs.microsoft.com/blog/author/${slug}/`}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="rounded underline-offset-2 hover:text-accent hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+    >
+      {author}
+    </a>
   );
 }
 
-export function ProductNewsCard({ news }: ProductNewsCardProps) {
+export function ProductNewsCard({ news, productIcon }: ProductNewsCardProps) {
   const title = normalizeFeedText(typeof news.title === 'string' ? news.title : '');
   const description = normalizeFeedText(
     typeof news.description === 'string' ? news.description : ''
@@ -49,54 +50,67 @@ export function ProductNewsCard({ news }: ProductNewsCardProps) {
   const author = normalizeFeedText(typeof news.author === 'string' ? news.author : '');
   const publishTimestamp = getFeedTimestamp(news.publishDate);
   const hasLink = typeof news.link === 'string' && news.link.startsWith('https://');
+  const headline = title || 'Untitled update';
 
   return (
-    <article className="mx-auto h-full w-full min-w-0 max-w-md rounded-xl border border-gray-200 bg-white/80 shadow-sm backdrop-blur-sm transition-[transform,box-shadow,border-color] duration-300 hover:-translate-y-1 hover:border-primary-200 hover:shadow-xl motion-reduce:transform-none motion-reduce:transition-none dark:border-gray-700/50 dark:bg-gray-800/50 dark:hover:border-primary-800">
-      <div className="flex h-full min-w-0 flex-col p-4">
-        <div className="min-w-0 flex-1">
-          <h3 className="mb-2 w-full overflow-hidden text-center text-lg font-bold text-gray-900 [overflow-wrap:anywhere] dark:text-white">
-            {hasLink ? (
-              <a
-                href={news.link}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="hover:text-primary-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 dark:hover:text-primary-400"
-              >
-                {title || 'Untitled update'}
-              </a>
+    <SurfaceCard as="article" interactive className="group gap-3">
+      <div className="flex min-w-0 items-start gap-3">
+        {productIcon ? (
+          <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-surface-sunken">
+            {typeof productIcon === 'string' ? (
+              <Image src={productIcon} alt="" width={20} height={20} className="h-5 w-5" />
             ) : (
-              title || 'Untitled update'
+              productIcon
             )}
-          </h3>
-          {publishTimestamp ? (
-            <time
-              dateTime={news.publishDate}
-              className="block text-center text-xs font-medium text-gray-500 dark:text-gray-400"
-            >
-              {dateFormatter.format(new Date(publishTimestamp))}
-            </time>
-          ) : null}
-          {author ? <Author author={author} /> : null}
-          {description ? (
-            <p className="mt-2 line-clamp-3 break-words text-center text-base text-gray-700 dark:text-gray-300">
-              {description}
-            </p>
-          ) : null}
-        </div>
-        {hasLink ? (
-          <div className="mt-4 flex justify-end">
+          </span>
+        ) : null}
+        <h3 className="type-card-title min-w-0 text-ink [overflow-wrap:anywhere]">
+          {hasLink ? (
             <a
               href={news.link}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-sm font-medium text-primary-600 hover:text-primary-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 dark:text-primary-400 dark:hover:text-primary-300"
-              aria-label={`Read ${title || 'this update'}`}
+              className="rounded transition-colors group-hover:text-accent focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
             >
-              Read more <span aria-hidden="true">&rarr;</span>
+              {headline}
             </a>
-          </div>
-        ) : null}
+          ) : (
+            headline
+          )}
+        </h3>
       </div>
-    </article>
+
+      <MetaRow
+        items={[
+          publishTimestamp ? (
+            <time dateTime={news.publishDate} className="tabular-nums">
+              {dateFormatter.format(new Date(publishTimestamp))}
+            </time>
+          ) : null,
+          author ? <Author author={author} /> : null,
+        ]}
+      />
+
+      {description ? (
+        <p className="type-body-sm line-clamp-4 break-words text-ink-muted">{description}</p>
+      ) : null}
+
+      {hasLink ? (
+        <div className="mt-auto pt-1">
+          <a
+            href={news.link}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="type-body-sm inline-flex items-center gap-1 rounded font-medium text-accent hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+            aria-label={`Read ${headline}`}
+          >
+            Read more
+            <span aria-hidden="true" className="transition-transform group-hover:translate-x-0.5">
+              &rarr;
+            </span>
+          </a>
+        </div>
+      ) : null}
+    </SurfaceCard>
   );
 }

@@ -15,6 +15,11 @@ interface MessageListProps {
 
 const ITEMS_PER_PAGE = 12;
 
+const filterButtonClass =
+  'relative flex min-h-9 w-full items-center justify-center gap-2 rounded-lg border border-line bg-surface px-3 text-sm font-medium text-ink shadow-sm transition-colors hover:border-line-strong hover:bg-surface-sunken focus:outline-none focus-visible:ring-2 focus-visible:ring-accent md:w-auto';
+const filterButtonActiveClass =
+  'border-critical/40 bg-critical-soft text-critical-ink hover:bg-critical-soft';
+
 export function MessageList({ messages: messagesProp }: MessageListProps) {
   const messages = messagesProp;
   const [page, setPage] = useState(1);
@@ -144,221 +149,221 @@ export function MessageList({ messages: messagesProp }: MessageListProps) {
 
   return (
     <div className="relative">
-      <div className="mx-auto mb-6 mt-8 w-full max-w-2xl">
-        <label htmlFor="message-search" className="sr-only">
-          Search Message Center updates
-        </label>
-        <input
-          id="message-search"
-          name="message-search"
-          type="search"
-          autoComplete="off"
-          value={searchQuery}
-          onChange={event => setSearchQuery(event.target.value)}
-          placeholder="Search titles, content, services, tags, or ID…"
-          className="w-full rounded-xl border border-gray-200 bg-white/80 px-4 py-3 text-gray-900 shadow-sm transition-[border-color,box-shadow] placeholder:text-gray-500 focus:outline-none focus-visible:border-primary-500 focus-visible:ring-2 focus-visible:ring-primary-500 dark:border-gray-700 dark:bg-gray-800/80 dark:text-white dark:placeholder:text-gray-400"
-        />
+      <div className="sticky top-[var(--app-header-h,6.5rem)] z-40 -mx-4 border-b border-line bg-canvas/90 px-4 py-3 backdrop-blur-md sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8">
+        <div className="flex flex-col gap-2 md:flex-row md:flex-wrap md:items-center">
+          <div className="min-w-0 md:flex-1">
+            <label htmlFor="message-search" className="sr-only">
+              Search Message Center updates
+            </label>
+            <input
+              id="message-search"
+              name="message-search"
+              type="search"
+              autoComplete="off"
+              value={searchQuery}
+              onChange={event => setSearchQuery(event.target.value)}
+              placeholder="Search titles, content, services, tags, or ID…"
+              className="min-h-9 w-full rounded-lg border border-line bg-surface px-3 text-sm text-ink shadow-sm transition-[border-color,box-shadow] placeholder:text-ink-subtle focus:outline-none focus-visible:border-accent focus-visible:ring-2 focus-visible:ring-accent"
+            />
+          </div>
+
+          <div className="w-full md:w-auto">
+            <ProductFilter
+              services={services}
+              selectedServices={selectedServices}
+              onFilterChange={setSelectedServices}
+              isOpen={openFilter === 'product'}
+              setOpen={open => setOpenFilter(open ? 'product' : null)}
+            />
+          </div>
+          <div className="w-full md:w-auto">
+            <TagsFilter messages={messages} />
+          </div>
+
+          <div className="relative w-full md:w-auto">
+            <button
+              type="button"
+              onClick={() => setOpenFilter(openFilter === 'date' ? null : 'date')}
+              className={filterButtonClass}
+              aria-label="Filter by date"
+              aria-expanded={openFilter === 'date'}
+            >
+              <svg
+                className="h-4 w-4 text-ink-subtle"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                aria-hidden="true"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                />
+              </svg>
+              <span>Date</span>
+              {selectedDateFilter !== 'all' && (
+                <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-accent text-[11px] font-semibold text-white">
+                  1
+                </span>
+              )}
+            </button>
+            {openFilter === 'date' && (
+              <div
+                className="absolute z-10 mt-2 w-72 rounded-xl border border-line bg-surface-raised shadow-xl"
+                onMouseDown={e => e.stopPropagation()}
+                onClick={e => e.stopPropagation()}
+              >
+                <div className="border-b border-line p-4">
+                  <h3 className="type-body-sm font-semibold text-ink">Filter by date</h3>
+                </div>
+                <div className="flex flex-col gap-2 p-4">
+                  <label className="flex cursor-pointer items-center gap-2">
+                    <input
+                      type="radio"
+                      checked={selectedDateFilter === 'all'}
+                      onChange={() => setSelectedDateFilter('all')}
+                      className="accent-[var(--c-accent)]"
+                    />
+                    <span className="type-body-sm text-ink">All dates</span>
+                  </label>
+                  <label className="flex cursor-pointer items-center gap-2">
+                    <input
+                      type="radio"
+                      checked={selectedDateFilter === 'last30'}
+                      onChange={() => setSelectedDateFilter('last30')}
+                      className="accent-[var(--c-accent)]"
+                    />
+                    <span className="type-body-sm text-ink">Last 30 days</span>
+                  </label>
+                  <label className="flex cursor-pointer items-center gap-2">
+                    <input
+                      type="radio"
+                      checked={selectedDateFilter === 'last7'}
+                      onChange={() => setSelectedDateFilter('last7')}
+                      className="accent-[var(--c-accent)]"
+                    />
+                    <span className="type-body-sm text-ink">Last 7 days</span>
+                  </label>
+                  <label className="flex cursor-pointer items-center gap-2">
+                    <input
+                      type="radio"
+                      checked={selectedDateFilter === 'custom'}
+                      onChange={() => setSelectedDateFilter('custom')}
+                      className="accent-[var(--c-accent)]"
+                    />
+                    <span className="type-body-sm text-ink">Custom range</span>
+                  </label>
+                  {selectedDateFilter === 'custom' && (
+                    <div className="mt-2 flex flex-col gap-2">
+                      <div className="flex flex-col gap-1">
+                        <label htmlFor="date-from" className="type-meta text-ink-muted">
+                          From
+                        </label>
+                        <input
+                          id="date-from"
+                          type="date"
+                          value={customDateRange.from}
+                          onChange={e =>
+                            setCustomDateRange({ ...customDateRange, from: e.target.value })
+                          }
+                          className="rounded-lg border border-line bg-surface px-2 py-1 text-sm text-ink focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+                        />
+                      </div>
+                      <div className="flex flex-col gap-1">
+                        <label htmlFor="date-to" className="type-meta text-ink-muted">
+                          To
+                        </label>
+                        <input
+                          id="date-to"
+                          type="date"
+                          value={customDateRange.to}
+                          onChange={e =>
+                            setCustomDateRange({ ...customDateRange, to: e.target.value })
+                          }
+                          className="rounded-lg border border-line bg-surface px-2 py-1 text-sm text-ink focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+                        />
+                      </div>
+                    </div>
+                  )}
+                </div>
+                <div className="border-t border-line p-3">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setSelectedDateFilter('all');
+                      setCustomDateRange({ from: '', to: '' });
+                      setOpenFilter(null);
+                    }}
+                    className="type-body-sm w-full rounded-md px-3 py-2 font-medium text-ink hover:bg-surface-sunken focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+                  >
+                    Clear all
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+
+          <div className="w-full md:w-auto">
+            <button
+              type="button"
+              onClick={() => {
+                setOpenFilter(null);
+                setShowMajorChangesOnly(!showMajorChangesOnly);
+              }}
+              aria-pressed={showMajorChangesOnly}
+              className={`${filterButtonClass} ${showMajorChangesOnly ? filterButtonActiveClass : ''}`}
+              aria-label="Filter major changes"
+            >
+              <svg
+                className="h-4 w-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                aria-hidden="true"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+                />
+              </svg>
+              <span>Major changes</span>
+            </button>
+          </div>
+        </div>
+
         <p
           id="message-results-status"
-          className="mt-2 text-center text-sm text-gray-600 dark:text-gray-400"
+          className="type-meta mt-2 text-ink-subtle"
           aria-live="polite"
         >
           {isSearchPending
             ? 'Updating results…'
-            : `${filteredMessages.length} result${filteredMessages.length === 1 ? '' : 's'}`}
+            : `${filteredMessages.length.toLocaleString()} of ${messages.length.toLocaleString()} update${messages.length === 1 ? '' : 's'}`}
         </p>
-      </div>{' '}
-      <div className="relative md:sticky md:top-[var(--app-header-h,7rem)] z-40 backdrop-blur-md pt-0 pb-0 border-b border-gray-200/50 dark:border-gray-700/50 mt-6">
-        <div className="mb-2">
-          <div className="flex flex-wrap items-center mb-2 gap-2">
-            <h2 className="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center">
-              Filters
-              <span className="ml-2 text-xs text-gray-600 dark:text-gray-400 font-normal">
-                (Found {filteredMessages.length} message{filteredMessages.length !== 1 ? 's' : ''}
-                {filteredMessages.length !== messages.length &&
-                  `, filtered from ${messages.length} total`}
-                )
-              </span>
-            </h2>
-          </div>
-          <div className="flex flex-col md:flex-row flex-wrap gap-2 md:gap-4 w-full">
-            <div className="w-full md:w-auto">
-              <ProductFilter
-                services={services}
-                selectedServices={selectedServices}
-                onFilterChange={setSelectedServices}
-                isOpen={openFilter === 'product'}
-                setOpen={open => setOpenFilter(open ? 'product' : null)}
-              />
-            </div>
-            <div className="w-full md:w-auto">
-              <TagsFilter messages={messages} />
-            </div>
-            <div className="relative w-full md:w-auto">
-              <button
-                onClick={() => setOpenFilter(openFilter === 'date' ? null : 'date')}
-                className="flex items-center justify-center gap-2 px-4 min-h-[32px] w-full md:w-auto text-gray-700 dark:text-gray-200 bg-white/80 dark:bg-gray-800/50 backdrop-blur-sm border border-gray-200 dark:border-gray-700/50 rounded-lg shadow-[inset_0_2px_4px_rgba(0,0,0,0.05)] dark:shadow-[inset_0_2px_4px_rgba(0,0,0,0.2)] hover:shadow-[0_0_0_1px_rgba(59,130,246,0.5)] dark:hover:shadow-[0_0_0_1px_rgba(59,130,246,0.5)] hover:border-primary-200 dark:hover:border-primary-800 transition-all duration-300 relative"
-                aria-label="Filter by date"
-              >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                  />
-                </svg>
-                <span className="text-sm font-medium">Date</span>
-                {selectedDateFilter !== 'all' && (
-                  <span className="absolute -top-1 -right-1 flex items-center justify-center w-5 h-5 text-xs font-medium text-white bg-primary-600 rounded-full">
-                    1
-                  </span>
-                )}
-              </button>
-              {openFilter === 'date' && (
-                <div
-                  className="absolute z-10 w-72 mt-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow-lg"
-                  onMouseDown={e => e.stopPropagation()}
-                  onClick={e => e.stopPropagation()}
-                >
-                  <div className="p-4 border-b border-gray-200 dark:border-gray-700">
-                    <h3 className="text-sm font-medium text-gray-900 dark:text-white">
-                      Filter by Date
-                    </h3>
-                  </div>
-                  <div className="p-4 flex flex-col gap-2">
-                    <label className="flex items-center gap-2 cursor-pointer">
-                      <input
-                        type="radio"
-                        checked={selectedDateFilter === 'all'}
-                        onChange={() => setSelectedDateFilter('all')}
-                        className="text-primary-600"
-                      />
-                      <span className="text-sm text-gray-700 dark:text-gray-200">All Dates</span>
-                    </label>
-                    <label className="flex items-center gap-2 cursor-pointer">
-                      <input
-                        type="radio"
-                        checked={selectedDateFilter === 'last30'}
-                        onChange={() => setSelectedDateFilter('last30')}
-                        className="text-primary-600"
-                      />
-                      <span className="text-sm text-gray-700 dark:text-gray-200">Last 30 days</span>
-                    </label>
-                    <label className="flex items-center gap-2 cursor-pointer">
-                      <input
-                        type="radio"
-                        checked={selectedDateFilter === 'last7'}
-                        onChange={() => setSelectedDateFilter('last7')}
-                        className="text-primary-600"
-                      />
-                      <span className="text-sm text-gray-700 dark:text-gray-200">Last 7 days</span>
-                    </label>
-                    <label className="flex items-center gap-2 cursor-pointer">
-                      <input
-                        type="radio"
-                        checked={selectedDateFilter === 'custom'}
-                        onChange={() => setSelectedDateFilter('custom')}
-                        className="text-primary-600"
-                      />
-                      <span className="text-sm text-gray-700 dark:text-gray-200">Custom Range</span>
-                    </label>
-                    {selectedDateFilter === 'custom' && (
-                      <div className="flex flex-col gap-2 mt-2">
-                        <div className="flex flex-col gap-1">
-                          <label
-                            htmlFor="date-from"
-                            className="text-sm text-gray-700 dark:text-gray-200"
-                          >
-                            From
-                          </label>
-                          <input
-                            id="date-from"
-                            type="date"
-                            value={customDateRange.from}
-                            onChange={e =>
-                              setCustomDateRange({ ...customDateRange, from: e.target.value })
-                            }
-                            className="border rounded px-2 py-1 text-sm text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600"
-                          />
-                        </div>
-                        <div className="flex flex-col gap-1">
-                          <label
-                            htmlFor="date-to"
-                            className="text-sm text-gray-700 dark:text-gray-200"
-                          >
-                            To
-                          </label>
-                          <input
-                            id="date-to"
-                            type="date"
-                            value={customDateRange.to}
-                            onChange={e =>
-                              setCustomDateRange({ ...customDateRange, to: e.target.value })
-                            }
-                            className="border rounded px-2 py-1 text-sm text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600"
-                          />
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                  <div className="p-3 border-t border-gray-200 dark:border-gray-700">
-                    <button
-                      onClick={() => {
-                        setSelectedDateFilter('all');
-                        setCustomDateRange({ from: '', to: '' });
-                        setOpenFilter(null);
-                      }}
-                      className="w-full px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
-                    >
-                      Clear all
-                    </button>
-                  </div>
-                </div>
-              )}
-            </div>
-            <div className="w-full md:w-auto">
-              <button
-                onClick={() => {
-                  setOpenFilter(null);
-                  setShowMajorChangesOnly(!showMajorChangesOnly);
-                }}
-                className={`flex items-center justify-center gap-2 px-4 min-h-[32px] w-full md:w-auto text-gray-700 dark:text-gray-200 bg-white/80 dark:bg-gray-800/50 backdrop-blur-sm border border-gray-200 dark:border-gray-700/50 rounded-lg shadow-[inset_0_2px_4px_rgba(0,0,0,0.05)] dark:shadow-[inset_0_2px_4px_rgba(0,0,0,0.2)] hover:shadow-[0_0_0_1px_rgba(59,130,246,0.5)] dark:hover:shadow-[0_0_0_1px_rgba(59,130,246,0.5)] hover:border-primary-200 dark:hover:border-primary-800 transition-all duration-300 relative ${showMajorChangesOnly ? 'bg-red-50 dark:bg-red-900/30 border-red-200 dark:border-red-800 text-red-700 dark:text-red-300 animate-pulse-slow' : ''}`}
-                aria-label="Filter major changes"
-              >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
-                  />
-                </svg>
-                <span className="text-sm font-medium">Major Changes</span>
-                <span className="absolute -top-1 -right-1 flex items-center justify-center w-5 h-5 text-xs font-medium text-white bg-primary-600 rounded-full opacity-0">
-                  0
-                </span>
-              </button>
-            </div>
-          </div>
-        </div>
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pt-4">
+      <div className="grid grid-cols-1 gap-4 pt-4 md:grid-cols-2 xl:grid-cols-3">
         {visibleMessages.map(message => (
           <MessageCard key={message.id} message={message} />
         ))}
       </div>
       {filteredMessages.length === 0 ? (
-        <p className="py-12 text-center text-gray-600 dark:text-gray-400" role="status">
-          No Message Center updates match these filters.
-        </p>
+        <div className="py-16 text-center" role="status">
+          <p className="type-h3 text-ink">No updates match these filters</p>
+          <p className="type-body-sm mt-2 text-ink-muted">
+            Try clearing a filter or broadening the date range.
+          </p>
+        </div>
       ) : null}
       {visibleMessages.length < filteredMessages.length ? (
         <div ref={loadMoreRef} className="flex min-h-20 items-center justify-center py-4">
           <button
             type="button"
             onClick={() => setPage(currentPage => currentPage + 1)}
-            className="rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:border-primary-400 hover:text-primary-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-200"
+            className="type-body-sm rounded-lg border border-line bg-surface px-4 py-2 font-medium text-ink transition-colors hover:border-accent/40 hover:text-accent focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
           >
             Load more
           </button>

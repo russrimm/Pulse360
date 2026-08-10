@@ -701,8 +701,8 @@ export function AzureUpdatesContent({ updates, searchQuery = '' }: AzureUpdatesC
           </div>
         </div>
       </div>
-      <div className="mt-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 z-0">
+      <div className="mt-4">
+        <div className="z-0 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
           {visibleUpdates.map((update) => (
             <AzureUpdateCard
               key={update.id}
