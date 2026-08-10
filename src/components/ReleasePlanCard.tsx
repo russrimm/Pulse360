@@ -4,6 +4,8 @@ import { SafeHtml } from '@/components/SafeHtml';
 import Link from 'next/link';
 import Image from 'next/image';
 import { formatCalendarDate } from '@/lib/date';
+import { SurfaceCard } from './SurfaceCard';
+import { StatusChip } from './StatusChip';
 
 interface ReleasePlan {
   id: string;
@@ -97,6 +99,15 @@ export const ReleasePlanCard: React.FC<ReleasePlanCardProps> = ({
   // Deduplicate and normalize services
   const uniqueServices = Array.from(new Set(plan.service));
 
+  const kindTags = plan.tags.filter(tag => {
+    const tagLower = tag.toLowerCase();
+    return tagLower.includes('new feature') || tagLower.includes('update');
+  });
+  const impactTags = plan.tags.filter(tag => {
+    const tagLower = tag.toLowerCase();
+    return tagLower.includes('user impact') || tagLower.includes('admin impact');
+  });
+
   // Map service names to their display names
   const getDisplayName = (service: string) => {
     if (
@@ -109,72 +120,70 @@ export const ReleasePlanCard: React.FC<ReleasePlanCardProps> = ({
   };
 
   return (
-    <Link href={`${drillthroughBasePath}/${plan.id}`}>
-      <div
-        className="group bg-white/80 dark:bg-gray-800/50 backdrop-blur-sm rounded-xl shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-200 dark:border-gray-700/50 hover:border-primary-200 dark:hover:border-primary-800 hover:-translate-y-1 h-full cursor-pointer flex flex-col"
-        onClick={handleClick}
-      >
-        <div className="flex flex-col">
-          <div className="flex flex-col w-full bg-gradient-to-b from-gray-50 to-transparent dark:from-gray-900/50 dark:to-transparent py-3 px-4 gap-1">
-            <div className="flex flex-wrap gap-2 justify-start w-full">
-              {plan.tags
-                .filter(tag => {
-                  const tagLower = tag.toLowerCase();
-                  return tagLower.includes('new feature') || tagLower.includes('update');
-                })
-                .map(tag => (
-                  <span
-                    key={tag}
-                    className="inline-flex items-center px-3 py-1.5 rounded-xl text-sm font-medium bg-emerald-50 text-emerald-700 dark:bg-emerald-900/20 dark:text-emerald-200 border border-emerald-200/30 dark:border-emerald-700/20 min-w-[120px] justify-center"
-                  >
-                    {tag}
-                  </span>
-                ))}
-            </div>
-            <div className="flex flex-wrap gap-2 justify-end w-full">
-              {plan.tags
-                .filter(tag => {
-                  const tagLower = tag.toLowerCase();
-                  return tagLower.includes('user impact') || tagLower.includes('admin impact');
-                })
-                .map(tag => (
-                  <span
-                    key={tag}
-                    className={`inline-flex items-center px-3 py-1.5 rounded-xl text-sm font-medium ${tag.toLowerCase().includes('user impact') ? 'bg-yellow-50 text-yellow-700 dark:bg-yellow-900/20 dark:text-yellow-200 border border-yellow-200/30 dark:border-yellow-700/20' : 'bg-orange-50 text-orange-700 dark:bg-orange-900/20 dark:text-orange-200 border border-orange-200/30 dark:border-orange-700/20'} min-w-[120px] justify-center`}
-                  >
-                    {tag}
-                  </span>
-                ))}
-            </div>
+    <Link href={`${drillthroughBasePath}/${plan.id}`} className="group block h-full min-w-0">
+      <SurfaceCard interactive className="gap-2.5" onClick={handleClick}>
+        {kindTags.length > 0 || impactTags.length > 0 ? (
+          <div className="flex flex-wrap items-center gap-1.5">
+            {kindTags.map(tag => (
+              <StatusChip key={tag} tone="ok">
+                {tag}
+              </StatusChip>
+            ))}
+            {impactTags.map(tag => (
+              <StatusChip
+                key={tag}
+                tone={tag.toLowerCase().includes('user impact') ? 'warn' : 'critical'}
+              >
+                {tag}
+              </StatusChip>
+            ))}
           </div>
-          <div className="flex items-center justify-center text-[10px] text-gray-500 dark:text-gray-400 gap-1.5 py-1.5">
-            <span className="font-medium">Published</span>
-            <span>{formatCalendarDate(plan.published)}</span>
-            {formatCalendarDate(plan.published) !== formatCalendarDate(plan.lastUpdated) && (
-              <>
-                <span>•</span>
-                <span className="font-medium">Updated</span>
-                <span>{formatCalendarDate(plan.lastUpdated)}</span>
-              </>
-            )}
+        ) : null}
+
+        <h3 className="type-card-title line-clamp-3 break-words text-ink transition-colors group-hover:text-accent">
+          {plan.title}
+        </h3>
+
+        {uniqueServices.length > 0 ? (
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+            {uniqueServices.slice(0, 3).map(service => {
+              const iconPath = serviceIcons[service];
+              const label = getDisplayName(service);
+              return (
+                <span
+                  key={service}
+                  title={label}
+                  className="type-meta inline-flex min-w-0 items-center gap-1 text-ink-muted"
+                >
+                  {iconPath ? (
+                    <Image
+                      src={iconPath}
+                      alt=""
+                      width={14}
+                      height={14}
+                      className="h-3.5 w-3.5 shrink-0"
+                    />
+                  ) : null}
+                  <span className="truncate">{label}</span>
+                </span>
+              );
+            })}
           </div>
-        </div>
-        <div className="p-6 pt-4 flex flex-col flex-grow">
-          <div className="flex flex-col flex-grow justify-start">
-            <div className="flex items-center gap-2 mb-1">
-              <h3 className="text-base font-medium text-gray-900 dark:text-white group-hover:text-primary-700 dark:group-hover:text-primary-400 transition-colors tracking-tight text-center">
-                {plan.title}
-              </h3>
-            </div>
-            <div className="mt-2 text-sm text-gray-600 dark:text-gray-400">
-              <SafeHtml
-                html={plan.businessValue}
-                className="line-clamp-3 prose dark:prose-invert prose-sm max-w-none"
-              />
-            </div>
-          </div>
-        </div>
-      </div>
+        ) : null}
+
+        {plan.businessValue ? (
+          <SafeHtml
+            html={plan.businessValue}
+            className="type-body-sm prose prose-sm dark:prose-invert line-clamp-3 max-w-none text-ink-muted"
+          />
+        ) : null}
+
+        <p className="type-meta mt-auto pt-1 text-ink-subtle">
+          {formatCalendarDate(plan.published) !== formatCalendarDate(plan.lastUpdated)
+            ? `Updated ${formatCalendarDate(plan.lastUpdated)}`
+            : `Published ${formatCalendarDate(plan.published)}`}
+        </p>
+      </SurfaceCard>
     </Link>
   );
 };

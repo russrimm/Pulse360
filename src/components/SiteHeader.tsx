@@ -33,16 +33,13 @@ export function SiteHeader() {
   return (
     <header
       ref={headerRef}
-      className="md:sticky md:top-0 z-50 bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border-b border-gray-200 dark:border-gray-800 shadow-sm"
+      className="sticky top-0 z-50 border-b border-line bg-surface/85 backdrop-blur-md"
     >
       <div
         aria-hidden="true"
         className="h-0.5 w-full bg-gradient-to-r from-primary-600 via-primary-400 to-primary-600 dark:from-primary-500 dark:via-primary-300 dark:to-primary-500"
       />
       <Navbar />
-      <div aria-hidden="true" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="h-px bg-gradient-to-r from-transparent via-gray-200 to-transparent dark:via-gray-700" />
-      </div>
       <NavigationTabs />
     </header>
   );

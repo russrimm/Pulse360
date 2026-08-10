@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import { ThemeProvider } from 'next-themes';
 import { SiteHeader } from '@/components/SiteHeader';
+import { SiteFooter } from '@/components/SiteFooter';
 import { Analytics } from '@vercel/analytics/next';
 import { SafeSpeedInsights } from '@/components/SafeSpeedInsights';
 import './globals.css';
@@ -49,12 +50,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link rel="icon" href="/icons/m365.svg" type="image/svg+xml" />
       </head>
       <body
-        className={`${inter.className} min-h-screen bg-white dark:bg-black transition-colors duration-200 motion-reduce:transition-none`}
+        className={`${inter.className} min-h-screen bg-canvas text-ink transition-colors duration-200 motion-reduce:transition-none`}
         suppressHydrationWarning
       >
         <a
           href="#main-content"
-          className="fixed left-4 top-4 z-[100] -translate-y-24 rounded-md bg-white px-4 py-2 font-medium text-gray-900 shadow-lg transition-transform focus:translate-y-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 dark:bg-gray-900 dark:text-white"
+          className="fixed left-4 top-4 z-[100] -translate-y-24 rounded-md bg-surface px-4 py-2 font-medium text-ink shadow-lg transition-transform focus:translate-y-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
         >
           Skip to main content
         </a>
@@ -69,6 +70,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <main id="main-content" className="flex-1 flex flex-col min-h-0">
               {children}
             </main>
+            <SiteFooter />
             <Analytics />
             <SafeSpeedInsights />
           </div>

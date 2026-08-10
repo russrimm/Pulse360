@@ -9,9 +9,9 @@ export const metadata = {
 
 export default function MsLifecyclePage() {
   return (
-    <div className="mx-auto flex min-h-0 w-full max-w-[110rem] flex-1 flex-col px-4 py-4 sm:px-6 md:h-[calc(100dvh-8rem)] md:flex-none md:overflow-hidden lg:px-8">
+    <div className="mx-auto flex min-h-0 w-full max-w-[110rem] flex-1 flex-col px-4 py-4 sm:px-6 md:h-[calc(100dvh-var(--app-header-h,6.5rem))] md:flex-none md:overflow-hidden lg:px-8">
       <header className="mb-2 shrink-0 text-center">
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white sm:text-3xl">Microsoft Support Lifecycle</h1>
+        <h1 className="type-h1 text-ink">Microsoft Support Lifecycle</h1>
       </header>
       <Suspense fallback={<LoadingSpinner />}>
         <MsLifecycleClient />

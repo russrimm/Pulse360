@@ -26,26 +26,29 @@ export function TagsFilter({ messages }: TagsFilterProps) {
   return (
     <div className="relative w-full md:w-auto" ref={dropdownRef}>
       <button
+        type="button"
         onClick={() => setOpenFilter(isOpen ? null : 'tags')}
-        className="flex items-center justify-center gap-2 px-4 h-8 text-gray-700 dark:text-gray-200 bg-white/80 dark:bg-gray-800/50 backdrop-blur-sm border border-gray-200 dark:border-gray-700/50 rounded-lg shadow-[inset_0_2px_4px_rgba(0,0,0,0.05)] dark:shadow-[inset_0_2px_4px_rgba(0,0,0,0.2)] hover:shadow-[inset_0_2px_4px_rgba(0,0,0,0.1)] dark:hover:shadow-[inset_0_2px_4px_rgba(0,0,0,0.3)] hover:border-primary-200 dark:hover:border-primary-800 hover:shadow-[0_0_0_1px_rgba(59,130,246,0.5)] dark:hover:shadow-[0_0_0_1px_rgba(59,130,246,0.5)] transition-all duration-300 relative w-full md:w-auto min-h-[32px]"
+        aria-expanded={isOpen}
+        className="relative flex min-h-9 w-full items-center justify-center gap-2 rounded-lg border border-line bg-surface px-3 text-sm font-medium text-ink shadow-sm transition-colors hover:border-line-strong hover:bg-surface-sunken focus:outline-none focus-visible:ring-2 focus-visible:ring-accent md:w-auto"
         aria-label="Filter tags"
       >
         <svg
-          className="w-5 h-5"
+          className="h-4 w-4 text-ink-subtle"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
+          aria-hidden="true"
         >
           <path
             strokeLinecap="round"
             strokeLinejoin="round"
             strokeWidth={2}
-            d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"
+            d="M7 7h.01M7 3h5a1.99 1.99 0 011.414.586l7 7a2 2 0 010 2.828l-5 5a2 2 0 01-2.828 0l-7-7A1.99 1.99 0 013 10V5a2 2 0 012-2z"
           />
         </svg>
-        <span className="text-sm font-medium">Tags</span>
+        <span>Tags</span>
         {selectedTags.length > 0 && (
-          <span className="absolute -top-1 -right-1 flex items-center justify-center w-5 h-5 text-xs font-medium text-white bg-primary-600 rounded-full">
+          <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-accent text-[11px] font-semibold text-white">
             {selectedTags.length}
           </span>
         )}
@@ -54,11 +57,11 @@ export function TagsFilter({ messages }: TagsFilterProps) {
         <div
           onMouseDown={e => e.stopPropagation()}
           onClick={e => e.stopPropagation()}
-          className="absolute z-10 w-72 mt-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow-lg"
+          className="animate-fadein absolute z-10 mt-2 w-72 rounded-xl border border-line bg-surface-raised shadow-xl"
         >
-          <div className="p-4 border-b border-gray-200 dark:border-gray-700">
-            <h3 className="text-sm font-medium text-gray-900 dark:text-white">Filter Tags</h3>
-            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+          <div className="border-b border-line p-4">
+            <h3 className="type-body-sm font-semibold text-ink">Filter tags</h3>
+            <p className="type-meta mt-1 text-ink-subtle">
               {selectedTags.length} tag{selectedTags.length !== 1 ? 's' : ''} selected
             </p>
           </div>
@@ -66,7 +69,7 @@ export function TagsFilter({ messages }: TagsFilterProps) {
             {uniqueTags.map((tag) => (
               <label
                 key={tag}
-                className="flex items-center px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md cursor-pointer"
+                className="flex cursor-pointer items-center rounded-md px-3 py-2 hover:bg-surface-sunken"
                 onMouseDown={e => e.stopPropagation()}
                 onClick={e => e.stopPropagation()}
               >
@@ -80,20 +83,21 @@ export function TagsFilter({ messages }: TagsFilterProps) {
                       setSelectedTags(selectedTags.filter(t => t !== tag));
                     }
                   }}
-                  className="w-4 h-4 text-primary-600 border-gray-300 rounded focus:ring-primary-500"
+                  className="h-4 w-4 rounded border-line accent-[var(--c-accent)]"
                   onClick={e => e.stopPropagation()}
                 />
-                <span className="ml-2 text-sm text-gray-700 dark:text-gray-200">{tag}</span>
+                <span className="ml-2 text-sm text-ink">{tag}</span>
               </label>
             ))}
           </div>
-          <div className="p-3 border-t border-gray-200 dark:border-gray-700">
+          <div className="border-t border-line p-3">
             <button
+              type="button"
               onClick={() => {
                 setSelectedTags([]);
                 setOpenFilter(null);
               }}
-              className="w-full px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
+              className="type-body-sm w-full rounded-md px-3 py-2 font-medium text-ink hover:bg-surface-sunken focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
             >
               Clear all
             </button>

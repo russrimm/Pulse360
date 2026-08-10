@@ -31,6 +31,11 @@ interface M365UpdatesListProps {
 
 const ITEMS_PER_PAGE = 12;
 
+const filterButtonClass =
+  'relative flex min-h-9 w-full items-center justify-center gap-2 rounded-lg border border-line bg-surface px-3 text-sm font-medium text-ink shadow-sm transition-colors hover:border-line-strong hover:bg-surface-sunken focus:outline-none focus-visible:ring-2 focus-visible:ring-accent md:w-auto';
+const filterButtonActiveClass =
+  'border-critical/40 bg-critical-soft text-critical-ink hover:bg-critical-soft';
+
 export function M365UpdatesList({ updates, searchQuery }: M365UpdatesListProps) {
   const router = useRouter();
   const [services, setServices] = useState<string[]>([]);
@@ -142,146 +147,132 @@ export function M365UpdatesList({ updates, searchQuery }: M365UpdatesListProps) 
           <LoadingSpinner />
         </div>
       )}
-      <div className="md:sticky md:top-[var(--app-header-h,7rem)] z-40 backdrop-blur-md pt-0 pb-2 border-b border-gray-200/50 dark:border-gray-700/50 -mt-4">
-        <div className="mb-2">
-          <div className="flex flex-wrap items-center mb-2 gap-2">
-            <h2 className="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center">
-              Filters
-              <span className="ml-2 text-xs text-gray-600 dark:text-gray-400 font-normal">
-                (Showing {filteredUpdates.length} update{filteredUpdates.length !== 1 ? 's' : ''}
-                {filteredUpdates.length !== updates.length && `, filtered from ${updates.length} total`})
-              </span>
-            </h2>
+      <div className="sticky top-[var(--app-header-h,6.5rem)] z-40 -mx-4 mb-3 border-b border-line bg-canvas/90 px-4 py-2.5 backdrop-blur-md">
+        <div className="flex flex-wrap items-center gap-2">
+          <div className="w-full md:w-auto">
+            <ProductFilter
+              services={services}
+              selectedServices={selectedServices}
+              onFilterChange={setSelectedServices}
+              isOpen={isProductOpen}
+              setOpen={open => {
+                setIsProductOpen(open);
+                if (open) setIsDateOpen(false);
+              }}
+            />
           </div>
-          <div className="w-full mb-2">
-            <div className="flex flex-col md:flex-row flex-wrap gap-2 md:gap-4 w-full">
-              <div className="w-full md:w-auto">
-                <ProductFilter
-                  services={services}
-                  selectedServices={selectedServices}
-                  onFilterChange={setSelectedServices}
-                  isOpen={isProductOpen}
-                  setOpen={open => {
-                    setIsProductOpen(open);
-                    if (open) setIsDateOpen(false);
-                  }}
+          <div className="relative w-full md:w-auto">
+            <button
+              onClick={() => {
+                setIsDateOpen(!isDateOpen);
+                if (!isDateOpen) setIsProductOpen(false);
+              }}
+              className={`${filterButtonClass}${selectedDateFilter !== 'all' ? ` ${filterButtonActiveClass}` : ''}`}
+              aria-label="Filter by date"
+              aria-expanded={isDateOpen}
+            >
+              <svg
+                className="h-4 w-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                aria-hidden="true"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
                 />
-              </div>
-              <div className="relative w-full md:w-auto">
-                <button
-                  onClick={() => {
-                    setIsDateOpen(!isDateOpen);
-                    if (!isDateOpen) setIsProductOpen(false);
-                  }}
-                  className="flex items-center justify-center gap-2 px-4 min-h-[32px] w-full md:w-auto text-gray-700 dark:text-gray-200 bg-white/80 dark:bg-gray-800/50 backdrop-blur-sm border border-gray-200 dark:border-gray-700/50 rounded-lg shadow-[inset_0_2px_4px_rgba(0,0,0,0.05)] dark:shadow-[inset_0_2px_4px_rgba(0,0,0,0.2)] hover:shadow-[inset_0_2px_4px_rgba(0,0,0,0.1)] dark:hover:shadow-[inset_0_2px_4px_rgba(0,0,0,0.3)] hover:border-primary-200 dark:hover:border-primary-800 hover:shadow-[0_0_0_1px_rgba(59,130,246,0.5)] dark:hover:shadow-[0_0_0_1px_rgba(59,130,246,0.5)] transition-all duration-300 relative"
-                  aria-label="Filter by date"
-                >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                  </svg>
-                  <span className="text-sm font-medium">Date</span>
-                  {selectedDateFilter !== 'all' && (
-                    <span className="absolute -top-1 -right-1 flex items-center justify-center w-5 h-5 text-xs font-medium text-white bg-primary-600 rounded-full">
-                      1
-                    </span>
+              </svg>
+              <span>Date</span>
+              {selectedDateFilter !== 'all' && (
+                <span className="ml-1 inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-critical px-1 text-[10px] font-semibold text-white">
+                  1
+                </span>
+              )}
+            </button>
+            {isDateOpen && (
+              <div className="animate-fadein absolute z-50 mt-2 w-72 rounded-xl border border-line bg-surface-raised shadow-xl">
+                <div className="border-b border-line px-4 py-3">
+                  <h3 className="type-h3 text-ink">Filter by date</h3>
+                </div>
+                <div className="flex flex-col gap-2 p-4">
+                  {(
+                    [
+                      ['all', 'All dates'],
+                      ['last30', 'Last 30 days'],
+                      ['last14', 'Last 14 days'],
+                      ['last7', 'Last 7 days'],
+                      ['custom', 'Custom range'],
+                    ] as const
+                  ).map(([value, label]) => (
+                    <label key={value} className="flex cursor-pointer items-center gap-2">
+                      <input
+                        type="radio"
+                        name="m365-date-filter"
+                        checked={selectedDateFilter === value}
+                        onChange={() => setSelectedDateFilter(value)}
+                        className="accent-[var(--c-accent)]"
+                      />
+                      <span className="type-body-sm text-ink">{label}</span>
+                    </label>
+                  ))}
+                  {selectedDateFilter === 'custom' && (
+                    <div className="mt-2 flex flex-col gap-2">
+                      <div className="flex flex-col gap-1">
+                        <label htmlFor="date-from" className="type-meta text-ink-muted">
+                          From
+                        </label>
+                        <input
+                          id="date-from"
+                          type="date"
+                          value={customDateRange.from}
+                          onChange={e =>
+                            setCustomDateRange({ ...customDateRange, from: e.target.value })
+                          }
+                          className="rounded-lg border border-line bg-surface px-2 py-1.5 text-sm text-ink"
+                        />
+                      </div>
+                      <div className="flex flex-col gap-1">
+                        <label htmlFor="date-to" className="type-meta text-ink-muted">
+                          To
+                        </label>
+                        <input
+                          id="date-to"
+                          type="date"
+                          value={customDateRange.to}
+                          onChange={e =>
+                            setCustomDateRange({ ...customDateRange, to: e.target.value })
+                          }
+                          className="rounded-lg border border-line bg-surface px-2 py-1.5 text-sm text-ink"
+                        />
+                      </div>
+                    </div>
                   )}
-                </button>
-                {isDateOpen && (
-                  <div className="absolute z-10 w-72 mt-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow-lg">
-                    <div className="p-4 border-b border-gray-200 dark:border-gray-700">
-                      <h3 className="text-sm font-medium text-gray-900 dark:text-white">Filter by Date</h3>
-                    </div>
-                    <div className="p-4 flex flex-col gap-2">
-                      <label className="flex items-center gap-2 cursor-pointer">
-                        <input
-                          type="radio"
-                          checked={selectedDateFilter === 'all'}
-                          onChange={() => setSelectedDateFilter('all')}
-                          className="text-primary-600"
-                        />
-                        <span className="text-sm text-gray-700 dark:text-gray-200">All Dates</span>
-                      </label>
-                      <label className="flex items-center gap-2 cursor-pointer">
-                        <input
-                          type="radio"
-                          checked={selectedDateFilter === 'last30'}
-                          onChange={() => setSelectedDateFilter('last30')}
-                          className="text-primary-600"
-                        />
-                        <span className="text-sm text-gray-700 dark:text-gray-200">Last 30 days</span>
-                      </label>
-                      <label className="flex items-center gap-2 cursor-pointer">
-                        <input
-                          type="radio"
-                          checked={selectedDateFilter === 'last14'}
-                          onChange={() => setSelectedDateFilter('last14')}
-                          className="text-primary-600"
-                        />
-                        <span className="text-sm text-gray-700 dark:text-gray-200">Last 14 days</span>
-                      </label>
-                      <label className="flex items-center gap-2 cursor-pointer">
-                        <input
-                          type="radio"
-                          checked={selectedDateFilter === 'last7'}
-                          onChange={() => setSelectedDateFilter('last7')}
-                          className="text-primary-600"
-                        />
-                        <span className="text-sm text-gray-700 dark:text-gray-200">Last 7 days</span>
-                      </label>
-                      <label className="flex items-center gap-2 cursor-pointer">
-                        <input
-                          type="radio"
-                          checked={selectedDateFilter === 'custom'}
-                          onChange={() => setSelectedDateFilter('custom')}
-                          className="text-primary-600"
-                        />
-                        <span className="text-sm text-gray-700 dark:text-gray-200">Custom Range</span>
-                      </label>
-                      {selectedDateFilter === 'custom' && (
-                        <div className="flex flex-col gap-2 mt-2">
-                          <div className="flex flex-col gap-1">
-                            <label htmlFor="date-from" className="text-sm text-gray-700 dark:text-gray-200">From</label>
-                            <input
-                              id="date-from"
-                              type="date"
-                              value={customDateRange.from}
-                              onChange={e => setCustomDateRange({ ...customDateRange, from: e.target.value })}
-                              className="border rounded px-2 py-1 text-sm text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600"
-                            />
-                          </div>
-                          <div className="flex flex-col gap-1">
-                            <label htmlFor="date-to" className="text-sm text-gray-700 dark:text-gray-200">To</label>
-                            <input
-                              id="date-to"
-                              type="date"
-                              value={customDateRange.to}
-                              onChange={e => setCustomDateRange({ ...customDateRange, to: e.target.value })}
-                              className="border rounded px-2 py-1 text-sm text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600"
-                            />
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                    <div className="p-3 border-t border-gray-200 dark:border-gray-700">
-                      <button
-                        onClick={() => {
-                          setSelectedDateFilter('all');
-                          setCustomDateRange({ from: '', to: '' });
-                          setIsDateOpen(false);
-                        }}
-                        className="w-full px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
-                      >
-                        Clear all
-                      </button>
-                    </div>
-                  </div>
-                )}
+                </div>
+                <div className="border-t border-line p-3">
+                  <button
+                    onClick={() => {
+                      setSelectedDateFilter('all');
+                      setCustomDateRange({ from: '', to: '' });
+                      setIsDateOpen(false);
+                    }}
+                    className="w-full rounded-lg px-3 py-2 text-sm font-medium text-ink-muted transition-colors hover:bg-surface-sunken hover:text-ink focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+                  >
+                    Clear all
+                  </button>
+                </div>
               </div>
-            </div>
+            )}
           </div>
+          <p className="type-meta ml-auto text-ink-subtle" aria-live="polite">
+            {filteredUpdates.length} update{filteredUpdates.length !== 1 ? 's' : ''}
+            {filteredUpdates.length !== updates.length ? ` of ${updates.length}` : ''}
+          </p>
         </div>
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pt-4">
+      <div className="grid grid-cols-1 gap-4 pt-2 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
         {visibleUpdates.map((update) => (
           <M365UpdateCard
             key={update.id}
@@ -293,4 +284,4 @@ export function M365UpdatesList({ updates, searchQuery }: M365UpdatesListProps) 
       <div ref={loadMoreRef} className="h-10" />
     </div>
   );
-} 
+}

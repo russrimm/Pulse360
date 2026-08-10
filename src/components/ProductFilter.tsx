@@ -245,11 +245,19 @@ export function ProductFilter({
   return (
     <div className="relative inline-block w-full md:w-auto" ref={dropdownRef}>
       <button
+        type="button"
         onClick={() => setOpen(!isOpen)}
-        className="flex items-center justify-center gap-2 px-4 h-8 text-gray-700 dark:text-gray-200 bg-white/80 dark:bg-gray-800/50 backdrop-blur-sm border border-gray-200 dark:border-gray-700/50 rounded-lg shadow-[inset_0_2px_4px_rgba(0,0,0,0.05)] dark:shadow-[inset_0_2px_4px_rgba(0,0,0,0.2)] hover:shadow-[inset_0_2px_4px_rgba(0,0,0,0.1)] dark:hover:shadow-[inset_0_2px_4px_rgba(0,0,0,0.3)] hover:border-primary-200 dark:hover:border-primary-800 hover:shadow-[0_0_0_1px_rgba(59,130,246,0.5)] dark:hover:shadow-[0_0_0_1px_rgba(59,130,246,0.5)] transition-all duration-300 relative w-full md:w-auto min-h-[32px]"
+        aria-expanded={isOpen}
+        className="relative flex min-h-9 w-full items-center justify-center gap-2 rounded-lg border border-line bg-surface px-3 text-sm font-medium text-ink shadow-sm transition-colors hover:border-line-strong hover:bg-surface-sunken focus:outline-none focus-visible:ring-2 focus-visible:ring-accent md:w-auto"
         aria-label="Filter products"
       >
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg
+          className="h-4 w-4 text-ink-subtle"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+          aria-hidden="true"
+        >
           <path
             strokeLinecap="round"
             strokeLinejoin="round"
@@ -257,9 +265,9 @@ export function ProductFilter({
             d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"
           />
         </svg>
-        <span className="text-sm font-medium">Products</span>
+        <span>Products</span>
         {selectedServices.length > 0 && (
-          <span className="absolute -top-1 -right-1 flex items-center justify-center w-5 h-5 text-xs font-medium text-white bg-primary-600 rounded-full">
+          <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-accent text-[11px] font-semibold text-white">
             {selectedServices.length}
           </span>
         )}
@@ -267,24 +275,24 @@ export function ProductFilter({
 
       {isOpen && (
         <div
-          className="absolute z-50 w-72 mt-1 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow-lg transition-opacity duration-150 opacity-100 animate-fadein"
+          className="animate-fadein absolute z-50 mt-2 w-72 rounded-xl border border-line bg-surface-raised shadow-xl"
           role="dialog"
           aria-label="Product filter options"
           onMouseDown={e => e.stopPropagation()}
           onClick={e => e.stopPropagation()}
         >
-          <div className="p-4 border-b border-gray-200 dark:border-gray-700">
-            <h3 className="text-sm font-medium text-gray-900 dark:text-white">Filter Products</h3>
-            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+          <div className="border-b border-line p-4">
+            <h3 className="type-body-sm font-semibold text-ink">Filter products</h3>
+            <p className="type-meta mt-1 text-ink-subtle">
               {selectedServices.length} product{selectedServices.length !== 1 ? 's' : ''} selected
             </p>
             <div className="mt-2">
               <input
                 type="text"
-                placeholder="Search products..."
+                placeholder="Search products…"
                 value={searchQuery}
                 onChange={e => setSearchQuery(e.target.value)}
-                className="w-full px-3 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white"
+                className="w-full rounded-md border border-line bg-surface px-3 py-1.5 text-sm text-ink placeholder:text-ink-subtle focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
               />
             </div>
           </div>
@@ -300,7 +308,7 @@ export function ProductFilter({
               return (
                 <label
                   key={service}
-                  className="flex items-center px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary-500"
+                  className="flex cursor-pointer items-center rounded-md px-3 py-2 hover:bg-surface-sunken focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
                   role="option"
                   aria-selected={isServiceSelected(service)}
                   data-service={service}
@@ -310,14 +318,14 @@ export function ProductFilter({
                     type="checkbox"
                     checked={isServiceSelected(service)}
                     onChange={() => toggleService(service)}
-                    className="w-4 h-4 text-primary-600 border-gray-300 rounded focus:ring-primary-500"
+                    className="h-4 w-4 rounded border-line accent-[var(--c-accent)]"
                   />
-                  <span className="ml-2 text-sm text-gray-700 dark:text-gray-200 flex items-center gap-2">
+                  <span className="ml-2 flex items-center gap-2 text-sm text-ink">
                     {iconSrc && (
                       <Image
                         src={iconSrc}
-                        alt={`${service} icon`}
-                        className="w-4 h-4 object-contain"
+                        alt=""
+                        className="h-4 w-4 object-contain"
                         width={16}
                         height={16}
                         loading="lazy"
@@ -332,10 +340,11 @@ export function ProductFilter({
               );
             })}
           </div>
-          <div className="p-3 border-t border-gray-200 dark:border-gray-700">
+          <div className="border-t border-line p-3">
             <button
+              type="button"
               onClick={handleClearAll}
-              className="w-full px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
+              className="type-body-sm w-full rounded-md px-3 py-2 font-medium text-ink hover:bg-surface-sunken focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
             >
               Clear all
             </button>

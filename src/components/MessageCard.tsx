@@ -1,8 +1,10 @@
-import React from 'react';
 import { format } from 'date-fns';
 import Link from 'next/link';
-import { Message } from '@/lib/types';
 import Image from 'next/image';
+import { Message } from '@/lib/types';
+import { decodeHtmlEntities } from '@/lib/feed/normalize';
+import { SurfaceCard, type SurfaceTone } from './SurfaceCard';
+import { StatusChip, type ChipTone } from './StatusChip';
 
 interface MessageCardProps {
   message: Message;
@@ -46,332 +48,170 @@ const serviceIcons: Record<string, string> = {
   'Microsoft Loop': '/icons/loop.svg',
 };
 
-// Normalize service names
-const normalizeService = (service: string): string => {
-  // Return the service name as is
-  return service;
-};
+/**
+ * Plain-text excerpt for the card body. The value is rendered as a text node,
+ * so React escapes it — stripping tags here is about readability, not safety.
+ */
+function toExcerpt(html: string): string {
+  return decodeHtmlEntities(html.replace(/<[^>]*>/g, ' '))
+    .replace(/\s+/g, ' ')
+    .trim();
+}
 
-export const MessageCard: React.FC<MessageCardProps> = ({ message }) => {
-  // Deduplicate and normalize services
-  const uniqueServices = Array.from(new Set(message.service.map(normalizeService)));
-  // Only reserve the banner strip when a banner is actually rendered, so ordinary
-  // cards start their content at the top instead of below empty space.
-  const hasTopBanner =
-    message.isMajorChange || message.status === 'archived' || message.status === 'expired';
+function serviceIcon(service: string): string | undefined {
+  return service.startsWith('Microsoft 365') ? '/icons/m365.svg' : serviceIcons[service];
+}
+
+interface StatusFlag {
+  label: string;
+  tone: ChipTone;
+  title?: string;
+}
+
+function getStatusFlags(message: Message): StatusFlag[] {
+  const flags: StatusFlag[] = [];
+  const tags = message.tags.map(tag => tag.toLowerCase());
+
+  if (message.isMajorChange) {
+    flags.push({ label: 'Major change', tone: 'critical' });
+  }
+  if (message.severity && message.severity.toLowerCase() !== 'normal') {
+    flags.push({ label: 'Critical', tone: 'critical', title: 'Critical alert' });
+  }
+  if (tags.some(tag => tag.includes('retirement'))) {
+    flags.push({ label: 'Deprecation', tone: 'critical' });
+  }
+  if (message.status === 'expired') {
+    flags.push({
+      label: 'Expired',
+      tone: 'warn',
+      title: 'The action-required date on this message has passed.',
+    });
+  }
+  if (message.status === 'archived') {
+    flags.push({
+      label: 'Archived',
+      tone: 'neutral',
+      title: "Removed from Microsoft's live feed but preserved here for reference.",
+    });
+  }
+  if (tags.some(tag => tag.includes('new feature'))) {
+    flags.push({ label: 'New', tone: 'ok' });
+  }
+  if (tags.some(tag => tag.includes('update'))) {
+    flags.push({ label: 'Updated', tone: 'info' });
+  }
+  return flags;
+}
+
+function getCardTone(message: Message): SurfaceTone {
+  if (message.isMajorChange) return 'critical';
+  if (message.severity && message.severity.toLowerCase() !== 'normal') return 'critical';
+  if (message.status === 'expired') return 'warn';
+  if (message.status === 'archived') return 'neutral';
+  if (message.tags.some(tag => tag.toLowerCase().includes('retirement'))) return 'critical';
+  return 'accent';
+}
+
+const IMPACT_TONES: { match: string; label: string; tone: ChipTone }[] = [
+  { match: 'admin impact', label: 'Admin impact', tone: 'critical' },
+  { match: 'user impact', label: 'User impact', tone: 'warn' },
+];
+
+export function MessageCard({ message }: MessageCardProps) {
+  const uniqueServices = Array.from(new Set(message.service));
+  const flags = getStatusFlags(message);
+  const excerpt = toExcerpt(message.summary || message.content);
+  const publishedDay = format(new Date(message.published), 'yyyy-MM-dd');
+  const updatedDay = format(new Date(message.lastUpdated), 'yyyy-MM-dd');
+  const wasUpdated = publishedDay !== updatedDay;
+  const impacts = IMPACT_TONES.filter(impact =>
+    message.tags.some(tag => tag.toLowerCase().includes(impact.match))
+  );
 
   return (
-    <Link
-      href={`/message/${message.id}`}
-      className="block min-w-0 h-full rounded-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500"
+    <SurfaceCard
+      as="article"
+      accent={getCardTone(message)}
+      interactive
+      muted={message.status === 'archived'}
+      className="group gap-2.5"
     >
-      <div
-        className={`group relative bg-white/80 dark:bg-gray-800/50 backdrop-blur-sm rounded-xl shadow-sm hover:shadow-xl transition-[transform,box-shadow,border-color] duration-300 motion-reduce:transition-none border border-gray-200 dark:border-gray-700/50 hover:border-primary-200 dark:hover:border-primary-800 hover:-translate-y-1 motion-reduce:transform-none h-full flex flex-col min-w-0 overflow-hidden ${message.status === 'archived' ? 'opacity-90' : ''}`}
-      >
-        {/* Archived watermark overlay */}
-        {message.status === 'archived' && (
-          <div
-            className="pointer-events-none absolute inset-0 z-30 flex items-center justify-center"
-            aria-hidden="true"
-          >
-            <span className="select-none -rotate-[20deg] whitespace-nowrap text-3xl sm:text-4xl font-black uppercase tracking-widest text-gray-500/25 dark:text-gray-200/20 border-4 border-gray-500/25 dark:border-gray-200/20 rounded-md px-4 py-1">
-              Archived
-            </span>
-          </div>
-        )}
-        {/* Major Change / status banner at the very top */}
-        {hasTopBanner && (
-          <div className="min-h-[38px]">
-            {message.isMajorChange ? (
-              <div className="w-full bg-red-50 dark:bg-red-900/30 border-b border-red-200 dark:border-red-800 animate-pulse-subtle">
-                <div className="flex items-center justify-center py-1.5">
-                  <span className="inline-flex items-center px-3 py-1 text-sm font-medium text-red-700 dark:text-red-300">
-                    <svg
-                      className="w-4 h-4 mr-1.5"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
-                      />
-                    </svg>
-                    Major Change
-                  </span>
-                </div>
-              </div>
-            ) : message.status === 'archived' ? (
-              <div className="w-full bg-gray-100 dark:bg-gray-800 border-b border-gray-300 dark:border-gray-700">
-                <div className="flex items-center justify-center py-1.5">
-                  <span
-                    className="inline-flex items-center px-3 py-1 text-sm font-medium text-gray-700 dark:text-gray-300"
-                    title="This message has been removed from Microsoft's live feed but is preserved here for reference."
-                  >
-                    <svg
-                      className="w-4 h-4 mr-1.5"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"
-                      />
-                    </svg>
-                    Archived
-                  </span>
-                </div>
-              </div>
-            ) : message.status === 'expired' ? (
-              <div className="w-full bg-amber-50 dark:bg-amber-900/30 border-b border-amber-200 dark:border-amber-800">
-                <div className="flex items-center justify-center py-1.5">
-                  <span
-                    className="inline-flex items-center px-3 py-1 text-sm font-medium text-amber-800 dark:text-amber-200"
-                    title="The action-required date on this message has passed."
-                  >
-                    <svg
-                      className="w-4 h-4 mr-1.5"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                      />
-                    </svg>
-                    Expired
-                  </span>
-                </div>
-              </div>
-            ) : null}
-          </div>
-        )}
-        {/* Message ID and service badges row (now just below banner) */}
-        <div
-          className={`w-full flex items-start justify-between relative px-4 gap-2 min-w-0 ${hasTopBanner ? 'pt-2' : 'pt-3'}`}
+      <div className="flex flex-wrap items-center gap-1.5">
+        <span className="type-meta rounded bg-surface-sunken px-1.5 py-0.5 font-semibold text-ink-muted">
+          {message.id}
+        </span>
+        {flags.map(flag => (
+          <StatusChip key={flag.label} tone={flag.tone} title={flag.title}>
+            {flag.label}
+          </StatusChip>
+        ))}
+      </div>
+
+      <h3 className="type-card-title text-ink transition-colors group-hover:text-accent">
+        <Link
+          href={`/message/${message.id}`}
+          className="rounded after:absolute after:inset-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
         >
-          <div className="flex items-center gap-2 min-w-0 flex-wrap">
-            <span className="text-xs font-semibold text-blue-700 dark:text-blue-300 break-all max-w-[120px]">
-              {message.id}
-            </span>
-            {(() => {
-              const isNew = message.tags.some(tag => tag.toLowerCase().includes('new feature'));
-              const isUpdated = message.tags.some(tag => tag.toLowerCase().includes('update'));
-              const isRetirement = message.tags.some(tag =>
-                tag.toLowerCase().includes('retirement')
-              );
-              if (!isNew && !isUpdated && !isRetirement) return null;
-              return (
-                <>
-                  {isNew && (
-                    <span
-                      className="inline-flex items-center justify-center px-3 py-0.5 rounded-full text-xs font-semibold tracking-wide whitespace-nowrap shadow-sm border bg-emerald-50 text-emerald-700 dark:bg-emerald-900/20 dark:text-emerald-200 border-emerald-200/70 dark:border-emerald-700/70 overflow-hidden text-ellipsis"
-                      title="New"
-                    >
-                      New
-                    </span>
-                  )}
-                  {isUpdated && (
-                    <span
-                      className="inline-flex items-center justify-center px-3 py-0.5 rounded-full text-xs font-semibold tracking-wide whitespace-nowrap shadow-sm border bg-teal-50 text-teal-700 dark:bg-teal-900/20 dark:text-teal-200 border-teal-200/70 dark:border-teal-700/70 ml-1 overflow-hidden text-ellipsis"
-                      title="Updated"
-                    >
-                      Updated
-                    </span>
-                  )}
-                  {isRetirement && (
-                    <span
-                      className="inline-flex items-center justify-center px-3 py-0.5 rounded-full text-xs font-semibold tracking-wide whitespace-nowrap shadow-sm border bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-200 border-red-400 ml-1 overflow-hidden text-ellipsis"
-                      title="Deprecation"
-                    >
-                      <svg
-                        className="w-3.5 h-3.5 mr-1 text-red-500 dark:text-red-300"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
-                        />
-                      </svg>
-                      Deprecation
-                    </span>
-                  )}
-                </>
-              );
-            })()}
-          </div>
-        </div>
-        {/* Service/product names: centered, full-width, wrapping so long names stay visible */}
-        {uniqueServices.length > 0 && (
-          <div className="w-full flex flex-wrap items-center justify-center gap-x-2 gap-y-0.5 px-4 pt-1.5 min-w-0">
-            {uniqueServices.map(service => (
+          <span className="line-clamp-3 break-words">{message.title}</span>
+        </Link>
+      </h3>
+
+      {excerpt ? (
+        <p className="type-body-sm line-clamp-3 break-words text-ink-muted">{excerpt}</p>
+      ) : null}
+
+      {uniqueServices.length > 0 ? (
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+          {uniqueServices.slice(0, 3).map(service => {
+            const iconPath = serviceIcon(service);
+            return (
               <span
                 key={service}
                 title={service}
-                className="text-blue-700 dark:text-blue-200 text-xs font-medium inline-flex items-center gap-1 z-10 min-w-0 max-w-full"
+                className="type-meta inline-flex min-w-0 items-center gap-1 text-ink-muted"
               >
-                {(() => {
-                  const iconPath = service.startsWith('Microsoft 365')
-                    ? '/icons/m365.svg'
-                    : serviceIcons[service];
-                  return (
-                    iconPath && (
-                      <Image
-                        src={iconPath}
-                        alt={service}
-                        width={14}
-                        height={14}
-                        className="inline-block w-3.5 h-3.5 flex-shrink-0"
-                      />
-                    )
-                  );
-                })()}
-                <span className="text-[11px] font-normal break-words text-center">{service}</span>
+                {iconPath ? (
+                  <Image
+                    src={iconPath}
+                    alt=""
+                    width={14}
+                    height={14}
+                    className="h-3.5 w-3.5 shrink-0"
+                  />
+                ) : null}
+                <span className="truncate">{service}</span>
               </span>
+            );
+          })}
+          {uniqueServices.length > 3 ? (
+            <span
+              className="type-meta text-ink-subtle"
+              title={uniqueServices.slice(3).join(', ')}
+            >
+              +{uniqueServices.length - 3} more
+            </span>
+          ) : null}
+        </div>
+      ) : null}
+
+      <div className="mt-auto flex flex-wrap items-center gap-x-3 gap-y-1.5 pt-1">
+        <p className="type-meta text-ink-subtle">
+          {wasUpdated ? 'Updated' : 'Published'}{' '}
+          <time dateTime={wasUpdated ? message.lastUpdated : message.published}>
+            {format(new Date(wasUpdated ? message.lastUpdated : message.published), 'MMM d, yyyy')}
+          </time>
+        </p>
+        {impacts.length > 0 ? (
+          <div className="ml-auto flex items-center gap-1">
+            {impacts.map(impact => (
+              <StatusChip key={impact.match} tone={impact.tone}>
+                {impact.label}
+              </StatusChip>
             ))}
           </div>
-        )}
-
-        <div
-          className={`relative flex flex-col h-full ${message.isMajorChange ? 'p-6' : 'pt-0 px-6 pb-8'}`}
-        >
-          <div className="flex-grow flex flex-col">
-            <div>
-              <div className="flex flex-wrap justify-center gap-1.5 mb-2">
-                <div className="flex w-full gap-1 overflow-x-auto pb-1">
-                  <div className="flex flex-nowrap gap-1 min-w-0 flex-1">
-                    {message.tags
-                      .filter(tag => {
-                        const tagLower = tag.toLowerCase();
-                        return (
-                          !tagLower.includes('user impact') &&
-                          !tagLower.includes('admin impact') &&
-                          !tagLower.includes('new feature') &&
-                          !tagLower.includes('update') &&
-                          !tagLower.includes('retirement')
-                        );
-                      })
-                      .map(tag => {
-                        const tagLower = tag.toLowerCase();
-                        let pillClass =
-                          'bg-gray-50/90 text-gray-600 dark:bg-gray-800/20 dark:text-gray-300 border border-gray-200/30 dark:border-gray-700/20';
-                        let pillText = tag;
-                        if (tagLower.includes('new feature')) {
-                          pillClass =
-                            'bg-emerald-50/90 text-emerald-700 dark:bg-emerald-900/20 dark:text-emerald-200 border border-emerald-200/30 dark:border-emerald-700/20';
-                          pillText = 'New';
-                        } else if (tagLower.includes('update')) {
-                          pillClass =
-                            'bg-teal-50/90 text-teal-700 dark:bg-teal-900/20 dark:text-teal-200 border border-teal-200/30 dark:border-teal-700/20';
-                          pillText = 'Updated';
-                        }
-                        return (
-                          <span
-                            key={tag}
-                            className={`inline-flex items-center min-w-0 max-w-[120px] justify-center px-2.5 py-0.5 rounded-full text-[11px] font-medium tracking-wide whitespace-nowrap shrink shadow-sm hover:shadow transition-all duration-200 overflow-hidden text-ellipsis ${pillClass}`}
-                          >
-                            {pillText}
-                          </span>
-                        );
-                      })}
-                  </div>
-                </div>
-              </div>
-              <div
-                className={`flex items-center justify-center text-[10px] text-gray-500 dark:text-gray-400 gap-1.5 mb-0${!message.isMajorChange ? ' pt-4' : ''}`}
-              >
-                <span className="font-medium">Published</span>
-                <span>{format(new Date(message.published), 'MMM d, yyyy')}</span>
-                {format(new Date(message.published).setHours(0, 0, 0, 0), 'yyyy-MM-dd') !==
-                  format(new Date(message.lastUpdated).setHours(0, 0, 0, 0), 'yyyy-MM-dd') && (
-                  <>
-                    <span>•</span>
-                    <span className="font-medium">Updated</span>
-                    <span>{format(new Date(message.lastUpdated), 'MMM d, yyyy')}</span>
-                  </>
-                )}
-              </div>
-              <div>
-                <div className="flex items-center gap-2">
-                  <h3 className="text-sm font-medium text-gray-900 dark:text-white group-hover:text-primary-700 dark:group-hover:text-primary-400 transition-colors tracking-tight text-center break-words overflow-hidden">
-                    {message.title}
-                  </h3>
-                  {message.severity && message.severity.toLowerCase() !== 'normal' && (
-                    <span
-                      className="inline-block px-2 py-0.5 rounded-full text-xs font-semibold border ml-1 bg-red-100 text-red-800 border-red-300 dark:bg-red-900/30 dark:text-red-200 dark:border-red-700"
-                      aria-label="Critical Alert"
-                    >
-                      Critical Alert
-                    </span>
-                  )}
-                </div>
-              </div>
-            </div>
-            {/* Impact label and pills pinned to bottom */}
-            {(() => {
-              const hasImpact = message.tags.some(tag => {
-                const tagLower = tag.toLowerCase();
-                return tagLower.includes('user impact') || tagLower.includes('admin impact');
-              });
-              if (!hasImpact) return null;
-              return (
-                <div className="mt-auto flex flex-col items-center gap-1 px-0 pt-2 pb-0 min-h-[40px] justify-end">
-                  <span className="text-[10px] font-medium text-primary-600 dark:text-primary-400 mb-0.5 text-center">
-                    Impact
-                  </span>
-                  <div className="flex flex-row gap-px">
-                    {['user impact', 'admin impact'].map((impactType, idx, arr) => {
-                      const tag = message.tags.find(t => t.toLowerCase().includes(impactType));
-                      if (!tag) return null;
-                      let pillClass = '';
-                      let pillText = '';
-                      let borderClass = '';
-                      if (impactType === 'user impact') {
-                        pillClass =
-                          'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-200';
-                        borderClass =
-                          'border border-orange-400 shadow-[0_0_8px_2px_#fb923c] dark:border-orange-300';
-                        pillText = 'User';
-                      } else if (impactType === 'admin impact') {
-                        pillClass = 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-200';
-                        borderClass =
-                          'border border-red-500 shadow-[0_0_8px_2px_#ef4444] dark:border-red-300';
-                        pillText = 'Admin';
-                      }
-                      return (
-                        <React.Fragment key={impactType}>
-                          <span
-                            className={`inline-flex items-center justify-center w-8 h-4 px-1 py-0 rounded-md text-[9px] tracking-wide whitespace-nowrap shadow-lg transition-all duration-200 overflow-hidden text-ellipsis ${pillClass} ${borderClass}`}
-                          >
-                            {pillText}
-                          </span>
-                          {idx === 0 &&
-                            arr.length > 1 &&
-                            message.tags.find(t => t.toLowerCase().includes('admin impact')) && (
-                              <span className="w-px h-3 bg-gray-300 dark:bg-gray-600 mx-1" />
-                            )}
-                        </React.Fragment>
-                      );
-                    })}
-                  </div>
-                </div>
-              );
-            })()}
-          </div>
-        </div>
+        ) : null}
       </div>
-    </Link>
+    </SurfaceCard>
   );
-};
+}

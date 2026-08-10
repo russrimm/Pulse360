@@ -84,7 +84,7 @@ export function ReleasePlansList({ releasePlans, hideFilters, drillthroughBasePa
           <LoadingSpinner />
         </div>
       )}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pt-4">
+      <div className="grid grid-cols-1 gap-4 pt-4 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
         {visibleReleasePlans.map((plan) => (
           <ReleasePlanCard key={plan.id} plan={plan} onClick={handleReleasePlanClick} drillthroughBasePath={drillthroughBasePath} />
         ))}
