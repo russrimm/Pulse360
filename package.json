@@ -32,7 +32,7 @@
     "@types/sanitize-html": "^2.16.1",
     "@vercel/analytics": "^2.0.1",
     "@vercel/speed-insights": "^2.0.0",
-    "baseline-browser-mapping": "^2.11.12",
+    "baseline-browser-mapping": "^2.11.13",
     "date-fns": "^4.1.0",
     "exceljs": "^4.4.0",
     "fast-xml-parser": "^5.10.1",
