@@ -744,6 +744,59 @@ pnpm start   # serves on port 3000
 
 Put it behind a reverse proxy (Caddy / nginx / CloudFront) with HTTPS terminated upstream. Set `NODE_ENV=production`.
 
+**Azure App Service (independent public deployment):**
+
+`infra/main.bicep` provisions a dedicated Linux B1 plan and Node.js 24 web app.
+The plan is billable. Always pass the intended subscription explicitly:
+
+```bash
+az deployment sub what-if --subscription <subscription-id> --location centralus --template-file infra/main.bicep
+az deployment sub create --subscription <subscription-id> --location centralus --name pulse360 --template-file infra/main.bicep
+```
+
+Build on Linux with Node.js 24 and the pinned pnpm version. Do not copy
+Windows-native dependencies to the Linux host:
+
+```bash
+pnpm install --frozen-lockfile
+pnpm build
+mkdir -p .next/standalone/public .next/standalone/.next/static
+cp -a public/. .next/standalone/public/
+cp -a .next/static/. .next/standalone/.next/static/
+(cd .next/standalone && tar -czf ../../application.tar.gz .)
+python3 -m zipfile -c pulse360.zip application.tar.gz
+az account set --subscription <subscription-id>
+az webapp deploy --subscription <subscription-id> --resource-group rg-pulse360 --name <app-name-output> --type zip --src-path pulse360.zip
+az webapp restart --subscription <subscription-id> --resource-group rg-pulse360 --name <app-name-output>
+```
+
+The tar archive preserves both pnpm and Turbopack dependency symlinks throughout
+the application, including `.next/node_modules`. The template extracts it into
+the container's local `/tmp/pulse360` directory before starting the standalone
+server with `node server.js`, enforces HTTPS,
+disables basic publishing authentication, and uses `/api/health` for health checks.
+Deploy using an Azure CLI identity authorized for the destination subscription.
+The `az account set` command changes the CLI default subscription; it also avoids
+cross-tenant publishing-token selection problems in the deployment command.
+Restart after publishing so the server extracts and loads the updated archive.
+Copy asset directory contents as shown above, not the directories themselves:
+an existing standalone asset directory would otherwise contain `public/public`
+or `.next/static/static`, breaking image URLs. After deploying, check the
+rendered dashboard images as well as application health:
+
+```bash
+PLAYWRIGHT_BASE_URL=https://<app-hostname> pnpm exec playwright test tests/public-assets.spec.ts tests/health.spec.ts --project=chromium
+```
+
+No credentials, database, APIM endpoint, or application registration is copied
+from another tenant. `MESSAGE_CENTER_PUBLIC=false` keeps Message Center blocked.
+Before enabling it, configure a destination-tenant database, a Graph application
+with administrator-consented `ServiceMessage.Read.All`, and a separate interactive
+Entra sign-in application. Set `NEXTAUTH_URL` and its matching redirect URI to the
+new HTTPS origin. Apply migrations against the destination database and arrange
+the `/api/cron/sync-messages` schedule; Vercel cron configuration does not schedule
+jobs on App Service.
+
 **Notes:**
 
 - The site never persists Graph tokens — each request acquires a fresh access token via the client credentials flow.

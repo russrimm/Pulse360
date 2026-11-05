@@ -14,6 +14,7 @@ const contentSecurityPolicyReportOnly = [
 ].join('; ');
 
 const nextConfig = {
+  output: 'standalone',
   turbopack: {
     root: __dirname,
   },
