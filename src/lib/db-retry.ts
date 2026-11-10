@@ -4,7 +4,7 @@
  * Neon scales a compute to zero when idle. The first query after that returns
  * `XX000 Control plane request failed` (surfaced by Prisma as P2039) while the
  * compute wakes up, and pooled sockets opened before the suspend come back as
- * connection resets. Both clear within a second or two, so a short retry turns
+ * connection resets. Both usually clear within a few seconds, so a short retry turns
  * a 500 into a slightly slower page load.
  *
  * Kept free of `server-only` and Prisma imports so it stays unit-testable.
@@ -40,6 +40,10 @@ const TRANSIENT_MESSAGE_PATTERNS = [
   /econnrefused/i,
   /etimedout/i,
   /timeout expired/i,
+  // pg-pool: no connection became available within connectionTimeoutMillis,
+  // which is what a still-waking Neon compute looks like from the pool.
+  /timeout exceeded when trying to connect/i,
+  /connection timeout/i,
   /socket hang up/i,
 ];
 
@@ -72,7 +76,8 @@ export function isTransientDbError(error: unknown, depth = 0): boolean {
   );
 }
 
-export const RETRY_DELAYS_MS = [250, 750];
+// Roughly 5s of total backoff so a cold Neon compute has time to resume.
+export const RETRY_DELAYS_MS = [500, 1500, 3000];
 
 /**
  * Runs a database operation, retrying only failures that happen before the
