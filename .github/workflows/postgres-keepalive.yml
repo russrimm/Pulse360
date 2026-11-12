@@ -1,0 +1,40 @@
+name: Keep Azure Postgres running
+
+# The Azure subscription stops pulse360-pg-82288 nightly (around 06:05 UTC) via an
+# external principal. Message Center is unavailable while it is stopped, so check
+# often and start it when needed. Idempotent: does nothing if the server is Ready.
+on:
+  schedule:
+    - cron: '*/20 * * * *'
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+concurrency:
+  group: postgres-keepalive
+  cancel-in-progress: false
+
+jobs:
+  ensure-running:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      RESOURCE_GROUP: rg-pulse360
+      SERVER_NAME: pulse360-pg-82288
+    steps:
+      - uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Start server if stopped
+        run: |
+          state=$(az postgres flexible-server show -g "$RESOURCE_GROUP" -n "$SERVER_NAME" --query state -o tsv)
+          echo "Server state: $state"
+          if [ "$state" = "Stopped" ]; then
+            az postgres flexible-server start -g "$RESOURCE_GROUP" -n "$SERVER_NAME"
+            echo "::warning::Server was stopped and has been started."
+          fi
