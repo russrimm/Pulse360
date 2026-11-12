@@ -40,6 +40,7 @@ const TRANSIENT_MESSAGE_PATTERNS = [
   /econnrefused/i,
   /etimedout/i,
   /timeout expired/i,
+  /timeout exceeded when trying to connect/i, // pg-pool connectionTimeoutMillis
   /socket hang up/i,
 ];
 
@@ -72,7 +73,9 @@ export function isTransientDbError(error: unknown, depth = 0): boolean {
   );
 }
 
-export const RETRY_DELAYS_MS = [250, 750];
+// Exponential backoff (~5.5s total, plus jitter) to outlast a Neon cold start,
+// which can take several seconds when the control plane is slow to respond.
+export const RETRY_DELAYS_MS = [250, 750, 1500, 3000];
 
 /**
  * Runs a database operation, retrying only failures that happen before the
