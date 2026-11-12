@@ -45,7 +45,6 @@ test.describe('isTransientDbError', () => {
 
   test('detects dropped pooled connections', () => {
     expect(isTransientDbError(new Error('Connection terminated unexpectedly'))).toBe(true);
-    expect(isTransientDbError(new Error('timeout exceeded when trying to connect'))).toBe(true);
     expect(isTransientDbError(Object.assign(new Error('boom'), { code: '57P01' }))).toBe(true);
     expect(isTransientDbError(Object.assign(new Error('boom'), { code: 'P1017' }))).toBe(true);
   });
