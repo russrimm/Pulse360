@@ -50,6 +50,11 @@ test.describe('isTransientDbError', () => {
     expect(isTransientDbError(Object.assign(new Error('boom'), { code: 'P1017' }))).toBe(true);
   });
 
+  test('detects pg-pool connect timeouts during a cold start', () => {
+    expect(isTransientDbError(new Error('timeout exceeded when trying to connect'))).toBe(true);
+    expect(isTransientDbError(new Error('Connection timeout'))).toBe(true);
+  });
+
   test('follows the cause chain', () => {
     const error = new Error('outer', { cause: new Error('read ECONNRESET') });
     expect(isTransientDbError(error)).toBe(true);

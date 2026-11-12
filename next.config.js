@@ -14,7 +14,9 @@ const contentSecurityPolicyReportOnly = [
 ].join('; ');
 
 const nextConfig = {
-  output: 'standalone',
+  // Standalone output is for the Azure App Service package. Vercel supplies its
+  // own packaging and fails the build (missing next-server.js.nft.json) with it.
+  ...(process.env.VERCEL ? {} : { output: 'standalone' }),
   turbopack: {
     root: __dirname,
   },
