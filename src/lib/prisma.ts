@@ -21,8 +21,16 @@ function createPrismaClient(): PrismaClient {
     // connections quickly avoids handing out sockets Neon already dropped
     // when the compute scaled to zero.
     max: 5,
-    connectionTimeoutMillis: 10_000,
+    // Fail a stalled connect quickly and let withDbRetry (src/lib/db-retry.ts)
+    // try again; a waking compute usually accepts connections within a few
+    // seconds, so several short attempts beat one long wait.
+    connectionTimeoutMillis: 5_000,
     idleTimeoutMillis: 10_000,
+    // Detect half-open sockets left behind when the compute suspends, and
+    // bound a hung query so a request never waits on it indefinitely.
+    keepAlive: true,
+    keepAliveInitialDelayMillis: 5_000,
+    query_timeout: 20_000,
   });
   return new PrismaClient({
     adapter,
