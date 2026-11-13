@@ -1,16 +1,18 @@
 import { M365UpdateCard } from '@/components/M365UpdateCard';
 import { UpdatesExplorer } from '@/components/UpdatesExplorer';
 import { parseListParams, queryList, type ListQueryConfig } from '@/lib/list-query';
+import { getRoadmapFamilies } from '@/lib/roadmap-families';
 import type { M365Update } from '@/lib/types';
 import { getM365UpdateSummaries } from '@/lib/update-summaries';
 
 export const metadata = {
-  title: 'Microsoft 365 Updates | Pulse 360',
-  description: 'Latest Microsoft 365 feature updates and change insights.',
+  title: 'AI at Work Roadmap | Pulse 360',
+  description:
+    'The Microsoft AI at Work roadmap (formerly the Microsoft 365 roadmap): upcoming and rolling-out features across Microsoft 365, Copilot, Dynamics 365, Power Platform, and Dataverse.',
 };
 
 const BASE_PATH = '/release-plans/m365';
-const FACET_KEYS = ['product', 'status'];
+const FACET_KEYS = ['family', 'product', 'status'];
 
 const listConfig: ListQueryConfig<M365Update> = {
   pageSize: 12,
@@ -18,6 +20,7 @@ const listConfig: ListQueryConfig<M365Update> = {
   getSearchText: update =>
     [update.id, update.title, update.product, ...update.service, ...update.tags].join(' '),
   facets: [
+    { key: 'family', label: 'Product family', getValues: update => getRoadmapFamilies(update.service) },
     { key: 'product', label: 'Products', getValues: update => update.service },
     {
       key: 'status',
@@ -38,8 +41,8 @@ export default async function M365UpdatesEmbeddedPage({ searchParams }: M365Upda
 
   return (
     <UpdatesExplorer
-      title="Microsoft 365 Release Plans"
-      description="Stay informed about the latest Microsoft 365 updates and changes."
+      title="AI at Work Roadmap"
+      description="Upcoming and rolling-out features across Microsoft 365, Copilot, Dynamics 365, Power Platform, and Dataverse."
       basePath={BASE_PATH}
       params={params}
       result={result}

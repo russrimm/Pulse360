@@ -12,18 +12,12 @@ interface HubCard {
 
 export const metadata = {
   title: 'Release Plans Hub | Pulse 360',
-  description: 'Navigation hub for Dynamics 365 & Power Platform roadmap and related resources.'
+  description:
+    'Navigation hub for the AI at Work roadmap (Microsoft 365, Copilot, Dynamics 365, Power Platform), Azure, and Fabric release plans.'
 };
 
 export default function ReleasePlansHubPage() {
   const cards: HubCard[] = [
-    {
-      href: '/release-plans/dynamics-power',
-      title: 'Power Platform & Dynamics',
-      description: 'Power Platform & Dynamics',
-      image: { src: '/icons/PowerPlatform_scalable.svg', alt: 'Power Platform & Dynamics' },
-      hideTitle: true
-    },
     {
       href: '/release-plans/azure',
       title: 'Azure',
@@ -33,9 +27,9 @@ export default function ReleasePlansHubPage() {
     },
     {
       href: '/release-plans/m365',
-      title: 'Microsoft 365',
-      description: 'Microsoft 365',
-      image: { src: '/icons/m365.svg', alt: 'Microsoft 365' },
+      title: 'AI at Work roadmap',
+      description: 'AI at Work roadmap',
+      image: { src: '/icons/m365.svg', alt: 'AI at Work roadmap' },
       hideTitle: true
     },
     {
@@ -52,11 +46,11 @@ export default function ReleasePlansHubPage() {
       <div className="relative w-full max-w-6xl px-4 md:px-8 flex flex-col z-0 items-center text-center">
         <header className="mb-10 md:mb-12 max-w-2xl">
           <h1 className="type-h1 text-ink">Release Plans</h1>
-          <p className="type-body mt-3 text-ink-muted">Central hub for roadmap browsing and future feature insights.</p>
+          <p className="type-body mt-3 text-ink-muted">Central hub for roadmap browsing and future feature insights, including Dynamics 365 and Power Platform on the AI at Work roadmap.</p>
         </header>
         <section aria-labelledby="release-plans-hub-heading" className="flex-1 w-full flex flex-col items-center">
           <h2 id="release-plans-hub-heading" className="sr-only">Release Plans navigation cards</h2>
-          <div className="grid grid-cols-2 gap-5 md:gap-6 w-full max-w-4xl h-full place-items-stretch auto-rows-[11rem] md:auto-rows-[13rem] lg:grid-cols-4">
+          <div className="grid grid-cols-2 gap-5 md:gap-6 w-full max-w-3xl h-full place-items-stretch auto-rows-[11rem] md:auto-rows-[13rem] lg:grid-cols-3">
             {cards.map((card, idx) => (
               <div key={card.href} className="relative group animate-fade-up will-change-transform">
                 <Link
