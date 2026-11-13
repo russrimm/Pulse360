@@ -32,5 +32,5 @@ jobs:
       - run: pnpm exec prisma generate
       - run: pnpm lint
       - run: pnpm type-check
-      - run: pnpm exec playwright test tests/sanitize.spec.ts tests/data-integrity.spec.ts tests/message-center-access.spec.ts tests/tenant-access.spec.ts tests/graph-token.spec.ts tests/rate-limit.spec.ts tests/nav.spec.ts tests/env.spec.ts --project=chromium
+      - run: pnpm exec playwright test tests/sanitize.spec.ts tests/data-integrity.spec.ts tests/message-center-access.spec.ts tests/tenant-access.spec.ts tests/graph-token.spec.ts tests/rate-limit.spec.ts tests/nav.spec.ts tests/env.spec.ts tests/service-health.spec.ts --project=chromium
       - run: pnpm build
