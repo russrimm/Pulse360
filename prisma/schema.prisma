@@ -49,3 +49,25 @@ model SyncState {
   lastError  String?
   updatedAt  DateTime  @updatedAt
 }
+
+/// Shared server-side cache (serverless-safe replacement for in-process Maps).
+/// `key` is a caller-built, namespaced hash; expired rows are purged lazily.
+model ApiCache {
+  key       String   @id
+  payload   Json
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([expiresAt])
+}
+
+/// Per-route daily request counter used by the Postgres-backed rate limiter.
+/// `day` is a UTC date key (YYYY-MM-DD).
+model ApiUsage {
+  day       String
+  route     String
+  count     Int      @default(0)
+  updatedAt DateTime @updatedAt
+
+  @@id([day, route])
+}
