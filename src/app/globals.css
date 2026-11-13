@@ -23,12 +23,12 @@
 
   --c-ink: #0f172a;
   --c-ink-muted: #475569;
-  --c-ink-subtle: #64748b;
+  --c-ink-subtle: #5b6778;
 
-  --c-accent: #0284c7;
-  --c-accent-hover: #0369a1;
+  --c-accent: #0369a1;
+  --c-accent-hover: #075985;
   --c-accent-soft: #e0f2fe;
-  --c-accent-ink: #0369a1;
+  --c-accent-ink: #075985;
 
   --c-critical: #dc2626;
   --c-critical-soft: #fef2f2;

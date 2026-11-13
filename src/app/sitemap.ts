@@ -3,7 +3,6 @@ import type { MetadataRoute } from 'next';
 const SITE_URL = 'https://www.mspulse360.app';
 
 const STATIC_ROUTES = [
-  '',
   '/home',
   '/release-plans',
   '/release-plans/azure',
@@ -34,7 +33,7 @@ const STATIC_ROUTES = [
 export default function sitemap(): MetadataRoute.Sitemap {
   return STATIC_ROUTES.map(route => ({
     url: `${SITE_URL}${route}`,
-    changeFrequency: route === '' || route === '/home' ? 'weekly' : 'daily',
-    priority: route === '' || route === '/home' ? 1 : 0.8,
+    changeFrequency: route === '/home' ? 'weekly' : 'daily',
+    priority: route === '/home' ? 1 : 0.8,
   }));
 }

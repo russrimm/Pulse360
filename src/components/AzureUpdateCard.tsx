@@ -1,5 +1,3 @@
-'use client';
-
 import { AzureUpdate } from '@/lib/types';
 import { format } from 'date-fns';
 import Link from 'next/link';
@@ -11,21 +9,16 @@ import { StatusChip } from './StatusChip';
 
 interface AzureUpdateCardProps {
   update: AzureUpdate;
-  onClick: (id: string) => void;
 }
 
-export function AzureUpdateCard({ update, onClick }: AzureUpdateCardProps) {
-  const handleClick = () => {
-    onClick(update.id);
-  };
-
+export function AzureUpdateCard({ update }: AzureUpdateCardProps) {
   const isUpdated =
     format(new Date(update.created), 'yyyy-MM-dd') !==
     format(new Date(update.modified), 'yyyy-MM-dd');
 
   return (
     <Link href={`/azure-update/${update.id}`} className="group block h-full min-w-0">
-      <SurfaceCard interactive className="gap-2.5" onClick={handleClick}>
+      <SurfaceCard interactive className="gap-2.5">
         {update.products.length > 0 ? (
           <div className="flex flex-wrap items-center gap-1.5">
             {update.products.slice(0, 3).map(product => {

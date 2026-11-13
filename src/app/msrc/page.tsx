@@ -228,7 +228,7 @@ function SecurityUpdatesContent() {
             value={selectedMonth ?? ''}
             onChange={handleMonthChange}
             disabled={isLoadingMonths || months.length === 0}
-            className="type-body-sm min-w-0 flex-1 rounded-lg border border-line bg-surface px-3 py-1.5 text-ink shadow-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-accent disabled:cursor-not-allowed disabled:opacity-60 sm:max-w-xs sm:flex-none"
+            className="type-body-sm w-full min-w-0 rounded-lg border border-line bg-surface px-3 py-1.5 text-ink shadow-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-accent disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto sm:max-w-xs"
           >
             {months.map(month => (
               <option key={month.ID} value={month.ID}>
@@ -237,7 +237,7 @@ function SecurityUpdatesContent() {
             ))}
           </select>
 
-          <p className="type-meta ml-auto text-ink-subtle" aria-live="polite">
+          <p className="type-meta w-full text-ink-subtle sm:ml-auto sm:w-auto" aria-live="polite">
             {totalVulnerabilities > 0
               ? `${totalVulnerabilities.toLocaleString()} vulnerabilities · page ${page} of ${totalPages}`
               : null}

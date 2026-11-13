@@ -1,8 +1,11 @@
 import { ProductNewsLayout } from '@/components/ProductNewsLayout'
 import { ProductNewsCard } from '@/components/ProductNewsCard'
 import { ProductNews } from '@/lib/types'
+import { productNewsMetadata } from '@/lib/product-news'
 // @ts-ignore
 import { parseStringPromise } from 'xml2js'
+
+export const metadata = productNewsMetadata('/product-news/all-things-azure')
 
 async function fetchRSS(): Promise<ProductNews[]> {
   const res = await fetch('https://devblogs.microsoft.com/all-things-azure/feed/', { next: { revalidate: 1800 } })

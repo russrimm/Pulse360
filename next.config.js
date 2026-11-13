@@ -10,7 +10,8 @@ const contentSecurityPolicyReportOnly = [
   "img-src 'self' data: blob: https:",
   "font-src 'self' data:",
   "connect-src 'self' https://vitals.vercel-insights.com",
-  'upgrade-insecure-requests',
+  // upgrade-insecure-requests is omitted: browsers ignore it (and log a console
+  // error) when delivered in a report-only policy. Add it if the policy is enforced.
 ].join('; ');
 
 const nextConfig = {
@@ -19,6 +20,25 @@ const nextConfig = {
   ...(process.env.VERCEL ? {} : { output: 'standalone' }),
   turbopack: {
     root: __dirname,
+  },
+  async redirects() {
+    return [
+      { source: '/', destination: '/home', permanent: false },
+      { source: '/fabric-roadmap', destination: '/release-plans/fabric', permanent: true },
+      { source: '/azure-updates', destination: '/release-plans/azure', permanent: true },
+      { source: '/m365-updates', destination: '/release-plans/m365', permanent: true },
+      { source: '/powerplatd365', destination: '/release-plans', permanent: true },
+      {
+        source: '/powerplatd365/release-plans',
+        destination: '/release-plans/dynamics-power',
+        permanent: true,
+      },
+      {
+        source: '/release-plans/roadmap',
+        destination: '/release-plans/dynamics-power',
+        permanent: true,
+      },
+    ];
   },
   async headers() {
     return [

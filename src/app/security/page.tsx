@@ -9,7 +9,7 @@ export const metadata = {
 export default function SecurityPage() {
   const cardBase = "group flex flex-col items-center justify-center text-center rounded-2xl border border-line bg-surface p-5 overflow-hidden focus:outline-none focus-visible:ring-2 focus-visible:ring-accent transition-all duration-300 hover:shadow-xl hover:-translate-y-1 hover:border-accent/40 h-full relative";
   return (
-    <main className="w-full flex flex-col items-center bg-canvas pt-10 pb-20">
+    <div className="w-full flex flex-col items-center bg-canvas pt-10 pb-20">
       <div className="w-full max-w-5xl px-4 md:px-8">
         <header className="mb-10">
           <h1 className="type-h1 text-ink">Security &amp; Advisories</h1>
@@ -31,6 +31,6 @@ export default function SecurityPage() {
           <Link href="/home" className="type-body-sm font-medium text-accent hover:underline">← Back to Hub</Link>
         </div>
       </div>
-    </main>
+    </div>
   );
 }

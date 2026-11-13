@@ -1,7 +1,9 @@
 import { ProductNewsLayout } from '@/components/ProductNewsLayout'
 import { ProductNewsCard } from '@/components/ProductNewsCard'
 import { FabricBlogNewsClient } from './FabricBlogNewsClient'
+import { productNewsMetadata } from '@/lib/product-news'
 
+export const metadata = productNewsMetadata('/product-news/fabric-blog')
 export const revalidate = 3600
 
 function highlightContinueReading(html: string) {

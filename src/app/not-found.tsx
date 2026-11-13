@@ -2,7 +2,7 @@ import Link from 'next/link';
 
 export default function NotFound() {
   return (
-    <main className="mx-auto flex min-h-[50vh] max-w-xl flex-col items-center justify-center px-6 text-center">
+    <div className="mx-auto flex min-h-[50vh] max-w-xl flex-col items-center justify-center px-6 text-center">
       <p className="text-sm font-semibold uppercase tracking-wider text-primary-600 dark:text-primary-400">
         404
       </p>
@@ -18,6 +18,6 @@ export default function NotFound() {
       >
         Back to Pulse 360
       </Link>
-    </main>
+    </div>
   );
 }

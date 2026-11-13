@@ -1,6 +1,6 @@
 export default function Loading() {
   return (
-    <main
+    <div
       className="flex min-h-[50vh] items-center justify-center px-6 text-gray-700 dark:text-gray-300"
       aria-busy="true"
       aria-live="polite"
@@ -12,6 +12,6 @@ export default function Loading() {
         />
         <p className="text-sm">Loading Pulse 360…</p>
       </div>
-    </main>
+    </div>
   );
 }

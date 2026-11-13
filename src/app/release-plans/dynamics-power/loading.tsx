@@ -10,7 +10,7 @@ function ShimmerBar({ className }: { className?: string }) {
 
 export default function Loading() {
   return (
-    <main className="w-full flex flex-col items-center bg-gradient-to-b from-white via-gray-50 to-white dark:from-black dark:via-gray-900 dark:to-black pt-10 pb-24">
+    <div className="w-full flex flex-col items-center bg-canvas pt-10 pb-24">
       <div className="w-full max-w-7xl px-4 md:px-8">
         <header className="mb-10">
           <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-gray-900 dark:text-gray-50">Dynamics & Power Platform Roadmap</h1>
@@ -51,6 +51,6 @@ export default function Loading() {
           ))}
         </div>
       </div>
-    </main>
+    </div>
   );
 }

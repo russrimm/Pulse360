@@ -28,10 +28,12 @@ module.exports = {
           300: '#7dd3fc',
           400: '#38bdf8',
           500: '#0ea5e9',
-          600: '#0284c7',
-          700: '#0369a1',
-          800: '#075985',
-          900: '#0c4a6e',
+          // 600 and up are shifted one step darker than the stock sky ramp so
+          // text and white-on-fill pairings reach WCAG AA (4.5:1) on light surfaces.
+          600: '#0369a1',
+          700: '#075985',
+          800: '#0c4a6e',
+          900: '#082f49',
         },
       },
       animation: {

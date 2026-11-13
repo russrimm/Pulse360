@@ -12,7 +12,7 @@ const Navbar = () => {
     <nav aria-label="Primary">
       <div className="mx-auto flex h-14 max-w-7xl items-center gap-3 px-4 sm:px-6 lg:px-8">
         <Link
-          href="/"
+          href="/home"
           className="flex min-w-0 items-center gap-3 rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
         >
           <span className="type-h2 bg-gradient-to-r from-primary-600 to-primary-400 bg-clip-text whitespace-nowrap text-transparent dark:from-primary-400 dark:to-primary-300">
