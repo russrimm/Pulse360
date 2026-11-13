@@ -49,6 +49,13 @@ export const NAV_ITEMS: NavItem[] = [
     icon: image('/icons/m365.svg'),
   },
   {
+    name: 'Service Health',
+    fullName: 'Microsoft 365 Service Health',
+    href: '/service-health',
+    matches: ['/service-health'],
+    icon: image('/icons/m365.svg'),
+  },
+  {
     name: 'Release Plans',
     fullName: 'Release Plans',
     href: '/release-plans',
