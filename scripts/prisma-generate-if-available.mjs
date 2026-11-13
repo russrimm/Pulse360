@@ -15,7 +15,8 @@ try {
 const prismaCommand = process.platform === 'win32' ? 'prisma.cmd' : 'prisma';
 const result = spawnSync(prismaCommand, ['generate'], {
   stdio: 'inherit',
-  shell: false,
+  // Node refuses to spawn .cmd files without a shell on Windows (EINVAL).
+  shell: process.platform === 'win32',
 });
 
 if (result.error) {
