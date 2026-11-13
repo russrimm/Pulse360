@@ -7,169 +7,30 @@ import { XMLParser } from 'fast-xml-parser';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import { parseGraphDate } from './graph';
+import {
+  DIRECT_GRAPH_BASE_URL,
+  getGraphConfig,
+  getGraphToken as getToken,
+  graphUrl,
+  isEmptyAccessTokenGraphError,
+} from './graph-token';
 
-// Base URL without version path — supports both /v1.0 and /beta
-const RAW_AZURE_API_URL = process.env.AZURE_API_URL?.trim();
-const DIRECT_GRAPH_BASE_URL = 'https://graph.microsoft.com';
 const GRAPH_REQUEST_TIMEOUT_MS = 25_000;
 // Whole-pagination budget. Keeps a slow Graph from blowing past the cron
 // route's maxDuration (60s) one 25s page at a time.
 const GRAPH_SYNC_BUDGET_MS = 45_000;
 
-function normalizeApiBaseUrl(url?: string): string {
-  const value = url || DIRECT_GRAPH_BASE_URL;
-  const parsed = new URL(
-    value.startsWith('http://') || value.startsWith('https://') ? value : `https://${value}`
-  );
-
-  if (parsed.protocol !== 'https:' && parsed.protocol !== 'http:') {
-    throw new Error('AZURE_API_URL must use http or https');
-  }
-
-  parsed.hash = '';
-  parsed.search = '';
-  if (parsed.hostname.toLowerCase() === 'graph.microsoft.com') {
-    parsed.pathname = parsed.pathname.replace(/\/(?:v1\.0|beta)\/?$/i, '');
-  }
-  parsed.pathname = parsed.pathname.replace(/\/+$/, '');
-  return parsed.toString().replace(/\/$/, '');
-}
-
-function isGraphMicrosoftHost(url: string): boolean {
-  try {
-    const parsed = new URL(url);
-    return parsed.hostname.toLowerCase() === 'graph.microsoft.com';
-  } catch {
-    return false;
-  }
-}
-
-const GRAPH_BASE_URL = normalizeApiBaseUrl(RAW_AZURE_API_URL);
-const API_KEY = process.env.AZURE_CLIENT_SECRET;
-const TENANT_ID = process.env.AZURE_TENANT_ID;
-const CLIENT_ID = process.env.AZURE_CLIENT_ID;
-const hasLocalCredentials = Boolean(API_KEY && TENANT_ID && CLIENT_ID);
-
-// APIM mode applies only when AZURE_API_URL points to a non-Graph host.
-const isApimMode = Boolean(RAW_AZURE_API_URL) && !isGraphMicrosoftHost(GRAPH_BASE_URL);
+const {
+  baseUrl: GRAPH_BASE_URL,
+  hasLocalCredentials,
+  isApimMode,
+  hasRequiredEnvVars,
+} = getGraphConfig();
 
 const isDev = process.env.NODE_ENV === 'development';
 
-// In APIM mode, no local credentials required; otherwise check env vars
-const hasRequiredEnvVars = isApimMode || hasLocalCredentials;
-
 export function isMessageCenterSyncConfigured(): boolean {
   return Boolean(process.env.DATABASE_URL && hasRequiredEnvVars);
-}
-
-/** Build a Graph API URL with version. Defaults to v1.0. */
-function graphUrl(
-  path: string,
-  version: 'v1.0' | 'beta' = 'v1.0',
-  baseUrl = GRAPH_BASE_URL
-): string {
-  return `${baseUrl}/${version}${path}`;
-}
-
-function isEmptyAccessTokenGraphError(errorText: string): boolean {
-  try {
-    const parsed = JSON.parse(errorText) as {
-      error?: { code?: string; message?: string };
-    };
-    const code = parsed.error?.code ?? '';
-    const message = parsed.error?.message ?? '';
-    return code === 'InvalidAuthenticationToken' && /access token is empty/i.test(message);
-  } catch {
-    return (
-      /InvalidAuthenticationToken/i.test(errorText) && /access token is empty/i.test(errorText)
-    );
-  }
-}
-
-interface CachedToken {
-  value: string;
-  expiresAt: number;
-}
-
-interface AzureTokenResponse {
-  access_token?: unknown;
-  expires_in?: unknown;
-  error?: unknown;
-  error_description?: unknown;
-}
-
-let cachedToken: CachedToken | null = null;
-
-async function getToken(): Promise<string> {
-  if (!hasRequiredEnvVars) {
-    const missing = [];
-    if (!API_KEY) missing.push('AZURE_CLIENT_SECRET');
-    if (!TENANT_ID) missing.push('AZURE_TENANT_ID');
-    if (!CLIENT_ID) missing.push('AZURE_CLIENT_ID');
-    throw new Error(`Missing required environment variables: ${missing.join(', ')}`);
-  }
-
-  if (cachedToken && cachedToken.expiresAt > Date.now()) {
-    return cachedToken.value;
-  }
-
-  const tokenEndpoint = `https://login.microsoftonline.com/${TENANT_ID}/oauth2/v2.0/token`;
-
-  const params = new URLSearchParams();
-  if (CLIENT_ID) params.append('client_id', CLIENT_ID);
-  params.append('scope', 'https://graph.microsoft.com/.default');
-  if (API_KEY) params.append('client_secret', API_KEY);
-  params.append('grant_type', 'client_credentials');
-
-  const response = await fetch(tokenEndpoint, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/x-www-form-urlencoded',
-    },
-    body: params,
-    signal: AbortSignal.timeout(10_000),
-  });
-
-  if (!response.ok) {
-    const errorText = await response.text();
-    let errorDetails = errorText;
-    try {
-      const errorJson = JSON.parse(errorText);
-      if (errorJson.error_description) {
-        errorDetails = errorJson.error_description;
-      }
-    } catch {
-      // Keep original error text if not JSON
-    }
-
-    throw new Error(
-      `Failed to get Azure AD token (${response.status}): ${errorDetails}. Please verify TENANT_ID, CLIENT_ID, and API_KEY in environment variables.`
-    );
-  }
-
-  const data = (await response.json()) as AzureTokenResponse;
-
-  if (typeof data.access_token !== 'string') {
-    throw new Error(
-      `Azure AD returned no access_token. Response: ${JSON.stringify({ error: data.error, error_description: data.error_description })}`
-    );
-  }
-
-  const accessToken = data.access_token.trim();
-  if (!accessToken) {
-    throw new Error('Azure AD returned an empty access_token.');
-  }
-
-  const expiresInSeconds =
-    typeof data.expires_in === 'number' && Number.isFinite(data.expires_in)
-      ? data.expires_in
-      : 3600;
-  cachedToken = {
-    value: accessToken,
-    expiresAt: Date.now() + Math.max(60, expiresInSeconds - 60) * 1000,
-  };
-
-  return cachedToken.value;
 }
 
 interface GraphApiMessage {
