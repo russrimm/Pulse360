@@ -723,9 +723,18 @@ environment with tenant credentials to refresh it.
 
 ## Deployment
 
-Pulse 360° is hosted on **Vercel** and can also run on other services that support Node 22.12+ or 24.0+ and Next.js 16.
+Pulse 360° runs on **Vercel** (production), on **Azure** through the Azure Developer CLI (`azd`), or anywhere that runs a **Docker** container. All options serve the same app; none changes the others.
 
-**Vercel (production):**
+| Option                                        | Best for                                     | Hosting                                                      | Database                                                  | Prerequisites                                                                              |
+| --------------------------------------------- | -------------------------------------------- | ------------------------------------------------------------ | --------------------------------------------------------- | ------------------------------------------------------------------------------------------ |
+| [Vercel](#vercel-production)                  | The default hosted site                      | Vercel (serverless)                                          | Bring your own Postgres (for example Neon)                | Vercel account, optional Postgres                                                          |
+| [Azure with `azd`](#azure-with-azd)           | A complete, repeatable Azure environment     | Azure Container Apps, Key Vault, managed identity            | Azure Database for PostgreSQL Flexible Server (included)  | Azure subscription, Azure CLI, `azd`, PowerShell 7 (`pwsh`)                                |
+| [Docker](#docker)                             | Local runs, any container host, GHCR         | Anything that runs a container                               | Postgres in Compose, or your own                          | Docker with Compose v2                                                                     |
+| [App Service package](#azure-app-service-package-deploy) | Existing single-app App Service deployment | Azure App Service B1 (zip of the standalone build)           | Not provisioned                                           | Azure CLI, Node.js 24, pnpm                                                                |
+
+Whichever option you use, Message Center needs a database, Microsoft Graph credentials, and (recommended) sign-in. See [Configuration](#configuration).
+
+### Vercel (production)
 
 1. Import this GitHub repository into Vercel. Vercel detects the Next.js application and uses `pnpm build`.
 2. Add environment variables in the Vercel project:
@@ -734,19 +743,89 @@ Pulse 360° is hosted on **Vercel** and can also run on other services that supp
    - Interactive Entra and NextAuth variables listed above (recommended); otherwise Message Center remains unavailable unless explicitly made public
 3. Deploy the project. The `build` script generates the Prisma client, applies configured migrations, and builds the app.
 
-**Self-host:**
+`next.config.js` produces `output: 'standalone'` everywhere except Vercel (the `VERCEL` variable is set there), so Docker and Azure builds are self-contained while Vercel keeps its own packaging.
+
+### Azure with `azd`
+
+`azure.yaml` and `infra/azd/` provision and deploy Pulse 360° with one command. They are separate from `infra/main.bicep`, which is the [App Service package deployment](#azure-app-service-package-deploy) below.
+
+**What gets created** (resource group `rg-<environment>`):
+
+- Azure Container Apps environment and app (external HTTPS ingress, 1–3 replicas, 0.5 vCPU / 1 GiB)
+- Azure Container Registry (Basic); `azd` builds the image remotely, so local Docker is not required
+- Azure Database for PostgreSQL Flexible Server (Burstable `Standard_B1ms`, version 17, 32 GiB) with an `AllowAzureServices` firewall rule
+- Key Vault (RBAC) holding `database-url`, `postgres-admin-password`, `nextauth-secret`, `cron-secret`, and the Entra client secrets
+- A user-assigned managed identity that pulls from the registry and reads Key Vault. The container app consumes secrets through Key Vault references, so no secret value appears in the template or the app configuration
+- Log Analytics (container logs) and Application Insights. The connection string is exposed as `APPLICATIONINSIGHTS_CONNECTION_STRING`; the app does not ship a telemetry SDK, so Application Insights receives data only once one is added
+- Startup and liveness probes on `/api/health`. Migrations run automatically at container start
+
+**Prerequisites:** an Azure subscription where you can create resources and role assignments (Owner, or Contributor plus User Access Administrator); [Azure CLI](https://learn.microsoft.com/cli/azure/install-azure-cli), [`azd`](https://learn.microsoft.com/azure/developer/azure-developer-cli/install-azd), and [PowerShell 7](https://learn.microsoft.com/powershell/scripting/install/installing-powershell) (`pwsh`) for the post-provision hook. Creating the Entra app registrations needs an account that can create applications; granting admin consent needs a Global Administrator, Privileged Role Administrator, or Cloud Application Administrator.
 
 ```bash
-pnpm install --prod --frozen-lockfile
+az login
+azd auth login
+azd up          # prompts for environment name, subscription, and region
+```
+
+**Post-provision hook.** After provisioning, `scripts/create-entra-app.ps1` creates or reuses two single-tenant app registrations:
+
+- **Pulse 360 - Graph reader** — app-only Microsoft Graph permissions, with admin consent attempted. Its client secret goes to Key Vault and into `AZURE_CLIENT_ID` / `AZURE_CLIENT_SECRET`.
+- **Pulse 360 - Sign-in** — interactive sign-in for Message Center, with redirect URI `https://<app>/api/auth/callback/azure-ad`. It sets the `AUTH_AZURE_AD_*` variables.
+
+Secrets are written to Key Vault only; they are never printed or stored in the `azd` environment. If the hook fails (for example, without Entra permissions), provisioning still succeeds; fix the cause and run `azd hooks run postprovision`. Pass `-SkipSignIn`, or set `SKIP_SIGNIN=true`, to skip the sign-in app; add `-RotateSecrets` to issue new secrets.
+
+**Adding Graph permissions for later features.** Permissions are configuration. The defaults live in `scripts/graph-permissions.json` (currently `ServiceMessage.Read.All`). A feature that needs more adds the permission name to that file, or you can set it per environment, then re-run the hook:
+
+```bash
+azd env set GRAPH_APPLICATION_PERMISSIONS "ServiceHealth.Read.All"
+azd hooks run postprovision
+```
+
+Names are resolved to app-role IDs against Microsoft Graph at run time. Consent is required again for newly added permissions.
+
+**Message Center sync.** `MESSAGE_CENTER_PUBLIC` defaults to `false`, so tenant data requires sign-in. The 15-minute sync runs from GitHub Actions (`sync-message-center.yml`); set the repository secrets `SYNC_URL` to `https://<app>/api/cron/sync-messages` and `CRON_SECRET` to the Key Vault `cron-secret` value (`az keyvault secret show --vault-name <vault> --name cron-secret --query value -o tsv`). Vercel Cron does not apply here.
+
+**Settings** (`azd env set NAME value`, then `azd provision`): `MESSAGE_CENTER_PUBLIC`, `POSTGRES_SKU_NAME`, `POSTGRES_SKU_TIER`, `MIN_REPLICAS`, `MAX_REPLICAS`. Redeploy code with `azd deploy`; remove everything with `azd down --purge`.
+
+**Limits to know about.** PostgreSQL uses password authentication and a public endpoint restricted to Azure services; use virtual-network integration if your policy requires private access. Message Center data is a tenant resource, so keep sign-in enabled.
+
+### Docker
+
+The root `Dockerfile` builds a multi-stage production image (Node 24, standalone Next.js output, non-root user, `HEALTHCHECK` on `/api/health`). The entrypoint applies Prisma migrations when `DATABASE_URL` is set (`RUN_MIGRATIONS=false` disables it), then starts the server.
+
+**Local run with Postgres** (loopback only, port 3000):
+
+```bash
+docker compose up --build
+curl http://localhost:3000/api/health
+```
+
+Put optional settings (Graph credentials, sign-in, `CRON_SECRET`) in a `.env` file next to `docker-compose.yml`; see `.env.example`. Compose variables `PULSE360_PORT` and `POSTGRES_PASSWORD` change the published port and local database password. Remove the data volume with `docker compose down -v`.
+
+**Single container:**
+
+```bash
+docker build -t pulse360 .
+docker run --rm -p 3000:3000 -e DATABASE_URL="postgresql://user:pass@host:5432/db?sslmode=require" pulse360
+```
+
+Terminate HTTPS at a reverse proxy or your platform's ingress, and set `NEXTAUTH_URL` to the public HTTPS origin.
+
+**Publishing to GHCR.** `.github/workflows/docker-publish.yml` is manual or tag-triggered only; it does not run on pushes or pull requests. It builds the Bicep templates and the image, smoke-tests `/api/health`, and pushes to `ghcr.io/<owner>/<repo>` when a `v*` tag is pushed or when you run it manually with **publish** enabled.
+
+### Self-host without a container
+
+```bash
+pnpm install --frozen-lockfile
 pnpm build
-pnpm start   # serves on port 3000
+node .next/standalone/server.js   # standalone output; copy public/ and .next/static alongside it
 ```
 
 Put it behind a reverse proxy (Caddy / nginx / CloudFront) with HTTPS terminated upstream. Set `NODE_ENV=production`.
 
-**Azure App Service (independent public deployment):**
+### Azure App Service (package deploy)
 
-`infra/main.bicep` provisions a dedicated Linux B1 plan and Node.js 24 web app.
+`infra/main.bicep` provisions a dedicated Linux B1 plan and Node.js 24 web app, with no database or identities.
 The plan is billable. Always pass the intended subscription explicitly:
 
 ```bash

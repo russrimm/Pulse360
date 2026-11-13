@@ -1,0 +1,43 @@
+# Local run of Pulse 360 with PostgreSQL:
+#
+#   docker compose up --build
+#   open http://localhost:3000   (health: /api/health)
+#
+# Optional settings (Graph credentials, sign-in, CRON_SECRET) can go in a
+# `.env` file next to this one; see .env.example. Variables below take
+# precedence over the same names in that file.
+services:
+  db:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: pulse360
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-pulse360}
+      POSTGRES_DB: pulse360
+    volumes:
+      - pulse360-db:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U pulse360 -d pulse360']
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    restart: unless-stopped
+
+  web:
+    build: .
+    image: pulse360:local
+    depends_on:
+      db:
+        condition: service_healthy
+    # Bound to loopback so the container is not exposed on the LAN by default.
+    ports:
+      - '127.0.0.1:${PULSE360_PORT:-3000}:3000'
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      DATABASE_URL: postgresql://pulse360:${POSTGRES_PASSWORD:-pulse360}@db:5432/pulse360
+      NEXTAUTH_URL: ${NEXTAUTH_URL:-http://localhost:3000}
+    restart: unless-stopped
+
+volumes:
+  pulse360-db:
