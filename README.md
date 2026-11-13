@@ -327,7 +327,7 @@ pnpm install
 pnpm dev
 ```
 
-Open <http://localhost:3000>. The root path redirects to `/home`.
+Open <http://localhost:3011>. The root path redirects to `/home`. `pnpm install` runs `prisma generate` (via `postinstall`) so the gitignored client in `src/generated/prisma` exists before `pnpm dev`.
 
 > **No env vars?** RSS-driven pages still work. Message Center requires Postgres and Graph configuration. It is served openly when no interactive sign-in provider is configured; configure tenant sign-in to gate it, or set `MESSAGE_CENTER_PUBLIC=false` to block it outright.
 

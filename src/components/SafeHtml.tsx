@@ -1,5 +1,3 @@
-'use client';
-
 import sanitizeHtml from 'sanitize-html';
 import { SANITIZE_CONFIG } from '@/lib/feed/sanitize';
 

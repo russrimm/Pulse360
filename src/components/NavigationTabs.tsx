@@ -6,6 +6,7 @@ import Image from 'next/image';
 import * as Popover from '@radix-ui/react-popover';
 import { ChevronDownIcon } from '@radix-ui/react-icons';
 import type { ReactNode } from 'react';
+import { useEffect, useState } from 'react';
 import { cn } from '@/lib/cn';
 
 interface NavChild {
@@ -53,7 +54,7 @@ const NAV_ITEMS: NavItem[] = [
     name: 'Release Plans',
     fullName: 'Release Plans',
     href: '/release-plans',
-    matches: ['/release-plans', '/release-plan', '/fabric-roadmap', '/azure-updates'],
+    matches: ['/release-plans', '/release-plan', '/fabric-roadmap', '/azure-update', '/m365-update'],
     icon: productIcon('/icons/planner.svg'),
     children: [
       {
@@ -73,7 +74,7 @@ const NAV_ITEMS: NavItem[] = [
       },
       {
         name: 'Fabric',
-        href: '/fabric-roadmap',
+        href: '/release-plans/fabric',
         icon: productIcon('/icons/fabric_48_color.svg'),
       },
     ],
@@ -148,12 +149,99 @@ function isItemActive(item: NavItem, pathname: string): boolean {
   return item.matches.some(match => pathname === match || pathname.startsWith(`${match}/`));
 }
 
+function MobileMenu({ pathname }: { pathname: string }) {
+  const [openPath, setOpenPath] = useState<string | null>(null);
+  const isOpen = openPath === pathname;
+  const activeItem = NAV_ITEMS.find(item => isItemActive(item, pathname));
+
+  // Closing on route change comes for free: openPath no longer equals pathname.
+  useEffect(() => {
+    if (!isOpen) return;
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setOpenPath(null);
+    };
+    document.addEventListener('keydown', onKeyDown);
+    return () => document.removeEventListener('keydown', onKeyDown);
+  }, [isOpen]);
+
+  return (
+    <div className="md:hidden">
+      <button
+        type="button"
+        aria-expanded={isOpen}
+        aria-controls="mobile-sections-menu"
+        onClick={() => setOpenPath(isOpen ? null : pathname)}
+        className={cn(
+          'flex min-h-11 w-full items-center justify-between gap-2 rounded-lg px-3 text-sm font-medium text-ink',
+          focusRing
+        )}
+      >
+        <span className="flex min-w-0 items-center gap-2">
+          <span className="text-accent">{activeItem?.icon ?? NAV_ITEMS[0]?.icon}</span>
+          <span className="truncate">{activeItem?.name ?? 'Menu'}</span>
+        </span>
+        <span className="flex items-center gap-1 text-ink-muted">
+          Menu
+          <ChevronDownIcon
+            className={cn('h-4 w-4 transition-transform', isOpen && 'rotate-180')}
+            aria-hidden="true"
+          />
+        </span>
+      </button>
+      {isOpen ? (
+        <div
+          id="mobile-sections-menu"
+          className="mb-2 flex flex-col gap-0.5 rounded-xl border border-line bg-surface-raised p-1.5 shadow-lg"
+        >
+          {NAV_ITEMS.map(item => {
+            const active = isItemActive(item, pathname);
+            return (
+              <div key={item.href} className="flex flex-col">
+                <Link
+                  href={item.href}
+                  aria-current={pathname === item.href ? 'page' : undefined}
+                  className={cn(
+                    'flex min-h-11 items-center gap-3 rounded-lg px-3 text-sm font-medium',
+                    focusRing,
+                    active ? 'bg-accent-soft text-accent-ink' : 'text-ink hover:bg-surface-sunken'
+                  )}
+                >
+                  <span className={active ? 'text-accent' : 'text-ink-subtle'}>{item.icon}</span>
+                  {item.fullName}
+                </Link>
+                {item.children?.map(child => (
+                  <Link
+                    key={child.href}
+                    href={child.href}
+                    aria-current={pathname === child.href ? 'page' : undefined}
+                    className={cn(
+                      'ml-8 flex min-h-11 items-center gap-3 rounded-lg px-3 text-sm',
+                      focusRing,
+                      pathname === child.href
+                        ? 'bg-accent-soft font-medium text-accent-ink'
+                        : 'text-ink-muted hover:bg-surface-sunken hover:text-ink'
+                    )}
+                  >
+                    <span className="shrink-0">{child.icon}</span>
+                    <span className="min-w-0 break-words">{child.name}</span>
+                  </Link>
+                ))}
+              </div>
+            );
+          })}
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
 export function NavigationTabs() {
   const pathname = usePathname();
 
   return (
     <nav aria-label="Sections" className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-      <div className="scrollbar-hide -mx-1 flex snap-x items-center gap-1 overflow-x-auto px-1 pb-2">
+      <MobileMenu pathname={pathname} />
+      <div className="scrollbar-hide -mx-1 hidden snap-x items-center gap-1 overflow-x-auto px-1 pb-2 md:flex">
         {NAV_ITEMS.map(item => {
           const active = isItemActive(item, pathname);
           const children = item.children;
@@ -164,7 +252,6 @@ export function NavigationTabs() {
                 key={item.href}
                 href={item.href}
                 title={item.fullName}
-                aria-label={item.fullName}
                 aria-current={active ? 'page' : undefined}
                 className={cn(pillBase, focusRing, active ? pillActive : pillIdle)}
               >
@@ -180,7 +267,6 @@ export function NavigationTabs() {
                 <Link
                   href={item.href}
                   title={item.fullName}
-                  aria-label={item.fullName}
                   aria-current={active ? 'page' : undefined}
                   className={cn('flex items-center gap-2 rounded-full', focusRing)}
                 >

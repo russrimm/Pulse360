@@ -1,32 +1,13 @@
-'use client';
-
 import { format } from 'date-fns';
 import { SafeHtml } from '@/components/SafeHtml';
 import Link from 'next/link';
 import Image from 'next/image';
 import { SurfaceCard } from './SurfaceCard';
 import { StatusChip, type ChipTone } from './StatusChip';
-
-interface M365Update {
-  id: string;
-  title: string;
-  content: string;
-  product: string;
-  status: string;
-  published: string;
-  lastUpdated: string;
-  tags: string[];
-  service: string[];
-  generalAvailabilityDate: string;
-  previewAvailabilityDate: string;
-  cloudInstances: string[];
-  platforms: string[];
-  releaseRings: string[];
-}
+import type { M365Update } from '@/lib/types';
 
 interface M365UpdateCardProps {
   update: M365Update;
-  onClick: (id: string) => void;
 }
 
 const serviceIcons: Record<string, string> = {
@@ -97,7 +78,7 @@ function statusTone(status: string): ChipTone {
   return STATUS_TONES.find(entry => lower.includes(entry.match))?.tone ?? 'neutral';
 }
 
-export const M365UpdateCard: React.FC<M365UpdateCardProps> = ({ update, onClick }) => {
+export const M365UpdateCard: React.FC<M365UpdateCardProps> = ({ update }) => {
   // Deduplicate and normalize services
   const uniqueServices = Array.from(new Set(update.service));
   const isUpdated =
@@ -106,7 +87,7 @@ export const M365UpdateCard: React.FC<M365UpdateCardProps> = ({ update, onClick 
 
   return (
     <Link href={`/m365-update/${update.id}`} className="group block h-full min-w-0">
-      <SurfaceCard interactive className="gap-2.5" onClick={() => onClick(update.id)}>
+      <SurfaceCard interactive className="gap-2.5">
         {update.status || update.generalAvailabilityDate ? (
           <div className="flex flex-wrap items-center gap-1.5">
             {update.status ? (

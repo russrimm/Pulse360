@@ -174,6 +174,7 @@ export function MessageList({ messages: messagesProp }: MessageListProps) {
               onFilterChange={setSelectedServices}
               isOpen={openFilter === 'product'}
               setOpen={open => setOpenFilter(open ? 'product' : null)}
+              persistKey="message-center-filters"
             />
           </div>
           <div className="w-full md:w-auto">

@@ -7,7 +7,7 @@ export default function Loading() {
   ];
 
   return (
-    <main
+    <div
       className="relative min-h-full overflow-hidden bg-slate-50 text-slate-950 dark:bg-neutral-950 dark:text-white"
       aria-busy="true"
       aria-live="polite"
@@ -112,6 +112,6 @@ export default function Loading() {
           </div>
         </section>
       </div>
-    </main>
+    </div>
   );
 }

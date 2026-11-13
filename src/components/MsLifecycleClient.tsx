@@ -328,6 +328,7 @@ function LifecycleGrid({
       <div className="mb-2 flex flex-col gap-2 sm:flex-row">
         <input
           type="search"
+          aria-label={searchPlaceholder}
           value={search}
           onChange={event => {
             setSearch(event.target.value);

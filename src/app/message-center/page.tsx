@@ -2,8 +2,14 @@ import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 import { HomeContent } from '@/components/HomeContent';
 import { FilterProvider } from '@/components/FilterContext';
-import { getMessages, getMessageSyncMetadata } from '@/lib/api.server';
+import { MessageCenterStatus } from '@/components/MessageCenterStatus';
+import {
+  getMessages,
+  getMessageSyncMetadata,
+  isMessageCenterSyncConfigured,
+} from '@/lib/api.server';
 import { getMessageCenterAccess } from '@/lib/message-center-auth';
+import { resolveMessageCenterViewState } from '@/lib/message-center-state';
 
 export const dynamic = 'force-dynamic';
 
@@ -30,17 +36,26 @@ export default async function MessageCenterPage() {
     redirect('/api/auth/signin?callbackUrl=%2Fmessage-center');
   }
 
-  const [messagesResult, syncMetadata] = await Promise.all([
-    getMessages().then(
-      messages => ({ messages, hasError: false }),
-      (error: unknown) => {
-        console.error('Message Center list query failed:', error);
-        return { messages: [], hasError: true };
-      }
-    ),
-    getMessageSyncMetadata(),
-  ]);
+  const hasDatabaseUrl = Boolean(process.env.DATABASE_URL);
+  const [messagesResult, syncMetadata] = hasDatabaseUrl
+    ? await Promise.all([
+        getMessages().then(
+          messages => ({ messages, hasError: false }),
+          (error: unknown) => {
+            console.error('Message Center list query failed:', error);
+            return { messages: [], hasError: true };
+          }
+        ),
+        getMessageSyncMetadata(),
+      ])
+    : [{ messages: [], hasError: false }, { lastSyncAt: null, isStale: true }];
   const { messages, hasError } = messagesResult;
+  const viewState = resolveMessageCenterViewState({
+    hasDatabaseUrl,
+    isSyncConfigured: isMessageCenterSyncConfigured(),
+    hasQueryError: hasError,
+    messageCount: messages.length,
+  });
   const formattedSyncTime = syncMetadata.lastSyncAt
     ? `${new Date(syncMetadata.lastSyncAt).toLocaleString('en-US', {
         dateStyle: 'medium',
@@ -60,34 +75,36 @@ export default async function MessageCenterPage() {
           </p>
           <p className="type-meta mt-3 flex flex-wrap items-center gap-x-2 gap-y-1 text-ink-subtle">
             <span>Source: Microsoft Graph Message Center for the configured tenant.</span>
-            <span aria-hidden="true" className="text-line-strong">
-              &middot;
-            </span>
-            <span>
-              Last successful sync:{' '}
-              <time className="whitespace-nowrap" dateTime={syncMetadata.lastSyncAt ?? undefined}>
-                {formattedSyncTime}
-              </time>
-              {syncMetadata.isStale ? ' — data may be stale.' : ''}
-            </span>
+            {hasDatabaseUrl ? (
+              <>
+                <span aria-hidden="true" className="text-line-strong">
+                  &middot;
+                </span>
+                <span>
+                  Last successful sync:{' '}
+                  <time
+                    className="whitespace-nowrap"
+                    dateTime={syncMetadata.lastSyncAt ?? undefined}
+                  >
+                    {formattedSyncTime}
+                  </time>
+                  {syncMetadata.isStale ? ' — data may be stale.' : ''}
+                </span>
+              </>
+            ) : null}
           </p>
           <p className="type-meta mt-1 text-ink-subtle">
             Message Center posts vary by tenant; always use your tenant&apos;s Message Center as the
             source of truth.
           </p>
         </header>
-        {hasError ? (
-          <div
-            className="type-body-sm mb-8 rounded-xl border border-warn/30 bg-warn-soft px-4 py-3 text-warn-ink"
-            role="alert"
-          >
-            Message Center data is temporarily unavailable while the database wakes up. Refresh in a
-            few seconds.
-          </div>
-        ) : null}
-        <FilterProvider>
-          <HomeContent messages={messages} />
-        </FilterProvider>
+        {viewState === 'ready' ? (
+          <FilterProvider>
+            <HomeContent messages={messages} />
+          </FilterProvider>
+        ) : (
+          <MessageCenterStatus state={viewState} />
+        )}
       </div>
     </div>
   );

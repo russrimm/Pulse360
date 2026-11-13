@@ -1,9 +1,75 @@
 import { ArrowUpRightIcon, CalendarDaysIcon } from '@heroicons/react/24/outline';
+import type { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
+import { getAzureUpdateSummaries, getM365UpdateSummaries } from '@/lib/update-summaries';
 
-// Home hub page: static card grid linking to key sections
-export default function HomePage() {
+export const revalidate = 3600;
+
+export const metadata: Metadata = {
+  title: 'Pulse 360° | Microsoft updates, one view',
+  description:
+    'Microsoft cloud news, roadmaps, lifecycle dates, security updates, and tenant Message Center changes in one place.',
+};
+
+interface LatestItem {
+  id: string;
+  title: string;
+  href: string;
+  date: string;
+}
+
+const LATEST_COUNT = 5;
+
+async function loadLatest(
+  load: () => Promise<Array<{ id: string; title: string; date: string }>>,
+  hrefFor: (id: string) => string
+): Promise<LatestItem[]> {
+  try {
+    const items = await load();
+    return items
+      .toSorted((a, b) => Date.parse(b.date) - Date.parse(a.date))
+      .slice(0, LATEST_COUNT)
+      .map(item => ({ ...item, href: hrefFor(item.id) }));
+  } catch {
+    return [];
+  }
+}
+
+function formatDay(iso: string): string {
+  const parsed = new Date(iso);
+  return Number.isNaN(parsed.getTime())
+    ? ''
+    : parsed.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+}
+
+// Home hub page: card grid linking to key sections plus a "what changed" strip
+export default async function HomePage() {
+  const [latestM365, latestAzure] = await Promise.all([
+    loadLatest(
+      async () =>
+        (await getM365UpdateSummaries()).map(update => ({
+          id: update.id,
+          title: update.title,
+          date: update.published,
+        })),
+      id => `/m365-update/${id}`
+    ),
+    loadLatest(
+      async () =>
+        (await getAzureUpdateSummaries()).map(update => ({
+          id: update.id,
+          title: update.title,
+          date: update.modified,
+        })),
+      id => `/azure-update/${id}`
+    ),
+  ]);
+  const latestSections = [
+    { heading: 'Latest Microsoft 365 updates', href: '/release-plans/m365', items: latestM365 },
+    { heading: 'Latest Azure updates', href: '/release-plans/azure', items: latestAzure },
+  ].filter(section => section.items.length > 0);
+
   const cards = [
     {
       href: '/message-center',
@@ -45,7 +111,7 @@ export default function HomePage() {
   };
 
   return (
-    <main className="relative min-h-full overflow-hidden bg-canvas text-ink">
+    <div className="relative min-h-full overflow-hidden bg-canvas text-ink">
       <div
         className="pointer-events-none absolute inset-0 opacity-60 dark:opacity-20"
         style={{
@@ -71,11 +137,10 @@ export default function HomePage() {
             Explore Pulse 360
           </h2>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {cards.map((card, idx) => (
+            {cards.map(card => (
               <Link
                 key={card.href}
                 href={card.href}
-                aria-labelledby={`card-${idx}-title`}
                 className={`group relative flex min-h-64 flex-col overflow-hidden rounded-xl border border-line bg-surface p-5 shadow-[0_1px_2px_rgba(15,23,42,0.04)] transition duration-300 hover:-translate-y-1 hover:border-accent/40 hover:shadow-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-accent dark:shadow-none ${
                   card.href === '/ms-lifecycle' ? 'sm:col-span-2 lg:col-span-4 lg:min-h-52' : ''
                 }`}
@@ -110,7 +175,7 @@ export default function HomePage() {
                   )}
 
                   <div className={card.href === '/ms-lifecycle' ? 'max-w-2xl' : 'pt-6'}>
-                    <h3 id={`card-${idx}-title`} className="type-h3 text-ink">
+                    <h3 className="type-h3 text-ink">
                       {card.title}
                     </h3>
                     <p className="type-body-sm mt-2 text-ink-muted">{card.description}</p>
@@ -128,7 +193,46 @@ export default function HomePage() {
             ))}
           </div>
         </section>
+
+        {latestSections.length > 0 ? (
+          <section aria-labelledby="latest-heading" className="mt-12">
+            <h2 id="latest-heading" className="type-h2 mb-4 text-ink">
+              What changed recently
+            </h2>
+            <div className="grid gap-4 md:grid-cols-2">
+              {latestSections.map(section => (
+                <div
+                  key={section.href}
+                  className="rounded-xl border border-line bg-surface p-5 shadow-[0_1px_2px_rgba(15,23,42,0.04)] dark:shadow-none"
+                >
+                  <div className="mb-3 flex items-baseline justify-between gap-2">
+                    <h3 className="type-h3 text-ink">{section.heading}</h3>
+                    <Link
+                      href={section.href}
+                      className="type-body-sm font-medium text-accent-ink hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+                    >
+                      View all
+                    </Link>
+                  </div>
+                  <ul className="divide-y divide-line">
+                    {section.items.map(item => (
+                      <li key={item.id} className="py-2.5">
+                        <Link
+                          href={item.href}
+                          className="type-body-sm line-clamp-2 font-medium text-ink hover:text-accent-ink focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+                        >
+                          {item.title}
+                        </Link>
+                        <p className="type-meta mt-0.5 text-ink-subtle">{formatDay(item.date)}</p>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+            </div>
+          </section>
+        ) : null}
       </div>
-    </main>
+    </div>
   );
 }

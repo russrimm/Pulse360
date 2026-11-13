@@ -1,4 +1,5 @@
 "use client";
+import { useState } from 'react';
 import Image from 'next/image';
 import { getProductIcon } from '@/lib/getProductIcon';
 import { getMsrcFieldValue, getMsrcImpact, getMsrcSeverity } from '@/lib/msrc';
@@ -59,7 +60,15 @@ export default function CVECard({ vuln, productTree }: CVECardProps) {
   const cardSeverity = getMsrcSeverity(vuln.Threats);
   const cardImpact = getMsrcImpact(vuln.Threats);
   const tone = severityTone(cardSeverity);
-
+  // Product rows are the bulk of the DOM; only render them once expanded.
+  const [isOpen, setIsOpen] = useState(false);
+  const productRowCount = Array.isArray(vuln.ProductStatuses)
+    ? vuln.ProductStatuses.reduce(
+        (total: number, status: { ProductID?: unknown }) =>
+          total + (Array.isArray(status.ProductID) ? status.ProductID.length : 1),
+        0
+      )
+    : 0;
   return (
     <SurfaceCard
       as="article"
@@ -86,7 +95,20 @@ export default function CVECard({ vuln, productTree }: CVECardProps) {
         </div>
       </div>
       <p className="type-meta font-medium text-ink-subtle">{cveIdentifier}</p>
-      <div className="-mr-4 -mb-4 mt-1 overflow-x-auto rounded-tl-lg border-t border-l border-line">
+      <details
+        className="group mt-1 rounded-lg border border-line"
+        onToggle={event => setIsOpen(event.currentTarget.open)}
+      >
+        <summary className="type-body-sm flex min-h-11 cursor-pointer items-center justify-between gap-2 px-3 font-medium text-ink hover:bg-surface-sunken focus:outline-none focus-visible:ring-2 focus-visible:ring-accent">
+          <span>
+            Affected products{' '}
+            <span className="text-ink-subtle">({productRowCount.toLocaleString('en-US')})</span>
+          </span>
+          <span aria-hidden="true" className="text-ink-subtle transition-transform group-open:rotate-180">
+            &#9662;
+          </span>
+        </summary>
+      <div className="overflow-x-auto border-t border-line">
         <table className="min-w-full text-left text-xs text-ink">
           <thead className="bg-surface-sunken text-ink-muted">
             <tr>
@@ -111,7 +133,7 @@ export default function CVECard({ vuln, productTree }: CVECardProps) {
             </tr>
           </thead>
           <tbody>
-            {Array.isArray(vuln.ProductStatuses) && vuln.ProductStatuses.length > 0 && vuln.ProductStatuses.map((status, idx) => {
+            {isOpen && Array.isArray(vuln.ProductStatuses) && vuln.ProductStatuses.length > 0 && vuln.ProductStatuses.map((status, idx) => {
                     const productIds = Array.isArray(status.ProductID) ? status.ProductID : [status.ProductID];
                     return productIds.map((pid: string, pidx: number) => {
                       const productName = getProductName(pid, productTree);
@@ -198,6 +220,7 @@ export default function CVECard({ vuln, productTree }: CVECardProps) {
                 </tbody>
               </table>
             </div>
+      </details>
     </SurfaceCard>
   );
 }

@@ -10,6 +10,10 @@ interface ProductFilterProps {
   onFilterChange: (services: string[]) => void;
   isOpen: boolean;
   setOpen: (open: boolean) => void;
+  /** Visible name of the filtered facet. Defaults to "Products". */
+  label?: string;
+  /** localStorage key used to remember the selection. Omit to disable persistence. */
+  persistKey?: string;
 }
 
 // Map of service names to their icons
@@ -101,9 +105,6 @@ const serviceIconMap: Record<string, string> = {
   'Office 365': '/icons/m365.svg',
 };
 
-// Storage key for persisting filter settings
-const STORAGE_KEY = 'message-center-filters';
-
 // Get icon for a service, using m365.svg for any 'Microsoft 365' prefix
 function getServiceIcon(service: string): string | undefined {
   if (service.startsWith('Microsoft 365')) return '/icons/m365.svg';
@@ -116,7 +117,10 @@ export function ProductFilter({
   onFilterChange,
   isOpen,
   setOpen,
+  label = 'Products',
+  persistKey,
 }: ProductFilterProps) {
+  const labelLower = label.toLowerCase();
   const [searchQuery, setSearchQuery] = useState('');
   const dropdownRef = useRef<HTMLDivElement>(null);
   const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -192,11 +196,11 @@ export function ProductFilter({
 
   // Load saved filters on mount
   useEffect(() => {
-    if (hasLoadedSavedFiltersRef.current) return;
+    if (!persistKey || hasLoadedSavedFiltersRef.current) return;
     hasLoadedSavedFiltersRef.current = true;
 
     try {
-      const savedFilters = localStorage.getItem(STORAGE_KEY);
+      const savedFilters = localStorage.getItem(persistKey);
       if (savedFilters) {
         const parsedFilters = JSON.parse(savedFilters);
         // Only apply saved filters if they exist in current services
@@ -208,10 +212,11 @@ export function ProductFilter({
     } catch (error) {
       console.error('Error loading saved filters:', error);
     }
-  }, [onFilterChange, selectedServices.length, services]);
+  }, [onFilterChange, persistKey, selectedServices.length, services]);
 
   // Save filters with debounce
   useEffect(() => {
+    if (!persistKey) return;
     if (saveTimeoutRef.current) {
       clearTimeout(saveTimeoutRef.current);
     }
@@ -219,9 +224,9 @@ export function ProductFilter({
     saveTimeoutRef.current = setTimeout(() => {
       try {
         if (selectedServices.length > 0) {
-          localStorage.setItem(STORAGE_KEY, JSON.stringify(selectedServices));
+          localStorage.setItem(persistKey, JSON.stringify(selectedServices));
         } else {
-          localStorage.removeItem(STORAGE_KEY);
+          localStorage.removeItem(persistKey);
         }
       } catch (error) {
         console.error('Error saving filters:', error);
@@ -233,7 +238,7 @@ export function ProductFilter({
         clearTimeout(saveTimeoutRef.current);
       }
     };
-  }, [selectedServices]);
+  }, [persistKey, selectedServices]);
 
   // Memoize filtered services
   const filteredServices = useMemo(
@@ -249,7 +254,7 @@ export function ProductFilter({
         onClick={() => setOpen(!isOpen)}
         aria-expanded={isOpen}
         className="relative flex min-h-9 w-full items-center justify-center gap-2 rounded-lg border border-line bg-surface px-3 text-sm font-medium text-ink shadow-sm transition-colors hover:border-line-strong hover:bg-surface-sunken focus:outline-none focus-visible:ring-2 focus-visible:ring-accent md:w-auto"
-        aria-label="Filter products"
+        aria-label={`Filter ${labelLower}`}
       >
         <svg
           className="h-4 w-4 text-ink-subtle"
@@ -265,7 +270,7 @@ export function ProductFilter({
             d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"
           />
         </svg>
-        <span>Products</span>
+        <span>{label}</span>
         {selectedServices.length > 0 && (
           <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-accent text-[11px] font-semibold text-white">
             {selectedServices.length}
@@ -277,19 +282,20 @@ export function ProductFilter({
         <div
           className="animate-fadein absolute z-50 mt-2 w-72 rounded-xl border border-line bg-surface-raised shadow-xl"
           role="dialog"
-          aria-label="Product filter options"
+          aria-label={`${label} filter options`}
           onMouseDown={e => e.stopPropagation()}
           onClick={e => e.stopPropagation()}
         >
           <div className="border-b border-line p-4">
-            <h3 className="type-body-sm font-semibold text-ink">Filter products</h3>
+            <h3 className="type-body-sm font-semibold text-ink">Filter {labelLower}</h3>
             <p className="type-meta mt-1 text-ink-subtle">
-              {selectedServices.length} product{selectedServices.length !== 1 ? 's' : ''} selected
+              {selectedServices.length} selected
             </p>
             <div className="mt-2">
               <input
                 type="text"
-                placeholder="Search products…"
+                placeholder={`Search ${labelLower}…`}
+                aria-label={`Search ${labelLower}`}
                 value={searchQuery}
                 onChange={e => setSearchQuery(e.target.value)}
                 className="w-full rounded-md border border-line bg-surface px-3 py-1.5 text-sm text-ink placeholder:text-ink-subtle focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"

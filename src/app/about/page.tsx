@@ -1,10 +1,17 @@
 import React from 'react'
+import type { Metadata } from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
 
+export const metadata: Metadata = {
+  title: 'About | Pulse 360',
+  description:
+    'About Pulse 360°: what it tracks, where the data comes from, and how to use each section.',
+}
+
 export default function AboutPage() {
   return (
-    <main className="max-w-3xl mx-auto px-4 py-12 sm:py-20 flex flex-col items-center">
+    <div className="max-w-3xl mx-auto px-4 py-12 sm:py-20 flex flex-col items-center">
       <div className="bg-white/80 dark:bg-gray-900/80 rounded-2xl shadow-xl border border-gray-200 dark:border-gray-700 p-8 w-full">
         <div className="flex flex-col items-center mb-6">
           <Image src="/icons/azure/general/10005-icon-service-Information.svg" alt="About" width={48} height={48} className="mb-2" />
@@ -95,7 +102,7 @@ export default function AboutPage() {
             name="fabric-roadmap"
             alt="Microsoft Fabric roadmap grouped into collapsible product areas with update counts"
             caption="Fabric roadmap, grouped by product area."
-            href="/fabric-roadmap"
+            href="/release-plans/fabric"
           />
 
           <h3 className="text-lg font-semibold mt-6 mb-2">📰 Product News</h3>
@@ -214,7 +221,7 @@ export default function AboutPage() {
           <p className="mt-8">Thanks for visiting! Feedback, ideas, or just want to say hi — <a href="mailto:russ.rimmerman@microsoft.com?subject=Pulse 360 Feedback" className="text-primary-600 dark:text-primary-400 underline">email me</a>.</p>
         </div>
       </div>
-    </main>
+    </div>
   )
 }
 

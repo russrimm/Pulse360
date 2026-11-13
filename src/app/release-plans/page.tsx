@@ -48,7 +48,7 @@ export default function ReleasePlansHubPage() {
   ];
 
   return (
-    <main className="relative w-full min-h-[calc(100vh-4rem)] flex flex-col items-center overflow-hidden bg-canvas pt-10 md:pt-12 pb-16">
+    <div className="relative w-full flex flex-col items-center overflow-hidden bg-canvas pt-10 md:pt-12 pb-16">
       <div className="relative w-full max-w-6xl px-4 md:px-8 flex flex-col z-0 items-center text-center">
         <header className="mb-10 md:mb-12 max-w-2xl">
           <h1 className="type-h1 text-ink">Release Plans</h1>
@@ -68,7 +68,7 @@ export default function ReleasePlansHubPage() {
                     {card.image && (
                       <Image
                         src={card.image.src}
-                        alt={card.image.alt}
+                        alt=""
                         width={160}
                         height={90}
                         className="w-32 h-auto mb-4 rounded-md shadow-sm dark:shadow-none object-contain"
@@ -87,11 +87,8 @@ export default function ReleasePlansHubPage() {
             ))}
           </div>
         </section>
-        <div className="mt-12 text-center">
-          <Link href="/home" className="type-body-sm font-medium text-accent hover:underline">← Back to Hub</Link>
-        </div>
       </div>
-    </main>
+    </div>
   );
 }
 

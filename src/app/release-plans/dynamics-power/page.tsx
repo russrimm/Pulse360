@@ -37,31 +37,26 @@ export default async function DynamicsPowerReleasePlansPage() {
 
   if (!plans || plans.length === 0) {
     return (
-      <main className="w-full flex flex-col items-center bg-white dark:bg-black pt-10 pb-24">
+      <div className="w-full flex flex-col items-center bg-canvas pt-10 pb-24">
         <div className="w-full max-w-5xl px-4 md:px-8">
           <header className="mb-8">
-            <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-gray-900 dark:text-gray-50">
-              Dynamics & Power Platform Release Plans
-            </h1>
-            <p className="mt-3 max-w-2xl text-sm md:text-base text-gray-600 dark:text-gray-400">
+            <h1 className="type-h1 text-ink">Dynamics & Power Platform Release Plans</h1>
+            <p className="type-body mt-3 max-w-2xl text-ink-muted">
               Unable to load release plan data at this time. Please try again later.
             </p>
           </header>
-          <div className="rounded-xl border border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-900/30 p-6 text-sm text-red-700 dark:text-red-300">
+          <div className="type-body-sm rounded-xl border border-critical/30 bg-critical-soft p-6 text-critical-ink" role="alert">
             The upstream Microsoft release plans feed returned no data. This can happen temporarily
             if their API changes or rate limits. We automatically fall back once data is available
             again.
           </div>
           <div className="mt-10">
-            <Link
-              href="/release-plans"
-              className="text-sm font-medium text-primary-600 dark:text-primary-400 hover:underline"
-            >
+            <Link href="/release-plans" className="type-body-sm font-medium text-accent-ink hover:underline">
               ← Back to Release Plans Hub
             </Link>
           </div>
         </div>
-      </main>
+      </div>
     );
   }
 
@@ -175,12 +170,10 @@ export default async function DynamicsPowerReleasePlansPage() {
   const dynamicsCount = dynamicsProducts.reduce((acc, p) => acc + groups[p].length, 0);
 
   return (
-    <main className="w-full flex flex-col items-center bg-gradient-to-b from-white via-gray-50 to-white dark:from-black dark:via-gray-900 dark:to-black pt-10 pb-24">
+    <div className="w-full flex flex-col items-center bg-canvas pt-10 pb-24">
       <div className="w-full max-w-7xl px-4 md:px-8">
         <header className="mb-10">
-          <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-gray-900 dark:text-gray-50">
-            Dynamics & Power Platform Roadmap
-          </h1>
+          <h1 className="type-h1 text-ink">Dynamics & Power Platform Roadmap</h1>
         </header>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-10">
@@ -225,10 +218,10 @@ export default async function DynamicsPowerReleasePlansPage() {
           )}
         </div>
 
-        <div className="mt-14 flex items-center gap-6 text-xs sm:text-sm text-gray-500 dark:text-gray-400">
+        <div className="type-body-sm mt-14 flex items-center gap-6 text-ink-subtle">
           <Link
             href="/release-plans"
-            className="font-medium text-primary-600 dark:text-primary-400 hover:underline"
+            className="font-medium text-accent-ink hover:underline"
           >
             ← Back to Release Plans Hub
           </Link>
@@ -242,6 +235,6 @@ export default async function DynamicsPowerReleasePlansPage() {
           </a>
         </div>
       </div>
-    </main>
+    </div>
   );
 }

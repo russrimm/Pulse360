@@ -111,12 +111,12 @@ test.describe('Feed pages – XSS safety + fidelity (E2E)', () => {
 
   test('azure-updates listing page responds and is safe', async ({ page }) => {
     test.skip(!serverAvailable, 'Configured test server is unavailable');
-    await assertFeedPageSafe(page, '/azure-updates');
+    await assertFeedPageSafe(page, '/release-plans/azure');
   });
 
   test('m365-updates listing page responds and is safe', async ({ page }) => {
     test.skip(!serverAvailable, 'Configured test server is unavailable');
-    await assertFeedPageSafe(page, '/m365-updates');
+    await assertFeedPageSafe(page, '/release-plans/m365');
   });
 
   test('release-plans listing page responds and is safe', async ({ page }) => {

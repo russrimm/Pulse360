@@ -1,11 +1,9 @@
-import { Metadata } from 'next';
 import { ReactQueryProvider } from '@/components/ReactQueryProvider';
+import { productNewsMetadata } from '@/lib/product-news';
 
-export const metadata: Metadata = {
-  title: 'Pulse 360 | Product News',
-  description:
-    'Stay up to date with the latest news and announcements from Microsoft Power Platform products.',
-};
+// The index route renders the first feed (Power Apps); every other feed route
+// sets its own title through a per-route layout.
+export const metadata = productNewsMetadata('/product-news');
 
 export default function ProductNewsLayout({ children }: { children: React.ReactNode }) {
   return <ReactQueryProvider>{children}</ReactQueryProvider>;

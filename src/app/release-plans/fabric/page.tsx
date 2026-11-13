@@ -1,15 +1,18 @@
 import { FabricRoadmapContent } from '@/components/FabricRoadmapContent';
 import Image from 'next/image';
 import { getFabricRoadmaps, type FabricRoadmapItem } from '@/lib/fabricApi';
+import { toExcerpt } from '@/lib/update-summaries';
 
+// List cards only show a short excerpt; the detail page loads the full text.
 function mapToReleasePlan(item: FabricRoadmapItem) {
+  const excerpt = toExcerpt(item.FeatureDescription);
   return {
     id: item.ReleaseItemID,
     title: item.FeatureName,
-    content: item.FeatureDescription,
+    content: excerpt,
     product: item.ProductName,
     investmentArea: '',
-    businessValue: item.FeatureDescription,
+    businessValue: excerpt,
     enabledFor: '',
     publicPreviewDate: item.ReleaseDate,
     gaDate: item.ReleaseDate,
@@ -58,14 +61,14 @@ export default async function FabricReleasePlansPage() {
         <div className="flex flex-col items-center justify-center mb-8 gap-4">
           <Image src="/icons/fabric_48_color.svg" alt="Fabric" width={48} height={48} className="w-12 h-12 mb-2" loading="lazy" />
           <div className="text-center">
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">Microsoft Fabric Roadmap</h1>
-            <p className="text-gray-600 dark:text-gray-400">Browse upcoming and shipped features from the Microsoft Fabric public roadmap.</p>
+            <h1 className="type-h1 text-ink">Microsoft Fabric Roadmap</h1>
+            <p className="type-body mt-2 text-ink-muted">Browse upcoming and shipped features from the Microsoft Fabric public roadmap.</p>
           </div>
         </div>
         {failedProductIds.length > 0 && (
           <p
             role="status"
-            className="mb-6 rounded-lg border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-900 dark:border-amber-700 dark:bg-amber-950/40 dark:text-amber-200"
+            className="type-body-sm mb-6 rounded-lg border border-warn/30 bg-warn-soft px-4 py-3 text-warn-ink"
           >
             Some Fabric roadmap product areas are temporarily unavailable. Showing data from the
             remaining sources.
