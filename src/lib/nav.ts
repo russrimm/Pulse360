@@ -49,6 +49,13 @@ export const NAV_ITEMS: NavItem[] = [
     icon: image('/icons/m365.svg'),
   },
   {
+    name: 'Briefing',
+    fullName: 'Weekly Customer Briefing',
+    href: '/briefing',
+    matches: ['/briefing'],
+    icon: image('/icons/PowerPlatform_scalable.svg'),
+  },
+  {
     name: 'Release Plans',
     fullName: 'Release Plans',
     href: '/release-plans',

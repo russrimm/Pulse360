@@ -50,6 +50,7 @@ _The Pulse 360° landing dashboard. More captures in [Screenshots](#screenshots)
 Pulse 360° pulls signals from the official Microsoft update channels and renders them in a consistent UI with the same filtering, search, and drill-through behavior across every product area:
 
 - **Microsoft 365 Message Center** — live tenant messages via Microsoft Graph (`/admin/serviceAnnouncement/messages`)
+- **Weekly Customer Briefing** — a Power Platform / Copilot Studio briefing built from Message Center (action-needed first), with an editable draft, Outlook-safe email HTML, and a one-click 7-day digest export (CSV, Markdown, JSON)
 - **MSRC Security Updates** — official CVRF data from `api.msrc.microsoft.com`, with month picker, per-CVE cards, KB articles, downloads, weakness (CWE) info, and revision history
 - **Release Plans** — the AI at Work roadmap (formerly the Microsoft 365 roadmap; now includes Dynamics 365, Power Platform, and Dataverse), Azure, and Fabric release planners
 - **Fabric & Power Platform Roadmap** — grouped by product, collapsible, drill-through detail pages
@@ -576,6 +577,7 @@ Pulse 360 uses Postgres via Prisma to **cache Microsoft Graph Message Center upd
 | `/about`                         | About / contact                                                   |
 | `/message-center`                | M365 Message Center list (search, filter, badges, impact pills)   |
 | `/message/[id]`                  | Message detail                                                    |
+| `/briefing`                      | Weekly Customer Briefing (`?week=YYYY-MM-DD&scope=both\|power-platform\|copilot-studio`) |
 | `/m365-updates`                  | Legacy path — redirects to `/release-plans/m365`                  |
 | `/m365-update/[id]`              | AI at Work roadmap item detail                                    |
 | `/azure-updates`                 | Legacy path — redirects to `/release-plans/azure`                 |
@@ -620,6 +622,8 @@ All routes are under `/api/*`. The protected sync endpoint performs the only mut
 | `/api/messages`                                                                                      | Authenticated Message Center list; returns `503` when configuration or upstream data is unavailable              |
 | `/api/health`                                                                                        | Uncached application readiness and Message Center sync status                                                    |
 | `/api/cron/sync-messages`                                                                            | Bearer-protected Message Center synchronization                                                                  |
+| `/api/briefing/digest?days=7&format=csv\|json\|md`                                                    | Message Center digest of Power Platform and Copilot Studio posts (`days` 1–90). Same access gate as `/api/messages`; CSV cells that start with `=`, `+`, `-`, or `@` are prefixed with `'` to block formula injection |
+| `/api/cron/briefing-snapshot`                                                                        | Bearer-protected Monday job that upserts the week's briefing items per product into `BriefingSnapshot` (`?week=YYYY-MM-DD` Monday to re-run a week) |
 | `/api/image-proxy?url=https://...`                                                                   | Allowlisted Microsoft image proxy; rejects redirects, non-images, SVG, and oversized responses                  |
 | `/api/mslifecycle`                                                                                   | Cached Microsoft Lifecycle data with stale-data fallback                                                         |
 | `/api/msrc?monthId=YYYY-Mmm`                                                                         | Proxies MSRC CVRF months list or a specific month; validates `monthId` strictly                                  |
@@ -644,6 +648,8 @@ All routes are under `/api/*`. The protected sync endpoint performs the only mut
 - **Global search.** Every list page has a search bar. Matching is case- and whitespace-insensitive against title, product name, and (where applicable) message ID.
 - **Filters.** Product, Area, Date, and Major Changes filters live above each list. Message Center filters are reflected in the URL so filtered views can be bookmarked and shared.
 - **Lifecycle export.** The Microsoft Lifecycle page exports the current filtered rows and visible columns as CSV.
+- **Weekly briefing.** `/briefing` drafts a Power Platform / Copilot Studio email for a Monday week key (UTC). The briefing covers the seven days before that Monday (start inclusive, end exclusive), puts action-needed items first, and lets you edit the greeting, introduction, closing, and per-item summaries or drop items. **Copy for Outlook** writes rich HTML plus plain text with `ClipboardItem` (falling back to `execCommand('copy')`); Message Center HTML is sanitized before it enters the email. Past weeks load from the Monday snapshot when one exists. The Message Center page also has an **Export 7-day digest** button. Both require the same access as Message Center (sign-in or `MESSAGE_CENTER_PUBLIC`), and `BriefingSnapshot` needs `DATABASE_URL` and `pnpm prisma migrate deploy` (done by `pnpm build`).
+- **Release plan section.** The briefing's "Coming soon" section reads through a small provider interface (`src/lib/briefing/release-plan.ts`). Release Planner (`releaseplans.microsoft.com`) is retired and redirects to the Microsoft 365 roadmap page, so the default provider currently returns nothing and the email says the source is unavailable instead of silently omitting the section.
 - **Drill-through.** Every card is fully clickable. Detail pages preserve the product tab and impact context — see the [detail drill-through screenshot](#detail-drill-through).
 - **MSRC month picker.** `/msrc` exposes a dropdown of every month MSRC has published a CVRF report for. Pick a month → the page re-fetches the per-month CVE bundle. Each CVE expands to show product, max severity, KB article links, downloads, weakness (CWE), and revision history.
 - **Theme.** Use the toggle in the top-right to switch light / dark / system.

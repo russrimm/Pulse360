@@ -15,6 +15,7 @@ test('entries are unique, rooted, and cover the shipped sections', () => {
   expect(hrefs).toEqual([
     '/home',
     '/message-center',
+    '/briefing',
     '/release-plans',
     '/product-news',
     '/security',
