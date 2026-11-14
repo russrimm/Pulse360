@@ -35,6 +35,10 @@ yarn-error.log*
 # vercel
 .vercel
 
+# azd environments (the committed deployment plan stays tracked)
+/.azure/*
+!/.azure/deployment-plan.md
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts 

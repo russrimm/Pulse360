@@ -1,0 +1,28 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "environmentName": { "value": "${AZURE_ENV_NAME}" },
+    "location": { "value": "${AZURE_LOCATION}" },
+    "principalId": { "value": "${AZURE_PRINCIPAL_ID}" },
+    "webImageName": { "value": "${SERVICE_WEB_IMAGE_NAME}" },
+    "postgresAdminPassword": {
+      "value": "$(secretOrRandomPassword ${AZURE_KEY_VAULT_NAME} postgres-admin-password)"
+    },
+    "nextAuthSecret": {
+      "value": "$(secretOrRandomPassword ${AZURE_KEY_VAULT_NAME} nextauth-secret)"
+    },
+    "cronSecret": {
+      "value": "$(secretOrRandomPassword ${AZURE_KEY_VAULT_NAME} cron-secret)"
+    },
+    "graphClientId": { "value": "${GRAPH_CLIENT_ID}" },
+    "graphCredentialsReady": { "value": "${GRAPH_CREDENTIALS_READY=false}" },
+    "signInClientId": { "value": "${SIGNIN_CLIENT_ID}" },
+    "signInCredentialsReady": { "value": "${SIGNIN_CREDENTIALS_READY=false}" },
+    "messageCenterPublic": { "value": "${MESSAGE_CENTER_PUBLIC=false}" },
+    "postgresSkuName": { "value": "${POSTGRES_SKU_NAME=Standard_B1ms}" },
+    "postgresSkuTier": { "value": "${POSTGRES_SKU_TIER=Burstable}" },
+    "minReplicas": { "value": "${MIN_REPLICAS=1}" },
+    "maxReplicas": { "value": "${MAX_REPLICAS=3}" }
+  }
+}
