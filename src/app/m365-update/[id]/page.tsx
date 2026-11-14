@@ -58,6 +58,18 @@ const serviceIcons: Record<string, string> = {
   'Windows 365': '/icons/Windows.svg',
   'Microsoft Defender for Office 365': '/icons/defender.svg',
   'Microsoft Defender for Cloud Apps': '/icons/defender.svg',
+  'Dynamics 365 Sales': '/icons/Sales_scalable.svg',
+  'Dynamics 365 Customer Service': '/icons/CustomerService_scalable.svg',
+  'Dynamics 365 Contact Center': '/icons/ContactCenter_scalable.svg',
+  'Dynamics 365 Field Service': '/icons/FieldService_scalable.svg',
+  'Dynamics 365 Finance': '/icons/Finance_scalable.svg',
+  'Dynamics 365 Supply Chain Management': '/icons/SupplyChainManagement_scalable.svg',
+  'Dynamics 365 Project Operations': '/icons/ProjectOperations_scalable.svg',
+  'Dynamics 365 Human Resources': '/icons/CoreHR_scalable.svg',
+  'Dynamics 365 Commerce': '/icons/Commerce_scalable.svg',
+  'Dynamics 365 Business Central': '/icons/BusinessCentral_scalable.svg',
+  'Dynamics 365 Customer Insights - Data': '/icons/CustomerInsights_scalable.svg',
+  'Dynamics 365 Customer Insights - Journeys': '/icons/CustomerInsights_scalable.svg',
 };
 
 interface M365UpdatePageProps {
@@ -69,7 +81,7 @@ const getCachedM365Update = cache(getM365Update);
 export async function generateMetadata({ params }: M365UpdatePageProps): Promise<Metadata> {
   const { id } = await params;
   const update = await getCachedM365Update(id);
-  if (!update) return buildMissingDetailMetadata('Microsoft 365 update');
+  if (!update) return buildMissingDetailMetadata('AI at Work roadmap item');
 
   return buildDetailMetadata({
     title: update.title,
@@ -105,7 +117,7 @@ export default async function M365UpdatePage({ params }: M365UpdatePageProps) {
                 d="M10 19l-7-7m0 0l7-7m-7 7h18"
               />
             </svg>
-            Back to Microsoft 365 Updates
+            Back to AI at Work roadmap
           </Link>
         </div>
         <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">

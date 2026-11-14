@@ -13,6 +13,7 @@ import { getFabricRoadmaps, parseFabricRoadmapPayload } from '../src/lib/fabricA
 import { buildDetailMetadata, buildMissingDetailMetadata } from '../src/lib/detailMetadata';
 import { normalizeFeedText } from '../src/lib/feed/text';
 import { parseGraphDate } from '../src/lib/graph';
+import { getRoadmapFamilies, getRoadmapFamily } from '../src/lib/roadmap-families';
 import { readBoundedResponseText } from '../src/lib/feed/response';
 import { formatCalendarDate, parseCalendarDate } from '../src/lib/date';
 import { resolveMessageCenterAccess } from '../src/lib/message-center-access';
@@ -360,5 +361,24 @@ test.describe('Graph date normalization', () => {
     expect(parseGraphDate('not-a-date')).toBeNull();
     expect(parseGraphDate(null)).toBeNull();
     expect(parseGraphDate('2026-07-31T12:00:00Z')?.toISOString()).toBe('2026-07-31T12:00:00.000Z');
+  });
+});
+
+test.describe('AI at Work roadmap product families', () => {
+  test('groups Dynamics 365, Power Platform, and Dataverse products', () => {
+    expect(getRoadmapFamily('Dynamics 365 Business Central')).toBe('Dynamics 365');
+    expect(getRoadmapFamily('Power Apps')).toBe('Power Platform and Dataverse');
+    expect(getRoadmapFamily('Microsoft Dataverse')).toBe('Power Platform and Dataverse');
+    expect(getRoadmapFamily('Microsoft Power Platform governance and administration')).toBe(
+      'Power Platform and Dataverse'
+    );
+    expect(getRoadmapFamily('Microsoft Teams')).toBe('Microsoft 365, Copilot & other');
+    expect(getRoadmapFamily('Microsoft Copilot Studio')).toBe('Microsoft 365, Copilot & other');
+  });
+
+  test('deduplicates families across multi-product items', () => {
+    expect(
+      getRoadmapFamilies(['Dynamics 365 Sales', 'Dynamics 365 Finance', 'Microsoft Teams'])
+    ).toEqual(['Dynamics 365', 'Microsoft 365, Copilot & other']);
   });
 });

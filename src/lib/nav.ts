@@ -52,16 +52,11 @@ export const NAV_ITEMS: NavItem[] = [
     name: 'Release Plans',
     fullName: 'Release Plans',
     href: '/release-plans',
-    matches: ['/release-plans', '/release-plan', '/fabric-roadmap', '/azure-update', '/m365-update'],
+    matches: ['/release-plans', '/fabric-roadmap', '/azure-update', '/m365-update'],
     icon: image('/icons/planner.svg'),
     children: [
       { name: 'Azure', href: '/release-plans/azure', icon: image('/icons/Azure.svg') },
-      { name: 'Microsoft 365', href: '/release-plans/m365', icon: image('/icons/m365.svg') },
-      {
-        name: 'Dynamics 365 & Power Platform',
-        href: '/release-plans/dynamics-power',
-        icon: image('/icons/PowerPlatform_scalable.svg'),
-      },
+      { name: 'AI at Work', href: '/release-plans/m365', icon: image('/icons/m365.svg') },
       { name: 'Fabric', href: '/release-plans/fabric', icon: image('/icons/fabric_48_color.svg') },
     ],
   },

@@ -1,7 +1,7 @@
 /**
  * tests/feed-pages.spec.ts
  *
- * WI-05 – E2E sanity: Azure/M365/Release-Plan/Message-Center feed pages.
+ * WI-05 – E2E sanity: Azure/AI at Work roadmap/Release-Plans hub/Message-Center feed pages.
  * Playwright starts the configured local server unless PLAYWRIGHT_BASE_URL
  * points to an existing deployment.
  *
@@ -114,7 +114,7 @@ test.describe('Feed pages – XSS safety + fidelity (E2E)', () => {
     await assertFeedPageSafe(page, '/release-plans/azure');
   });
 
-  test('m365-updates listing page responds and is safe', async ({ page }) => {
+  test('ai-at-work roadmap (m365 path) listing page responds and is safe', async ({ page }) => {
     test.skip(!serverAvailable, 'Configured test server is unavailable');
     await assertFeedPageSafe(page, '/release-plans/m365');
   });
