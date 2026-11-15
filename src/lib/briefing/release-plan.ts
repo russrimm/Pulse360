@@ -1,8 +1,8 @@
 /**
  * Release plan section of the briefing, behind a small provider interface.
  *
- * releaseplans.microsoft.com (Release Planner) is retired and redirects to the
- * Microsoft 365 roadmap page, so live data may be empty. Callers must handle
+ * releaseplans.microsoft.com (Release Planner) is retired; its plans moved to the
+ * AI at Work roadmap, which is the live source, so data may still be empty. Callers must handle
  * the 'unavailable' result; the email then carries a clear note instead of a
  * silent gap.
  */
@@ -39,7 +39,7 @@ export interface ReleasePlanProvider {
 }
 
 export const RELEASE_PLAN_UNAVAILABLE_NOTE =
-  'Release plan data is currently unavailable: the Release Planner source has been retired. Check the Microsoft 365 roadmap for upcoming features.';
+  'Release plan data is currently unavailable: the AI at Work roadmap could not be reached. Check the roadmap directly for upcoming features.';
 
 /** Days after the briefing Monday that count as "coming soon". */
 export const RELEASE_PLAN_LOOKAHEAD_DAYS = 60;
