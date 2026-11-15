@@ -1,0 +1,9 @@
+{
+  "description": "Microsoft Graph application permissions that scripts/create-entra-app.ps1 grants to the Pulse 360 app registration (admin consent required). Features that call additional Graph APIs add a permission name here, or set GRAPH_APPLICATION_PERMISSIONS=Name1,Name2 with `azd env set`. Names are resolved to role IDs at run time.",
+  "graphApplicationPermissions": [
+    {
+      "name": "ServiceMessage.Read.All",
+      "purpose": "Message Center sync and /message-center"
+    }
+  ]
+}

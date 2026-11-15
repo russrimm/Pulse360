@@ -1,6 +1,9 @@
 # Auto detect text files and perform LF normalization
 * text=auto
 
+# Shell scripts run in Linux containers and must keep LF endings
+*.sh text eol=lf
+
 # Squad append-only state — union merge to avoid cross-branch conflicts
 .squad/decisions.md merge=union
 .squad/agents/*/history.md merge=union

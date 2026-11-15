@@ -1,0 +1,53 @@
+# Dependencies and build output are produced inside the image.
+node_modules
+.next
+out
+build
+coverage
+src/generated
+
+# Version control, CI, editor, and agent tooling
+.git
+.github
+.vscode
+.idea
+.cursor
+.cursorignore
+.dotfiles
+.claude
+.azure
+
+# Secrets and local environment (the committed template stays available)
+.env
+.env.*
+!.env.example
+*.pem
+
+# Deployment definitions and docs that the image does not need
+infra
+azure.yaml
+docker-compose.yml
+Dockerfile
+.dockerignore
+docs
+security-review
+screenshots
+*.md
+
+# Tests and reports
+tests
+playwright-report
+test-results
+blob-report
+playwright.config.ts
+
+# Local data exports
+*.xlsx
+security-audit-raw.json
+
+# Logs and OS junk
+npm-debug.log*
+yarn-debug.log*
+*.tsbuildinfo
+.DS_Store
+Thumbs.db

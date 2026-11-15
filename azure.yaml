@@ -1,0 +1,27 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/Azure/azure-dev/main/schemas/v1.0/azure.yaml.json
+#
+# `azd up` provisions Azure Container Apps, Key Vault, PostgreSQL, and
+# monitoring (infra/azd), builds the root Dockerfile in Azure Container
+# Registry (no local Docker needed), and deploys the image.
+name: pulse360
+infra:
+  provider: bicep
+  path: infra/azd
+  module: main
+services:
+  web:
+    project: .
+    # "docker" means the Dockerfile is the whole build; azd does not run npm.
+    language: docker
+    host: containerapp
+    docker:
+      path: ./Dockerfile
+      context: .
+      remoteBuild: true
+hooks:
+  postprovision:
+    shell: pwsh
+    run: ./scripts/create-entra-app.ps1
+    # A failure here (for example, no Entra permissions) must not undo a
+    # successful provision. Re-run later with: azd hooks run postprovision
+    continueOnError: true
