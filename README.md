@@ -51,6 +51,7 @@ Pulse 360° pulls signals from the official Microsoft update channels and render
 
 - **Microsoft 365 Message Center** — live tenant messages via Microsoft Graph (`/admin/serviceAnnouncement/messages`)
 - **Weekly Customer Briefing** — a Power Platform / Copilot Studio briefing built from Message Center (action-needed first), with an editable draft, Outlook-safe email HTML, and a one-click 7-day digest export (CSV, Markdown, JSON)
+- **Microsoft 365 Service Health** — tenant service status, incidents, and advisories via Microsoft Graph (`/admin/serviceAnnouncement/healthOverviews` and `/issues`)
 - **MSRC Security Updates** — official CVRF data from `api.msrc.microsoft.com`, with month picker, per-CVE cards, KB articles, downloads, weakness (CWE) info, and revision history
 - **Release Plans** — the AI at Work roadmap (formerly the Microsoft 365 roadmap; now includes Dynamics 365, Power Platform, and Dataverse), Azure, and Fabric release planners
 - **Fabric & Power Platform Roadmap** — grouped by product, collapsible, drill-through detail pages
@@ -497,18 +498,19 @@ AZURE_CLIENT_SECRET=replace_with_real_secret_value
 | ---------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `NEXTAUTH_URL`, `NEXTAUTH_SECRET`, `AUTH_AZURE_AD_CLIENT_ID`, `AUTH_AZURE_AD_CLIENT_SECRET`, `AUTH_AZURE_AD_TENANT_ID` | Recommended for production. Enables single-tenant sign-in and protects Message Center list/detail routes. Use an interactive app registration separate from the Graph daemon credentials. |
 | `MESSAGE_CENTER_PUBLIC`                                                                                                | Optional override. `true` allows anonymous access even when sign-in is configured. `false` blocks anonymous access (routes fail closed when sign-in is unconfigured). Unset defers to whether sign-in is configured.              |
+| `SERVICE_HEALTH_PUBLIC`                                                                                                | Same semantics as `MESSAGE_CENTER_PUBLIC`, applied to `/service-health` and `/api/service-health/m365`.                                                                                  |
 
 ### Creating the Microsoft Entra app registration
 
-The Message Center calls Microsoft Graph with the **application** permission `ServiceMessage.Read.All` (admin-consented, app-only — no user is signed in).
+The Message Center calls Microsoft Graph with the **application** permission `ServiceMessage.Read.All` (admin-consented, app-only — no user is signed in). Microsoft 365 Service Health (`/service-health`) additionally needs the **application** permission `ServiceHealth.Read.All` on the same app registration (also admin-consented).
 
 1. Sign in to the [Microsoft Entra admin center](https://entra.microsoft.com) as an admin of the tenant whose Message Center you want to surface.
 2. **Identity → Applications → App registrations → New registration.** Name it (e.g. `Pulse 360 - Message Center Reader`). Account type: **Single tenant**. Leave redirect URI blank.
 3. Copy **Application (client) ID** → `AZURE_CLIENT_ID`.
 4. Copy **Directory (tenant) ID** → `AZURE_TENANT_ID`.
 5. **Certificates & secrets → New client secret.** Copy the **Value** (you cannot see it again) → `AZURE_CLIENT_SECRET`.
-6. **API permissions → Add a permission → Microsoft Graph → Application permissions → `ServiceMessage.Read.All` → Add.**
-7. **Grant admin consent** for the directory. Without this, the token request will succeed but Graph will return `403`.
+6. **API permissions → Add a permission → Microsoft Graph → Application permissions → `ServiceMessage.Read.All` (Message Center) and `ServiceHealth.Read.All` (Service Health) → Add.**
+7. **Grant admin consent** for the directory. Without this, the token request will succeed but Graph will return `403`. Service Health shows a "Microsoft Graph denied access" message naming `ServiceHealth.Read.All` when that permission or its consent is missing.
 
 For production, create a second, single-tenant Entra app registration for interactive sign-in. Add the web redirect URI `${NEXTAUTH_URL}/api/auth/callback/azure-ad`, then set `AUTH_AZURE_AD_CLIENT_ID`, `AUTH_AZURE_AD_CLIENT_SECRET`, `AUTH_AZURE_AD_TENANT_ID`, `NEXTAUTH_URL`, and `NEXTAUTH_SECRET`. Do not reuse the app-only Graph secret.
 
@@ -578,6 +580,8 @@ Pulse 360 uses Postgres via Prisma to **cache Microsoft Graph Message Center upd
 | `/message-center`                | M365 Message Center list (search, filter, badges, impact pills)   |
 | `/message/[id]`                  | Message detail                                                    |
 | `/briefing`                      | Weekly Customer Briefing (`?week=YYYY-MM-DD&scope=both\|power-platform\|copilot-studio`) |
+| `/service-health`                | M365 Service Health: service status, incidents and advisories     |
+| `/service-health/[id]`           | Service health issue detail with Microsoft's update posts         |
 | `/m365-updates`                  | Legacy path — redirects to `/release-plans/m365`                  |
 | `/m365-update/[id]`              | AI at Work roadmap item detail                                    |
 | `/azure-updates`                 | Legacy path — redirects to `/release-plans/azure`                 |
@@ -621,6 +625,7 @@ All routes are under `/api/*`. The protected sync endpoint performs the only mut
 | ---------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
 | `/api/messages`                                                                                      | Authenticated Message Center list; returns `503` when configuration or upstream data is unavailable              |
 | `/api/health`                                                                                        | Uncached application readiness and Message Center sync status                                                    |
+| `/api/service-health/m365`                                                                           | Tenant-gated JSON snapshot of M365 Service Health (cached ~60 s); `502` when Graph denies access (`ServiceHealth.Read.All`), `429` when throttled |
 | `/api/cron/sync-messages`                                                                            | Bearer-protected Message Center synchronization                                                                  |
 | `/api/briefing/digest?days=7&format=csv\|json\|md`                                                    | Message Center digest of Power Platform and Copilot Studio posts (`days` 1–90). Same access gate as `/api/messages`; CSV cells that start with `=`, `+`, `-`, or `@` are prefixed with `'` to block formula injection |
 | `/api/cron/briefing-snapshot`                                                                        | Bearer-protected Monday job that upserts the week's briefing items per product into `BriefingSnapshot` (`?week=YYYY-MM-DD` Monday to re-run a week) |
@@ -819,6 +824,7 @@ The Graph token request failed silently. Check the Vercel logs. Common causes:
 
 - `AZURE_CLIENT_SECRET` expired — generate a new one in Entra and update the env var.
 - Admin consent for `ServiceMessage.Read.All` was never granted.
+- Admin consent for `ServiceHealth.Read.All` was never granted (Service Health shows "Microsoft Graph denied access to Service Health").
 - Wrong tenant ID.
 
 **MSRC page shows "Failed to fetch CVEs for month".**

@@ -64,6 +64,8 @@ const envSchema = z.object({
   // Parsed leniently by parseTenantPublicMode; anything but true/false is "unset".
   MESSAGE_CENTER_PUBLIC: optionalString,
   CRON_SECRET: optionalSecret,
+  // Parsed leniently by parseTenantPublicMode; same semantics as MESSAGE_CENTER_PUBLIC.
+  SERVICE_HEALTH_PUBLIC: optionalString,
 });
 
 export type Env = z.infer<typeof envSchema>;

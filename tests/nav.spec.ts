@@ -16,6 +16,7 @@ test('entries are unique, rooted, and cover the shipped sections', () => {
     '/home',
     '/message-center',
     '/briefing',
+    '/service-health',
     '/release-plans',
     '/product-news',
     '/security',
