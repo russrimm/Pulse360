@@ -39,7 +39,7 @@ export interface ReleasePlanProvider {
 }
 
 export const RELEASE_PLAN_UNAVAILABLE_NOTE =
-  'Release plan data is currently unavailable: the AI at Work roadmap could not be reached. Check the roadmap directly for upcoming features.';
+  'Release plan data is currently unavailable: the Release Planner source has been retired. Check the Microsoft 365 roadmap for upcoming features.';
 
 /** Days after the briefing Monday that count as "coming soon". */
 export const RELEASE_PLAN_LOOKAHEAD_DAYS = 60;
