@@ -64,6 +64,18 @@ const serviceIcons: Record<string, string> = {
   'Azure Databricks': '/icons/databricks.svg',
   'Exchange': '/icons/exchange.svg',
   'Microsoft Exchange': '/icons/exchange.svg',
+  'Dynamics 365 Sales': '/icons/Sales_scalable.svg',
+  'Dynamics 365 Customer Service': '/icons/CustomerService_scalable.svg',
+  'Dynamics 365 Contact Center': '/icons/ContactCenter_scalable.svg',
+  'Dynamics 365 Field Service': '/icons/FieldService_scalable.svg',
+  'Dynamics 365 Finance': '/icons/Finance_scalable.svg',
+  'Dynamics 365 Supply Chain Management': '/icons/SupplyChainManagement_scalable.svg',
+  'Dynamics 365 Project Operations': '/icons/ProjectOperations_scalable.svg',
+  'Dynamics 365 Human Resources': '/icons/CoreHR_scalable.svg',
+  'Dynamics 365 Commerce': '/icons/Commerce_scalable.svg',
+  'Dynamics 365 Business Central': '/icons/BusinessCentral_scalable.svg',
+  'Dynamics 365 Customer Insights - Data': '/icons/CustomerInsights_scalable.svg',
+  'Dynamics 365 Customer Insights - Journeys': '/icons/CustomerInsights_scalable.svg',
 };
 
 const STATUS_TONES: Array<{ match: string; tone: ChipTone }> = [

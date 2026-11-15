@@ -50,11 +50,12 @@ _The Pulse 360° landing dashboard. More captures in [Screenshots](#screenshots)
 Pulse 360° pulls signals from the official Microsoft update channels and renders them in a consistent UI with the same filtering, search, and drill-through behavior across every product area:
 
 - **Microsoft 365 Message Center** — live tenant messages via Microsoft Graph (`/admin/serviceAnnouncement/messages`)
+- **Weekly Customer Briefing** — a Power Platform / Copilot Studio briefing built from Message Center (action-needed first), with an editable draft, Outlook-safe email HTML, and a one-click 7-day digest export (CSV, Markdown, JSON)
 - **MSRC Security Updates** — official CVRF data from `api.msrc.microsoft.com`, with month picker, per-CVE cards, KB articles, downloads, weakness (CWE) info, and revision history
-- **Release Plans** — Azure, Microsoft 365, Fabric, and Dynamics / Power Platform release planners
+- **Release Plans** — the AI at Work roadmap (formerly the Microsoft 365 roadmap; now includes Dynamics 365, Power Platform, and Dataverse), Azure, and Fabric release planners
 - **Fabric & Power Platform Roadmap** — grouped by product, collapsible, drill-through detail pages
 - **Product News** — aggregated RSS/Atom feeds for Power BI, Power Apps, Power Automate, Power Platform, Microsoft News, Tech Community, Learn Blog, Copilot, Copilot Studio, Azure AI Foundry, Azure AI/ML, Semantic Kernel, VS Code, Windows, and Microsoft Fabric Blog
-- **M365 / Azure Updates** — dedicated feeds with per-item detail pages
+- **AI at Work / Azure Updates** — dedicated feeds with per-item detail pages
 - **Microsoft Product Lifecycle** — end-of-support and retirement dates from the official Microsoft Lifecycle export
 - **Global filtering and search** — Product, Area, Date, and Major Changes filters; case- and whitespace-insensitive search
 
@@ -82,19 +83,19 @@ same files back both this README and the in-app [About page](https://www.mspulse
 
 ### Release Plans hub
 
-`/release-plans` — entry point for the four release planners.
+`/release-plans` — entry point for the three release planners: AI at Work roadmap, Azure, and Fabric.
 
 | Dark                                                                      | Light                                                                       |
 | --------------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
 | ![Release Plans – Dark](public/screenshots/release-plans-dark.png) | ![Release Plans – Light](public/screenshots/release-plans-light.png) |
 
-### Microsoft 365 release plans
+### AI at Work roadmap
 
-`/release-plans/m365`
+`/release-plans/m365` — the AI at Work roadmap (formerly the Microsoft 365 roadmap). Microsoft folded the Dynamics 365, Power Platform, and Dataverse release plans into it in September 2026; use the **Product family** filter to focus on Dynamics 365 or Power Platform and Dataverse. The URL keeps its original path so existing links keep working.
 
 | Dark                                                                                  | Light                                                                                   |
 | --------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
-| ![Microsoft 365 release plans – Dark](public/screenshots/release-plans-m365-dark.png) | ![Microsoft 365 release plans – Light](public/screenshots/release-plans-m365-light.png) |
+| ![AI at Work roadmap – Dark](public/screenshots/release-plans-m365-dark.png) | ![AI at Work roadmap – Light](public/screenshots/release-plans-m365-light.png) |
 
 ### Azure release plans
 
@@ -111,22 +112,6 @@ same files back both this README and the in-app [About page](https://www.mspulse
 | Dark                                                                              | Light                                                                               |
 | ----------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------- |
 | ![Fabric release plans – Dark](public/screenshots/release-plans-fabric-dark.png) | ![Fabric release plans – Light](public/screenshots/release-plans-fabric-light.png) |
-
-### Dynamics 365 &amp; Power Platform roadmap
-
-`/release-plans/dynamics-power`
-
-| Dark                                                                                                | Light                                                                                                 |
-| ----------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
-| ![Dynamics &amp; Power Platform – Dark](public/screenshots/release-plans-dynamics-power-dark.png) | ![Dynamics &amp; Power Platform – Light](public/screenshots/release-plans-dynamics-power-light.png) |
-
-### Combined roadmap
-
-`/release-plans/roadmap` — single-column variant of the Dynamics 365 &amp; Power Platform roadmap, reachable from plan detail pages.
-
-| Dark                                                                                | Light                                                                                 |
-| ------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------- |
-| ![Combined roadmap – Dark](public/screenshots/release-plans-roadmap-dark.png) | ![Combined roadmap – Light](public/screenshots/release-plans-roadmap-light.png) |
 
 ### Fabric &amp; Power Platform roadmap
 
@@ -170,11 +155,11 @@ same files back both this README and the in-app [About page](https://www.mspulse
 
 ### Detail drill-through
 
-`/m365-update/[id]` — representative of every detail page (message, release plan, roadmap item, Azure update).
+`/m365-update/[id]` — representative of every detail page (message, roadmap item, Azure update).
 
 | Dark                                                                                | Light                                                                                 |
 | ------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------- |
-| ![M365 update detail – Dark](public/screenshots/m365-update-detail-dark.png) | ![M365 update detail – Light](public/screenshots/m365-update-detail-light.png) |
+| ![AI at Work roadmap item detail – Dark](public/screenshots/m365-update-detail-dark.png) | ![AI at Work roadmap item detail – Light](public/screenshots/m365-update-detail-light.png) |
 
 ### About
 
@@ -255,6 +240,8 @@ Key design choices:
 | `graph.microsoft.com/v1.0/admin/serviceAnnouncement/messages`                                                                                                                                                                 | M365 Message Center               | App-only OAuth (client credentials)       | 24 h                  |
 | `api.msrc.microsoft.com/cvrf/v3.0/updates` and `/cvrf/v3.0/cvrf/{monthId}`                                                                                                                                                    | MSRC CVE data                     | Public                                    | per-request           |
 | `releaseplanner.azure-api.net/fabric/fabric-json/?productId=...`                                                                                                                                                              | Fabric roadmap                    | Public                                    | no-store              |
+| `www.microsoft.com/releasecommunications/api/v2/m365` (+ `/m365/rss/{id}` for detail)                                                                                                                                         | AI at Work roadmap (incl. Dynamics 365, Power Platform, Dataverse) | Public                                    | no-store / 1 h        |
+| `www.microsoft.com/releasecommunications/api/v2/azure`                                                                                                                                                                        | Azure updates                     | Public                                    | 1 h                   |
 | `devblogs.microsoft.com/foundry/feed/`                                                                                                                                                                                        | Azure AI Foundry news             | Public RSS                                | 1 h                   |
 | `devblogs.microsoft.com/*`, `blogs.windows.com`, `blogs.microsoft.com`, `techcommunity.microsoft.com`, `azure.microsoft.com`, `cloudblogs.microsoft.com`, `powerplatform.microsoft.com`, `www.microsoft.com`, `microsoft.com` | Product News feeds                | Public RSS via `/api/proxy-rss` allowlist | 10 min edge / 1 h app |
 | `learn.microsoft.com` (HTML table scrape)                                                                                                                                                                                     | Copilot Studio release plan       | Public                                    | 1 h                   |
@@ -283,16 +270,14 @@ If an upstream is down, feed pages show an actionable retry or unavailable state
 │   │   ├── message-center/      # M365 Message Center list
 │   │   ├── message/[id]/        # Message detail
 │   │   ├── m365-updates/        # Legacy path → redirects to /release-plans/m365
-│   │   ├── m365-update/[id]/    # M365 update detail
+│   │   ├── m365-update/[id]/    # AI at Work roadmap item detail
 │   │   ├── azure-updates/       # Legacy path → redirects to /release-plans/azure
 │   │   ├── azure-update/[id]/   # Azure update detail
 │   │   ├── fabric-roadmap/      # Fabric + Power Platform roadmap
-│   │   ├── release-plans/       # Hub + /azure, /m365, /fabric, /dynamics-power, /roadmap
-│   │   ├── release-plan/[id]/   # Release plan detail
-│   │   ├── msrc/                # MSRC vulnerabilities
+│   │   ├── release-plans/       # Hub + /azure, /m365 (AI at Work roadmap), /fabric│   │   ├── msrc/                # MSRC vulnerabilities
 │   │   ├── security/            # Security overview
 │   │   ├── product-news/        # Aggregated product news + 15+ subroutes
-│   │   ├── powerplatd365/       # Legacy path → redirects to /release-plans
+│   │   ├── powerplatd365/       # Legacy path → redirects (see next.config.js)
 │   │   └── api/                 # 20+ route handlers (see below)
 │   ├── components/              # Cards, filters, lists, nav, theme toggle
 │   ├── lib/
@@ -592,19 +577,20 @@ Pulse 360 uses Postgres via Prisma to **cache Microsoft Graph Message Center upd
 | `/about`                         | About / contact                                                   |
 | `/message-center`                | M365 Message Center list (search, filter, badges, impact pills)   |
 | `/message/[id]`                  | Message detail                                                    |
+| `/briefing`                      | Weekly Customer Briefing (`?week=YYYY-MM-DD&scope=both\|power-platform\|copilot-studio`) |
 | `/m365-updates`                  | Legacy path — redirects to `/release-plans/m365`                  |
-| `/m365-update/[id]`              | M365 update detail                                                |
+| `/m365-update/[id]`              | AI at Work roadmap item detail                                    |
 | `/azure-updates`                 | Legacy path — redirects to `/release-plans/azure`                 |
 | `/azure-update/[id]`             | Azure update detail                                               |
 | `/fabric-roadmap`                | Fabric + Power Platform roadmap (grouped, collapsible)            |
 | `/fabric-roadmap/[id]`           | Roadmap item detail                                               |
 | `/release-plans`                 | Hub page                                                          |
 | `/release-plans/azure`           | Azure release planner                                             |
-| `/release-plans/m365`            | M365 release planner                                              |
+| `/release-plans/m365`            | AI at Work roadmap (incl. Dynamics 365 + Power Platform)          |
 | `/release-plans/fabric`          | Fabric release planner                                            |
-| `/release-plans/dynamics-power`  | Dynamics 365 + Power Platform release planner                     |
-| `/release-plans/roadmap`         | Combined roadmap view                                             |
-| `/release-plan/[id]`             | Release plan item detail                                          |
+| `/release-plans/dynamics-power`  | Legacy path — redirects to the AI at Work roadmap, filtered to Dynamics 365 + Power Platform |
+| `/release-plans/roadmap`         | Legacy path — same redirect as above                              |
+| `/release-plan/[id]`             | Legacy path — redirects to `/release-plans/m365`                  |
 | `/msrc`                          | MSRC CVE list with month picker                                   |
 | `/security`                      | Security overview                                                 |
 | `/product-news`                  | Aggregated product news hub                                       |
@@ -624,6 +610,7 @@ Pulse 360 uses Postgres via Prisma to **cache Microsoft Graph Message Center upd
 | `/product-news/vscode`           | VS Code blog                                                      |
 | `/product-news/windows`          | Windows blog                                                      |
 | `/powerplatd365`                 | Legacy path — redirects to `/release-plans`                       |
+| `/powerplatd365/release-plans`   | Legacy path — redirects to the AI at Work roadmap, filtered to Dynamics 365 + Power Platform |
 | `/ms-lifecycle`                  | Microsoft product lifecycle — end-of-support and retirement dates |
 
 ### API routes
@@ -635,6 +622,8 @@ All routes are under `/api/*`. The protected sync endpoint performs the only mut
 | `/api/messages`                                                                                      | Authenticated Message Center list; returns `503` when configuration or upstream data is unavailable              |
 | `/api/health`                                                                                        | Uncached application readiness and Message Center sync status                                                    |
 | `/api/cron/sync-messages`                                                                            | Bearer-protected Message Center synchronization                                                                  |
+| `/api/briefing/digest?days=7&format=csv\|json\|md`                                                    | Message Center digest of Power Platform and Copilot Studio posts (`days` 1–90). Same access gate as `/api/messages`; CSV cells that start with `=`, `+`, `-`, or `@` are prefixed with `'` to block formula injection |
+| `/api/cron/briefing-snapshot`                                                                        | Bearer-protected Monday job that upserts the week's briefing items per product into `BriefingSnapshot` (`?week=YYYY-MM-DD` Monday to re-run a week) |
 | `/api/image-proxy?url=https://...`                                                                   | Allowlisted Microsoft image proxy; rejects redirects, non-images, SVG, and oversized responses                  |
 | `/api/mslifecycle`                                                                                   | Cached Microsoft Lifecycle data with stale-data fallback                                                         |
 | `/api/msrc?monthId=YYYY-Mmm`                                                                         | Proxies MSRC CVRF months list or a specific month; validates `monthId` strictly                                  |
@@ -659,6 +648,8 @@ All routes are under `/api/*`. The protected sync endpoint performs the only mut
 - **Global search.** Every list page has a search bar. Matching is case- and whitespace-insensitive against title, product name, and (where applicable) message ID.
 - **Filters.** Product, Area, Date, and Major Changes filters live above each list. Message Center filters are reflected in the URL so filtered views can be bookmarked and shared.
 - **Lifecycle export.** The Microsoft Lifecycle page exports the current filtered rows and visible columns as CSV.
+- **Weekly briefing.** `/briefing` drafts a Power Platform / Copilot Studio email for a Monday week key (UTC). The briefing covers the seven days before that Monday (start inclusive, end exclusive), puts action-needed items first, and lets you edit the greeting, introduction, closing, and per-item summaries or drop items. **Copy for Outlook** writes rich HTML plus plain text with `ClipboardItem` (falling back to `execCommand('copy')`); Message Center HTML is sanitized before it enters the email. Past weeks load from the Monday snapshot when one exists. The Message Center page also has an **Export 7-day digest** button. Both require the same access as Message Center (sign-in or `MESSAGE_CENTER_PUBLIC`), and `BriefingSnapshot` needs `DATABASE_URL` and `pnpm prisma migrate deploy` (done by `pnpm build`).
+- **Release plan section.** The briefing's "Coming soon" section reads through a small provider interface (`src/lib/briefing/release-plan.ts`). Release Planner (`releaseplans.microsoft.com`) is retired and redirects to the Microsoft 365 roadmap page, so the default provider currently returns nothing and the email says the source is unavailable instead of silently omitting the section.
 - **Drill-through.** Every card is fully clickable. Detail pages preserve the product tab and impact context — see the [detail drill-through screenshot](#detail-drill-through).
 - **MSRC month picker.** `/msrc` exposes a dropdown of every month MSRC has published a CVRF report for. Pick a month → the page re-fetches the per-month CVE bundle. Each CVE expands to show product, max severity, KB article links, downloads, weakness (CWE), and revision history.
 - **Theme.** Use the toggle in the top-right to switch light / dark / system.
