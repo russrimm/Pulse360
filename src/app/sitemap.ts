@@ -8,7 +8,6 @@ const STATIC_ROUTES = [
   '/release-plans/azure',
   '/release-plans/m365',
   '/release-plans/fabric',
-  '/release-plans/dynamics-power',
   '/product-news',
   '/product-news/power-platform',
   '/product-news/power-automate',

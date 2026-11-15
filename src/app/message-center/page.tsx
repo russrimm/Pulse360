@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation';
 import { HomeContent } from '@/components/HomeContent';
 import { FilterProvider } from '@/components/FilterContext';
 import { MessageCenterStatus } from '@/components/MessageCenterStatus';
+import { MessageCenterDigestExport } from '@/components/MessageCenterDigestExport';
 import {
   getMessages,
   getMessageSyncMetadata,
@@ -97,6 +98,7 @@ export default async function MessageCenterPage() {
             Message Center posts vary by tenant; always use your tenant&apos;s Message Center as the
             source of truth.
           </p>
+          {hasDatabaseUrl ? <MessageCenterDigestExport /> : null}
         </header>
         {viewState === 'ready' ? (
           <FilterProvider>

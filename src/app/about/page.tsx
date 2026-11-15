@@ -55,19 +55,19 @@ export default function AboutPage() {
             href="/release-plans/azure"
           />
 
-          <h3 className="text-lg font-semibold mt-6 mb-2">🟦 Microsoft 365 Updates</h3>
+          <h3 className="text-lg font-semibold mt-6 mb-2">🟦 AI at Work Roadmap</h3>
           <p>
-            M365 service update announcements with the same search-and-filter experience as Azure Updates. Covers Exchange, Teams, SharePoint, and all M365 services.
+            The AI at Work roadmap (formerly the Microsoft 365 roadmap) with the same search-and-filter experience as Azure Updates. Covers Microsoft 365, Copilot, Teams, SharePoint, Exchange, and — since Microsoft folded the Dynamics 365 and Power Platform release plans into it in September 2026 — Dynamics 365, Power Platform, and Dataverse. Filter by product family to focus on one area.
           </p>
           <TourShot
             name="release-plans-m365"
-            alt="Microsoft 365 release plans list with search and product filters"
-            caption="Microsoft 365 updates at /release-plans/m365."
+            alt="AI at Work roadmap list with search, product family, and product filters"
+            caption="The AI at Work roadmap at /release-plans/m365."
             href="/release-plans/m365"
           />
           <TourShot
             name="m365-update-detail"
-            alt="A Microsoft 365 update detail page showing affected services, publish date, and full description"
+            alt="An AI at Work roadmap item detail page showing affected services, publish date, and full description"
             caption="Every card drills through to a full detail page."
             href="/release-plans/m365"
           />
@@ -85,12 +85,12 @@ export default function AboutPage() {
 
           <h3 className="text-lg font-semibold mt-6 mb-2">🗺️ Release Plans</h3>
           <p>
-            Forward-looking release planners for four product families — Azure, Microsoft 365, Microsoft Fabric, and Dynamics 365 / Power Platform — plus a combined roadmap view. Each plan item links to a detail page with full description, timeline, and product context.
+            Forward-looking release planners for three destinations — the AI at Work roadmap (Microsoft 365, Copilot, Dynamics 365, Power Platform, and Dataverse), Azure, and Microsoft Fabric. Each item links to a detail page with full description, timeline, and product context.
           </p>
           <TourShot
             name="release-plans"
-            alt="Release Plans hub with tiles for Power Platform & Dynamics, Azure, Microsoft 365, and Fabric"
-            caption="The Release Plans hub — four planners plus a combined roadmap."
+            alt="Release Plans hub with tiles for Azure, the AI at Work roadmap, and Fabric"
+            caption="The Release Plans hub — the AI at Work roadmap, Azure, and Fabric."
             href="/release-plans"
           />
 
@@ -157,16 +157,12 @@ export default function AboutPage() {
                 <td className="py-2 align-top">MSRC CVRF API — <code>api.msrc.microsoft.com/cvrf/v3.0</code> (public)</td>
               </tr>
               <tr className="border-b border-gray-100 dark:border-gray-800">
-                <td className="py-2 pr-4 align-top">Azure &amp; M365 Updates</td>
-                <td className="py-2 align-top">Microsoft RSS feeds via a server-side allowlisted proxy</td>
+                <td className="py-2 pr-4 align-top">Azure Updates &amp; AI at Work Roadmap</td>
+                <td className="py-2 align-top">Microsoft Release Communications API — <code>www.microsoft.com/releasecommunications/api/v2</code> (<code>/azure</code> and <code>/m365</code>, the AI at Work roadmap data including Dynamics 365, Power Platform, and Dataverse; public)</td>
               </tr>
               <tr className="border-b border-gray-100 dark:border-gray-800">
-                <td className="py-2 pr-4 align-top">Fabric / Power Platform Roadmap</td>
+                <td className="py-2 pr-4 align-top">Fabric Roadmap</td>
                 <td className="py-2 align-top">Release Planner API — <code>releaseplanner.azure-api.net</code> (public)</td>
-              </tr>
-              <tr className="border-b border-gray-100 dark:border-gray-800">
-                <td className="py-2 pr-4 align-top">Release Plans</td>
-                <td className="py-2 align-top">Release Planner API for Azure, M365, Fabric &amp; Dynamics / Power Platform (public)</td>
               </tr>
               <tr className="border-b border-gray-100 dark:border-gray-800">
                 <td className="py-2 pr-4 align-top">Product News</td>

@@ -33,16 +33,10 @@ const themes = ['dark', 'light'];
 const targets = [
   { name: 'home', path: '/home', requiredText: 'Microsoft updates, one view' },
   { name: 'message-center', path: '/message-center', requiredText: 'Filters', optional: true },
-  { name: 'release-plans', path: '/release-plans', requiredText: 'Power Platform' },
-  { name: 'release-plans-m365', path: '/release-plans/m365', requiredText: 'Showing' },
+  { name: 'release-plans', path: '/release-plans', requiredText: 'AI at Work' },
+  { name: 'release-plans-m365', path: '/release-plans/m365', requiredText: 'AI at Work Roadmap' },
   { name: 'release-plans-azure', path: '/release-plans/azure', requiredText: 'Showing' },
   { name: 'release-plans-fabric', path: '/release-plans/fabric', requiredText: 'Updates' },
-  {
-    name: 'release-plans-dynamics-power',
-    path: '/release-plans/dynamics-power',
-    requiredText: 'updates',
-  },
-  { name: 'release-plans-roadmap', path: '/release-plans/roadmap', requiredText: 'updates' },
   { name: 'fabric-roadmap', path: '/fabric-roadmap', requiredText: 'Updates' },
   { name: 'product-news', path: '/product-news', requiredText: 'Read more' },
   { name: 'msrc', path: '/msrc', requiredText: 'CVE-' },

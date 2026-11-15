@@ -71,3 +71,17 @@ model ApiUsage {
 
   @@id([day, route])
 }
+
+/// Weekly Customer Briefing archive, written by the Monday cron
+/// (/api/cron/briefing-snapshot). `weekKey` is the briefing Monday as
+/// YYYY-MM-DD (UTC); `product` is 'power-platform' or 'copilot-studio'.
+model BriefingSnapshot {
+  id        String   @id @default(cuid())
+  weekKey   String
+  product   String
+  payload   Json
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([weekKey, product])
+}

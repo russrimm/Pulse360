@@ -66,7 +66,7 @@ export default async function HomePage() {
     ),
   ]);
   const latestSections = [
-    { heading: 'Latest Microsoft 365 updates', href: '/release-plans/m365', items: latestM365 },
+    { heading: 'Latest AI at Work roadmap updates', href: '/release-plans/m365', items: latestM365 },
     { heading: 'Latest Azure updates', href: '/release-plans/azure', items: latestAzure },
   ].filter(section => section.items.length > 0);
 
@@ -79,7 +79,7 @@ export default async function HomePage() {
     {
       href: '/release-plans',
       title: 'Release Plans',
-      description: 'Track upcoming features & roadmap items',
+      description: 'Track upcoming features on the AI at Work roadmap, Azure, and Fabric',
     },
     {
       href: '/product-news',

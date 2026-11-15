@@ -14,6 +14,9 @@ const contentSecurityPolicyReportOnly = [
   // error) when delivered in a report-only policy. Add it if the policy is enforced.
 ].join('; ');
 
+const DYNAMICS_POWER_ROADMAP =
+  '/release-plans/m365?family=Dynamics+365&family=Power+Platform+and+Dataverse';
+
 const nextConfig = {
   // Standalone output is for the Azure App Service package. Vercel supplies its
   // own packaging and fails the build (missing next-server.js.nft.json) with it.
@@ -28,16 +31,25 @@ const nextConfig = {
       { source: '/azure-updates', destination: '/release-plans/azure', permanent: true },
       { source: '/m365-updates', destination: '/release-plans/m365', permanent: true },
       { source: '/powerplatd365', destination: '/release-plans', permanent: true },
+      // Dynamics 365, Power Platform, and Dataverse roadmap content moved into the
+      // AI at Work roadmap (formerly the Microsoft 365 roadmap) in September 2026.
+      {
+        source: '/release-plans/dynamics-power',
+        destination: DYNAMICS_POWER_ROADMAP,
+        permanent: true,
+      },
       {
         source: '/powerplatd365/release-plans',
-        destination: '/release-plans/dynamics-power',
+        destination: DYNAMICS_POWER_ROADMAP,
         permanent: true,
       },
       {
         source: '/release-plans/roadmap',
-        destination: '/release-plans/dynamics-power',
+        destination: DYNAMICS_POWER_ROADMAP,
         permanent: true,
       },
+      // Old Release Planner item IDs (GUIDs) do not exist on the new roadmap.
+      { source: '/release-plan/:id', destination: '/release-plans/m365', permanent: true },
     ];
   },
   async headers() {
